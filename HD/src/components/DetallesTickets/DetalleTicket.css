@@ -1,0 +1,55 @@
+.detalle-ticket {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
+
+.detalle-ticket h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.detalle-ticket .fila {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.detalle-ticket .campo {
+  flex: 1 1 45%;
+  margin: 0.5rem;
+}
+
+.detalle-ticket .campo label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+.detalle-ticket .campo span {
+  display: block;
+  color: #222;
+  background-color: #f7f7f7;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.btn-volver {
+  margin-top: 2rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-volver:hover {
+  background-color: #0056b3;
+}
