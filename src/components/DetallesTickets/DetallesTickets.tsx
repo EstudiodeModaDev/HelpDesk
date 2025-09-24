@@ -1,7 +1,8 @@
+import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
-import type { ticket } from '../../Funcionalidades/Tickets';
 
-export default function DetalleTicket({ ticket, onVolver }: { ticket: ticket, onVolver: () => void }) {
+
+export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void }) {
   if (!ticket) return <div>Ticket no encontrado</div>;
 
   const categoria = [ticket.categoria, ticket.subcategoria, ticket.articulo]
