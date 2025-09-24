@@ -1,0 +1,130 @@
+/* === Layout para sidebar fijo visible siempre === */
+.layout {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Empuja todo el contenido (header + main) cuando hay sidebar */
+.layout--withSidebar .headerRow,
+.layout--withSidebar .content {
+  margin-left: 260px;
+}
+
+/* Sidebar fijo SIEMPRE visible */
+.sidebar {
+  width: 260px;
+  background-color: #2c3e50;
+  color: white;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;                    /* <-- SIEMPRE visible */
+  z-index: 1000;
+  display: flex;              /* <-- visible */
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+  border-right: 1px solid #34495e;
+}
+
+.backdrop, .backdrop--show { display: none !important; }
+
+.sidebar__header {
+  padding: 16px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #1a252f;
+  border-bottom: 1px solid #34495e;
+}
+
+.sidebar__nav {
+  flex: 1;
+  padding: 8px 0;
+  overflow-y: auto;           /* scroll solo dentro del menú si hace falta */
+}
+
+.sideItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.sideItem:hover { background-color: #34495e; }
+.sideItem--active {
+  background-color: #1abc9c;
+  color: #fff;
+}
+.sideItem__icon { margin-right: 12px; font-size: 1.2rem; }
+
+.sidebar__footer {
+  padding: 12px 20px;
+  font-size: 0.8rem;
+  background-color: #1a252f;
+  border-top: 1px solid #34495e;
+}
+
+/* Header moderno (ajustado para sidebar fijo) */
+.headerRow {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(to right, #1f1f1f, #2c3e50);
+  color: #ffffff;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-family: 'Segoe UI', sans-serif;
+  min-height: 60px;
+}
+
+/* Hamburguesa ya no se usa si el sidebar es fijo */
+.hamburger { display: none; }
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Avatar y usuario */
+.userCluster { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  background-color: #1abc9c; color: white; border-radius: 50%;
+  width: 32px; height: 32px; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; box-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+.userInfo { display: flex; flex-direction: column; font-size: 0.85rem; }
+.btn-logout {
+  background-color: #e74c3c; color: white; border: none;
+  padding: 6px 12px; border-radius: 4px; cursor: pointer;
+}
+
+/* Contenido */
+.content {
+  padding: 16px 8px;
+  background-color: #f9f9f9;
+  min-height: calc(100vh - 60px);
+  font-family: 'Segoe UI', sans-serif;
+  transition: margin-left 0.2s ease;
+}
+/* Por claridad, mantenemos esta clase aunque ya empujamos arriba */
+.content--withSidebar { margin-left: 260px; }
+
+.center {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-align: center;
+}
+.center h2 { font-size: 1.6rem; margin-bottom: 12px; color: #2c3e50; }
+.center p  { font-size: 1rem; color: #7f8c8d; margin-bottom: 8px; }
+.muted { color: #95a5a6; font-size: 0.85rem; }
