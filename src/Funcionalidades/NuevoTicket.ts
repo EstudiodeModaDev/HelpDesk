@@ -14,8 +14,10 @@ const USUARIOS: UserOption[] = [
   { value: "andres@estudiodemoda.com.co", label: "Andres Godoy", id: 3 },
 ];
 
-// 👇 Cambia any[] por Category[]
+//Se le envian las categorias al hook
 export function useNuevoTicketForm(CATS: Category[]) {
+
+  //Estado inicial del formulario
   const [state, setState] = useState<FormState>({
     solicitante: null,
     resolutor: null,
@@ -34,14 +36,16 @@ export function useNuevoTicketForm(CATS: Category[]) {
   const [holidays, setHolidays] = useState<string[]>([]);
   const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null);
 
+  //Obtener los festivos de Colombia al cargar el componente
   useEffect(() => {
     fetchHolidays("CO").then(setHolidays).catch(console.error);
   }, []);
 
+  //Función para actualizar los campos del formulario
   const setField = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setState((s) => ({ ...s, [k]: v }));
 
-  // 👇 Tipamos explícitamente el retorno de useMemo y los params de find
+  //Defini categorías, subcategorías y artículos según la selección del usuario
   const subcats = useMemo<Subcat[]>(() => {
     const cat = CATS.find((c: Category) => c.id === state.categoria);
     return cat ? cat.subs : [];
@@ -52,6 +56,7 @@ export function useNuevoTicketForm(CATS: Category[]) {
     return sub ? sub.items : [];
   }, [subcats, state.subcategoria]);
 
+  //Validar el formulario
   const validate = () => {
     const e: FormErrors = {};
     if (!state.solicitante) e.solicitante = "Requerido";

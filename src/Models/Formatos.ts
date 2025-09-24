@@ -2,8 +2,7 @@ export type OpcionSolicitud =
   | "Solicitud de servicios de TI"
   | "FR Admin seguridad unidad de red"
   | "FR Administrador seguridad ERP"
-  | "Administrador"
-  | "permisos de navegacion";
+  | "Permisos de navegacion";
 
 //Modelo de Servicios TI
 export type TipoContratacion = "Directo" | "Temporal" | "Practicante" | "Tercero";

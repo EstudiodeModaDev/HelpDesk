@@ -26,6 +26,7 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   border-right: 1px solid rgba(255,255,255,.05);
+  z-index: 1;
 }
 
 /* ====== Header top bar ====== */
