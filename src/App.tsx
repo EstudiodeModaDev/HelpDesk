@@ -5,24 +5,20 @@ import Home from './components/Home/Home';
 import NuevoTicketForm from './components/NuevoTicket/NuevoTicketForm';
 import TablaTickets from './components/Tickets/Tickets';
 import TareasPage from './components/Tareas/Tareas';
+import type { User } from './Models/User';
+import Formatos from './components/Formatos/Formatos';
 
 const NAVS_ADMIN = [
   { key: 'home', label: 'Home' },
   { key: 'ticketform', label: 'Nuevo Ticket' },
   { key: 'ticketTable', label: 'Tickets' },
   { key: 'task', label: 'Tareas' },
-  { key: 'colaboradores', label: 'Colaboradores', icon: '👥' },
+  { key: 'formatos', label: 'Formatos',},
   { key: 'reportes', label: 'Reportes', icon: '📊' },
 ] as const;
 
-type AdminNavKey = typeof NAVS_ADMIN[number]['key'];
-type NavKey = AdminNavKey;
-
-type User = {
-  displayName?: string;
-  mail?: string;
-  jobTitle?: string;
-} | null;
+export type AdminNavKey = typeof NAVS_ADMIN[number]['key'];
+export type NavKey = AdminNavKey;
 
 function HeaderBar(props: {
   user: User;
@@ -114,6 +110,7 @@ function AppInner() {
         {selected === 'ticketform' && <NuevoTicketForm />}
         {selected === 'ticketTable' && <TablaTickets />}
         {selected === 'task' && <TareasPage />}
+        {selected === 'formatos' && <Formatos />}
       </main>
     </div>
   );

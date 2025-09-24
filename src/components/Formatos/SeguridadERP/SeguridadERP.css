@@ -1,0 +1,79 @@
+:root{
+  --card-bg:#fff; --card-bd:#e5e7eb; --ink:#0f172a; --muted:#6b7280;
+  --primary:#2d6df6; --primary-ink:#fff; --ring:rgba(45,109,246,.42);
+  --radius:14px; --shadow:0 12px 28px rgba(2,6,23,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --card-bg:#0f172a; --card-bd:#1f2937; --ink:#e5e7eb; --muted:#9ca3af;
+    --shadow:0 16px 34px rgba(0,0,0,.35);
+  }
+}
+
+.erp-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-bd);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+
+.erp-title{
+  margin:0 0 14px; text-align:center; color:var(--ink); font-weight:800;
+}
+
+/* Tabla */
+.erp-table{ display:grid; gap:10px; }
+.erp-header, .erp-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1.1fr 1.1fr 1.2fr 110px;
+  gap:10px; align-items:center;
+}
+.erp-header{
+  color:var(--muted); font-weight:700; font-size:.95rem;
+  padding-bottom:4px; border-bottom:1px dashed var(--card-bd);
+}
+.erp-cell{ width:100%; }
+
+.erp-input, .erp-select{
+  width:100%; min-height:38px; padding:8px 10px;
+  border:1px solid var(--card-bd); border-radius:10px;
+  background:transparent; color:var(--ink);
+  outline:none; box-sizing:border-box;
+  transition:border-color .2s, box-shadow .2s;
+}
+.erp-input:focus, .erp-select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px var(--ring);
+}
+
+.erp-cell--acciones{ text-align:center; }
+
+/* Botones */
+.erp-actions{ display:flex; gap:10px; justify-content:center; margin-top:12px; }
+.erp-btn{
+  border:1px solid var(--card-bd); background:#fff; color:var(--ink);
+  border-radius:10px; padding:10px 14px; cursor:pointer;
+  transition: filter .15s, box-shadow .2s, transform .05s;
+}
+.erp-btn:hover{ filter:brightness(.98); }
+.erp-btn:active{ transform: translateY(1px); }
+.erp-btn:disabled{ opacity:.6; cursor:not-allowed; }
+.erp-btn--primary{
+  background:var(--primary); color:var(--primary-ink); border-color:transparent;
+  box-shadow:0 8px 20px rgba(45,109,246,.35);
+}
+.erp-btn--ghost{
+  background:transparent; color:var(--ink); border:1px solid var(--card-bd);
+}
+
+/* Error */
+.erp-error{
+  margin-top:8px; background:#fde8e8; border:1px solid #f5c2c2;
+  color:#7a1f1f; padding:10px 12px; border-radius:10px;
+}
+
+/* Responsive */
+@media (max-width: 1200px){
+  .erp-header, .erp-row{ grid-template-columns: 1fr 1fr; }
+}

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import DetalleTicket from '../DetallesTickets/DetallesTickets';
 import './Tickets.css';
-import {calcularColorEstado, parseFecha, type ticket} from '../../Funcionalidades/Tickets';
+import {calcularColorEstado, parseFecha} from '../../Funcionalidades/Tickets';
+import type { Ticket } from '../../Models/Tickets';
 
-const tickets: ticket[] = [
+const tickets: Ticket[] = [
   {
     id: '2007',
     resolutor: 'Juan David Chavarria Mesa',
@@ -51,7 +52,7 @@ export default function TablaTickets() {
   const [search, setSearch] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
-  const [ticketSeleccionado, setTicketSeleccionado] = useState<ticket | null>(null);
+  const [ticketSeleccionado, setTicketSeleccionado] = useState<Ticket | null>(null);
 
     const filtrarTickets = tickets.filter((ticket) => {
     // ✅ Template string con backticks y campos correctos + null-coalescing

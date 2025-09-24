@@ -1,18 +1,15 @@
-// src/components/Tareas/FormTarea.tsx
+import { useCallback, useMemo, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import "./TareasForm.css";
-import { useState } from "react";
+import type { NuevaTarea } from "../../../Models/Tareas";
 
-export type NuevaTarea = {
-  titulo: string;
-  solicitante?: string;
-  responsable?: string;
-  fecha?: string; // yyyy-mm-dd
-  hora?: string;  // hh:mm
-  estado?: "Pendiente" | "Iniciada" | "Finalizada";
-};
+export interface FormTareaProps {
+  onAgregar: (t: NuevaTarea) => void;
+}
 
-export default function FormTarea(props: { onAgregar: (t: NuevaTarea) => void }) {
-  const { onAgregar } = props;
+const ESTADOS: NuevaTarea["estado"][] = ["Pendiente", "Iniciada", "Finalizada"];
+
+export default function FormTarea({ onAgregar }: FormTareaProps) {
   const [form, setForm] = useState<NuevaTarea>({
     titulo: "",
     solicitante: "",
@@ -22,57 +19,135 @@ export default function FormTarea(props: { onAgregar: (t: NuevaTarea) => void })
     estado: "Pendiente",
   });
 
-  const onChange = (k: keyof NuevaTarea) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  // Para IDs únicos y accesibles
+  const ids = useMemo(
+    () => ({
+      titulo: "ft_titulo",
+      solicitante: "ft_solicitante",
+      responsable: "ft_responsable",
+      fecha: "ft_fecha",
+      hora: "ft_hora",
+      estado: "ft_estado",
+    }),
+    []
+  );
 
-  const submit = (e: React.FormEvent) => {
+  const onChange =
+    <K extends keyof NuevaTarea>(k: K) =>
+    (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setForm((f) => ({ ...f, [k]: e.target.value as NuevaTarea[K] }));
+    };
+
+  const limpiar = useCallback(() => {
+    setForm({
+      titulo: "",
+      solicitante: "",
+      responsable: "",
+      fecha: "",
+      hora: "",
+      estado: "Pendiente",
+    });
+  }, []);
+
+  const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!form.titulo.trim()) return;
+    const tituloOk = form.titulo.trim().length > 0;
+    if (!tituloOk) return;
+
     onAgregar(form);
-    setForm({ titulo: "", solicitante: "", responsable: "", fecha: "", hora: "", estado: "Pendiente" });
+    limpiar();
   };
 
+  const disabled = form.titulo.trim().length === 0;
+
   return (
-    <section className="ft-card">
-      <h2 className="ft-title">Nueva Tarea</h2>
-      <form className="ft-form" onSubmit={submit}>
-        <label className="ft-field">
+    <section className="ft-card" role="region" aria-labelledby="ft_title">
+      <h2 id="ft_title" className="ft-title">Nueva Tarea</h2>
+
+      <form className="ft-form" onSubmit={submit} onReset={limpiar} noValidate>
+        <label className="ft-field" htmlFor={ids.titulo}>
           <span>Asunto *</span>
-          <input value={form.titulo} onChange={onChange("titulo")} placeholder="Asunto de la tarea" />
+          <input
+            id={ids.titulo}
+            name="titulo"
+            value={form.titulo}
+            onChange={onChange("titulo")}
+            placeholder="Asunto de la tarea"
+            autoComplete="off"
+            required
+            aria-required="true"
+          />
         </label>
 
-        <label className="ft-field">
+        <label className="ft-field" htmlFor={ids.solicitante}>
           <span>Solicitante</span>
-          <input value={form.solicitante} onChange={onChange("solicitante")} placeholder="Buscar solicitante" />
+          <input
+            id={ids.solicitante}
+            name="solicitante"
+            value={form.solicitante || ""}
+            onChange={onChange("solicitante")}
+            placeholder="Buscar solicitante"
+            autoComplete="off"
+          />
         </label>
 
-        <label className="ft-field">
+        <label className="ft-field" htmlFor={ids.responsable}>
           <span>Responsable</span>
-          <input value={form.responsable} onChange={onChange("responsable")} placeholder="Nombre del responsable" />
+          <input
+            id={ids.responsable}
+            name="responsable"
+            value={form.responsable || ""}
+            onChange={onChange("responsable")}
+            placeholder="Nombre del responsable"
+            autoComplete="off"
+          />
         </label>
 
         <div className="ft-grid-3">
-          <label className="ft-field">
+          <label className="ft-field" htmlFor={ids.fecha}>
             <span>Fecha del evento</span>
-            <input type="date" value={form.fecha} onChange={onChange("fecha")} />
+            <input
+              id={ids.fecha}
+              name="fecha"
+              type="date"
+              value={form.fecha || ""}
+              onChange={onChange("fecha")}
+            />
           </label>
-          <label className="ft-field">
+
+          <label className="ft-field" htmlFor={ids.hora}>
             <span>Hora</span>
-            <input type="time" value={form.hora} onChange={onChange("hora")} />
+            <input
+              id={ids.hora}
+              name="hora"
+              type="time"
+              value={form.hora || ""}
+              onChange={onChange("hora")}
+            />
           </label>
-          <label className="ft-field">
+
+          <label className="ft-field" htmlFor={ids.estado}>
             <span>Estado</span>
-            <select value={form.estado} onChange={onChange("estado")}>
-              <option>Pendiente</option>
-              <option>Iniciada</option>
-              <option>Finalizada</option>
+            <select
+              id={ids.estado}
+              name="estado"
+              value={form.estado || "Pendiente"}
+              onChange={onChange("estado")}
+            >
+              {ESTADOS.map((op) => (
+                <option key={op} value={op}>
+                  {op}
+                </option>
+              ))}
             </select>
           </label>
         </div>
 
         <div className="ft-actions">
-          <button type="submit" className="ft-btn-primary">Guardar</button>
-          <button type="button" className="ft-btn-ghost" onClick={() => setForm({ titulo: "", solicitante: "", responsable: "", fecha: "", hora: "", estado: "Pendiente" })}>Limpiar</button>
+          <button type="submit" className="ft-btn-primary" disabled={disabled} aria-disabled={disabled}>
+            Guardar
+          </button>
+          <button type="reset" className="ft-btn-ghost">Limpiar</button>
         </div>
       </form>
     </section>

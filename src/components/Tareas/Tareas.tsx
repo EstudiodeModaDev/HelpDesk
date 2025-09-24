@@ -1,9 +1,9 @@
 // src/components/Tareas/TareasPage.tsx
 import { useMemo, useState } from "react";
 import FormTarea from "./TareasForm/TareasForm";
-import type { NuevaTarea } from "./TareasForm/TareasForm";
-import ListaTareas from "./TareasRegistradas/TareasRegistradas";
-import type { Tarea } from "./TareasRegistradas/TareasRegistradas";
+import type { NuevaTarea } from "../../Models/Tareas";
+import ListaTareas from "../Tareas/TareasRegistradas/TareasRegistradas";
+import type { Tarea } from "../../Models/Tareas";
 
 export default function TareasPage() {
 

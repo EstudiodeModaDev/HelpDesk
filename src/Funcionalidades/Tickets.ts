@@ -1,18 +1,4 @@
-export type ticket = {
-  id: string;
-  resolutor?: string;
-  solicitante?: string;
-  Title?: string;
-  apertura?: string; // "dd/mm/yyyy hh:mm"
-  maxima?: string;   // "dd/mm/yyyy hh:mm"
-  estado?: string;
-  observador?: string;
-  descripcion?: string;
-  categoria?: string;
-  subcategoria?: string;
-  articulo?: string;
-  fuente?: string;
-};
+import type { Ticket } from "../Models/Tickets";
 
 export function parseFecha(fecha?: string): Date {
   if (!fecha) return new Date(NaN);
@@ -32,7 +18,7 @@ export function parseFecha(fecha?: string): Date {
   return isNaN(dt.getTime()) ? new Date(NaN) : dt;
 }
 
-export function calcularColorEstado(ticket: ticket): string {
+export function calcularColorEstado(ticket: Ticket): string {
   const estado = (ticket.estado ?? '').toLowerCase();
 
   if (estado === 'cerrado' || estado === 'cerrado fuera de tiempo') {

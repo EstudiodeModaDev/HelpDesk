@@ -1,130 +1,220 @@
-/* === Layout para sidebar fijo visible siempre === */
-.layout {
-  position: relative;
-  min-height: 100vh;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+/* ===========================
+   Variables & base
+=========================== */
+:root{
+  --sb-w: 220px;            /* Sidebar más angosto */
+  --sb-bg: #0b275a;         /* azul oscuro base */
+  --sb-bg-2: #0e316f;       /* azul oscuro (gradiente) */
+  --sb-hover: #1a4bb3;      /* hover */
+  --sb-active: #2d6df6;     /* active/accent */
+  --sb-ink: #e8eefc;        /* texto principal */
+  --sb-ink-muted: #b7c4ec;  /* texto secundario */
+  --sb-bd: rgba(255,255,255,.08);
+
+  --page-bg: #f6f7fb;
+  --card-bd: #e5e7eb;
+  --text: #0f172a;
+  --muted:#6b7280;
+
+  --radius: 14px;
+  --shadow: 0 10px 28px rgba(2,6,23,.08);
 }
 
-/* Empuja todo el contenido (header + main) cuando hay sidebar */
+@media (prefers-color-scheme: dark){
+  :root{
+    --page-bg: #0b1222;
+    --card-bd: #1f2937;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+  }
+}
+
+*{ box-sizing:border-box; }
+html,body,#root{ height:100%; }
+body{ 
+  margin:0; 
+  background:var(--page-bg); 
+  color:var(--text); 
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI",
+               Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans",
+               "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+/* ===========================
+   Layout
+=========================== */
+.page.layout{ min-height:100%; }
 .layout--withSidebar .headerRow,
-.layout--withSidebar .content {
-  margin-left: 260px;
-}
+.content--withSidebar{ margin-left: var(--sb-w); }
 
-/* Sidebar fijo SIEMPRE visible */
-.sidebar {
-  width: 260px;
-  background-color: #2c3e50;
-  color: white;
+.content{ padding: 20px 18px; }
+
+/* ===========================
+   Sidebar fijo azul oscuro
+=========================== */
+.layout--withSidebar .sidebar{
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;                    /* <-- SIEMPRE visible */
-  z-index: 1000;
-  display: flex;              /* <-- visible */
-  flex-direction: column;
-  font-family: 'Segoe UI', sans-serif;
-  border-right: 1px solid #34495e;
+  inset: 0 auto 0 0;             /* top:0 right:auto bottom:0 left:0 */
+  width: var(--sb-w);
+  background: linear-gradient(180deg, var(--sb-bg) 0%, var(--sb-bg-2) 100%);
+  color: var(--sb-ink);
+  border-right:1px solid var(--sb-bd);
+  padding: 18px 14px 12px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(2,6,23,.25);
+  z-index: 30;
 }
 
-.backdrop, .backdrop--show { display: none !important; }
-
-.sidebar__header {
-  padding: 16px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  background-color: #1a252f;
-  border-bottom: 1px solid #34495e;
+.sidebar__header{
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--sb-ink);
+  opacity: .95;
+  padding: 6px 8px 2px;
 }
 
-.sidebar__nav {
-  flex: 1;
-  padding: 8px 0;
-  overflow-y: auto;           /* scroll solo dentro del menú si hace falta */
+.sidebar__nav{
+  display: grid;
+  gap: 10px;
+  padding: 6px 2px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+.sidebar__nav::-webkit-scrollbar{ width: 8px; }
+.sidebar__nav::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.22);
+  border-radius: 8px;
 }
 
-.sideItem {
+/* Item de navegación */
+.sideItem{
+  all: unset;
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  color: white;
-  font-size: 0.95rem;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.2s ease;
+  color: var(--sb-ink);
+  border: 1px solid transparent;
+  transition: transform .08s ease, background .2s ease, color .2s ease,
+              border-color .2s ease, box-shadow .2s ease;
 }
-.sideItem:hover { background-color: #34495e; }
-.sideItem--active {
-  background-color: #1abc9c;
-  color: #fff;
+.sideItem__label{
+  font-size: .95rem;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.sideItem__icon { margin-right: 12px; font-size: 1.2rem; }
+.sideItem:hover{
+  background: rgba(255,255,255,.08);
+  border-color: var(--sb-bd);
+}
+.sideItem:focus-visible{
+  outline: 2px solid rgba(45,109,246,.8);
+  outline-offset: 2px;
+}
+.sideItem--active{
+  background: linear-gradient(180deg, rgba(45,109,246,.18), rgba(45,109,246,.12));
+  border-color: rgba(45,109,246,.45);
+  box-shadow: inset 0 0 0 1px rgba(45,109,246,.35), 0 6px 18px rgba(22,52,116,.35);
+}
+.sideItem--active .sideItem__label{ color:#fff; font-weight:600; }
 
-.sidebar__footer {
-  padding: 12px 20px;
-  font-size: 0.8rem;
-  background-color: #1a252f;
-  border-top: 1px solid #34495e;
+.sidebar__footer{
+  margin-top:6px;
+  padding: 10px 8px;
+  border-top: 1px dashed var(--sb-bd);
+  color: var(--sb-ink-muted);
 }
+.sidebar__footer small{ font-size:.8rem; }
 
-/* Header moderno (ajustado para sidebar fijo) */
-.headerRow {
-  position: sticky; top: 0; z-index: 100;
+/* ===========================
+   Header (barra superior)
+=========================== */
+.headerRow{
+  position: sticky; top: 0;
+  height: 64px;
   display: flex; align-items: center; justify-content: space-between;
-  background: linear-gradient(to right, #1f1f1f, #2c3e50);
-  color: #ffffff;
-  padding: 10px 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  font-family: 'Segoe UI', sans-serif;
-  min-height: 60px;
+  padding: 10px 18px;
+  background: #ffffffcc;                   /* blanco con leve transparencia */
+  backdrop-filter: saturate(140%) blur(6px);
+  border-bottom: 1px solid var(--card-bd);
+  z-index: 25;
+}
+@media (prefers-color-scheme: dark){
+  .headerRow{
+    background: #0f172acc;
+    border-bottom-color: #1f2937;
+  }
 }
 
-/* Hamburguesa ya no se usa si el sidebar es fijo */
-.hamburger { display: none; }
-
-.brand h1 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  letter-spacing: 1px;
+/* Marca (lado izquierdo del header) */
+.brand h1{
+  margin:0;
+  font-size: 1.9rem;
+  letter-spacing: .2px;
+  color: var(--text);
 }
 
-/* Avatar y usuario */
-.userCluster { display: flex; align-items: center; gap: 12px; }
-.avatar {
-  background-color: #1abc9c; color: white; border-radius: 50%;
-  width: 32px; height: 32px; font-size: 0.9rem;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: bold; box-shadow: 0 0 4px rgba(0,0,0,0.3);
+/* Cluster de usuario (lado derecho) */
+.userCluster{
+  display:flex; align-items:center; gap:12px;
 }
-.userInfo { display: flex; flex-direction: column; font-size: 0.85rem; }
-.btn-logout {
-  background-color: #e74c3c; color: white; border: none;
-  padding: 6px 12px; border-radius: 4px; cursor: pointer;
+.avatar{
+  width:36px; height:36px; border-radius:50%;
+  background: linear-gradient(135deg, #2d6df6, #0b275a);
+  color:#fff; display:grid; place-items:center; font-weight:700;
+  box-shadow: 0 3px 10px rgba(45,109,246,.35);
+}
+.userInfo{ display:flex; flex-direction:column; line-height:1.1; }
+.userName{ font-weight:600; }
+.userMail{ font-size:.82rem; color:var(--muted); text-transform: lowercase; }
+
+.btn-logout{
+  border:1px solid var(--card-bd);
+  background:#fff;
+  padding:8px 12px;
+  border-radius: 10px;
+  cursor:pointer;
+  transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
+}
+.btn-logout:hover{
+  background:#f4f6fb;
+  box-shadow: 0 6px 16px rgba(2,6,23,.08);
+}
+.btn-logout:active{ transform: translateY(1px); }
+@media (prefers-color-scheme: dark){
+  .btn-logout{ background:#0f172a; color:#e5e7eb; border-color:#1f2937; }
+  .btn-logout:hover{ background:#0b1326; }
 }
 
-/* Contenido */
-.content {
-  padding: 16px 8px;
-  background-color: #f9f9f9;
-  min-height: calc(100vh - 60px);
-  font-family: 'Segoe UI', sans-serif;
-  transition: margin-left 0.2s ease;
+/* ===========================
+   Helpers & responsive
+=========================== */
+.card{
+  background:#fff; border:1px solid var(--card-bd); border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
-/* Por claridad, mantenemos esta clase aunque ya empujamos arriba */
-.content--withSidebar { margin-left: 260px; }
+@media (prefers-color-scheme: dark){
+  .card{ background:#0f172a; border-color:#1f2937; }
+}
 
-.center {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 32px 24px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  text-align: center;
+@media (max-width: 900px){
+  :root{ --sb-w: 200px; }
+  .brand h1{ font-size: 1.6rem; }
 }
-.center h2 { font-size: 1.6rem; margin-bottom: 12px; color: #2c3e50; }
-.center p  { font-size: 1rem; color: #7f8c8d; margin-bottom: 8px; }
-.muted { color: #95a5a6; font-size: 0.85rem; }
+@media (max-width: 720px){
+  /* Mantenerlo fijo pero permite que el contenido use todo el ancho si lo necesitas */
+  .layout--withSidebar .headerRow,
+  .content--withSidebar{ margin-left: 0; }
+  .layout--withSidebar .sidebar{
+    width: 82vw;
+  }
+}

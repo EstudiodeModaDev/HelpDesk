@@ -1,0 +1,71 @@
+:root{
+  --card-bg:#fff; --card-bd:#e5e7eb; --ink:#0f172a; --muted:#6b7280;
+  --primary:#2d6df6; --primary-ink:#fff; --ring:rgba(45,109,246,.4);
+  --radius:14px; --shadow:0 12px 30px rgba(2,6,23,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --card-bg:#0f172a; --card-bd:#1f2937; --ink:#e5e7eb; --muted:#9ca3af;
+    --shadow:0 16px 34px rgba(0,0,0,.35);
+  }
+}
+
+.tg-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-bd);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+  display:grid; gap:12px;
+}
+
+.tg-row{ display:grid; gap:6px; max-width:520px; }
+.tg-label{ color:var(--muted); font-size:.92rem; }
+
+.tg-select{
+  height:42px; padding:0 12px; border-radius:12px;
+  border:1px solid var(--card-bd); background:transparent; color:var(--ink);
+  outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.tg-select:focus{ border-color:var(--primary); box-shadow:0 0 0 3px var(--ring); }
+
+.tg-terms{
+  margin-top:8px; padding:14px; border:1px dashed var(--card-bd);
+  border-radius:12px; display:grid; gap:10px;
+}
+.tg-terms h3{
+  margin:0; font-size:1.05rem; font-weight:800; letter-spacing:.2px; color:var(--ink);
+}
+.tg-terms-text{ margin:0; color:var(--muted); }
+
+.tg-check{ display:flex; align-items:center; gap:10px; }
+.tg-check input{
+  appearance:none; width:20px; height:20px; border-radius:6px;
+  border:1px solid var(--card-bd); position:relative; background:#fff;
+}
+@media (prefers-color-scheme: dark){
+  .tg-check input{ background:#0f172a; }
+}
+.tg-check input:checked{
+  border-color:var(--primary); background:var(--primary);
+}
+.tg-check input:checked::after{
+  content:""; position:absolute; inset:0; margin:auto; width:12px; height:12px;
+  border-radius:3px; background:#fff;
+}
+
+.tg-actions{ display:flex; gap:10px; justify-content:flex-end; }
+.tg-btn-primary{
+  background:var(--primary); color:var(--primary-ink);
+  border:none; border-radius:12px; padding:10px 14px; cursor:pointer;
+  box-shadow:0 8px 20px rgba(45,109,246,.35);
+  transition:transform .05s, filter .15s, box-shadow .2s;
+}
+.tg-btn-primary:hover{ filter:brightness(.96); box-shadow:0 10px 24px rgba(45,109,246,.4); }
+.tg-btn-primary:active{ transform:translateY(1px); }
+.tg-btn-primary[disabled]{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+
+.tg-btn-ghost{
+  background:transparent; color:var(--ink);
+  border:1px solid var(--card-bd); border-radius:12px; padding:10px 12px; cursor:pointer;
+}

@@ -1,14 +1,7 @@
-// src/components/Tareas/ListaTareas.tsx
+import type { Tarea } from "../../../Models/Tareas";
 import "./TareasRegistradas.css";
 
-export type Tarea = {
-  id: string;
-  titulo: string;
-  responsable: string;
-  solicitante: string;
-  fechaSolicitada?: string;
-  estado?: "Pendiente" | "Iniciada" | "Finalizada" | string;
-};
+
 
 export default function ListaTareas(props: { tareas: Tarea[] }) {
   const { tareas } = props;

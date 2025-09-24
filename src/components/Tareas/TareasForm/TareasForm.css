@@ -25,17 +25,18 @@
 }
 
 .ft-form{ display:grid; gap:12px; }
-.ft-field{ display:grid; gap:6px; }
+.ft-field{ display:grid; gap:6px; min-width:0;}
 .ft-field > span{ color:var(--muted); font-size:.9rem; }
 .ft-field input,
 .ft-field select{
   height:38px; padding:0 10px; border-radius:10px;
   border:1px solid var(--card-bd); background:transparent; color:var(--text);
+  width:100%; box-sizing:border-box;
 }
 .ft-field input::placeholder{ color:var(--muted); }
 
 .ft-grid-3{
-  display:grid; grid-template-columns:1fr 120px 1fr; gap:10px;
+  display:grid; grid-template-columns:1fr 120px 1fr; gap:20px;
 }
 
 .ft-actions{
