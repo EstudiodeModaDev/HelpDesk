@@ -8,14 +8,16 @@ import TareasPage from './components/Tareas/Tareas';
 import type { User } from './Models/User';
 import Formatos from './components/Formatos/Formatos';
 
+
 const NAVS_ADMIN = [
-  { key: 'home', label: 'Home' },
-  { key: 'ticketform', label: 'Nuevo Ticket' },
-  { key: 'ticketTable', label: 'Tickets' },
-  { key: 'task', label: 'Tareas' },
-  { key: 'formatos', label: 'Formatos',},
-  { key: 'reportes', label: 'Reportes', icon: '📊' },
+  { key: 'home',          label: 'Home',         icon: '🏠' },
+  { key: 'ticketform',    label: 'Nuevo Ticket', icon: '➕' },
+  { key: 'ticketTable',   label: 'Ver Tickets',  icon: '👁️' },
+  { key: 'task',          label: 'Tareas',       icon: '✅' },
+  { key: 'formatos', label: 'Formatos',icon: '👥' },
+  { key: 'reportes',      label: 'Reportes',     icon: '📊' },
 ] as const;
+
 
 export type AdminNavKey = typeof NAVS_ADMIN[number]['key'];
 export type NavKey = AdminNavKey;
@@ -55,18 +57,19 @@ function Sidebar(props: {
   return (
     <aside className="sidebar" aria-label="Navegación principal">
       <div className="sidebar__header">Menú</div>
-      <nav className="sidebar__nav" role="navigation">
-        {NAVS_ADMIN.map((nav) => (
-          <button
-            key={nav.key}
-            className={`sideItem ${selected === nav.key ? 'sideItem--active' : ''}`}
-            onClick={() => onSelect(nav.key)}
-            aria-current={selected === nav.key ? 'page' : undefined}
-          >
-            <span className="sideItem__label">{nav.label}</span>
-          </button>
-        ))}
-      </nav>
+        <nav className="sidebar__nav" role="navigation">
+          {NAVS_ADMIN.map((nav) => (
+            <button
+              key={nav.key}
+              className={`sideItem ${selected === nav.key ? 'sideItem--active' : ''}`}
+              onClick={() => onSelect(nav.key)}
+              aria-current={selected === nav.key ? 'page' : undefined}
+            >
+              <span className="sideItem__icon" aria-hidden="true">{nav.icon ?? '•'}</span>
+              <span className="sideItem__label">{nav.label}</span>
+            </button>
+          ))}
+        </nav>
       <div className="sidebar__footer"><small>Estudio de moda</small></div>
     </aside>
   );
