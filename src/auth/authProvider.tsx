@@ -1,4 +1,3 @@
-// src/auth/AuthProvider.tsx
 import * as React from 'react';
 import type { AccountInfo } from '@azure/msal-browser';
 import { initMSAL, ensureLogin, getAccessToken, logout, getActiveAccount} from './msal';

@@ -1,4 +1,3 @@
-// msal.ts
 import { PublicClientApplication, type AccountInfo, type SilentRequest, type PopupRequest } from '@azure/msal-browser';
 
 let pca: PublicClientApplication | null = null;
@@ -8,7 +7,7 @@ export async function initMSAL() {
   pca = new PublicClientApplication({
     auth: {
       clientId: '8d2f570b-7baa-4d6d-bb31-7ed206c06e11',
-      authority: 'https://login.microsoftonline.com/cd48ecd9-7e15-4f4b-97d9-ec813ee42b2c', // evita /common si es single-tenant
+      authority: 'https://login.microsoftonline.com/cd48ecd9-7e15-4f4b-97d9-ec813ee42b2c',
       redirectUri: window.location.origin,
     },
     cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false },
