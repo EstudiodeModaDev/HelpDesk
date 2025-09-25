@@ -7,6 +7,7 @@ import TablaTickets from './components/Tickets/Tickets';
 import TareasPage from './components/Tareas/Tareas';
 import type { User } from './Models/User';
 import Formatos from './components/Formatos/Formatos';
+import { GraphServicesProvider } from './graph/GrapServicesContext';
 
 
 const NAVS_ADMIN = [
@@ -120,5 +121,9 @@ function AppInner() {
 }
 
 export default function App() {
-  return <AppInner />;
+  return (
+      <GraphServicesProvider>
+        <AppInner />
+      </GraphServicesProvider>
+  );
 }
