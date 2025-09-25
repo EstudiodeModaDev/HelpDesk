@@ -11,22 +11,22 @@ const tickets: Ticket[] = [
     resolutor: "Juan David Chavarria Mesa",
     solicitante: "Aprendiz Capital Humano",
     Title: "Revisión de impresora",
-    apertura: "25/09/2025 8:56",
-    maxima: "25/09/2025 16:56",
+    FechaApertura: "25/09/2025 8:56",
+    TiempoSolucion: "25/09/2025 16:56",
     estado: "En atención",
-    categoria: "Siesa",
-    subcategoria: "POS",
-    articulo: "",
+    Categoria: "Siesa",
+    Subcategoria: "POS",
+    Articulo: "",
     descripcion: "Caso de prueba",
-    fuente: "Correo",
+    Fuente: "Correo",
   },
   {
     id: "2005",
     resolutor: "Juan David Chavarria Mesa",
     solicitante: "Pilatos Caribe Plaza Cartagena",
     Title: "tienda sin internet",
-    apertura: "19/09/2025 18:11",
-    maxima: "24/09/2025 18:11",
+    FechaApertura: "19/09/2025 18:11",
+    TiempoSolucion: "24/09/2025 18:11",
     estado: "red",
   },
   {
@@ -34,8 +34,8 @@ const tickets: Ticket[] = [
     resolutor: "Juan David Chavarria Mesa",
     solicitante: "Repoly Tesoro",
     Title: "CPU/Puerto para reproducir sonido",
-    apertura: "19/09/2025 9:27",
-    maxima: "",
+    FechaApertura: "19/09/2025 9:27",
+    TiempoSolucion: "",
     estado: "",
   },
   {
@@ -43,8 +43,8 @@ const tickets: Ticket[] = [
     resolutor: "Andres Felipe Godoy Pastrana",
     solicitante: "Natalia Londoño Acebedo",
     Title: "AYUDA ADOBE PDF",
-    apertura: "",
-    maxima: "",
+    FechaApertura: "",
+    TiempoSolucion: "",
     estado: "red",
   },
 ];
@@ -59,7 +59,7 @@ export default function TablaTickets() {
     const texto = `${ticket.resolutor ?? ""} ${ticket.solicitante ?? ""} ${ticket.Title ?? ""}`.toLowerCase();
     const coincideTexto = texto.includes(search.toLowerCase());
 
-    const fechaMaxima = ticket.maxima ? parseFecha(ticket.maxima) : null;
+    const fechaMaxima = ticket.TiempoSolucion ? parseFecha(ticket.TiempoSolucion) : null;
     const desde = fechaInicio ? new Date(fechaInicio) : null;
     const hasta = fechaFin ? new Date(fechaFin) : null;
 
@@ -136,8 +136,8 @@ export default function TablaTickets() {
                   <td>{ticket.resolutor}</td>
                   <td>{ticket.solicitante}</td>
                   <td>{ticket.Title}</td>
-                  <td>{ticket.apertura || "–"}</td>
-                  <td>{ticket.maxima || "–"}</td>
+                  <td>{ticket.FechaApertura || "–"}</td>
+                  <td>{ticket.TiempoSolucion || "–"}</td>
                   <td>
                     <span
                       className="estado-circulo"

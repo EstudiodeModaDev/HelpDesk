@@ -5,7 +5,7 @@ import './DetalleTicket.css';
 export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void }) {
   if (!ticket) return <div>Ticket no encontrado</div>;
 
-  const categoria = [ticket.categoria, ticket.subcategoria, ticket.articulo]
+  const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
     .filter(Boolean)
     .join(' > ');
 
@@ -28,11 +28,11 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
       <div className='fila'>
         <div className="campo">
           <label>Fecha de Apertura</label>
-          <span>{ticket.apertura || '–'}</span>
+          <span>{ticket.FechaApertura || '–'}</span>
         </div>
         <div className="campo">
           <label>Fecha máxima de solución</label>
-          <span>{ticket.maxima || '–'}</span>
+          <span>{ticket.TiempoSolucion || '–'}</span>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
 
         <div className="campo">
           <label>Fuente de solicitud</label>
-          <span>{ticket.fuente || '–'}</span>
+          <span>{ticket.Fuente || '–'}</span>
         </div>
       </div>
 

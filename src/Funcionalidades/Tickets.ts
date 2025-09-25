@@ -25,12 +25,12 @@ export function calcularColorEstado(ticket: Ticket): string {
     return 'rgba(0,0,0,1)'; // negro
   }
 
-  if (!ticket.apertura || !ticket.maxima) {
+  if (!ticket.FechaApertura || !ticket.TiempoSolucion) {
     return 'rgba(255,0,0,1)'; // rojo si faltan fechas
   }
 
-  const inicio = parseFecha(ticket.apertura).getTime();
-  const fin    = parseFecha(ticket.maxima).getTime();
+  const inicio = parseFecha(ticket.FechaApertura).getTime();
+  const fin    = parseFecha(ticket.TiempoSolucion).getTime();
   const ahora  = Date.now();
 
   if (isNaN(inicio) || isNaN(fin)) {
