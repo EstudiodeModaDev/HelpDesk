@@ -1,43 +1,81 @@
+// src/utils/Commons.ts
 import type { GraphRest } from "../graph/GraphRest";
 
-function saveCache(hostname: string, sitePath: string, listName: string, siteId: string, listId: string) {
-    try {
-      const k = `sp:${hostname}${sitePath}:${listName}`;
-      localStorage.setItem(k, JSON.stringify({ siteId: siteId, listId: listId }));
-    } catch {}
-  }
-function loadCache(hostname: string, sitePath: string, listName: string, siteId: string, listId: string) {
+export type EnsureIdsResult = { siteId: string; listId: string };
+
+export const esc = (s: string) => String(s).replace(/'/g, "''");
+
+/** Lee cache (si existe) y lo devuelve */
+function loadCache(
+  hostname: string,
+  sitePath: string,
+  listName: string
+): Partial<EnsureIdsResult> {
   try {
     const k = `sp:${hostname}${sitePath}:${listName}`;
     const raw = localStorage.getItem(k);
-    if (raw) {
-      const data = JSON.parse(raw) as Partial<{ siteId: string; listId: string }>;
-      // usar las del cache si existen; si no, mantener las recibidas
-      siteId = data?.siteId || siteId;
-      listId = data?.listId || listId;
-    }
+    if (raw) return JSON.parse(raw) as Partial<EnsureIdsResult>;
+  } catch {}
+  return {};
+}
+
+/** Persiste en cache si ambos IDs existen */
+function saveCache(
+  hostname: string,
+  sitePath: string,
+  listName: string,
+  siteId?: string,
+  listId?: string
+) {
+  try {
+    if (!siteId || !listId) return;
+    const k = `sp:${hostname}${sitePath}:${listName}`;
+    localStorage.setItem(k, JSON.stringify({ siteId, listId }));
   } catch {}
 }
 
-export function esc(s: string) { return String(s).replace(/'/g, "''"); }
+/**
+ * Resuelve y devuelve { siteId, listId } para una lista de SharePoint usando Graph.
+ * - Usa cache localStorage si está disponible.
+ * - Corrige sitePath y evita el ":" sobrante al final.
+ */
+export async function ensureIds(
+  siteId: string | undefined,
+  listId: string | undefined,
+  graph: GraphRest,
+  hostname: string,
+  sitePath: string,   // p.ej. "/sites/TransformacionDigital/IN/HD"
+  listName: string    // p.ej. "Tickets"
+): Promise<EnsureIdsResult> {
+  // normaliza sitePath
+  const sp = sitePath.startsWith("/") ? sitePath : `/${sitePath}`;
 
-export async function ensureIds(siteId: string | undefined, listId: string | undefined, graph: GraphRest, hostname: string, sitePath: string, listName: string) {
-    if (!siteId || !listId) loadCache(hostname, sitePath, listName, siteId!, listId!);
-
-    if (!siteId) {
-      const site = await graph.get<any>(`/sites/${hostname}:${sitePath}:`);
-      siteId = site?.id;
-      if (!siteId) throw new Error('No se pudo resolver siteId');
-      saveCache(hostname, sitePath, listName, siteId, listId!);
-    }
-
-    if (!listId) {
-      const lists = await graph.get<any>(
-        `/sites/${siteId}/lists?$filter=displayName eq '${esc(listName)}'`
-      );
-      const list = lists?.value?.[0];
-      if (!list?.id) throw new Error(`Lista no encontrada: ${listName}`);
-      listId = list.id;
-      saveCache(hostname, sitePath, listName, siteId, listId!);
-    }
+  // 1) intenta cache
+  if (!siteId || !listId) {
+    const cached = loadCache(hostname, sp, listName);
+    siteId = cached.siteId ?? siteId;
+    listId = cached.listId ?? listId;
   }
+
+  // 2) resuelve siteId si falta
+  if (!siteId) {
+    // OJO: sin colon al final
+    const site = await graph.get<any>(`/sites/${hostname}:${sp}`);
+    siteId = site?.id;
+    if (!siteId) throw new Error("No se pudo resolver siteId");
+    saveCache(hostname, sp, listName, siteId, listId);
+  }
+
+  // 3) resuelve listId si falta
+  if (!listId) {
+    const lists = await graph.get<any>(
+      `/sites/${siteId}/lists?$filter=displayName eq '${esc(listName)}'`
+    );
+    const list = lists?.value?.[0];
+    if (!list?.id) throw new Error(`Lista no encontrada: ${listName}`);
+    listId = list.id as string;
+    saveCache(hostname, sp, listName, siteId, listId);
+  }
+
+  return { siteId, listId };
+}

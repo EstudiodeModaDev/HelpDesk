@@ -1,4 +1,4 @@
-
+// src/Services/Tickets.service.ts
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts } from '../Models/Commons';
 import type { Ticket } from '../Models/Tickets';
@@ -16,50 +16,71 @@ export class TicketsService {
   constructor(
     graph: GraphRest,
     hostname = 'estudiodemoda.sharepoint.com',
+    // ⚠️ SIN barra final
     sitePath = '/sites/TransformacionDigital/IN/HD',
-    listName = 'Tickets'     
+    listName = 'Tickets'
   ) {
     this.graph = graph;
     this.hostname = hostname;
     this.sitePath = sitePath.startsWith('/') ? sitePath : `/${sitePath}`;
     this.listName = listName;
   }
+
   // ---------- mapping ----------
   private toModel(item: any): Ticket {
     const f = item?.fields ?? {};
     return {
-        //Información del ticket
-        id: f.id,
-        IdCasoPadre: f.IdCasoPadre,
-        Title:  f.Title, //Asunto
-        FechaApertura: f.FechaApertura, // "dd/mm/yyyy hh:mm"
-        TiempoSolucion: f.TiempoSolucion,   // "dd/mm/yyyy hh:mm"
-        Fuente: f.Fuente,        
-        Descripcion: f.Descripcion,
-        Categoria: f.Categoria,
-        Subcategoria: f.SubCategoria,
-        Articulo: f.SubSubCategoria,
-        estado: f.Estadodesolicitud,
-        ANS: f.ANS,
+      // Identificadores / asunto
+      id: String(f.ID ?? f.Id ?? f.id ?? item?.id ?? ''),
+      IdCasoPadre: f.IdCasoPadre ?? null,
+      Title: f.Title ?? '',
 
-        //Información del resolutor
-        resolutor: f.Nombreresolutor,
-        resolutorId: f.IdResolutor,
-        CorreoResolutor: f.Correoresolutor, 
+      // Fechas (tu UI usa "dd/mm/yyyy hh:mm")
+      FechaApertura: f.FechaApertura ?? '',
+      TiempoSolucion: f.TiempoSolucion ?? '',
 
-        //Información del solicitante
-        solicitante: f.Solicitante,
-        CorreoSolicitante: f.CorreoSolicitante,
+      // Estado / categorización
+      Fuente: f.Fuente ?? '',
+      Descripcion: f.Descripcion ?? '',
+      Categoria: f.Categoria ?? '',
+      Subcategoria: f.Subcategoria ?? f.SubCategoria ?? '',
+      Articulo: f.Articulo ?? f.SubSubCategoria ?? '',
+      estado: f.Estadodesolicitud ?? '',
+      ANS: f.ANS ?? '',
 
-        //Información del observador
-        observador: f.Observador,
-        CorreoObservador: f.CorreoObservador,
+      // Resolutor
+      resolutor: f.Nombreresolutor ?? '',
+      resolutorId: f.IdResolutor ?? '',
+      CorreoResolutor: f.Correoresolutor ?? '',
+
+      // Solicitante
+      solicitante: f.Solicitante ?? '',
+      CorreoSolicitante: f.CorreoSolicitante ?? '',
+
+      // Observador
+      observador: f.Observador ?? '',
+      CorreoObservador: f.CorreoObservador ?? '',
     };
   }
 
+  // ---------- ids ----------
+  private async ensure(): Promise<void> {
+    // Asegura y persiste los IDs resueltos
+    const ids = await ensureIds(
+      this.siteId,
+      this.listId,
+      this.graph,
+      this.hostname,
+      this.sitePath,
+      this.listName
+    );
+    this.siteId = ids.siteId;
+    this.listId = ids.listId;
+  }
+
   // ---------- CRUD ----------
-  async create(record: Omit<Ticket, 'ID'>) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+  async create(record: Omit<Ticket, 'ID' | 'id'>) {
+    await this.ensure();
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
       { fields: record }
@@ -67,8 +88,8 @@ export class TicketsService {
     return this.toModel(res);
   }
 
-  async update(id: string, changed: Partial<Omit<Ticket, 'ID'>>) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+  async update(id: string | number, changed: Partial<Omit<Ticket, 'ID' | 'id'>>) {
+    await this.ensure();
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
       changed
@@ -79,13 +100,13 @@ export class TicketsService {
     return this.toModel(res);
   }
 
-  async delete(id: string) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+  async delete(id: string | number) {
+    await this.ensure();
     await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
   }
 
-  async get(id: string) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+  async get(id: string | number) {
+    await this.ensure();
     const res = await this.graph.get<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
     );
@@ -93,34 +114,17 @@ export class TicketsService {
   }
 
   async getAll(opts?: GetAllOpts) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
-
-    // ID -> id, Title -> fields/Title (cuando NO está prefijado con '/')
-    const normalizeFieldTokens = (s: string) =>
-      s
-        .replace(/\bID\b/g, 'id')
-        .replace(/(^|[^/])\bTitle\b/g, '$1fields/Title');
-
-    const escapeODataLiteral = (v: string) => v.replace(/'/g, "''");
-
-    // Normaliza expresiones del $filter (minimiza 404 por sintaxis)
-    const normalizeFilter = (raw: string) => {
-      let out = normalizeFieldTokens(raw.trim());
-      // escapa todo literal '...'
-      out = out.replace(/'(.*?)'/g, (_m, p1) => `'${escapeODataLiteral(p1)}'`);
-      return out;
-    };
-
-    const normalizeOrderby = (raw: string) => normalizeFieldTokens(raw.trim());
+    await this.ensure();
 
     const qs = new URLSearchParams();
-    qs.set('$expand', 'fields');        // necesario si filtras por fields/*
-    qs.set('$select', 'id,webUrl');     // opcional; añade fields(...) si quieres
-    if (opts?.orderby) qs.set('$orderby', normalizeOrderby(opts.orderby));
-    if (opts?.top != null) qs.set('$top', String(opts.top));
-    if (opts?.filter) qs.set('$filter', normalizeFilter(String(opts.filter)));
+    qs.set('$expand', 'fields');      // necesario para leer campos
+    // qs.set('$select', 'id,webUrl,fields'); // opcional
 
-    // Evita '+' por espacios (algunos proxies se quejan)
+    if (opts?.orderby) qs.set('$orderby', opts.orderby.trim());
+    if (opts?.top != null) qs.set('$top', String(opts.top));
+    if (opts?.filter) qs.set('$filter', opts.filter.trim());
+
+    // Evita '+' por espacios
     const query = qs.toString().replace(/\+/g, '%20');
 
     const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
@@ -129,12 +133,12 @@ export class TicketsService {
       const res = await this.graph.get<any>(url);
       return (res.value ?? []).map((x: any) => this.toModel(x));
     } catch (e: any) {
-      // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
+      // Reintenta sin $filter si rompió por sintaxis (útil para diagnóstico)
       const code = e?.error?.code ?? e?.code;
       if (code === 'itemNotFound' && opts?.filter) {
         const qs2 = new URLSearchParams(qs);
         qs2.delete('$filter');
-        const url2 = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${qs2.toString()}`;
+        const url2 = `/sites/${this.siteId}/lists/${this.listId}/items?${qs2.toString()}`;
         const res2 = await this.graph.get<any>(url2);
         return (res2.value ?? []).map((x: any) => this.toModel(x));
       }
@@ -142,12 +146,14 @@ export class TicketsService {
     }
   }
 
-  // ---------- helpers de consulta (opcionales) ----------
-  async findById(ID: string, top = 1) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+  // ---------- helpers de consulta ----------
+  async findById(itemId: string | number, top = 1) {
+    await this.ensure();
+    // Mejor filtrar por el id del listItem (numérico) en top-level, no en fields/*
+    const idNum = Number(itemId);
     const qs = new URLSearchParams({
       $expand: 'fields',
-      $filter: `fields/ID eq '${esc(ID)}'`,
+      $filter: Number.isFinite(idNum) ? `id eq ${idNum}` : `id eq ${esc(String(itemId))}`,
       $top: String(top),
     });
     const res = await this.graph.get<any>(
@@ -155,11 +161,4 @@ export class TicketsService {
     );
     return (res.value ?? []).map((x: any) => this.toModel(x));
   }
-
 }
-
-
-
-
-
-
