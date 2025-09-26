@@ -63,8 +63,6 @@ export class TicketsService {
         const lists = await this.graph.get<any>(
             `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
         );
-        const AvailableLists = await this.graph.get<any>(`/sites/${this.siteId}/lists`);
-        console.log('Available lists:', AvailableLists?.value?.map((l: any) => l.displayName));
         const list = lists?.value?.[0];
         if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
         this.listId = list.id;

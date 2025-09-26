@@ -98,8 +98,8 @@ export function useTickets(
     } else {
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
-    if (range.from) filters.push(`fields/Date ge '${range.from}'`);
-    if (range.to)   filters.push(`fields/Date le '${range.to}'`);
+    if (range.from) filters.push(`fields/FechaApertura ge '${range.from}'`);
+    if (range.to)   filters.push(`fields/FechaApertura le '${range.to}'`);
 
     const filter = filters.join(' and ');
 
