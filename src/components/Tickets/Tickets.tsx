@@ -7,7 +7,7 @@ import { useAuth } from "../../auth/authContext"; // o la ruta que uses
 import { useGraphServices } from "../../graph/GrapServicesContext"; // tu context de servicios
 import { useTickets, calcularColorEstado, } from "../../Funcionalidades/Tickets" 
 import type { Ticket } from "../../Models/Tickets";
-import { toISODateFlex } from "../../utils/Date";
+import { toISODateTimeFlex } from "../../utils/Date";
 
 
 export default function TablaTickets() {
@@ -156,8 +156,8 @@ export default function TablaTickets() {
                   <td>{ticket.resolutor}</td>
                   <td>{ticket.solicitante}</td>
                   <td>{ticket.Title}</td>
-                  <td>{toISODateFlex(ticket.FechaApertura)|| "–"}</td>
-                  <td>{toISODateFlex(ticket.TiempoSolucion) || "No tiene fecha maxima"}</td>
+                  <td>{toISODateTimeFlex(ticket.FechaApertura)|| "–"}</td>
+                  <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "No tiene fecha maxima"}</td>
                   <td>
                     <span
                       className="estado-circulo"

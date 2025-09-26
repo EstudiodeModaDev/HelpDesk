@@ -2,7 +2,7 @@ import React from "react";
 import type { Ticket } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
-import { toISODateFlex } from "../utils/Date";
+import { toISODateFlex  } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 
 export function parseFecha(fecha?: string): Date {
