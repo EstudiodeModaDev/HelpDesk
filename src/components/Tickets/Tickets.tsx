@@ -50,7 +50,7 @@ export default function TablaTickets() {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter((t) => {
-      const texto = `${t.resolutor ?? ""} ${t.solicitante ?? ""} ${t.Title ?? ""}`.toLowerCase();
+      const texto = `${t.resolutor ?? ""} ${t.solicitante ?? ""} ${t.Title ?? ""} ${t.id}`.toLowerCase();
       return texto.includes(q);
     });
   }, [rows, search]);
