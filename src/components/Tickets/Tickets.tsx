@@ -155,8 +155,8 @@ export default function TablaTickets() {
                   <td>{ticket.resolutor}</td>
                   <td>{ticket.solicitante}</td>
                   <td>{ticket.Title}</td>
-                  <td>{toISODateFlex(ticket.FechaApertura) || "–"}</td>
-                  <td>{toISODateFlex(ticket.TiempoSolucion) || "–"}</td>
+                  <td>{ticket.FechaApertura|| "–"}</td>
+                  <td>{ticket.TiempoSolucion || "–"}</td>
                   <td>
                     <span
                       className="estado-circulo"
