@@ -21,7 +21,7 @@ function Shell() {
       if (account) {
         await signOut(); // hay sesión -> cerrar
       } else {
-        await signIn();  // no hay sesión -> iniciar
+        await signIn('popup');  // no hay sesión -> iniciar
       }
     } finally {
       setLoading(false);

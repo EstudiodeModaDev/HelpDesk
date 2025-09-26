@@ -1,13 +1,20 @@
 // src/auth/AuthProvider.tsx
 import * as React from 'react';
 import type { AccountInfo } from '@azure/msal-browser';
-import { initMSAL, ensureLogin, getAccessToken, logout } from './msal';
+import {
+  initMSAL,
+  ensureActiveAccount,
+  isLoggedIn,
+  getAccessToken,
+  ensureLogin,
+  logout,
+} from './msal';
 
 type AuthCtx = {
   ready: boolean;
   account: AccountInfo | null;
-  getToken: () => Promise<string>;
-  signIn: () => Promise<void>;
+  getToken: () => Promise<string>;     // NO fuerza login; falla si no hay sesión
+  signIn: (mode?: 'popup' | 'redirect') => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -17,43 +24,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [ready, setReady] = React.useState(false);
   const [account, setAccount] = React.useState<AccountInfo | null>(null);
 
-  // Solo inicializa MSAL (no forza login)
+  // Inicializa MSAL y rehidrata sesión si existe
   React.useEffect(() => {
     let cancel = false;
     (async () => {
       try {
-        await initMSAL();
-        console.log('[AuthProvider] MSAL initialized');
+        await initMSAL();                              // procesa handleRedirectPromise
+        const acc = ensureActiveAccount();             // toma active o primera cuenta
         if (!cancel) {
-          // si ya había sesión previa, refléjala
-          const acc = (window as any)._skip_auto_login
-            ? (null)
-            : (/* opcional: intentar “rehidratar” sesión */ null);
-          if (acc) setAccount(acc);
+          setAccount(acc ?? null);
           setReady(true);
         }
+        console.log('[AuthProvider] MSAL initialized');
       } catch (err) {
-        console.error('[AuthProvider] auto-login error:', err);
+        console.error('[AuthProvider] init error:', err);
         if (!cancel) setReady(true);
       }
     })();
     return () => { cancel = true; };
   }, []);
 
-  const signIn = React.useCallback(async () => {
-    const acc = await ensureLogin(); // popup
+  // Login explícito (por defecto, POPUP para evitar loops de redirect)
+  const signIn = React.useCallback(async (mode: 'popup' | 'redirect' = 'popup') => {
+    const acc = await ensureLogin(mode);
     setAccount(acc);
     setReady(true);
   }, []);
 
+  // Logout
   const signOut = React.useCallback(async () => {
     await logout();
     setAccount(null);
     setReady(true);
   }, []);
 
+  // Obtener token SIN forzar interacción (si no hay sesión, lanza error)
   const getToken = React.useCallback(async () => {
-    return getAccessToken();
+    if (!isLoggedIn()) {
+      // evita iniciar interacción desde aquí; deja que UI llame signIn()
+      throw new Error('No hay sesión iniciada. Inicia sesión para continuar.');
+    }
+    return getAccessToken({ interactionMode: 'popup', forceSilent: false });
   }, []);
 
   const value = React.useMemo<AuthCtx>(() => ({
