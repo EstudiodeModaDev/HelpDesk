@@ -7,7 +7,7 @@ import { useAuth } from "../../auth/authContext"; // o la ruta que uses
 import { useGraphServices } from "../../graph/GrapServicesContext"; // tu context de servicios
 import { useTickets, calcularColorEstado, } from "../../Funcionalidades/Tickets" 
 import type { Ticket } from "../../Models/Tickets";
-import { toISODateFlex } from "../../utils/Date";
+
 
 export default function TablaTickets() {
   const { account } = useAuth();
