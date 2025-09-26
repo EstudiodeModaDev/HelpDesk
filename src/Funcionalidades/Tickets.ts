@@ -114,7 +114,7 @@ export function useTickets(
     try {
       const opts = buildFilter();
       const list = await TicketsSvc.getAll(opts);
-      console.log('[Tickets] fetched', list.length, 'rows with filter:', opts.filter);
+      console.log('[Tickets] fetched', list, 'rows with filter:', opts.filter);
 
       setRows(list);
       setPageIndex(0); // reset paginación en cada recarga
