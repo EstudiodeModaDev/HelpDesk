@@ -26,6 +26,49 @@ export class TicketsService {
     this.listName = listName;
   }
 
+   private esc(s: string) { return String(s).replace(/'/g, "''"); }
+
+  // cache (mem + localStorage opcional)
+    private loadCache() {
+        try {
+        const k = `sp:${this.hostname}${this.sitePath}:${this.listName}`;
+        const raw = localStorage.getItem(k);
+        if (raw) {
+            const { siteId, listId } = JSON.parse(raw);
+            this.siteId = siteId || this.siteId;
+            this.listId = listId || this.listId;
+        }
+        } catch {}
+    }
+
+    private saveCache() {
+        try {
+        const k = `sp:${this.hostname}${this.sitePath}:${this.listName}`;
+        localStorage.setItem(k, JSON.stringify({ siteId: this.siteId, listId: this.listId }));
+        } catch {}
+    }
+
+    private async ensureIds() {
+        if (!this.siteId || !this.listId) this.loadCache();
+
+        if (!this.siteId) {
+        const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
+        this.siteId = site?.id;
+        if (!this.siteId) throw new Error('No se pudo resolver siteId');
+        this.saveCache();
+        }
+
+        if (!this.listId) {
+        const lists = await this.graph.get<any>(
+            `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
+        );
+        const list = lists?.value?.[0];
+        if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
+        this.listId = list.id;
+        this.saveCache();
+        }
+    }
+
   // ---------- mapping ----------
   private toModel(item: any): Ticket {
     const f = item?.fields ?? {};
@@ -79,78 +122,53 @@ export class TicketsService {
   }
 
   // ---------- CRUD ----------
-  async create(record: Omit<Ticket, 'ID' | 'id'>) {
-    await this.ensure();
+  async create(record: Omit<Ticket, 'ID'>) {
+    await this.ensureIds();
     const res = await this.graph.post<any>(
-      `/sites/${this.siteId}/lists/${this.listId}/items`,
-      { fields: record }
+    `/sites/${this.siteId}/lists/${this.listId}/items`,
+    { fields: record }
     );
     return this.toModel(res);
+}
+
+  async update(id: string, changed: Partial<Omit<Ticket, 'ID'>>) {
+        await this.ensureIds();
+        await this.graph.patch<any>(
+        `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
+        changed
+        );
+        const res = await this.graph.get<any>(
+        `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
+        );
+        return this.toModel(res);
   }
 
-  async update(id: string | number, changed: Partial<Omit<Ticket, 'ID' | 'id'>>) {
-    await this.ensure();
-    await this.graph.patch<any>(
-      `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
-      changed
-    );
-    const res = await this.graph.get<any>(
-      `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
-    );
-    return this.toModel(res);
-  }
-
-  async delete(id: string | number) {
-    await this.ensure();
-    await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
-  }
-
-  async get(id: string | number) {
-    await this.ensure();
-    const res = await this.graph.get<any>(
-      `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
-    );
-    return this.toModel(res);
-  }
-
-  async getAll(opts?: GetAllOpts) {
-    await this.ensure();
-
-    const qs = new URLSearchParams();
-    qs.set('$expand', 'fields');      // necesario para leer campos
-    // qs.set('$select', 'id,webUrl,fields'); // opcional
-
-    if (opts?.orderby) qs.set('$orderby', opts.orderby.trim());
-    if (opts?.top != null) qs.set('$top', String(opts.top));
-    if (opts?.filter) qs.set('$filter', opts.filter.trim());
-
-
-    // Evita '+' por espacios
-    const query = qs.toString().replace(/\+/g, '%20');
-
-    const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
-
-    console.debug('[TicketsService] getAll url:', url);
-    console.debug('[TicketsService] getAll qs:', query);
-    console.debug('[TicketsService] siteId/listId:', this.siteId, this.listId);
-
-    try {
-      const res = await this.graph.get<any>(url);
-      return (res.value ?? []).map((x: any) => this.toModel(x));
-    } catch (e: any) {
-      // Reintenta sin $filter si rompió por sintaxis (útil para diagnóstico)
-      const code = e?.error?.code ?? e?.code;
-      if (code === 'itemNotFound' && opts?.filter) {
-        const qs2 = new URLSearchParams(qs);
-        qs2.delete('$filter');
-        const url2 = `/sites/${this.siteId}/lists/${this.listId}/items?${qs2.toString()}`;
-        const res2 = await this.graph.get<any>(url2);
-        return (res2.value ?? []).map((x: any) => this.toModel(x));
-      }
-      throw e;
+    async delete(id: string) {
+        await this.ensureIds();
+        await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
     }
-  }
 
+    async get(id: string) {
+        await this.ensureIds();
+        const res = await this.graph.get<any>(
+        `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
+        );
+        return this.toModel(res);
+    }
+
+    async getAll(opts?: GetAllOpts) {
+        await this.ensureIds();
+        const qs = new URLSearchParams({ $expand: 'fields' });
+        if (opts?.filter) qs.set('$filter', opts.filter);
+        if (opts?.orderby) qs.set('$orderby', opts.orderby);
+        if (opts?.top != null) qs.set('$top', String(opts.top));
+
+        const res = await this.graph.get<any>(
+        `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`
+        );
+        const arr = Array.isArray(res?.value) ? res.value : [];
+        return arr.map((x: any) => this.toModel(x));
+    }
   // ---------- helpers de consulta ----------
   async findById(itemId: string | number, top = 1) {
     await this.ensure();
@@ -167,3 +185,6 @@ export class TicketsService {
     return (res.value ?? []).map((x: any) => this.toModel(x));
   }
 }
+
+
+
