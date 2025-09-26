@@ -157,7 +157,7 @@ export default function TablaTickets() {
                   <td>{ticket.solicitante}</td>
                   <td>{ticket.Title}</td>
                   <td>{toISODateFlex(ticket.FechaApertura)|| "–"}</td>
-                  <td>{toISODateFlex(ticket.TiempoSolucion) || "–"}</td>
+                  <td>{toISODateFlex(ticket.TiempoSolucion) || "No tiene fecha maxima"}</td>
                   <td>
                     <span
                       className="estado-circulo"
