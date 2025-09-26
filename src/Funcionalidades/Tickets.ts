@@ -93,17 +93,18 @@ export function useTickets(
     }
 
     if (filterMode === 'En curso') {
-      // Próximas ACTIVAS (>= hoy)
       filters.push(`(fields/Estadodesolicitud eq 'En atención' or fields/Estadodesolicitud eq 'Fuera de tiempo')`);
     } else {
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
-    if (range.from) filters.push(`fields/FechaApertura ge '${range.from}'`);
-    if (range.to)   filters.push(`fields/FechaApertura le '${range.to}'`);
+    if(range.from > range.to) {
+      if (range.from) filters.push(`fields/FechaApertura ge '${range.from}'`);
+      if (range.to)   filters.push(`fields/FechaApertura le '${range.to}'`);
+    }
 
     const filter = filters.join(' and ');
 
-    return { filter, top: 2000 };
+    return { filter, top: 5000 };
   }, [isAdmin, userMail, filterMode, range.from, range.to, today]);
 
   // ===== cargar datos =====
