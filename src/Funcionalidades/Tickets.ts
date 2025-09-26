@@ -2,7 +2,7 @@ import React from "react";
 import type { Ticket } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
-import { toISODate } from "../utils/Date";
+import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 
 export function parseFecha(fecha?: string): Date {
@@ -76,7 +76,7 @@ export function useTickets(
 
   const [filterMode, setFilterMode] = React.useState<FilterMode>('En curso');
 
-  const today = React.useMemo(() => toISODate(new Date()), []);
+  const today = React.useMemo(() => toISODateFlex(new Date()), []);
   const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
 
   const [pageSize, setPageSize] = React.useState<number>(10);

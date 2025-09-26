@@ -1,9 +1,17 @@
-// src/components/Tickets/Tickets.tsx
-import { parseFecha } from '../Funcionalidades/Tickets';
+export function parseFecha(fecha?: string): Date {
+  if (!fecha) return new Date(NaN);
+  const [dmy, hm] = fecha.trim().split(/\s+/);
+  if (!dmy || !hm) return new Date(NaN);
+  const [dia, mes, anio] = dmy.split('/');
+  const [horas, minutos] = hm.split(':');
+  if (!dia || !mes || !anio || !horas || !minutos) return new Date(NaN);
+  const iso = `${anio}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}T${horas.padStart(2,'0')}:${minutos.padStart(2,'0')}`;
+  const dt = new Date(iso);
+  return isNaN(dt.getTime()) ? new Date(NaN) : dt;
+}
 
-export function toISODate(v: Date): string;
-export function toISODate(v: string | undefined): string;
-export function toISODate(v: Date | string | undefined): string {
+/** Devuelve YYYY-MM-DD aceptando Date o "dd/mm/yyyy hh:mm". Vacío si inválido. */
+export function toISODateFlex(v?: Date | string): string {
   const d = v instanceof Date ? v : parseFecha(v);
-  return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
+  return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
 }
