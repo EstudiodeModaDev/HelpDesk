@@ -26,7 +26,7 @@ export class TicketsService {
     this.listName = listName;
   }
 
-   private esc(s: string) { return String(s).replace(/'/g, "''"); }
+   //private esc(s: string) { return String(s).replace(/'/g, "''"); }
 
   // cache (mem + localStorage opcional)
     private loadCache() {
@@ -54,17 +54,20 @@ export class TicketsService {
         if (!this.siteId) {
         const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
         this.siteId = site?.id;
+        console.log('Resolved siteId:', this.siteId);
         if (!this.siteId) throw new Error('No se pudo resolver siteId');
         this.saveCache();
         }
 
         if (!this.listId) {
         const lists = await this.graph.get<any>(
-            `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
+            //`/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
+            `/sites/${this.siteId}/lists`
         );
-        const list = lists?.value?.[0];
-        if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
-        this.listId = list.id;
+        console.log('Available lists:', lists?.value?.map((l: any) => l.displayName));
+        //const list = lists?.value?.[0];
+       // if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
+        //this.listId = list.id;
         this.saveCache();
         }
     }
