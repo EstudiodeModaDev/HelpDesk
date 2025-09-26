@@ -26,7 +26,7 @@ export class TicketsService {
     this.listName = listName;
   }
 
-   //private esc(s: string) { return String(s).replace(/'/g, "''"); }
+   private esc(s: string) { return String(s).replace(/'/g, "''"); }
 
   // cache (mem + localStorage opcional)
     private loadCache() {
@@ -61,13 +61,13 @@ export class TicketsService {
 
         if (!this.listId) {
         const lists = await this.graph.get<any>(
-            //`/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
-            `/sites/${this.siteId}/lists`
+            `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
         );
-        console.log('Available lists:', lists?.value?.map((l: any) => l.displayName));
-        //const list = lists?.value?.[0];
-       // if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
-        //this.listId = list.id;
+        const AvailableLists = await this.graph.get<any>(`/sites/${this.siteId}/lists`);
+        console.log('Available lists:', AvailableLists?.value?.map((l: any) => l.displayName));
+        const list = lists?.value?.[0];
+        if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
+        this.listId = list.id;
         this.saveCache();
         }
     }

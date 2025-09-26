@@ -73,7 +73,7 @@ type ProviderProps = {
 
 const DEFAULT_CONFIG: GraphSiteConfig = {
   hostname: 'estudiodemoda.sharepoint.com',
-  sitePath: '/sites/TransformacionDigital/IN/SA',
+  sitePath: '/sites/TransformacionDigital/IN/HD',
   lists: {
     Sociedades: 'Sociedades',
     Proveedores: 'Proeedores de internet',
