@@ -124,10 +124,15 @@ export class TicketsService {
     if (opts?.top != null) qs.set('$top', String(opts.top));
     if (opts?.filter) qs.set('$filter', opts.filter.trim());
 
+
     // Evita '+' por espacios
     const query = qs.toString().replace(/\+/g, '%20');
 
     const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
+
+    console.debug('[TicketsService] getAll url:', url);
+    console.debug('[TicketsService] getAll qs:', query);
+    console.debug('[TicketsService] siteId/listId:', this.siteId, this.listId);
 
     try {
       const res = await this.graph.get<any>(url);
