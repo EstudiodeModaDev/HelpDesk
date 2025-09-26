@@ -1,151 +1,74 @@
-// src/auth/AuthContext.tsx
-import * as React from "react";
-import {PublicClientApplication, LogLevel,} from "@azure/msal-browser";
-import type {  Configuration,   AccountInfo,   SilentRequest,   RedirectRequest,} from "@azure/msal-browser"
-// =====================
-// Tipos expuestos
-// =====================
-export type AuthCtx = {
-  ready: boolean;                 // MSAL listo para emitir tokens
-  account: AccountInfo | null;    // Cuenta activa (si hay)
-  getToken: (scopes?: string[]) => Promise<string>;
-  logout: () => Promise<void>;
+// src/auth/AuthProvider.tsx
+import * as React from 'react';
+import type { AccountInfo } from '@azure/msal-browser';
+import { initMSAL, ensureLogin, getAccessToken, logout } from './msal';
+
+type AuthCtx = {
+  ready: boolean;
+  account: AccountInfo | null;
+  getToken: () => Promise<string>;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
-const AuthContext = React.createContext<AuthCtx | null>(null);
+const Ctx = React.createContext<AuthCtx | null>(null);
 
-export const useAuth = (): AuthCtx => {
-  const ctx = React.useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
-  return ctx;
-};
-
-// =====================
-// Configuración MSAL
-// =====================
-// Usa variables de entorno o pon valores directos
-const REDIRECT_URI =
-  (import.meta.env.VITE_AAD_REDIRECT_URI as string | undefined) ||
-  window.location.origin;
-
-// Scopes por defecto para Graph (ajústalos a tu app/consentimiento)
-const DEFAULT_SCOPES = [
-  "User.Read",
-  "Sites.Read.All",
-  "Sites.ReadWrite.All",
-  // agrega otros si tu app los requiere:
-  // "Mail.Send",
-] as const;
-
-const msalConfig: Configuration = {
-  auth: {
-    clientId: "8d2f570b-7baa-4d6d-bb31-7ed206c06e11",
-    authority: `https://login.microsoftonline.com/cd48ecd9-7e15-4f4b-97d9-ec813ee42b2c`,
-    redirectUri: REDIRECT_URI,
-    navigateToLoginRequestUrl: true,
-  },
-  cache: {
-    cacheLocation: "localStorage", // o "sessionStorage"
-    storeAuthStateInCookie: false,
-  },
-  system: {
-    loggerOptions: {
-      logLevel: LogLevel.Error,
-      loggerCallback: () => {},
-    },
-  },
-};
-
-// =====================
-// Provider
-// =====================
-type Props = { children: React.ReactNode; scopes?: string[] };
-
-export const AuthProvider: React.FC<Props> = ({ children, scopes }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [ready, setReady] = React.useState(false);
   const [account, setAccount] = React.useState<AccountInfo | null>(null);
 
-  // Instancia MSAL singleton (memo)
-  const pca = React.useMemo(() => new PublicClientApplication(msalConfig), []);
-
-  // Elegir/guardar la cuenta activa
-  const pickActiveAccount = React.useCallback(() => {
-    const accounts = pca.getAllAccounts();
-    if (accounts.length > 0) {
-      pca.setActiveAccount(accounts[0]);
-      setAccount(accounts[0]);
-      return accounts[0];
-    }
-    setAccount(null);
-    return null;
-  }, [pca]);
-
-  // Inicialización + manejo de redirect
+  // Solo inicializa MSAL (no forza login)
   React.useEffect(() => {
-    let disposed = false;
+    let cancel = false;
     (async () => {
-      await pca.initialize();
-
-      // Procesa posibles respuestas de redirect
-      await pca.handleRedirectPromise().catch(() => {});
-
-      // Selecciona cuenta si ya había sesión
-      const acc = pickActiveAccount();
-
-      // Si no hay sesión → auto-login (redirect)
-      if (!acc) {
-        const loginReq: RedirectRequest = {
-          scopes: scopes && scopes.length ? scopes : Array.from(DEFAULT_SCOPES),
-        };
-        // No bloquea render, pero redirige inmediatamente
-        pca.loginRedirect(loginReq).catch(() => {});
-      }
-
-      if (!disposed) setReady(true);
-    })();
-
-    return () => {
-      disposed = true;
-    };
-  }, [pca, pickActiveAccount, scopes]);
-
-  // Helper: adquirir token
-  const getToken = React.useCallback(
-    async (customScopes?: string[]) => {
-      const active = pca.getActiveAccount() || pickActiveAccount();
-      const reqScopes = customScopes && customScopes.length
-        ? customScopes
-        : Array.from(DEFAULT_SCOPES);
-
-      const silentReq: SilentRequest = {
-        account: active ?? undefined,
-        scopes: reqScopes,
-      };
-
       try {
-        const res = await pca.acquireTokenSilent(silentReq);
-        return res.accessToken;
-      } catch {
-        // Si falla silent (p.ej. primer login o expiró refresh), redirige a login
-        await pca.acquireTokenRedirect({ scopes: reqScopes });
-        // la app regresará por redirect; aquí devolvemos cadena vacía para
-        // conformidad del tipo (no se usará).
-        return "";
+        await initMSAL();
+        console.log('[AuthProvider] MSAL initialized');
+        if (!cancel) {
+          // si ya había sesión previa, refléjala
+          const acc = (window as any)._skip_auto_login
+            ? (null)
+            : (/* opcional: intentar “rehidratar” sesión */ null);
+          if (acc) setAccount(acc);
+          setReady(true);
+        }
+      } catch (err) {
+        console.error('[AuthProvider] auto-login error:', err);
+        if (!cancel) setReady(true);
       }
-    },
-    [pca, pickActiveAccount]
-  );
+    })();
+    return () => { cancel = true; };
+  }, []);
 
-  // Helper: logout
-  const logout = React.useCallback(async () => {
-    const acc = pca.getActiveAccount() || undefined;
-    await pca.logoutRedirect({ account: acc });
-  }, [pca]);
+  const signIn = React.useCallback(async () => {
+    const acc = await ensureLogin(); // popup
+    setAccount(acc);
+    setReady(true);
+  }, []);
 
-  const value: AuthCtx = React.useMemo(
-    () => ({ ready, account, getToken, logout }),
-    [ready, account, getToken, logout]
-  );
+  const signOut = React.useCallback(async () => {
+    await logout();
+    setAccount(null);
+    setReady(true);
+  }, []);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const getToken = React.useCallback(async () => {
+    return getAccessToken();
+  }, []);
+
+  const value = React.useMemo<AuthCtx>(() => ({
+    ready,
+    account,
+    getToken,
+    signIn,
+    signOut,
+  }), [ready, account, getToken, signIn, signOut]);
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 };
+
+export function useAuth(): AuthCtx {
+  const ctx = React.useContext(Ctx);
+  if (!ctx) throw new Error('useAuth must be used within <AuthProvider>');
+  return ctx;
+}

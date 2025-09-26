@@ -1,0 +1,1 @@
+export const toISODate = (d: Date) => d.toISOString().slice(0, 10); //Parsear a formato YYYY-MM-DD

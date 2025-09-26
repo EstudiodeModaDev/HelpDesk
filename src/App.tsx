@@ -1,129 +1,139 @@
 // src/App.tsx
-import { useEffect, useState } from 'react';
-import './App.css';
-import Home from './components/Home/Home';
-import NuevoTicketForm from './components/NuevoTicket/NuevoTicketForm';
-import TablaTickets from './components/Tickets/Tickets';
-import TareasPage from './components/Tareas/Tareas';
-import type { User } from './Models/User';
-import Formatos from './components/Formatos/Formatos';
-import { GraphServicesProvider } from './graph/GrapServicesContext';
+import * as React from 'react';
+import { AuthProvider, useAuth } from './auth/authContext';
 
-
-const NAVS_ADMIN = [
-  { key: 'home',          label: 'Home',         icon: '🏠' },
-  { key: 'ticketform',    label: 'Nuevo Ticket', icon: '➕' },
-  { key: 'ticketTable',   label: 'Ver Tickets',  icon: '👁️' },
-  { key: 'task',          label: 'Tareas',       icon: '✅' },
-  { key: 'formatos', label: 'Formatos',icon: '👥' },
-  { key: 'reportes',      label: 'Reportes',     icon: '📊' },
-] as const;
-
-
-export type AdminNavKey = typeof NAVS_ADMIN[number]['key'];
-export type NavKey = AdminNavKey;
-
-function HeaderBar(props: {
-  user: User;
-  role: 'admin' | 'usuario';
-  onPrimaryAction?: { label: string; onClick: () => void } | null;
-}) {
-  const { user, role, onPrimaryAction } = props;
-  const isLogged = Boolean(user);
+export default function App() {
   return (
-    <div className="headerRow">
-      {/* Hamburguesa ya no es necesaria si el sidebar es fijo */}
-      <div className="brand"><h1>Helpdesk EDM</h1></div>
-      <div className="userCluster">
-        <div className="avatar">{user?.displayName ? user.displayName[0] : '?'}</div>
-        <div className="userInfo">
-          <div className="userName">{isLogged ? user?.displayName : 'Invitado'}</div>
-          <div className="userMail">{isLogged ? role : '–'}</div>
-        </div>
-        {onPrimaryAction && (
-          <button className="btn-logout" onClick={onPrimaryAction.onClick}>
-            ⎋ {onPrimaryAction.label}
+    <AuthProvider>
+      <Shell />
+    </AuthProvider>
+  );
+}
+
+function Shell() {
+  const { ready, account, signIn, signOut } = useAuth();
+  const [loading, setLoading] = React.useState(false);
+
+  const handleAuthClick = async () => {
+    if (!ready || loading) return;
+    setLoading(true);
+    try {
+      if (account) {
+        await signOut(); // hay sesión -> cerrar
+      } else {
+        await signIn();  // no hay sesión -> iniciar
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const buttonLabel = !ready
+    ? 'Cargando…'
+    : loading
+    ? (account ? 'Cerrando…' : 'Abriendo Microsoft…')
+    : (account ? 'Cerrar sesión' : 'Iniciar sesión');
+
+  return (
+    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          borderBottom: '1px solid #e5e7eb',
+          gap: 12,
+        }}
+      >
+        <strong style={{ fontSize: 18 }}>Mi App</strong>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {ready && account && (
+            <>
+              <div
+                title={account.username}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: '#1f3a8a',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: 13,
+                }}
+              >
+                {account.name?.slice(0, 1).toUpperCase() ?? 'U'}
+              </div>
+              <span style={{ fontSize: 14 }}>{account.name ?? account.username}</span>
+            </>
+          )}
+
+          {/* ÚNICO botón que alterna iniciar/cerrar */}
+          <button
+            type="button"
+            onClick={() => void handleAuthClick()}
+            disabled={!ready || loading}
+            aria-busy={loading}
+            style={btnStyle({ variant: account ? 'danger' : 'primary', disabled: !ready || loading })}
+          >
+            {buttonLabel}
           </button>
+        </div>
+      </header>
+
+      {/* Main */}
+      <main style={{ flex: 1, padding: 16 }}>
+        {!ready ? (
+          <p>Preparando autenticación…</p>
+        ) : account ? (
+          <div>
+            <h2 style={{ marginTop: 0 }}>Bienvenido, {account.name ?? account.username}</h2>
+            <p>Tu contenido privado va aquí.</p>
+          </div>
+        ) : (
+          <div
+            style={{
+              minHeight: '50vh',
+              display: 'grid',
+              placeItems: 'center',
+              textAlign: 'center',
+              color: '#334155',
+            }}
+          >
+            <div style={{ maxWidth: 460 }}>
+              <h2 style={{ marginTop: 0 }}>Necesitas iniciar sesión</h2>
+              <p>Usa el botón “Iniciar sesión” arriba a la derecha para continuar.</p>
+            </div>
+          </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function Sidebar(props: {
-  selected: NavKey;
-  onSelect: (k: NavKey) => void;
-}) {
-  const { selected, onSelect } = props;
-  return (
-    <aside className="sidebar" aria-label="Navegación principal">
-      <div className="sidebar__header">Menú</div>
-        <nav className="sidebar__nav" role="navigation">
-          {NAVS_ADMIN.map((nav) => (
-            <button
-              key={nav.key}
-              className={`sideItem ${selected === nav.key ? 'sideItem--active' : ''}`}
-              onClick={() => onSelect(nav.key)}
-              aria-current={selected === nav.key ? 'page' : undefined}
-            >
-              <span className="sideItem__icon" aria-hidden="true">{nav.icon ?? '•'}</span>
-              <span className="sideItem__label">{nav.label}</span>
-            </button>
-          ))}
-        </nav>
-      <div className="sidebar__footer"><small>Estudio de moda</small></div>
-    </aside>
-  );
-}
-
-function AppInner() {
-  const [selected, setSelected] = useState<NavKey>('home');
-  const [user, setUser] = useState<User>(null);
-  const [userRole] = useState<'admin' | 'usuario'>('admin');
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setUser({
-        displayName: 'Daniel Palacios',
-        mail: 'practicantelisto@estudiodemoda.com.co',
-        jobTitle: 'Desarrollador'
-      });
-    }, 1000);
-    return () => clearTimeout(t);
-  }, []);
-
-  const isAdmin = userRole === 'admin';
-
-  return (
-    <div className={`page layout ${isAdmin ? 'layout--withSidebar' : ''}`}>
-      {isAdmin && (
-        <Sidebar
-          selected={selected}
-          onSelect={(k) => setSelected(k)}
-        />
-      )}
-
-      <HeaderBar
-        user={user}
-        role={userRole}
-        onPrimaryAction={{ label: 'Cerrar sesión', onClick: () => alert('Cerrar sesión') }}
-      />
-
-      <main className={`content ${isAdmin ? 'content--withSidebar' : ''}`}>
-        {selected === 'home' && <Home />}
-        {selected === 'ticketform' && <NuevoTicketForm />}
-        {selected === 'ticketTable' && <TablaTickets />}
-        {selected === 'task' && <TareasPage />}
-        {selected === 'formatos' && <Formatos />}
       </main>
     </div>
   );
 }
 
-export default function App() {
-  return (
-      <GraphServicesProvider>
-        <AppInner />
-      </GraphServicesProvider>
-  );
+function btnStyle(opts: { variant: 'primary' | 'danger'; disabled?: boolean }): React.CSSProperties {
+  const palette =
+    opts.variant === 'primary'
+      ? { fg: '#1f3a8a', bg: '#ffffff', hoverBg: '#1f3a8a', hoverFg: '#ffffff', border: '#1f3a8a' }
+      : { fg: '#b91c1c', bg: '#ffffff', hoverBg: '#b91c1c', hoverFg: '#ffffff', border: '#b91c1c' };
+
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 16px',
+    borderRadius: 12,
+    border: `1px solid ${palette.border}`,
+    background: palette.bg,
+    color: palette.fg,
+    fontWeight: 500,
+    cursor: opts.disabled ? 'not-allowed' : 'pointer',
+    opacity: opts.disabled ? 0.6 : 1,
+    transition: 'background-color 180ms ease, color 180ms ease, border-color 180ms ease, opacity 120ms ease',
+  };
 }

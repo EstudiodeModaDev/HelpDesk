@@ -1,4 +1,9 @@
+import React from "react";
 import type { Ticket } from "../Models/Tickets";
+import { TicketsService } from "../Services/Tickets.service";
+import type { DateRange, FilterMode } from "../Models/Filtros";
+import { toISODate } from "../utils/Date";
+import type { GetAllOpts } from "../Models/Commons";
 
 export function parseFecha(fecha?: string): Date {
   if (!fecha) return new Date(NaN);
@@ -57,4 +62,128 @@ export function calcularColorEstado(ticket: Ticket): string {
   const alpha = Math.max(0.3, 1 - p);
 
   return `rgba(${r},${g},${b},${alpha})`;
+}
+
+export function useTickets(
+  TicketsSvc: TicketsService,
+  userMail: string,
+  isAdmin: boolean
+) {
+  // UI state
+  const [rows, setRows] = React.useState<Ticket[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const [filterMode, setFilterMode] = React.useState<FilterMode>('En curso');
+
+  const today = React.useMemo(() => toISODate(new Date()), []);
+  const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
+
+  const [pageSize, setPageSize] = React.useState<number>(10);
+  const [pageIndex, setPageIndex] = React.useState<number>(0);
+
+  const [reloadTick, setReloadTick] = React.useState(0);
+
+  // ===== construir filtro OData según modo =====
+  const buildFilter = React.useCallback((): GetAllOpts => {
+    const filters: string[] = [];
+    if (!isAdmin && userMail?.trim()) {
+      const emailSafe = userMail.replace(/'/g, "''");
+      filters.push(`fields/Title eq '${emailSafe}'`);
+    }
+
+    if (filterMode === 'En curso') {
+      // Próximas ACTIVAS (>= hoy)
+      filters.push(`(fields/Estadodesolicitud eq 'En atención' or fields/Estadodesolicitud eq 'Fuera de tiempo')`);
+    } else {
+      filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
+    }
+    if (range.from) filters.push(`fields/Date ge '${range.from}'`);
+    if (range.to)   filters.push(`fields/Date le '${range.to}'`);
+
+    const filter = filters.join(' and ');
+
+    return { filter, top: 2000 };
+  }, [isAdmin, userMail, filterMode, range.from, range.to, today]);
+
+  // ===== cargar datos =====
+  const fetchRows = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const opts = buildFilter();
+      const list = await TicketsSvc.getAll(opts);
+
+      setRows(list);
+      setPageIndex(0); // reset paginación en cada recarga
+    } catch (e: any) {
+      console.error('[MisReservas] fetchRows error:', e);
+      setError(e?.message ?? 'Error cargando reservas');
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [buildFilter, TicketsSvc]);
+
+  // Primer load + recargas controladas
+  React.useEffect(() => {
+    let cancel = false;
+    (async () => {
+      await fetchRows();
+      if (cancel) return;
+    })();
+    return () => { cancel = true; };
+    // reloadTick asegura que sólo apliquemos rango cuando el usuario pulse “Buscar”
+  }, [fetchRows, reloadTick]);
+
+  // ===== acciones públicas =====
+  const nextPage = React.useCallback(() => {
+    setPageIndex(i => i + 1);
+  }, []);
+  const prevPage = React.useCallback(() => {
+    setPageIndex(i => Math.max(0, i - 1));
+  }, []);
+
+  const hasNext = React.useMemo(() => {
+    const total = rows.length;
+    return (pageIndex + 1) * pageSize < total;
+  }, [rows.length, pageIndex, pageSize]);
+
+  const applyRange = React.useCallback(() => {
+    // Sólo tiene efecto en modo historial; en “upcoming-active” igual recarga.
+    setReloadTick(x => x + 1);
+  }, []);
+
+  const reloadAll = React.useCallback(() => {
+    // Recarga general (úsalo después de reservar/cancelar)
+    setReloadTick(x => x + 1);
+  }, []);
+
+
+  return {
+    // datos
+    rows,
+    loading,
+    error,
+
+    // filtros
+    filterMode,
+    setFilterMode,
+
+    // rango (para “Historial”)
+    range,
+    setRange,
+    applyRange,
+
+    // paginación
+    pageSize,
+    setPageSize,
+    pageIndex,
+    hasNext,
+    nextPage,
+    prevPage,
+
+    // acciones
+    reloadAll, // 👈 expuesto
+  };
 }

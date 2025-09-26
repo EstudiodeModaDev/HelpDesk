@@ -172,3 +172,13 @@
   :root{ --sb-width: 220px; --header-h: 56px; }
   .sideItem{ font-size:13px; }
 }
+
+/* agrega al final de src/components/auth/LoginButton.css */
+.logout-btn {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+.logout-btn:hover:not(:disabled) {
+  background: #b91c1c;
+  color: #fff;
+}
