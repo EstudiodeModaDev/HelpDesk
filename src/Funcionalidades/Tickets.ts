@@ -133,7 +133,7 @@ export function useTickets(
 
     // Estabilidad de orden: si no incluiste 'id', agrega 'id desc' como desempate.
     if (!sorts.some(s => s.field === 'id')) {
-      orderParts.push('Id desc');
+      orderParts.push('ID desc');
     }
 
     return {
@@ -189,7 +189,7 @@ export function useTickets(
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   const sortFieldToOData: Record<SortField, string> = {
-    id: 'Id',
+    id: 'ID',
     FechaApertura: 'fields/FechaApertura',
     TiempoSolucion: 'fields/TiempoSolucion',
     Title: 'fields/Title',
