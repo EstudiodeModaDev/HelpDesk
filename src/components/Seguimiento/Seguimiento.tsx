@@ -167,14 +167,14 @@ export default function TicketHistorial({
 
 function mapItemsToMensajes(items: any[]): Log[] {
   return items.map((it: any) => ({
-    Id: String(it.id ?? cryptoRandom()),
-    Actor: it.fields?.Autor ?? "Sistema",
+    Id: String(it.Id ?? cryptoRandom()),
+    Actor: it.Actor ?? "Sistema",
     //autorAvatarUrl: it.fields?.AvatarUrl ?? undefined,
-    Created: normalizeToISO(it.fields?.FechaCreacion),
-    Title: it.fields?.Titulo ?? undefined,
-    Descripcion: it.fields?.Texto ?? "",
-    Tipo_de_accion: mapTipo(it.fields?.Tipo),
-    CorreoActor: it.fields?.CorreoAutor ?? undefined,
+    Created: normalizeToISO(it.Created),
+    Title: it.Title ?? undefined,
+    Descripcion: it.Descripcion ?? "",
+    Tipo_de_accion: mapTipo(it.Tipo_de_accion),
+    CorreoActor: it.CorreoActor
   }));
 }
 

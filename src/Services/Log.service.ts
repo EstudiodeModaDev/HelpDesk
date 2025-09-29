@@ -77,7 +77,8 @@ export class LogService {
         Descripcion: f.Descripcion,
         Tipo_de_accion: f.Tipo_de_accion,
         Actor: f.Actor,
-        CorreoActor: f.CorreoActor
+        CorreoActor: f.CorreoActor,
+        Created : f.Created
     };
   }
 
