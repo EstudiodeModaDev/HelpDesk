@@ -127,16 +127,20 @@ const imgStyle: React.CSSProperties = {
 };
 
 const closeBtnStyle: React.CSSProperties = {
-  position: "absolute",
+  position: "absolute", // o fixed si usas la opción B
   top: 8,
   right: 8,
   width: 36,
   height: 36,
-  borderRadius: "9999px",
   border: "none",
-  fontSize: 24,
-  lineHeight: "36px",
-  cursor: "pointer",
+  borderRadius: "9999px",
   background: "rgba(255,255,255,0.95)",
   boxShadow: "0 2px 10px rgba(0,0,0,.25)",
+  cursor: "pointer",
+  padding: 0,
+  display: "flex",                 // 👈
+  alignItems: "center",            // 👈
+  justifyContent: "center",        // 👈
+  fontSize: 22,
+  lineHeight: 1,                   // 👈 evita baseline raro
 };
