@@ -12,6 +12,7 @@ import type { User } from './Models/User';
 import { GraphServicesProvider } from './graph/GrapServicesContext';
 
 import { AuthProvider, useAuth } from './auth/authContext'; // ajusta la ruta si tu archivo se llama distinto
+import { useUserRoleFromSP } from './Funcionalidades/Usuarios';
 
 /* ---------------------- NAV ---------------------- */
 const NAVS_ADMIN = [
@@ -91,17 +92,23 @@ function Shell() {
   const [selected, setSelected] = React.useState<NavKey>('home');
   const [loadingAuth, setLoadingAuth] = React.useState(false);
 
-  // Mapear la cuenta MSAL a tu tipo User (para el Header)
+  // Mapear cuenta -> User
   const user: User = account
     ? {
         displayName: account.name ?? account.username ?? 'Usuario',
         mail: account.username ?? '',
-        jobTitle: '', // si luego lo traes de Graph, lo rellenas aquí
+        jobTitle: '',
       }
     : null;
 
   const isLogged = Boolean(account);
-  const userRole: 'admin' | 'usuario' = 'admin'; // ajusta tu lógica de roles si aplica
+
+  // 👇 Usa el hook con un mail "seguro" (puede ser null si no hay sesión)
+  const mail = user?.mail ?? null;
+  const { role } = useUserRoleFromSP(mail);
+
+  // 👇 Deriva lo que usas en la UI
+  const userRole: 'admin' | 'usuario' = role === 'admin' ? 'admin' : 'usuario';
   const isAdmin = userRole === 'admin';
 
   const handleAuthClick = async () => {
@@ -111,7 +118,7 @@ function Shell() {
       if (isLogged) {
         await signOut();
       } else {
-        await signIn('popup'); // forzamos popup para evitar loops por redirect
+        await signIn('popup');
       }
     } finally {
       setLoadingAuth(false);
@@ -124,7 +131,7 @@ function Shell() {
     ? (isLogged ? 'Cerrando…' : 'Abriendo Microsoft…')
     : (isLogged ? 'Cerrar sesión' : 'Iniciar sesión');
 
-  /* === NO LOGUEADO: solo header con botón “Iniciar sesión” === */
+  // No logueado
   if (!ready || !isLogged) {
     return (
       <div className="page layout">
@@ -137,12 +144,11 @@ function Shell() {
             disabled: !ready || loadingAuth,
           }}
         />
-        {/* Sin sidebar ni main cuando no hay sesión */}
       </div>
     );
   }
 
-  /* === LOGUEADO: layout completo con sidebar + contenido === */
+  // Logueado
   return (
     <div className={`page layout ${isAdmin ? 'layout--withSidebar' : ''}`}>
       {isAdmin && (
@@ -163,16 +169,22 @@ function Shell() {
       />
 
       <main className={`content ${isAdmin ? 'content--withSidebar' : ''}`}>
-        {selected === 'home' && <Home />}
-        {selected === 'ticketform' && <NuevoTicketForm />}
-        {selected === 'ticketTable' && <TablaTickets />}
-        {selected === 'task' && <TareasPage />}
-        {selected === 'formatos' && <Formatos />}
-        {/* {selected === 'reportes' && <Reportes />} // agrega tu componente cuando esté listo */}
+        {/* Opcional: mientras resuelve el rol puedes bloquear contenido sensible */}
+        {/* {loadingRole ? <p>Cargando permisos…</p> : ( */}
+          <>
+            {selected === 'home' && <Home />}
+            {selected === 'ticketform' && <NuevoTicketForm />}
+            {selected === 'ticketTable' && <TablaTickets />}
+            {selected === 'task' && <TareasPage />}
+            {selected === 'formatos' && <Formatos />}
+            {/* {selected === 'reportes' && <Reportes />} */}
+          </>
+        {/* )} */}
       </main>
     </div>
   );
 }
+
 
 /* ---------------------- App Root ---------------------- */
 export default function App() {
