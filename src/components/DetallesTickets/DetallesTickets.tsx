@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
 import TicketHistorial from '../Seguimiento/Seguimiento'; // ajusta la ruta si es diferente
+import HtmlContent from '../Renderizador/Renderizador';
 
 export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void }) {
   if (!ticket) return <div>Ticket no encontrado</div>;
@@ -53,7 +54,7 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
       <div className="fila">
         <div className="campo">
           <label>Descripción del caso</label>
-          <span>{ticket.Descripcion || '–'}</span>
+          <span><HtmlContent html={ticket.Descripcion} /></span>
         </div>
 
         <div className="campo">

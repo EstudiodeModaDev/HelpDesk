@@ -1,51 +1,48 @@
 import * as React from "react";
 import "./Seguimiento.css";
 import HtmlContent from "../Renderizador/Renderizador";
-
-// Ajusta esta import si tu contexto/servicio está en otra ruta:
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
 
 type Rol = "admin" | "tecnico" | "usuario";
 type Tab = "seguimiento" | "solucion";
 
-
-type Props = {role: Rol; ticketId: string | number; onVolver?: () => void; onAddClick?: (m: Log) => void; onViewClick?: (m: Log) => void; defaultTab?: Tab; className?: string;};
+type Props = {
+  role: Rol;
+  ticketId: string | number;
+  onVolver?: () => void;
+  onAddClick?: (m: Log) => void;
+  onViewClick?: (m: Log) => void;
+  defaultTab?: Tab;
+  className?: string;
+};
 
 export default function TicketHistorial({
   role,
   ticketId,
   onVolver,
-  onAddClick,
-  onViewClick,
   defaultTab = "solucion",
   className,
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
-  const isPrivileged = role === "admin" || role === "tecnico";
+  const isPrivileged = role === "admin"; // 👈 solo admin ve acciones
 
-  const { Logs } = useGraphServices(); // debe exponer tu LogService
+  const { Logs } = useGraphServices();
 
   const [mensajes, setMensajes] = React.useState<Log[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Cargar primera página
   React.useEffect(() => {
     let cancel = false;
     const load = async () => {
       setLoading(true); setError(null);
-      console.log("Cargando mensajes para ticketId:", ticketId);
       try {
         const items = await Logs.getAll({
-        filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`, // 👈 índice
-        orderby: "fields/Created asc,id asc",
-        top: 2000, // pagina
-        // select: "id,webUrl,fields(Autor,Texto,Created,Titulo,Tipo,CorreoAutor)" // opcional, reduce payload
+          filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`,
+          orderby: "fields/Created asc,id asc",
+          top: 2000,
         });
-
-        console.log("Cargados mensajes:", items);
-
         if (cancel) return;
         const mapped = mapItemsToMensajes(items);
         setMensajes(mapped);
@@ -62,115 +59,88 @@ export default function TicketHistorial({
   }, [ticketId, Logs]);
 
   return (
-  <div className={className ?? ""} style={{ padding: 16 }}>
-    {/* Header */}
-    <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-      <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>
-        Agregar :
-      </span>
+    <div className={className ?? ""} style={{ padding: 16 }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>
+          Agregar :
+        </span>
 
-      <div style={{ display: "flex", gap: 8 }}>
-        <button
-          type="button"
-          onClick={() => setTab("seguimiento")}
-          className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
-        >
-          Seguimiento
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("solucion")}
-          className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
-        >
-          Solución
-        </button>
-      </div>
-
-      <div style={{ marginLeft: "auto" }}>
-        <button type="button" className="th-back" onClick={onVolver}>
-          <span className="th-back-icon" aria-hidden>←</span> Volver
-        </button>
-      </div>
-    </div>
-
-    {/* Caja principal */}
-    <div className="th-box">
-      {loading && mensajes.length === 0 && (
-        <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>
-      )}
-      {error && <p style={{ color: "#b91c1c", padding: 16 }}>{error}</p>}
-
-      {!loading && !error && mensajes.length === 0 && (
-        <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>
-      )}
-
-      {mensajes.map((m) => (
-        <div key={m.Id} className="th-row">
-          {/* izquierda: avatar + nombre + fecha */}
-          <div className="th-left">
-            <div className="th-avatar">
-              {/* avatar opcional */}
-              {/* {m.autorAvatarUrl ? (
-                <img src={m.autorAvatarUrl} alt={m.Actor} />
-              ) : ( */}
-              <div className="th-avatar-fallback" aria-hidden>👤</div>
-              {/* )} */}
-            </div>
-            <div className="th-meta">
-              <div className="th-nombre">{m.Actor}</div>
-              <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>
-            </div>
+        {/* 👇 Tabs SOLO para admins */}
+        {isPrivileged && (
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => setTab("seguimiento")}
+              className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
+            >
+              Seguimiento
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("solucion")}
+              className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
+            >
+              Solución
+            </button>
           </div>
+        )}
 
-          {/* derecha: burbuja + acciones */}
-          <div className="th-right">
-            <div className="th-bubble">
-            {/* Si Title viene con HTML, también puedes renderizarlo con HtmlContent */}
-            {m.Title && <HtmlContent className="th-title" html={m.Title} />}
-            <HtmlContent className="th-text" html={m.Descripcion} />
-            </div>
-
-            {isPrivileged && (
-              <div className="th-actions">
-                <button
-                  type="button"
-                  className="th-action-btn"
-                  title="Agregar"
-                  onClick={() => onAddClick?.(m)}
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  className="th-action-btn"
-                  title="Ver detalle"
-                  onClick={() => onViewClick?.(m)}
-                >
-                  🔍
-                </button>
-              </div>
-            )}
-          </div>
+        <div style={{ marginLeft: "auto" }}>
+          <button type="button" className="th-back" onClick={onVolver}>
+            <span className="th-back-icon" aria-hidden>←</span> Volver
+          </button>
         </div>
-      ))}
-    </div>
+      </div>
 
-    {/* Footer */}
-    <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
-      <button className="th-history-link" type="button" onClick={() => setTab("seguimiento")}>
-        Historial completo
-      </button>
+      {/* Caja principal */}
+      <div className="th-box">
+        {loading && mensajes.length === 0 && (
+          <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>
+        )}
+        {error && <p style={{ color: "#b91c1c", padding: 16 }}>{error}</p>}
+        {!loading && !error && mensajes.length === 0 && (
+          <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>
+        )}
+
+        {mensajes.map((m) => (
+          <div key={m.Id} className="th-row">
+            <div className="th-left">
+              <div className="th-avatar">
+                <div className="th-avatar-fallback" aria-hidden>👤</div>
+              </div>
+              <div className="th-meta">
+                <div className="th-nombre">{m.Actor}</div>
+                <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>
+              </div>
+            </div>
+
+            <div className="th-right">
+              <div className="th-bubble">
+                {m.Title && <HtmlContent className="th-title" html={m.Title} />}
+                <HtmlContent className="th-text" html={m.Descripcion} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer: lo dejo como está (visible para todos) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+        <button className="th-history-link" type="button" onClick={() => setTab("seguimiento")}>
+          Historial completo
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
 }
+
 /* ---------------- helpers ---------------- */
 
 function mapItemsToMensajes(items: any[]): Log[] {
-  return items.map((it: any) => ({
+  return (Array.isArray(items) ? items : []).map((it: any) => ({
     Id: String(it.Id),
     Actor: it.Actor ?? "Sistema",
-    //autorAvatarUrl: it.fields?.AvatarUrl ?? undefined,
     Created: normalizeToISO(it.Created),
     Title: it.Title ?? undefined,
     Descripcion: it.Descripcion ?? "",
@@ -179,17 +149,14 @@ function mapItemsToMensajes(items: any[]): Log[] {
   }));
 }
 
-
 function normalizeToISO(v: string | undefined): string {
   if (!v) return new Date().toISOString();
-  if (/^\d{4}-\d{2}-\d{2}t/i.test(v)) return v; // ya es ISO
-  // Soporta "DD/MM/YYYY HH:mm"
+  if (/^\d{4}-\d{2}-\d{2}t/i.test(v)) return v;
   const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
   if (m) {
     const [, dd, mm, yyyy, HH, MM] = m;
     return `${yyyy}-${mm}-${dd}T${HH}:${MM}:00`;
   }
-  // Último recurso: Date parse
   const d = new Date(v);
   return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
 }
@@ -200,5 +167,3 @@ function formatDateTime(iso: string) {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-
-
