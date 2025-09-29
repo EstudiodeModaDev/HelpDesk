@@ -44,6 +44,8 @@ export function useTickets(
     if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
     if (range.to)   filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
 
+    console.log("OData filters:", filters);
+    console.log("top", pageSize);
     return {
       filter: filters.join(" and "),
       orderby: "fields/FechaApertura desc,id desc", // orden estable
@@ -56,6 +58,7 @@ export function useTickets(
     setLoading(true); setError(null);
     try {
       const { items, nextLink } = await TicketsSvc.getAll(buildFilter()); // debe devolver {items,nextLink}
+      console.log("Tickets cargados:", items.length, "nextLink:", nextLink);
       setRows(items);
       setNextLink(nextLink ?? null);
       setPageIndex(1);

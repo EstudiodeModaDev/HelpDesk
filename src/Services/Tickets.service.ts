@@ -180,6 +180,7 @@ export class TicketsService {
     const raw = Array.isArray(res?.value) ? res.value : [];
     const items = raw.map((x: any) => this.toModel(x));
     const nextLink = (res && res['@odata.nextLink']) ? String(res['@odata.nextLink']) : null;
+    console.log("Fetched page:", items.length, "items", raw, "nextLink:", nextLink);
     return { items, nextLink };
   }
   // ---------- helpers de consulta ----------
