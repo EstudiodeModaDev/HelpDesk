@@ -1,5 +1,5 @@
 import React from "react";
-import type { Ticket } from "../Models/Tickets";
+import type { SortDir, SortField, Ticket } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
@@ -101,6 +101,8 @@ export function useTickets(
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
 
+  const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
+
   // construir filtro OData
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
@@ -116,18 +118,30 @@ export function useTickets(
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
 
-    if( range.from && range.to && (range.from < range.to) ) {
+    if (range.from && range.to && (range.from < range.to)) {
       if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
       if (range.to)   filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
     }
-    console.log("OData filters:", filters);
-    console.log("top", pageSize);
+
+    // ← NUEVO: construir orderby desde 'sorts'
+    const orderParts: string[] = sorts
+      .map(s => {
+        const col = sortFieldToOData[s.field];
+        return col ? `${col} ${s.dir}` : '';
+      })
+      .filter(Boolean);
+
+    // Estabilidad de orden: si no incluiste 'id', agrega 'id desc' como desempate.
+    if (!sorts.some(s => s.field === 'id')) {
+      orderParts.push('id desc');
+    }
+
     return {
       filter: filters.join(" and "),
-      orderby: "fields/FechaApertura desc,id desc", // orden estable
+      orderby: orderParts.join(","),
       top: pageSize,
     };
-  }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize]);
+  }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize, sorts]); // ← agrega 'sorts' a deps
 
   // cargar primera página (o recargar)
   const loadFirstPage = React.useCallback(async () => {
@@ -146,7 +160,7 @@ export function useTickets(
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc, buildFilter]);
+  }, [TicketsSvc, buildFilter, sorts]);
 
   React.useEffect(() => {
     loadFirstPage();
@@ -174,6 +188,35 @@ export function useTickets(
   const applyRange = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
+  const sortFieldToOData: Record<SortField, string> = {
+    id: 'id',
+    FechaApertura: 'fields/FechaApertura',
+    TiempoSolucion: 'fields/TiempoSolucion',
+    Title: 'fields/Title',
+    resolutor: 'fields/Nombreresolutor',
+  };
+
+  const toggleSort = React.useCallback((field: SortField, additive = false) => {
+    setSorts(prev => {
+      const idx = prev.findIndex(s => s.field === field);
+      if (!additive) {
+        // clic normal: solo esta columna; alterna asc/desc
+        if (idx >= 0) {
+          const dir: SortDir = prev[idx].dir === 'desc' ? 'asc' : 'desc';
+          return [{ field, dir }];
+        }
+        return [{ field, dir: 'asc' }];
+      }
+      // Shift+clic: multi-columna
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = { field, dir: copy[idx].dir === 'desc' ? 'asc' : 'desc' };
+        return copy;
+      }
+      return [...prev, { field, dir: 'asc' }];
+    });
+  }, []);
+
   return {
     // datos visibles (solo la página actual)
     rows,
@@ -193,5 +236,7 @@ export function useTickets(
 
     // acciones
     reloadAll,
+    toggleSort,
+    sorts,
   };
 }

@@ -8,12 +8,11 @@ export type Ticket = {
   TiempoSolucion?: string;   // "dd/mm/yyyy hh:mm"
   estado?: string;
   observador?: string;
-  descripcion?: string;
+  Descripcion?: string;
   Categoria?: string;
   Subcategoria?: string;
   Articulo?: string;
   Fuente?: string;
-  Descripcion?: string;
   CorreoResolutor?: string;
   CorreoSolicitante?: string;
   IdCasoPadre?: string;
@@ -22,7 +21,5 @@ export type Ticket = {
 };
 
 // Para filtros locales
-export type TicketLike = {
-  estado?: string | null;           // 'Estado de solicitud'
-  TiempoSolucion?: string | null;   // formato "dd/mm/yyyy hh:mm"
-};
+export type SortDir = 'asc' | 'desc';
+export type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';

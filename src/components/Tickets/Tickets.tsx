@@ -6,8 +6,15 @@ import "./Tickets.css";
 import { useAuth } from "../../auth/authContext";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { calcularColorEstado, useTickets } from "../../Funcionalidades/Tickets";
-import type { Ticket } from "../../Models/Tickets";
+import type { SortDir, SortField, Ticket } from "../../Models/Tickets";
 import { toISODateTimeFlex } from "../../utils/Date";
+
+function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; dir: SortDir}>) {
+  const idx = sorts.findIndex(s => s.field === field);
+  if (idx < 0) return null;
+  const dir = sorts[idx].dir === 'asc' ? '▲' : '▼';
+  return <span style={{ marginLeft: 6, opacity: 0.85 }}>{dir}{sorts.length > 1 ? ` ${idx+1}` : ''}</span>;
+}
 
 export default function TablaTickets() {
   const { account } = useAuth();
@@ -35,7 +42,9 @@ export default function TablaTickets() {
     pageIndex,      // 1-based
     hasNext,        // !!nextLink
     nextPage,       // sigue @odata.nextLink
-    reloadAll,      // recarga primera página (para “Anterior”)
+    reloadAll, 
+    toggleSort,
+    sorts     // recarga primera página (para “Anterior”)
 
   } = useTickets(Tickets, userMail, isAdmin);
 
@@ -127,12 +136,63 @@ export default function TablaTickets() {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Resolutor</th>
-                <th>Solicitante</th>
-                <th>Asunto</th>
-                <th>Fecha de apertura</th>
-                <th>Fecha máxima</th>
+                <th
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => toggleSort('id', e.shiftKey)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('id', e.shiftKey); }}
+                  aria-label="Ordenar por ID"
+                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  ID {renderSortIndicator('id', sorts)}
+                </th>
+
+                <th
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => toggleSort('resolutor', e.shiftKey)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('resolutor', e.shiftKey); }}
+                  aria-label="Ordenar por Resolutor"
+                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  Resolutor {renderSortIndicator('resolutor', sorts)}
+                </th>
+
+                <th>Solicitante</th> {/* si quieres ordenar por Solicitante, avísame y lo añadimos al mapping */}
+
+                <th
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => toggleSort('Title', e.shiftKey)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('Title', e.shiftKey); }}
+                  aria-label="Ordenar por Asunto"
+                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  Asunto {renderSortIndicator('Title', sorts)}
+                </th>
+
+                <th
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => toggleSort('FechaApertura', e.shiftKey)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('FechaApertura', e.shiftKey); }}
+                  aria-label="Ordenar por Fecha de apertura"
+                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  Fecha de apertura {renderSortIndicator('FechaApertura', sorts)}
+                </th>
+
+                <th
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => toggleSort('TiempoSolucion', e.shiftKey)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('TiempoSolucion', e.shiftKey); }}
+                  aria-label="Ordenar por Fecha máxima"
+                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  Fecha máxima {renderSortIndicator('TiempoSolucion', sorts)}
+                </th>
+
                 <th>Estado</th>
               </tr>
             </thead>
@@ -173,7 +233,7 @@ export default function TablaTickets() {
                 Siguiente
               </button>
 
-              <span style={{ marginLeft: 12 }}>Filas por página ($top):</span>
+              <span style={{ marginLeft: 12 }}>Registris por pagina:</span>
               <select
                 value={pageSize}
                 onChange={(e) => setPageSize(Number(e.target.value))}

@@ -50,7 +50,7 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
       <div className="fila">
         <div className="campo">
           <label>Descripción del caso</label>
-          <span>{ticket.descripcion || '–'}</span>
+          <span>{ticket.Descripcion || '–'}</span>
         </div>
 
         <div className="campo">
