@@ -11,6 +11,7 @@ export function useUserRoleFromSP(email?: string | null) {
   React.useEffect(() => {
     let cancel = false;
     (async () => {
+      console.log("email", email)
       if (!email) { setRole("usuario"); return; }
 
       const cacheKey = `role:${email.toLowerCase()}`;
@@ -25,14 +26,14 @@ export function useUserRoleFromSP(email?: string | null) {
           filter: `fields/Correo eq '${safe}'`,  
           top: 1,
         });
+        console.log("Rol encontrado", resp)
 
         const items = Array.isArray(resp) ? resp : resp?.items ?? [];
         const rolSP = items?.[0]?.fields?.Rol as string | undefined;
-
-        const mapped: string = mapRol(rolSP);
+        console.log("Rol normalizado", rolSP)
         if (!cancel) {
-          setRole(mapped);
-          sessionStorage.setItem(cacheKey, mapped);
+          setRole(rolSP ?? "No encontrado");
+          sessionStorage.setItem(cacheKey, rolSP ?? "No encontrado");
         }
       } catch (e: any) {
         if (!cancel) setError(e?.message ?? "No se pudo obtener el rol");
@@ -45,11 +46,4 @@ export function useUserRoleFromSP(email?: string | null) {
   }, [email, Usuarios]);
 
   return { role, loading, error };
-}
-
-function mapRol(v?: string): string {
-  const t = (v ?? "").toLowerCase();
-  if (t.includes("admin")) return "admin";
-  if (t.includes("tec")) return "tecnico";
-  return "usuario";
 }
