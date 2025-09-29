@@ -36,7 +36,7 @@ export default function TicketHistorial({
       setLoading(true); setError(null);
       try {
         const { items } = await Logs.getAll({
-        filter: `fields/IdCaso eq '${String(ticketId).replace(/'/g, "''")}'`, // 👈 índice
+        filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`, // 👈 índice
         orderby: "fields/Created asc,id asc",
         top: 2000, // pagina
         // select: "id,webUrl,fields(Autor,Texto,Created,Titulo,Tipo,CorreoAutor)" // opcional, reduce payload
