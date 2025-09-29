@@ -20,3 +20,4 @@ export type Ticket = {
   ANS?: string;
   CorreoObservador?: string;
 };
+

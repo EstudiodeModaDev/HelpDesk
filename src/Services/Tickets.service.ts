@@ -1,6 +1,6 @@
 // src/Services/Tickets.service.ts
 import { GraphRest } from '../graph/GraphRest';
-import type { GetAllOpts } from '../Models/Commons';
+import type { GetAllOpts, PageResult } from '../Models/Commons';
 import type { Ticket } from '../Models/Tickets';
 import { ensureIds, esc } from '../utils/Commons';
 
@@ -144,33 +144,44 @@ export class TicketsService {
         return this.toModel(res);
   }
 
-    async delete(id: string) {
-        await this.ensureIds();
-        await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
-    }
+  async delete(id: string) {
+      await this.ensureIds();
+      await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
+  }
 
-    async get(id: string) {
-        await this.ensureIds();
-        const res = await this.graph.get<any>(
-        `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
-        );
-        return this.toModel(res);
-    }
+  async get(id: string) {
+      await this.ensureIds();
+      const res = await this.graph.get<any>(
+      `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
+      );
+      return this.toModel(res);
+  }
 
-    async getAll(opts?: GetAllOpts) {
-        await this.ensureIds();
-        const qs = new URLSearchParams({ $expand: 'fields' });
-        if (opts?.filter) qs.set('$filter', opts.filter);
-        if (opts?.orderby) qs.set('$orderby', opts.orderby);
-        if (opts?.top != null) qs.set('$top', String(opts.top));
+  async getAll(opts?: GetAllOpts): Promise<PageResult<Ticket>> {
+    await this.ensureIds();
 
-        const res = await this.graph.get<any>(
-        `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`
-        );
-        console.log('getAll response:', res);
-        const arr = Array.isArray(res?.value) ? res.value : [];
-        return arr.map((x: any) => this.toModel(x));
-    }
+    const qs = new URLSearchParams({ $expand: 'fields' });
+    if (opts?.filter)  qs.set('$filter', opts.filter);
+    if (opts?.orderby) qs.set('$orderby', opts.orderby);
+    if (opts?.top != null) qs.set('$top', String(opts.top));
+
+    const url = `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`;
+    return this.fetchPage(url);
+  }
+
+  // Seguir el @odata.nextLink tal cual lo entrega Graph
+  async getByNextLink(nextLink: string): Promise<PageResult<Ticket>> {
+    return this.fetchPage(nextLink, /*isAbsolute*/ true);
+  }
+
+  private async fetchPage(url: string, isAbsolute = false): Promise<PageResult<Ticket>> {
+    const res = await this.graph.get<any>(isAbsolute ? url : url);
+    // res: { value: [], '@odata.nextLink'?: string }
+    const raw = Array.isArray(res?.value) ? res.value : [];
+    const items = raw.map((x: any) => this.toModel(x));
+    const nextLink = (res && res['@odata.nextLink']) ? String(res['@odata.nextLink']) : null;
+    return { items, nextLink };
+  }
   // ---------- helpers de consulta ----------
   async findById(itemId: string | number, top = 1) {
     await this.ensure();
