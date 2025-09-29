@@ -70,6 +70,7 @@ export function useIsAdmin(email?: string | null) {
           "";
 
         const rol = String(rolRaw).trim().toLowerCase();
+        console.log(rol)
         const admin =
           rol === "administrador";
 
