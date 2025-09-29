@@ -1,5 +1,6 @@
 import * as React from "react";
 import "./Seguimiento.css";
+import HtmlContent from "../Renderizador/Renderizador";
 
 // Ajusta esta import si tu contexto/servicio está en otra ruta:
 import { useGraphServices } from "../../graph/GrapServicesContext";
@@ -61,108 +62,108 @@ export default function TicketHistorial({
   }, [ticketId, Logs]);
 
   return (
-    <div className={className ?? ""} style={{ padding: 16 }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>
-          Agregar :
-        </span>
+  <div className={className ?? ""} style={{ padding: 16 }}>
+    {/* Header */}
+    <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+      <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>
+        Agregar :
+      </span>
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            type="button"
-            onClick={() => setTab("seguimiento")}
-            className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
-          >
-            Seguimiento
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("solucion")}
-            className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
-          >
-            Solución
-          </button>
-        </div>
-
-        <div style={{ marginLeft: "auto" }}>
-          <button type="button" className="th-back" onClick={onVolver}>
-            <span className="th-back-icon" aria-hidden>←</span> Volver
-          </button>
-        </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button
+          type="button"
+          onClick={() => setTab("seguimiento")}
+          className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
+        >
+          Seguimiento
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("solucion")}
+          className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
+        >
+          Solución
+        </button>
       </div>
 
-      {/* Caja principal */}
-      <div className="th-box">
-        {loading && mensajes.length === 0 && (
-          <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>
-        )}
-        {error && <p style={{ color: "#b91c1c", padding: 16 }}>{error}</p>}
-
-        {!loading && !error && mensajes.length === 0 && (
-          <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>
-        )}
-
-        {mensajes.map((m) => (
-          <div key={m.Id} className="th-row">
-            {/* izquierda: avatar + nombre + fecha */}
-            <div className="th-left">
-              <div className="th-avatar">
-                {/*m.autorAvatarUrl ? (
-                  <img src={m.autorAvatarUrl} alt={m.autorNombre} />
-                ) : (
-                  <div className="th-avatar-fallback" aria-hidden>
-                    👤
-                  </div>
-                )*/}
-              </div>
-              <div className="th-meta">
-                <div className="th-nombre">{m.Actor}</div>
-                <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>
-              </div>
-            </div>
-
-            {/* derecha: burbuja + acciones */}
-            <div className="th-right">
-              <div className="th-bubble">
-                <div className="th-text">{m.Descripcion}</div>
-              </div>
-
-              {isPrivileged && (
-                <div className="th-actions">
-                  <button
-                    type="button"
-                    className="th-action-btn"
-                    title="Agregar"
-                    onClick={() => onAddClick?.(m)}
-                  >
-                    +
-                  </button>
-                  <button
-                    type="button"
-                    className="th-action-btn"
-                    title="Ver detalle"
-                    onClick={() => onViewClick?.(m)}
-                  >
-                    🔍
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
-        <button className="th-history-link" type="button" onClick={() => setTab("seguimiento")}>
-          Historial completo
+      <div style={{ marginLeft: "auto" }}>
+        <button type="button" className="th-back" onClick={onVolver}>
+          <span className="th-back-icon" aria-hidden>←</span> Volver
         </button>
       </div>
     </div>
-  );
-}
 
+    {/* Caja principal */}
+    <div className="th-box">
+      {loading && mensajes.length === 0 && (
+        <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>
+      )}
+      {error && <p style={{ color: "#b91c1c", padding: 16 }}>{error}</p>}
+
+      {!loading && !error && mensajes.length === 0 && (
+        <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>
+      )}
+
+      {mensajes.map((m) => (
+        <div key={m.Id} className="th-row">
+          {/* izquierda: avatar + nombre + fecha */}
+          <div className="th-left">
+            <div className="th-avatar">
+              {/* avatar opcional */}
+              {/* {m.autorAvatarUrl ? (
+                <img src={m.autorAvatarUrl} alt={m.Actor} />
+              ) : ( */}
+              <div className="th-avatar-fallback" aria-hidden>👤</div>
+              {/* )} */}
+            </div>
+            <div className="th-meta">
+              <div className="th-nombre">{m.Actor}</div>
+              <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>
+            </div>
+          </div>
+
+          {/* derecha: burbuja + acciones */}
+          <div className="th-right">
+            <div className="th-bubble">
+            {/* Si Title viene con HTML, también puedes renderizarlo con HtmlContent */}
+            {m.Title && <HtmlContent className="th-title" html={m.Title} />}
+            <HtmlContent className="th-text" html={m.Descripcion} />
+            </div>
+
+            {isPrivileged && (
+              <div className="th-actions">
+                <button
+                  type="button"
+                  className="th-action-btn"
+                  title="Agregar"
+                  onClick={() => onAddClick?.(m)}
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  className="th-action-btn"
+                  title="Ver detalle"
+                  onClick={() => onViewClick?.(m)}
+                >
+                  🔍
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Footer */}
+    <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+      <button className="th-history-link" type="button" onClick={() => setTab("seguimiento")}>
+        Historial completo
+      </button>
+    </div>
+  </div>
+);
+}
 /* ---------------- helpers ---------------- */
 
 function mapItemsToMensajes(items: any[]): Log[] {
