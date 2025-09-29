@@ -22,10 +22,9 @@ export function useUserRoleFromSP(email?: string | null) {
           filter: `fields/Correo eq '${safe}'`,  
           top: 1,
         });
-        console.log("Rol encontrado", resp)
 
         const items = Array.isArray(resp) ? resp : resp?.items ?? [];
-        const rolSP = items?.[0]?.fields?.Rol as string | undefined;
+        const rolSP = items?.[0]?.Rol as string | undefined;
         console.log("Rol normalizado", rolSP)
         if (!cancel) {
           setRole(rolSP ?? "No encontrado");
