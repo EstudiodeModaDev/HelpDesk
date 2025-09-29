@@ -1,9 +1,12 @@
+import * as React from 'react';
 import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
-
+import TicketHistorial from '../Seguimiento/Seguimiento'; // ajusta la ruta si es diferente
 
 export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void }) {
   if (!ticket) return <div>Ticket no encontrado</div>;
+
+  const [showSeg, setShowSeg] = React.useState(false); // ← NUEVO
 
   const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
     .filter(Boolean)
@@ -66,10 +69,26 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
         </div>
       </div>
 
-      {/* TODO: Poner los casos asociados*/}
+      {/* Botón Seguimiento (toggle) */}
+      <div>
+        <button className="btn-volver" onClick={() => setShowSeg(v => !v)}>
+          {showSeg ? 'Ocultar seguimiento' : 'Seguimiento ticket'}
+        </button>
+      </div>
 
-       <div><button className="btn-volver">Seguimiento ticket</button></div>
-
-    </div>
-  );
+      {/* Render del componente de seguimiento solo cuando showSeg = true */}
+      {showSeg && (
+        <div style={{ marginTop: 16 }}>
+          <TicketHistorial
+            role="admin"       // opcional: 'admin' o 'tecnico' para ver botones
+            mensajes={[]}        // pasa tus mensajes reales aquí
+            onVolver={() => setShowSeg(false)}
+            onAddClick={() => {}}
+            onViewClick={() => {}}
+            defaultTab="solucion"
+          />
+        </div>
+      )}
+    </div>
+  );
 }
