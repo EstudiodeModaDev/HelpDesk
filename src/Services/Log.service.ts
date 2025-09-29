@@ -152,8 +152,10 @@ export class LogService {
 
     try {
       const res = await this.graph.get<any>(url);
-      console.log('LogService.getAll response:', res);
-      return (res.value ?? []).map((x: any) => this.toModel(x));
+      const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
+      console.log('LogService.getAll response:', mapped);
+      return mapped
+
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
       const code = e?.error?.code ?? e?.code;
