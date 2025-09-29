@@ -3,8 +3,9 @@ import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
 import TicketHistorial from '../Seguimiento/Seguimiento'; // ajusta la ruta si es diferente
 import HtmlContent from '../Renderizador/Renderizador';
+import { useUserRoleFromSP } from '../../Funcionalidades/Usuarios';
 
-export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void }) {
+export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void}) {
   if (!ticket) return <div>Ticket no encontrado</div>;
 
   const [showSeg, setShowSeg] = React.useState(false);
@@ -81,7 +82,7 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
       {showSeg && (
         <div style={{ marginTop: 16 }}>
           <TicketHistorial
-            role="admin" // opcional: 'admin' o 'tecnico' para ver botones
+            role= {useUserRoleFromSP().role ?? "Usuario"}
             onVolver={() => setShowSeg(false)}
             ticketId={ticket.id}
             onAddClick={() => { } }

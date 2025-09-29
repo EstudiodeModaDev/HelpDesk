@@ -175,8 +175,7 @@ function LoggedApp({
       />
 
       <main className={`content ${isAdmin ? 'content--withSidebar' : ''}`}>
-
-        {/* {loadingRole ? <p style={{margin:12}}>Cargando permisos…</p> : ( */}
+        
           <>
             {selected === 'home' && <Home />}
             {selected === 'ticketform' && <NuevoTicketForm />}

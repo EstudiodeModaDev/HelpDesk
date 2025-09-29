@@ -8,6 +8,7 @@ import { useGraphServices } from "../../graph/GrapServicesContext";
 import { calcularColorEstado, useTickets } from "../../Funcionalidades/Tickets";
 import type { SortDir, SortField, Ticket } from "../../Models/Tickets";
 import { toISODateTimeFlex } from "../../utils/Date";
+import { useIsAdmin } from "../../Funcionalidades/Usuarios";
 
 function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; dir: SortDir}>) {
   const idx = sorts.findIndex(s => s.field === field);
@@ -19,7 +20,7 @@ function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; d
 export default function TablaTickets() {
   const { account } = useAuth();
   const userMail = account?.username ?? "";
-  const isAdmin = true; // ajusta tu lógica real de roles
+  const isAdmin = useIsAdmin(userMail); // ajusta tu lógica real de roles
 
   const { Tickets } = useGraphServices();
 
@@ -46,7 +47,7 @@ export default function TablaTickets() {
     toggleSort,
     sorts     // recarga primera página (para “Anterior”)
 
-  } = useTickets(Tickets, userMail, isAdmin);
+  } = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");

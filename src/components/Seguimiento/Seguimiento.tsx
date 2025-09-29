@@ -4,11 +4,10 @@ import HtmlContent from "../Renderizador/Renderizador";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
 
-type Rol = "admin" | "tecnico" | "usuario";
 type Tab = "seguimiento" | "solucion";
 
 type Props = {
-  role: Rol;
+  role: string;
   ticketId: string | number;
   onVolver?: () => void;
   onAddClick?: (m: Log) => void;
@@ -25,7 +24,7 @@ export default function TicketHistorial({
   className,
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
-  const isPrivileged = role === "admin"; // 👈 solo admin ve acciones
+  const isPrivileged = role === "Administrador" || role === "Tecnico"; // 👈 solo admin ve acciones
 
   const { Logs } = useGraphServices();
 
