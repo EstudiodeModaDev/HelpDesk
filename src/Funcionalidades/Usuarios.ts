@@ -14,10 +14,6 @@ export function useUserRoleFromSP(email?: string | null) {
       console.log("email", email)
       if (!email) { setRole("usuario"); return; }
 
-      const cacheKey = `role:${email.toLowerCase()}`;
-      const cached = sessionStorage.getItem(cacheKey);
-      if (cached) { setRole(cached ); return; }
-
       setLoading(true); setError(null);
       try {
         // IMPORTANTE: normaliza y escapa comillas
@@ -33,7 +29,6 @@ export function useUserRoleFromSP(email?: string | null) {
         console.log("Rol normalizado", rolSP)
         if (!cancel) {
           setRole(rolSP ?? "No encontrado");
-          sessionStorage.setItem(cacheKey, rolSP ?? "No encontrado");
         }
       } catch (e: any) {
         if (!cancel) setError(e?.message ?? "No se pudo obtener el rol");
