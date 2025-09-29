@@ -173,16 +173,11 @@ function mapItemsToMensajes(items: any[]): Log[] {
     Created: normalizeToISO(it.Created),
     Title: it.Title ?? undefined,
     Descripcion: it.Descripcion ?? "",
-    Tipo_de_accion: mapTipo(it.Tipo_de_accion),
+    Tipo_de_accion: it.Tipo_de_accion,
     CorreoActor: it.CorreoActor
   }));
 }
 
-function mapTipo(v: any): "seguimiento" | "solucion" | "sistema" {
-  const t = String(v ?? "").toLowerCase();
-  if (t === "seguimiento" || t === "solucion" || t === "sistema") return t;
-  return "seguimiento";
-}
 
 function normalizeToISO(v: string | undefined): string {
   if (!v) return new Date().toISOString();
