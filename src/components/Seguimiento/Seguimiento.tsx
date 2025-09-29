@@ -167,7 +167,7 @@ export default function TicketHistorial({
 
 function mapItemsToMensajes(items: any[]): Log[] {
   return items.map((it: any) => ({
-    Id: String(it.Id ?? cryptoRandom()),
+    Id: String(it.Id),
     Actor: it.Actor ?? "Sistema",
     //autorAvatarUrl: it.fields?.AvatarUrl ?? undefined,
     Created: normalizeToISO(it.Created),
@@ -200,10 +200,4 @@ function formatDateTime(iso: string) {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function cryptoRandom() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    // @ts-ignore
-    return crypto.randomUUID();
-  }
-  return Math.random().toString(36).slice(2);
-}
+
