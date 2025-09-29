@@ -83,6 +83,7 @@ export function useTickets(
   const [pageIndex, setPageIndex] = React.useState<number>(0);
 
   const [reloadTick, setReloadTick] = React.useState(0);
+  const [nextLink, setNextLink] = React.useState<string | null>(null);
 
   // ===== construir filtro OData según modo =====
   const buildFilter = React.useCallback((): GetAllOpts => {
@@ -97,7 +98,7 @@ export function useTickets(
     } else {
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
-    if(range.from > range.to) {
+    if(range.from < range.to) {
       if (range.from) filters.push(`fields/FechaApertura ge '${range.from}'`);
       if (range.to)   filters.push(`fields/FechaApertura le '${range.to}'`);
     }
@@ -118,7 +119,10 @@ export function useTickets(
 
       setRows(list.items);
       setPageIndex(0); // reset paginación en cada recarga
-      if(list.nextLink) console.warn('[Tickets] WARNING: hay más páginas, pero no se cargan automáticamente.', list.nextLink);
+      if(list.nextLink){
+        console.warn('[Tickets] WARNING: hay más páginas, pero no se cargan automáticamente.', list.nextLink);
+        setNextLink(list.nextLink ?? null);
+      } 
     } catch (e: any) {
       console.error('[MisReservas] fetchRows error:', e);
       setError(e?.message ?? 'Error cargando reservas');
@@ -137,7 +141,7 @@ export function useTickets(
     })();
     return () => { cancel = true; };
     // reloadTick asegura que sólo apliquemos rango cuando el usuario pulse “Buscar”
-  }, [fetchRows, reloadTick]);
+  }, [fetchRows, reloadTick, setPageSize]);
 
   // ===== acciones públicas =====
   const nextPage = React.useCallback(() => {
@@ -187,6 +191,7 @@ export function useTickets(
     prevPage,
 
     // acciones
-    reloadAll, // 👈 expuesto
+    reloadAll, 
+    nextLink
   };
 }
