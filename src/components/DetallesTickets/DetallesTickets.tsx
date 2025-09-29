@@ -82,9 +82,10 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
           <TicketHistorial
             role="admin" // opcional: 'admin' o 'tecnico' para ver botones
             onVolver={() => setShowSeg(false)}
+            ticketId={ticket.id}
             onAddClick={() => { } }
             onViewClick={() => { } }
-            defaultTab="solucion" ticketId={''}          />
+          />
         </div>
       )}
     </div>
