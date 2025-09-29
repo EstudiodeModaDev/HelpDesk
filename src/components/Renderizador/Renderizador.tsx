@@ -110,8 +110,11 @@ const overlayStyle: React.CSSProperties = {
 
 const contentStyle: React.CSSProperties = {
   position: "relative",
-  maxWidth: "95vw",
-  maxHeight: "95vh",
+  maxWidth: "100%",
+  maxHeight: "100%",
+  borderRadius: 8,
+  overflow: "hidden",       // opcional, para que la imagen no “sangre” fuera
+  background: "#000",       // opcional, marco negro detrás de la imagen
 };
 
 const imgStyle: React.CSSProperties = {
@@ -125,14 +128,15 @@ const imgStyle: React.CSSProperties = {
 
 const closeBtnStyle: React.CSSProperties = {
   position: "absolute",
-  top: -10,
-  right: -10,
+  top: 8,
+  right: 8,
   width: 36,
   height: 36,
-  borderRadius: "50%",
+  borderRadius: "9999px",
   border: "none",
   fontSize: 24,
   lineHeight: "36px",
   cursor: "pointer",
-  background: "white",
+  background: "rgba(255,255,255,0.95)",
+  boxShadow: "0 2px 10px rgba(0,0,0,.25)",
 };
