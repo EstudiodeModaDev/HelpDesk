@@ -12,7 +12,7 @@ export function useTicketLogs(LogSvc: LogService) {
   const [currentTicketId, setCurrentTicketId] = React.useState<string | null>(null);
 
   const buildFilter = React.useCallback((idTicket: string): GetAllOpts => {
-    const filters: string[] = [`fields/IdCaso eq '${idTicket.replace(/'/g, "''")}'`];
+    const filters: string[] = [`fields/Title eq '${idTicket.replace(/'/g, "''")}'`];
 
     return {
       filter: filters.join(" and "),
