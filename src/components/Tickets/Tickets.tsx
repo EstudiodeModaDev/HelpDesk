@@ -5,7 +5,7 @@ import "./Tickets.css";
 
 import { useAuth } from "../../auth/authContext"; // o la ruta que uses
 import { useGraphServices } from "../../graph/GrapServicesContext"; // tu context de servicios
-import { useTickets, calcularColorEstado, } from "../../Funcionalidades/Tickets" 
+import { useTickets, } from "../../Funcionalidades/Tickets" 
 import type { Ticket } from "../../Models/Tickets";
 import { toISODateTimeFlex } from "../../utils/Date";
 
@@ -161,7 +161,7 @@ export default function TablaTickets() {
                   <td>
                     <span
                       className="estado-circulo"
-                      style={{ backgroundColor: calcularColorEstado(ticket) }}
+                      style={{ backgroundColor: "white" }}
                       title={ticket.estado || "Sin estado"}
                     />
                   </td>
