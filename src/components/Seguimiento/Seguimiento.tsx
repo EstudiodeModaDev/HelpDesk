@@ -34,6 +34,7 @@ export default function TicketHistorial({
     let cancel = false;
     const load = async () => {
       setLoading(true); setError(null);
+      console.log("Cargando mensajes para ticketId:", ticketId);
       try {
         const { items } = await Logs.getAll({
         filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`, // 👈 índice
