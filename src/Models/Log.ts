@@ -5,4 +5,5 @@ export type Log = {
     Tipo_de_accion: string;
     Actor: string;
     CorreoActor: string;
+    Created?: string;
 };
