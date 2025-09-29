@@ -104,7 +104,7 @@ export function useTickets(
 
     const filter = filters.join(' and ');
 
-    return { filter, top: 5000 };
+    return { filter, top: pageSize };
   }, [isAdmin, userMail, filterMode, range.from, range.to, today]);
 
   // ===== cargar datos =====
