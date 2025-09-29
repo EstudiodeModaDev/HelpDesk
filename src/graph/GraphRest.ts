@@ -89,6 +89,7 @@ export class GraphRest {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
+        Prefer: 'HonorNonIndexedQueriesWarningMayFailRandomly',
         ...(init?.headers || {}),
       },
       ...init,
