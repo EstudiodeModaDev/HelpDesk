@@ -175,12 +175,13 @@ export class TicketsService {
   }
 
   private async fetchPage(url: string, isAbsolute = false): Promise<PageResult<Ticket>> {
-    const res = await this.graph.get<any>(isAbsolute ? url : url);
-    // res: { value: [], '@odata.nextLink'?: string }
+    const res = isAbsolute
+      ? await this.graph.getAbsolute<any>(url)  // 👈 URL absoluta (nextLink)
+      : await this.graph.get<any>(url);         // 👈 path relativo
+
     const raw = Array.isArray(res?.value) ? res.value : [];
     const items = raw.map((x: any) => this.toModel(x));
-    const nextLink = (res && res['@odata.nextLink']) ? String(res['@odata.nextLink']) : null;
-    console.log("Fetched page:", items.length, "items", raw, "nextLink:", nextLink);
+    const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
     return { items, nextLink };
   }
   // ---------- helpers de consulta ----------

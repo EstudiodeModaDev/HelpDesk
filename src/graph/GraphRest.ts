@@ -1,5 +1,3 @@
-// src/graph/GraphRest.ts
-
 export class GraphRest {
   private getToken: () => Promise<string>;
   private base = 'https://graph.microsoft.com/v1.0';
@@ -82,5 +80,37 @@ export class GraphRest {
   delete(path: string, init?: RequestInit) {
     // DELETE típicamente devuelve 204 No Content
     return this.call<void>('DELETE', path, undefined, init);
+  }
+
+  async getAbsolute<T = any>(url: string, init?: RequestInit): Promise<T> {
+    const token = await this.getToken();
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(init?.headers || {}),
+      },
+      ...init,
+    });
+
+    if (!res.ok) {
+      let detail = '';
+      try {
+        const txt = await res.text();
+        if (txt) {
+          try { detail = JSON.parse(txt)?.error?.message ?? JSON.parse(txt)?.message ?? txt; }
+          catch { detail = txt; }
+        }
+      } catch {}
+      throw new Error(`GET (absolute) ${url} → ${res.status} ${res.statusText}${detail ? `: ${detail}` : ''}`);
+    }
+
+    if (res.status === 204) return undefined as unknown as T;
+
+    const ct = res.headers.get('content-type') ?? '';
+    const txt = await res.text();
+    if (!txt) return undefined as unknown as T;
+    return ct.includes('application/json') ? JSON.parse(txt) as T : (txt as unknown as T);
   }
 }

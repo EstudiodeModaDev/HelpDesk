@@ -40,10 +40,10 @@ export function useTickets(
       filters.push(`startswith(fields/Estadodesolicitud,'Cerrado')`);
     }
 
-    // ✅ rango correcto y con hora para no perder registros
-    if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
-    if (range.to)   filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
-
+    if( range.from && range.to && (range.from < range.to) ) {
+      if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
+      if (range.to)   filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
+    }
     console.log("OData filters:", filters);
     console.log("top", pageSize);
     return {
