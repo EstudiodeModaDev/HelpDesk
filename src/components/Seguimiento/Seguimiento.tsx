@@ -37,7 +37,7 @@ export default function TicketHistorial({
       try {
         const id = String(ticketId).replace(/'/g, "''");
         const { items } = await Logs.getAll({
-          filter: `fields/IdCaso eq '${id}'`,
+          filter: `fields/Title eq '${id}'`,
           orderby: "fields/Created asc, id asc", // ajusta el nombre real
         });
         if (cancel) return;
