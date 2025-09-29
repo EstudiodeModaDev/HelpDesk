@@ -21,3 +21,8 @@ export type Ticket = {
   CorreoObservador?: string;
 };
 
+// Para filtros locales
+export type TicketLike = {
+  estado?: string | null;           // 'Estado de solicitud'
+  TiempoSolucion?: string | null;   // formato "dd/mm/yyyy hh:mm"
+};

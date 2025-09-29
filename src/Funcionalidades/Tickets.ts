@@ -1,9 +1,65 @@
 import React from "react";
-import type { Ticket } from "../Models/Tickets";
+import type { Ticket, TicketLike } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
+
+export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
+  if (!fecha) return new Date(NaN);
+  const [dmy, hm] = fecha.trim().split(/\s+/);
+  if (!dmy || !hm) return new Date(NaN);
+  const [d, m, y] = dmy.split('/');
+  const [H, M] = hm.split(':');
+  if (!d || !m || !y || !H || !M) return new Date(NaN);
+  // Construimos ISO local (sin zona); JS lo interpreta en local.
+  const iso = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T${H.padStart(2, '0')}:${M.padStart(2, '0')}`;
+  const dt = new Date(iso);
+  return isNaN(dt.getTime()) ? new Date(NaN) : dt;
+}
+
+export function colorEstadoPA(
+  item: TicketLike,
+  alphaCerrado: number = 1 // pon 0 si quieres replicar literal RGBA(0,0,0,0)
+): string {
+  const estado = (item.estado ?? '').toLowerCase();
+  const ts = parseDDMMYYYYHHMM(item.TiempoSolucion);
+
+  // 1) Cerrado o Cerrado fuera de tiempo
+  if (estado === 'cerrado' || estado === 'cerrado fuera de tiempo') {
+    return `rgba(0,0,0,${alphaCerrado})`; // negro (o transparente si alphaCerrado=0)
+  }
+
+  // 2) Si no hay TiempoSolucion -> rojo
+  if (!item.TiempoSolucion || isNaN(ts.getTime())) {
+    return 'rgba(255,0,0,1)';
+  }
+
+  // 3) Rama "Hour(ts) <> 0 && DateDiff(Now(); ts; Hours) <> 0"
+  const now = Date.now();
+  const horasRestantes = (ts.getTime() - now) / 3_600_000;
+  const horaDelDia = ts.getHours(); // equivalente a Hour(DateTimeValue(ts)) en PA
+
+  if (horaDelDia !== 0 && horasRestantes !== 0) {
+    // p = Max(0; Min(1; horasRestantes / horaDelDia))
+    const denom = horaDelDia === 0 ? 1 : horaDelDia; // por seguridad (aunque ya chequeamos)
+    const ratio = horasRestantes / denom;
+    const p = Math.max(0, Math.min(1, ratio));
+
+    // Colores según p (verde→naranja→rojo) y alpha Max(0,3; 1 - p)
+    const r = p > 0.5 ? 34  : p > 0.1 ? 255 : 255;
+    const g = p > 0.5 ? 139 : p > 0.1 ? 165 :   0;
+    const b = p > 0.5 ? 34  : p > 0.1 ?   0 :   0;
+    const a = Math.max(0.3, 1 - p);
+
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  // 4) Si Hour(ts) == 0 o horasRestantes == 0
+  // Power Apps: If(IsBlank(TiempoSolucion); RGBA(0,0,0,0); RGBA(255,0,0,1))
+  // Ya verificamos blank arriba; aquí devolvemos rojo cuando no entra a la rama anterior.
+  return 'rgba(255,0,0,1)';
+}
 
 export function useTickets(
   TicketsSvc: TicketsService,
