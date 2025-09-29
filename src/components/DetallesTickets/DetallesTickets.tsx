@@ -2,174 +2,77 @@
 import * as React from 'react';
 import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
-import TicketHistorial from '../Seguimiento/Seguimiento'; // ajusta la ruta si es necesario
+import TicketHistorial from '../Seguimiento/Seguimiento';
+import { useTicketLogs } from '../../Funcionalidades/Log';      // ← importa el hook
+import { useGraphServices } from '../../graph/GrapServicesContext'; // o donde obtienes LogSvc
 
 type Rol = 'admin' | 'tecnico' | 'usuario';
-
-// Tipo de mensaje del historial
-type Mensaje = {
-  id: string | number;
-  autorNombre: string;
-  autorAvatarUrl?: string;
-  fechaISO: string;     // ISO
-  titulo?: string;
-  texto: string;
-  tipo: 'seguimiento' | 'solucion' | 'sistema';
-};
 
 export default function DetalleTicket({
   ticket,
   onVolver,
   role = 'admin',
-  fetchMensajes,
 }: {
   ticket: Ticket;
   onVolver: () => void;
   role?: Rol;
-  fetchMensajes?: (ticketId: number | string) => Promise<Mensaje[]>;
 }) {
   if (!ticket) return <div>Ticket no encontrado</div>;
 
-  const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
-    .filter(Boolean)
-    .join(' > ');
+  //const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo].filter(Boolean).join(' > ');
 
-  // Estado para mostrar/ocultar el bloque de seguimiento
+  // 1) Obtén el servicio y crea el hook
+  const { Log } = useGraphServices();        
+  const {rows: logs, loading, error, loadFor, currentTicketId } = useTicketLogs(Log);                        
+
+  // 2) Toggle del panel
   const [showSeg, setShowSeg] = React.useState(false);
-  const [mensajes, setMensajes] = React.useState<Mensaje[]>([]);
-  const [loadingSeg, setLoadingSeg] = React.useState(false);
-  const [errSeg, setErrSeg] = React.useState<string | null>(null);
-
-  // Alternar el panel de seguimiento
-  const handleOpenSeguimiento = async () => {
-    setShowSeg((v) => !v);
+  const handleOpenSeguimiento = () => {
+    const next = !showSeg;
+    setShowSeg(next);
+    // 3) Al abrir, carga los logs del ticket (solo si no están ya cargados)
+    if (next && currentTicketId !== String(ticket.id)) {
+      void loadFor(String(ticket.id));
+    }
   };
-
-  // Cargar historial cuando se abra el panel (si provees fetchMensajes)
-  React.useEffect(() => {
-    const load = async () => {
-      if (!showSeg) return;
-      if (mensajes.length > 0 || !fetchMensajes) return;
-
-      setLoadingSeg(true);
-      setErrSeg(null);
-      try {
-        const data = await fetchMensajes(ticket.id);
-        setMensajes(data);
-      } catch (e: any) {
-        setErrSeg(e?.message ?? 'No se pudo cargar el historial');
-      } finally {
-        setLoadingSeg(false);
-      }
-    };
-    void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSeg, fetchMensajes, ticket?.id]);
-
-  // Fallback: si no pasas fetchMensajes, muestro un ejemplo mínimo
-  const mensajesFallback: Mensaje[] = React.useMemo(
-    () => [
-      {
-        id: 'sys-1',
-        autorNombre: 'Sistema',
-        fechaISO: new Date().toISOString(),
-        titulo: 'Asignamiento de resolutor',
-        texto: '',
-        tipo: 'sistema',
-      },
-      {
-        id: 'u-1',
-        autorNombre: ticket.resolutor || 'Resolutor',
-        fechaISO: new Date().toISOString(),
-        titulo: ticket.Title || 'Sin asunto',
-        texto: ticket.Descripcion || '',
-        tipo: 'solucion',
-      },
-    ],
-    [ticket]
-  );
-
-  const visibles = fetchMensajes ? mensajes : mensajesFallback;
 
   return (
     <div className="detalle-ticket">
       <button className="btn-volver" onClick={onVolver}>← Volver</button>
       <h2>Asunto ticket #{ticket.id}</h2>
 
-      <div className="fila">
-        <div className="campo">
-          <label>Asunto</label>
-          <span>{ticket.Title}</span>
-        </div>
-        <div className="campo">
-          <label>Categoría</label>
-          <span>{categoria || '–'}</span>
-        </div>
-      </div>
+      {/* ... tus filas de metadata igual que antes ... */}
 
-      <div className="fila">
-        <div className="campo">
-          <label>Fecha de Apertura</label>
-          <span>{ticket.FechaApertura || '–'}</span>
-        </div>
-        <div className="campo">
-          <label>Fecha máxima de solución</label>
-          <span>{ticket.TiempoSolucion || '–'}</span>
-        </div>
-      </div>
-
-      <div className="fila">
-        <div className="campo">
-          <label>Resolutor del caso</label>
-          <span>{ticket.resolutor || '–'}</span>
-        </div>
-        <div className="campo">
-          <label>Solicitante del ticket</label>
-          <span>{ticket.solicitante || '–'}</span>
-        </div>
-      </div>
-
-      <div className="fila">
-        <div className="campo">
-          <label>Descripción del caso</label>
-          <span>{ticket.Descripcion || '–'}</span>
-        </div>
-
-        <div className="campo">
-          <label>Fuente de solicitud</label>
-          <span>{ticket.Fuente || '–'}</span>
-        </div>
-      </div>
-
-      <div className="fila">
-        <div className="campo">
-          <label>Estado del caso</label>
-          <span>{ticket.estado || '–'}</span>
-        </div>
-      </div>
-
-      {/* Botón para mostrar/ocultar el seguimiento */}
       <div style={{ marginTop: 12 }}>
         <button className="btn-volver" onClick={handleOpenSeguimiento}>
           {showSeg ? 'Ocultar seguimiento' : 'Seguimiento ticket'}
         </button>
       </div>
 
-      {/* Bloque de seguimiento embebido */}
       {showSeg && (
         <div style={{ marginTop: 16 }}>
-          {loadingSeg && <p>Cargando historial…</p>}
-          {errSeg && <p style={{ color: '#b91c1c' }}>{errSeg}</p>}
+          {loading && <p>Cargando historial…</p>}
+          {error && <p style={{ color: '#b91c1c' }}>{error}</p>}
 
-          {!loadingSeg && !errSeg && (
-            <TicketHistorial
-              role={role}                  // controla visibilidad de botones (admin/tecnico)
-              mensajes={visibles}          // desde API o fallback
-              onVolver={() => setShowSeg(false)} // cierra el bloque
-              onAddClick={(m) => console.log('Agregar sobre:', m)}
-              onViewClick={(m) => console.log('Ver detalle de:', m)}
-              defaultTab="solucion"
-            />
+          {!loading && !error && (
+            <>
+              <TicketHistorial
+                role={role}
+                mensajes={logs.map(l => ({
+                  id: l.Id,
+                  autorNombre: l.Actor ?? 'Sistema',
+                 // autorAvatarUrl: l.,
+                  fechaISO: l.Created ?? "",
+                  titulo: l.Title,
+                  texto: l.Descripcion ?? '',
+                  tipo: (l.Tipo_de_accion as any) ?? 'seguimiento',
+                }))}
+                onVolver={() => setShowSeg(false)}
+                onAddClick={(m) => console.log('Agregar sobre:', m)}
+                onViewClick={(m) => console.log('Ver detalle de:', m)}
+                defaultTab="solucion"
+              />
+            </>
           )}
         </div>
       )}
