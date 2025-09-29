@@ -1,5 +1,5 @@
 import React from "react";
-import type { Ticket, TicketLike } from "../Models/Tickets";
+import type { Ticket } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
@@ -18,48 +18,68 @@ export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   return isNaN(dt.getTime()) ? new Date(NaN) : dt;
 }
 
-export function colorEstadoPA(
-  item: TicketLike,
-  alphaCerrado: number = 1 // pon 0 si quieres replicar literal RGBA(0,0,0,0)
-): string {
-  const estado = (item.estado ?? '').toLowerCase();
-  const ts = parseDDMMYYYYHHMM(item.TiempoSolucion);
+// Reemplaza tu parseFecha por esta versión
+export function parseFechaFlex(fecha?: string): Date {
+  if (!fecha) return new Date(NaN);
+  const t = fecha.trim();
 
-  // 1) Cerrado o Cerrado fuera de tiempo
-  if (estado === 'cerrado' || estado === 'cerrado fuera de tiempo') {
-    return `rgba(0,0,0,${alphaCerrado})`; // negro (o transparente si alphaCerrado=0)
+  // 1) YYYY-MM-DD HH:mm  o  YYYY-MM-DDTHH:mm  (lo más común desde Graph/SharePoint)
+  if (/^\d{4}-\d{2}-\d{2}/.test(t)) {
+    // normaliza el espacio a 'T' para que Date lo entienda mejor
+    return new Date(t.replace(' ', 'T'));
   }
 
-  // 2) Si no hay TiempoSolucion -> rojo
-  if (!item.TiempoSolucion || isNaN(ts.getTime())) {
+  // 2) DD/MM/YYYY HH:mm  (tu formato anterior)
+  const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
+  if (m) {
+    const [, dd, mm, yyyy, HH, MM] = m;
+    return new Date(`${yyyy}-${mm}-${dd}T${HH}:${MM}`);
+  }
+
+  return new Date(NaN);
+}
+
+
+export function calcularColorEstado(ticket: Ticket): string {
+  const estado = (ticket.estado ?? '').toLowerCase();
+
+  if (estado === 'cerrado' || estado === 'cerrado fuera de tiempo') {
+    return 'rgba(0,0,0,1)'; // negro para cerrados
+  }
+
+  if (!ticket.FechaApertura || !ticket.TiempoSolucion) {
+    return 'rgba(255,0,0,1)'; // rojo si faltan fechas
+  }
+
+  const inicio = parseFechaFlex(ticket.FechaApertura).getTime();
+  const fin    = parseFechaFlex(ticket.TiempoSolucion).getTime();
+  const ahora  = Date.now();
+
+  if (isNaN(inicio) || isNaN(fin)) {
+    return 'rgba(255,0,0,1)'; // rojo si fechas inválidas
+  }
+
+  const horasTotales   = (fin - inicio) / 3_600_000;
+  const horasRestantes = (fin - ahora)  / 3_600_000;
+
+  // vencido o duración inválida => rojo
+  if (horasTotales <= 0 || horasRestantes <= 0) {
     return 'rgba(255,0,0,1)';
   }
 
-  // 3) Rama "Hour(ts) <> 0 && DateDiff(Now(); ts; Hours) <> 0"
-  const now = Date.now();
-  const horasRestantes = (ts.getTime() - now) / 3_600_000;
-  const horaDelDia = ts.getHours(); // equivalente a Hour(DateTimeValue(ts)) en PA
+  // p = % de tiempo restante
+  const p = Math.max(0, Math.min(1, horasRestantes / horasTotales));
 
-  if (horaDelDia !== 0 && horasRestantes !== 0) {
-    // p = Max(0; Min(1; horasRestantes / horaDelDia))
-    const denom = horaDelDia === 0 ? 1 : horaDelDia; // por seguridad (aunque ya chequeamos)
-    const ratio = horasRestantes / denom;
-    const p = Math.max(0, Math.min(1, ratio));
+  // >50% verde, 10–50% amarillo/naranja, <10% rojo
+  const r = p > 0.5 ? 34  : p > 0.1 ? 255 : 255;
+  const g = p > 0.5 ? 139 : p > 0.1 ? 165 :   0;
+  const b = p > 0.5 ? 34  : p > 0.1 ?   0 :   0;
 
-    // Colores según p (verde→naranja→rojo) y alpha Max(0,3; 1 - p)
-    const r = p > 0.5 ? 34  : p > 0.1 ? 255 : 255;
-    const g = p > 0.5 ? 139 : p > 0.1 ? 165 :   0;
-    const b = p > 0.5 ? 34  : p > 0.1 ?   0 :   0;
-    const a = Math.max(0.3, 1 - p);
+  const alpha = Math.max(0.3, 1 - p); // más visible cuando queda poco
 
-    return `rgba(${r},${g},${b},${a})`;
-  }
-
-  // 4) Si Hour(ts) == 0 o horasRestantes == 0
-  // Power Apps: If(IsBlank(TiempoSolucion); RGBA(0,0,0,0); RGBA(255,0,0,1))
-  // Ya verificamos blank arriba; aquí devolvemos rojo cuando no entra a la rama anterior.
-  return 'rgba(255,0,0,1)';
+  return `rgba(${r},${g},${b},${alpha})`;
 }
+
 
 export function useTickets(
   TicketsSvc: TicketsService,
