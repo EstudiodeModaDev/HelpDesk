@@ -35,11 +35,13 @@ export default function TicketHistorial({
     const load = async () => {
       setLoading(true); setError(null);
       try {
-        const id = String(ticketId).replace(/'/g, "''");
         const { items } = await Logs.getAll({
-          filter: `fields/Title eq '${id}'`,
-          orderby: "fields/Created asc, id asc", // ajusta el nombre real
+        filter: `fields/IdCaso eq '${String(ticketId).replace(/'/g, "''")}'`, // 👈 índice
+        orderby: "fields/Created asc,id asc",
+        top: 2000, // pagina
+        // select: "id,webUrl,fields(Autor,Texto,Created,Titulo,Tipo,CorreoAutor)" // opcional, reduce payload
         });
+
         if (cancel) return;
         const mapped = mapItemsToMensajes(items);
         setMensajes(mapped);
