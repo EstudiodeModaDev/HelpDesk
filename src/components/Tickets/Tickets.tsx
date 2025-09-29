@@ -3,12 +3,11 @@ import * as React from "react";
 import DetalleTicket from "../DetallesTickets/DetallesTickets";
 import "./Tickets.css";
 
-import { useAuth } from "../../auth/authContext"; // o la ruta que uses
-import { useGraphServices } from "../../graph/GrapServicesContext"; // tu context de servicios
-import { useTickets, } from "../../Funcionalidades/Tickets" 
+import { useAuth } from "../../auth/authContext";
+import { useGraphServices } from "../../graph/GrapServicesContext";
+import { useTickets } from "../../Funcionalidades/Tickets";
 import type { Ticket } from "../../Models/Tickets";
 import { toISODateTimeFlex } from "../../utils/Date";
-
 
 export default function TablaTickets() {
   const { account } = useAuth();
@@ -18,34 +17,32 @@ export default function TablaTickets() {
   const { Tickets } = useGraphServices();
 
   const {
+    // datos/página actual (server-side)
     rows,
     loading,
     error,
 
-    // filtros
+    // filtros (server)
     filterMode,
     setFilterMode,
     range,
     setRange,
-    applyRange,
+    applyRange,     // recarga primera página con el rango
 
-    // paginación
+    // paginación (server)
     pageSize,
-    setPageSize,
-    pageIndex,
-    //hasNext,
-    nextPage,
-    prevPage,
+    setPageSize,    // cambia $top -> recarga primera página
+    pageIndex,      // 1-based
+    hasNext,        // !!nextLink
+    nextPage,       // sigue @odata.nextLink
+    reloadAll,      // recarga primera página (para “Anterior”)
 
-    // acciones
-    reloadAll,
   } = useTickets(Tickets, userMail, isAdmin);
 
-  // Búsqueda local (tu input de texto)
+  // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");
   const [ticketSeleccionado, setTicketSeleccionado] = React.useState<Ticket | null>(null);
 
-  // Filtro local por texto (resolutor, solicitante, asunto)
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
@@ -55,24 +52,19 @@ export default function TablaTickets() {
     });
   }, [rows, search]);
 
-  // Paginación en cliente (tu hook ya trae todo y resetea pageIndex en cada recarga)
-  const start = pageIndex * pageSize;
-  const end = start + pageSize;
-  const pageRows = filtered.slice(start, end);
-  const pageHasNext = end < filtered.length;
-
-  const resetFiltrosLocal = () => {
-    setSearch("");
-  };
+  const resetFiltrosLocal = () => setSearch("");
 
   return (
     <div className="tabla-tickets">
       <h2>Listado de Tickets</h2>
 
-      {/* Barra de filtros (solo si NO está en detalle) */}
+      {/* Barra de filtros (oculta en detalle) */}
       {!ticketSeleccionado && (
-        <div className="filtros" style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr auto auto auto auto auto auto' }}>
-          {/* Búsqueda local */}
+        <div
+          className="filtros"
+          style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}
+        >
+          {/* Búsqueda local (solo página actual) */}
           <input
             type="text"
             placeholder="Buscar (resolutor, solicitante, asunto)…"
@@ -105,12 +97,12 @@ export default function TablaTickets() {
             title="Hasta"
           />
 
-          {/* Aplicar rango (re-carga servidor) */}
+          {/* Aplicar rango (recarga primera página) */}
           <button type="button" onClick={applyRange} title="Aplicar rango">
             Aplicar
           </button>
 
-          {/* Recargar todo */}
+          {/* Recargar primera página */}
           <button type="button" onClick={reloadAll} title="Recargar">
             ⟳
           </button>
@@ -124,7 +116,7 @@ export default function TablaTickets() {
 
       {/* Estados */}
       {loading && <p>Cargando tickets…</p>}
-      {error && <p style={{ color: '#b91c1c' }}>{error}</p>}
+      {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
       {!loading && !error && filtered.length === 0 && <p>No hay tickets para los filtros seleccionados.</p>}
 
       {/* Tabla o Detalle */}
@@ -145,7 +137,7 @@ export default function TablaTickets() {
               </tr>
             </thead>
             <tbody>
-              {pageRows.map((ticket) => (
+              {filtered.map((ticket) => (
                 <tr
                   key={ticket.id}
                   onClick={() => setTicketSeleccionado(ticket)}
@@ -156,8 +148,8 @@ export default function TablaTickets() {
                   <td>{ticket.resolutor}</td>
                   <td>{ticket.solicitante}</td>
                   <td>{ticket.Title}</td>
-                  <td>{toISODateTimeFlex(ticket.FechaApertura)|| "–"}</td>
-                  <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "No tiene fecha maxima"}</td>
+                  <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
+                  <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "No tiene fecha máxima"}</td>
                   <td>
                     <span
                       className="estado-circulo"
@@ -170,24 +162,28 @@ export default function TablaTickets() {
             </tbody>
           </table>
 
-          {/* Paginación */}
+          {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
           {filtered.length > 0 && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
-              <button onClick={prevPage} disabled={loading || pageIndex === 0}>Anterior</button>
-              <span>Página {pageIndex + 1} de {Math.max(1, Math.ceil(filtered.length / pageSize))}</span>
-              <button onClick={nextPage} disabled={loading || !pageHasNext}>Siguiente</button>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+              <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
+                Anterior
+              </button>
+              <span>Página {pageIndex}</span>
+              <button onClick={nextPage} disabled={loading || !hasNext}>
+                Siguiente
+              </button>
 
-              <span style={{ marginLeft: 12 }}>Filas por página:</span>
+              <span style={{ marginLeft: 12 }}>Filas por página ($top):</span>
               <select
                 value={pageSize}
-                onChange={(e) => {
-                  const n = Number(e.target.value);
-                  // rehusa setPageSize del hook para mantener coherencia
-                  // (el hook expone setPageSize: (n: number) => void)
-                  setPageSize(n);
-                }}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                disabled={loading}
               >
-                {[10, 20, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+                {[10, 20, 50, 100].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
               </select>
             </div>
           )}
