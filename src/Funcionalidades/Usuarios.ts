@@ -2,11 +2,9 @@
 import * as React from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 
-export type Rol = "admin" | "tecnico" | "usuario";
-
 export function useUserRoleFromSP(email?: string | null) {
   const { Usuarios } = useGraphServices(); // ajusta el nombre si tu service se llama distinto
-  const [role, setRole] = React.useState<Rol>("usuario");
+  const [role, setRole] = React.useState<string>("usuario");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -17,7 +15,7 @@ export function useUserRoleFromSP(email?: string | null) {
 
       const cacheKey = `role:${email.toLowerCase()}`;
       const cached = sessionStorage.getItem(cacheKey);
-      if (cached) { setRole(cached as Rol); return; }
+      if (cached) { setRole(cached ); return; }
 
       setLoading(true); setError(null);
       try {
@@ -31,7 +29,7 @@ export function useUserRoleFromSP(email?: string | null) {
         const items = Array.isArray(resp) ? resp : resp?.items ?? [];
         const rolSP = items?.[0]?.fields?.Rol as string | undefined;
 
-        const mapped: Rol = mapRol(rolSP);
+        const mapped: string = mapRol(rolSP);
         if (!cancel) {
           setRole(mapped);
           sessionStorage.setItem(cacheKey, mapped);
@@ -49,7 +47,7 @@ export function useUserRoleFromSP(email?: string | null) {
   return { role, loading, error };
 }
 
-function mapRol(v?: string): Rol {
+function mapRol(v?: string): string {
   const t = (v ?? "").toLowerCase();
   if (t.includes("admin")) return "admin";
   if (t.includes("tec")) return "tecnico";

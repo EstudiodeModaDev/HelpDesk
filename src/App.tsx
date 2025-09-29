@@ -11,7 +11,7 @@ import Formatos from './components/Formatos/Formatos';
 import type { User } from './Models/User';
 import { GraphServicesProvider } from './graph/GrapServicesContext';
 
-import { AuthProvider, useAuth } from './auth/authContext'; // ajusta la ruta si tu archivo se llama distinto
+import { AuthProvider, useAuth } from './auth/authContext';
 import { useUserRoleFromSP } from './Funcionalidades/Usuarios';
 
 /* ---------------------- NAV ---------------------- */
@@ -30,7 +30,7 @@ export type NavKey = AdminNavKey;
 /* ---------------------- UI: Header ---------------------- */
 function HeaderBar(props: {
   user: User;
-  role: 'admin' | 'usuario';
+  role: string; // texto de visualización ("Administrador" | "Técnico" | "Usuario")
   onPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean } | null;
 }) {
   const { user, role, onPrimaryAction } = props;
@@ -60,10 +60,7 @@ function HeaderBar(props: {
 }
 
 /* ---------------------- UI: Sidebar ---------------------- */
-function Sidebar(props: {
-  selected: NavKey;
-  onSelect: (k: NavKey) => void;
-}) {
+function Sidebar(props: { selected: NavKey; onSelect: (k: NavKey) => void; }) {
   const { selected, onSelect } = props;
   return (
     <aside className="sidebar" aria-label="Navegación principal">
@@ -89,10 +86,9 @@ function Sidebar(props: {
 /* ---------------------- Shell (usa Auth) ---------------------- */
 function Shell() {
   const { ready, account, signIn, signOut } = useAuth();
-  const [selected, setSelected] = React.useState<NavKey>('home');
   const [loadingAuth, setLoadingAuth] = React.useState(false);
 
-  // Mapear cuenta -> User
+  // Mapear la cuenta MSAL a tu tipo User (para el Header)
   const user: User = account
     ? {
         displayName: account.name ?? account.username ?? 'Usuario',
@@ -103,23 +99,12 @@ function Shell() {
 
   const isLogged = Boolean(account);
 
-  // 👇 Usa el hook con un mail "seguro" (puede ser null si no hay sesión)
-  const mail = user?.mail ?? null;
-  const { role } = useUserRoleFromSP(mail);
-
-  // 👇 Deriva lo que usas en la UI
-  const userRole: 'admin' | 'usuario' = role === 'admin' ? 'admin' : 'usuario';
-  const isAdmin = userRole === 'admin';
-
   const handleAuthClick = async () => {
     if (!ready || loadingAuth) return;
     setLoadingAuth(true);
     try {
-      if (isLogged) {
-        await signOut();
-      } else {
-        await signIn('popup');
-      }
+      if (isLogged) await signOut();
+      else await signIn('popup');
     } finally {
       setLoadingAuth(false);
     }
@@ -131,13 +116,13 @@ function Shell() {
     ? (isLogged ? 'Cerrando…' : 'Abriendo Microsoft…')
     : (isLogged ? 'Cerrar sesión' : 'Iniciar sesión');
 
-  // No logueado
+  /* === NO LOGUEADO: solo header con botón “Iniciar sesión” === */
   if (!ready || !isLogged) {
     return (
       <div className="page layout">
         <HeaderBar
           user={user}
-          role={'usuario'}
+          role={'Usuario'}
           onPrimaryAction={{
             label: actionLabel,
             onClick: handleAuthClick,
@@ -148,29 +133,50 @@ function Shell() {
     );
   }
 
-  // Logueado
+  /* === LOGUEADO: delega en LoggedApp (aquí sí usamos GraphServices y el hook del rol) === */
+  return (
+    <LoggedApp
+      user={user as User}
+      actionLabel={actionLabel}
+      onAuthClick={handleAuthClick}
+    />
+  );
+}
+
+/* ---------------------- LoggedApp: solo se renderiza si hay sesión ---------------------- */
+function LoggedApp({
+  user,
+  actionLabel,
+  onAuthClick,
+}: {
+  user: User;
+  actionLabel: string;
+  onAuthClick: () => void;
+}) {
+  const [selected, setSelected] = React.useState<NavKey>('home');
+
+  // Hook que consulta SharePoint por correo => 'admin' | 'tecnico' | 'usuario'
+  const { role } = useUserRoleFromSP(user!.mail);
+
+  // lógica
+  const isAdmin = role === 'Administrador';
+
+
   return (
     <div className={`page layout ${isAdmin ? 'layout--withSidebar' : ''}`}>
       {isAdmin && (
-        <Sidebar
-          selected={selected}
-          onSelect={(k) => setSelected(k)}
-        />
+        <Sidebar selected={selected} onSelect={(k) => setSelected(k)} />
       )}
 
       <HeaderBar
         user={user}
-        role={userRole}
-        onPrimaryAction={{
-          label: actionLabel,
-          onClick: handleAuthClick,
-          disabled: loadingAuth,
-        }}
+        role={role}
+        onPrimaryAction={{ label: actionLabel, onClick: onAuthClick, disabled: false }}
       />
 
       <main className={`content ${isAdmin ? 'content--withSidebar' : ''}`}>
-        {/* Opcional: mientras resuelve el rol puedes bloquear contenido sensible */}
-        {/* {loadingRole ? <p>Cargando permisos…</p> : ( */}
+
+        {/* {loadingRole ? <p style={{margin:12}}>Cargando permisos…</p> : ( */}
           <>
             {selected === 'home' && <Home />}
             {selected === 'ticketform' && <NuevoTicketForm />}
@@ -185,12 +191,11 @@ function Shell() {
   );
 }
 
-
 /* ---------------------- App Root ---------------------- */
 export default function App() {
   return (
     <AuthProvider>
-      {/* Monta GraphServices SOLO cuando hay sesión, para evitar pedir token antes de tiempo */}
+      {/* Monta GraphServices SOLO cuando hay sesión */}
       <GraphServicesGate>
         <Shell />
       </GraphServicesGate>
@@ -198,7 +203,7 @@ export default function App() {
   );
 }
 
-/* Gate opcional: provee GraphServices sólo si hay cuenta (evita llamadas a token antes de login) */
+/* Gate: provee GraphServices sólo si hay cuenta (evita pedir token antes de login) */
 function GraphServicesGate({ children }: { children: React.ReactNode }) {
   const { ready, account } = useAuth();
   if (!ready || !account) return <>{children}</>; // sin provider cuando no hay sesión
