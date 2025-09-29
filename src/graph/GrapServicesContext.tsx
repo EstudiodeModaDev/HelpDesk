@@ -36,7 +36,7 @@ export type GraphSiteConfig = {
     Anuncios: string;
     Articulos: string;
     Usuarios: string;
-    Log: string;
+    Logs: string;
     Tickets: string;
     Categorias: string;
     Franquicias: string;
@@ -55,7 +55,7 @@ export type GraphServices = {
   Anuncios: AnunciosService;
   Articulos: ArticulosService;
   Usuarios: UsuariosSPService;
-  Log: LogService;
+  Logs: LogService;
   Tickets: TicketsService;
   Categorias: CategoriasService; 
   Franquicias: FranquiciasService;
@@ -84,7 +84,7 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     Anuncios: 'Anuncios',
     Articulos: 'Articulos',
     Usuarios: 'Usuarios',
-    Log: 'Log',
+    Logs: 'Log',
     Tickets: 'Tickets',
     Categorias: 'Categorias',
     Franquicias: 'Franquicias',
@@ -111,7 +111,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Anuncios:                       config?.lists?.Anuncios                 ?? base.lists.Anuncios,
         Articulos:                      config?.lists?.Articulos                ?? base.lists.Articulos,
         Usuarios:                       config?.lists?.Usuarios                 ?? base.lists.Usuarios,
-        Log:                            config?.lists?.Log                      ?? base.lists.Log,
+        Logs:                            config?.lists?.Logs                      ?? base.lists.Logs,
         Tickets:                        config?.lists?.Tickets                  ?? base.lists.Tickets,
         Categorias:                     config?.lists?.Categorias               ?? base.lists.Categorias,
         Franquicias:                    config?.lists?.Franquicias              ?? base.lists.Franquicias,
@@ -138,7 +138,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Anuncios                  = new AnunciosService(graph, hostname, sitePath, lists.Anuncios);
     const Articulos                 = new ArticulosService(graph, hostname, sitePath, lists.Articulos);
     const Usuarios                  = new UsuariosSPService(graph, hostname, sitePath, lists.Usuarios);
-    const Log                       = new LogService(graph, hostname, sitePath, lists.Log);
+    const Logs                       = new LogService(graph, hostname, sitePath, lists.Logs);
     const Tickets                   = new TicketsService(graph, hostname, sitePath, lists.Tickets);
     const Categorias                = new CategoriasService(graph, hostname, sitePath, lists.Categorias);
     const Franquicias               = new FranquiciasService(graph, hostname, sitePath, lists.Franquicias);
@@ -158,7 +158,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Anuncios,
         Articulos,
         Usuarios,
-        Log,
+        Logs,
         Tickets,
         Categorias,
         Franquicias,
