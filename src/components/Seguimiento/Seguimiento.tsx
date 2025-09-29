@@ -42,6 +42,8 @@ export default function TicketHistorial({
         // select: "id,webUrl,fields(Autor,Texto,Created,Titulo,Tipo,CorreoAutor)" // opcional, reduce payload
         });
 
+        console.log("Cargados mensajes:", items);
+
         if (cancel) return;
         const mapped = mapItemsToMensajes(items);
         setMensajes(mapped);
