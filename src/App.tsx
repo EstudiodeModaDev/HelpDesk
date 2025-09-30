@@ -51,7 +51,7 @@ const NAVS_USUARIO: NavItem<UsuarioKey>[] = [
 function getNavsForRole(role: Role | string) {
   switch (role) {
     case 'Administrador': return NAVS_ADMIN as readonly NavItem<NavKey>[];
-    case 'Técnico':       return NAVS_TECNICO as readonly NavItem<NavKey>[];
+    case 'Tecnico':       return NAVS_TECNICO as readonly NavItem<NavKey>[];
     case 'Usuario':
     default:              return NAVS_USUARIO as readonly NavItem<NavKey>[];
   }
