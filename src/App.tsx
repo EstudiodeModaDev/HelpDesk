@@ -195,22 +195,17 @@ function LoggedApp({
   const navs = getNavsForRole(role);
   const [selected, setSelected] = React.useState<NavKey>(navs[0].key);
 
-  // Mantener selected válido si cambia el rol/navs
+  // Si cambia el rol y el tab actual ya no existe, cae al primero del menú del rol
   React.useEffect(() => {
     if (!hasNav(navs, selected)) setSelected(navs[0].key);
   }, [role, navs, selected]);
 
-  // Sidebar para Admin/Técnico; Usuario sin sidebar (ajústalo si quieres)
-  const showSidebar = role === 'Administrador' || role === 'Técnico';
-
-  // Helper para chequear si la clave existe en el menú actual
   const allow = (key: NavKey) => hasNav(navs, key);
 
   return (
-    <div className={`page layout ${showSidebar ? 'layout--withSidebar' : ''}`}>
-      {showSidebar && (
-        <Sidebar navs={navs} selected={selected} onSelect={(k) => setSelected(k)} />
-      )}
+    <div className="page layout layout--withSidebar">
+      {/* Sidebar SIEMPRE visible */}
+      <Sidebar navs={navs} selected={selected} onSelect={(k) => setSelected(k)} />
 
       <HeaderBar
         user={user}
@@ -218,28 +213,18 @@ function LoggedApp({
         onPrimaryAction={{ label: actionLabel, onClick: onAuthClick, disabled: false }}
       />
 
-      <main className={`content ${showSidebar ? 'content--withSidebar' : ''}`}>
+      <main className="content content--withSidebar">
         {selected === 'home' && <Home />}
 
-        {allow('ticketform' as NavKey) && selected === 'ticketform' && (
-          <NuevoTicketForm />
-        )}
+        {allow('ticketform' as NavKey) && selected === 'ticketform' && <NuevoTicketForm />}
 
-        {allow('ticketTable' as NavKey) && selected === 'ticketTable' && (
-          <TablaTickets />
-        )}
+        {allow('ticketTable' as NavKey) && selected === 'ticketTable' && <TablaTickets />}
 
-        {allow('task' as NavKey) && selected === 'task' && (
-          <TareasPage />
-        )}
+        {allow('task' as NavKey) && selected === 'task' && <TareasPage />}
 
-        {allow('formatos' as NavKey) && selected === 'formatos' && (
-          <Formatos />
-        )}
+        {allow('formatos' as NavKey) && selected === 'formatos' && <Formatos />}
 
-        {allow('reportes' as NavKey) && selected === 'reportes' && (
-          <div>Reportes (WIP)</div>
-        )}
+        {allow('reportes' as NavKey) && selected === 'reportes' && <div>Reportes (WIP)</div>}
       </main>
     </div>
   );
