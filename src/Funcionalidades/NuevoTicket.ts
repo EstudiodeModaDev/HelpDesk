@@ -83,7 +83,7 @@ export function useNuevoTicketForm(services: Svc) {
           Articulos.getAll({ orderby: "fields/Title asc", top: 5000 }),
         ]);
 
-        console.log(subsRaw)
+        console.log(artsRaw)
 
         if (cancel) return;
 
@@ -99,12 +99,12 @@ export function useNuevoTicketForm(services: Svc) {
           Id_categoria: String(first(r.Id_categoria, "")),
         }));
 
-        console.log(subs)
+        console.log(artsRaw)
 
         const arts: Articulo[] = (artsRaw ?? []).map((r: any) => ({
           ID: String(first(r.ID, r.Id, r.id)),
           Title: String(first(r.Title,  "")),
-          Id_subCategoria: String(first(r.Id_Subcategoria, "")),
+          Id_subCategoria: String(first(r.Id_Subcategoria, r.Id_subcategoria, "")),
         }));
 
         setCategorias(cats);
