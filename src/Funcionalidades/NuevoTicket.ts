@@ -3,16 +3,17 @@ import * as React from "react";
 import { useState, useMemo, useEffect } from "react";
 import { calcularFechaSolucion } from "../utils/ans";
 import { fetchHolidays } from "../Services/Festivos";
-import type { UserOption, FormState, FormErrors } from "../Models/nuevoTicket";
+import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
+import type { UserOption } from "../Models/Commons";
 
 /* ============================
    Datos de ejemplo para selects de usuarios
    ============================ */
 const USUARIOS: UserOption[] = [
-  { value: "practicantelisto@estudiodemoda.com.co", label: "Practicante Listo", id: 1 },
-  { value: "cesar@estudiodemoda.com.co", label: "Cesar Sanchez", id: 2 },
-  { value: "andres@estudiodemoda.com.co", label: "Andres Godoy", id: 3 },
+  { value: "practicantelisto@estudiodemoda.com.co", label: "Practicante Listo"},
+  { value: "cesar@estudiodemoda.com.co", label: "Cesar Sanchez",},
+  { value: "andres@estudiodemoda.com.co", label: "Andres Godoy"},
 ];
 
 type Svc = {
@@ -83,8 +84,6 @@ export function useNuevoTicketForm(services: Svc) {
           Articulos.getAll({ orderby: "fields/Title asc", top: 5000 }),
         ]);
 
-        console.log(artsRaw)
-
         if (cancel) return;
 
         const cats: Categoria[] = (catsRaw ?? []).map((r: any) => ({
@@ -98,8 +97,6 @@ export function useNuevoTicketForm(services: Svc) {
           Title: String(first(r.Title, "No mapeado")),
           Id_categoria: String(first(r.Id_categoria, "")),
         }));
-
-        console.log(artsRaw)
 
         const arts: Articulo[] = (artsRaw ?? []).map((r: any) => ({
           ID: String(first(r.ID, r.Id, r.id)),
@@ -125,9 +122,7 @@ export function useNuevoTicketForm(services: Svc) {
   const subcats = useMemo<Subcategoria[]>(() => {
     const catId = String(state.categoria ?? "");
     if (!catId) return [];
-    console.log("base: ", subcategorias)
     const filter = subcategorias.filter((s) => String(s.Id_categoria) === catId);
-    console.log(filter)
     return filter
   }, [subcategorias, state.categoria]);
 

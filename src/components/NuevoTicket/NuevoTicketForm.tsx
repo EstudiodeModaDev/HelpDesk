@@ -1,26 +1,70 @@
-import Select from "react-select";
+// src/components/NuevoTicketForm.tsx
+import * as React from "react";
+import Select, { components } from "react-select";
 import "./NuevoTicketForm.css";
 
-import type { UserOption } from "../../Models/nuevoTicket";
+import type { UserOption, Worker } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket"; // <- tu hook debe aceptar services
+import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
+import { useWorkers } from "../../Funcionalidades/Workers"; // 👈 tu hook Graph
 
 export default function NuevoTicketForm() {
   // Servicios Graph/SharePoint
   const { Categorias, SubCategorias, Articulos } = useGraphServices();
 
-  // Hook del formulario (carga catálogos desde listas)
   const {
     state, errors, submitting, fechaSolucion,
-    setField, subcats, articulos, handleSubmit, USUARIOS,
-    categorias, loadingCatalogos, // catálogos y estado de carga
+    setField, subcats, articulos, handleSubmit,
+    categorias, loadingCatalogos,
   } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos });
+
+  const workersToUserOptions = (workers: Worker[]): UserOption[] =>
+    workers.map(w => ({
+      value: (w.mail || String(w.id) || "").trim(),   // *correo* como valor estable
+      label: w.displayName || w.mail || "—",          // texto visible
+      id: w.id !== undefined ? String(w.id) : undefined,
+      email: w.mail,
+      jobTitle: w.jobTitle,
+    }));
+
+  const { workers, loading: loadingUsers, error: usersError, refresh } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+
+  const userOptions: UserOption[] = React.useMemo(
+    () => workersToUserOptions(workers),
+    [workers]
+  );
+
+  // Búsqueda: incluye nombre, correo y cargo
+  const filterOption = React.useCallback(
+    (option: any, rawInput: string) => {
+      const q = rawInput.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+      if (!q) return true;
+      const w = workers[option.index];
+      const haystack = `${w.displayName ?? ""} ${w.mail ?? ""} ${w.jobTitle ?? ""}`
+        .normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+      return haystack.includes(q);
+    },
+    [workers]
+  );
+
+  // Render de opción con nombre + correo (bonito)
+  const Option = (props: any) => {
+    const w = workers[props.index];
+    return (
+      <components.Option {...props}>
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+          <span style={{ fontWeight: 600 }}>{w?.displayName ?? props.label}</span>
+          <span style={{ fontSize: 12, opacity: 0.8 }}>{w?.mail}</span>
+          {w?.jobTitle && <span style={{ fontSize: 11, opacity: 0.7 }}>{w.jobTitle}</span>}
+        </div>
+      </components.Option>
+    );
+  };
 
   return (
     <div className="ticket-form">
       <h2>Nuevo Ticket</h2>
 
-      {/* Banner ANS cuando existe */}
       {fechaSolucion && (
         <div className="ans-banner">
           Fecha estimada de solución:{" "}
@@ -33,28 +77,51 @@ export default function NuevoTicketForm() {
       <form onSubmit={handleSubmit} noValidate>
         {/* Solicitante / Resolutor */}
         <div className="form-row">
-          <div className="form-group inline-group">
-            <label>Solicitante</label>
+          <div className="form-group inline-group" style={{ minWidth: 300 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <label>Solicitante</label>
+              <button
+                type="button"
+                onClick={refresh}
+                className="mini-reload"
+                title="Recargar usuarios"
+                disabled={loadingUsers || submitting}
+              >
+                ⟳
+              </button>
+            </div>
             <Select<UserOption, false>
-              options={USUARIOS}
-              placeholder="Buscar solicitante..."
+              options={userOptions}
+              placeholder={loadingUsers ? "Cargando usuarios…" : "Buscar solicitante…"}
               value={state.solicitante}
               onChange={(opt) => setField("solicitante", (opt as UserOption) ?? null)}
               classNamePrefix="rs"
-              isDisabled={submitting}
+              isDisabled={submitting || loadingUsers}
+              isLoading={loadingUsers}
+              filterOption={filterOption}
+              components={{ Option }}
+              noOptionsMessage={() =>
+                usersError ? "Error cargando usuarios" : "Sin coincidencias"
+              }
             />
             {errors.solicitante && <small className="error">{errors.solicitante}</small>}
           </div>
 
-          <div className="form-group inline-group">
+          <div className="form-group inline-group" style={{ minWidth: 300 }}>
             <label>Resolutor</label>
             <Select<UserOption, false>
-              options={USUARIOS}
-              placeholder="Buscar resolutor..."
+              options={userOptions}
+              placeholder={loadingUsers ? "Cargando usuarios…" : "Buscar resolutor…"}
               value={state.resolutor}
               onChange={(opt) => setField("resolutor", (opt as UserOption) ?? null)}
               classNamePrefix="rs"
-              isDisabled={submitting}
+              isDisabled={submitting || loadingUsers}
+              isLoading={loadingUsers}
+              filterOption={filterOption}
+              components={{ Option }}
+              noOptionsMessage={() =>
+                usersError ? "Error cargando usuarios" : "Sin coincidencias"
+              }
             />
             {errors.resolutor && <small className="error">{errors.resolutor}</small>}
           </div>
@@ -96,10 +163,11 @@ export default function NuevoTicketForm() {
             disabled={submitting}
           >
             <option value="">Seleccione una fuente</option>
-            <option value="correo">Correo</option>
-            <option value="teams">Teams</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="presencial">Presencial</option>
+            <option value="Correo">Correo</option>
+            <option value="Disponibilidad">Disponibilidad</option>
+            <option value="Teams">Teams</option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="En persona">Presencial</option>
           </select>
           {errors.fuente && <small className="error">{errors.fuente}</small>}
         </div>
@@ -147,7 +215,9 @@ export default function NuevoTicketForm() {
               }}
               disabled={submitting || loadingCatalogos}
             >
-              <option value="">{loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}</option>
+              <option value="">
+                {loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
+              </option>
               {categorias.map((c) => (
                 <option key={c.ID} value={c.ID}>
                   {c.Title}
@@ -172,7 +242,9 @@ export default function NuevoTicketForm() {
               <option value="">
                 {!state.categoria
                   ? "Seleccione una categoría primero"
-                  : (loadingCatalogos ? "Cargando subcategorías..." : "Seleccione una subcategoría")}
+                  : loadingCatalogos
+                  ? "Cargando subcategorías..."
+                  : "Seleccione una subcategoría"}
               </option>
               {subcats.map((s) => (
                 <option key={s.ID} value={s.ID}>
@@ -195,7 +267,9 @@ export default function NuevoTicketForm() {
               <option value="">
                 {!state.subcategoria
                   ? "Seleccione una subcategoría primero"
-                  : (loadingCatalogos ? "Cargando artículos..." : "Seleccione un artículo")}
+                  : loadingCatalogos
+                  ? "Cargando artículos..."
+                  : "Seleccione un artículo"}
               </option>
               {articulos.map((a) => (
                 <option key={a} value={a}>

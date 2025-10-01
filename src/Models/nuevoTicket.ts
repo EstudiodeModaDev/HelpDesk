@@ -1,3 +1,5 @@
+import type { UserOption } from "./Commons";
+
 export type FormState = {
   solicitante: UserOption | null;
   resolutor: UserOption | null;
@@ -12,6 +14,5 @@ export type FormState = {
   archivo: File | null;
 };
 
-export type UserOption = { value: string; label: string, id?: number };
 
 export type FormErrors = Partial<Record<keyof FormState, string>>;
