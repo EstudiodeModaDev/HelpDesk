@@ -166,7 +166,7 @@ export class TicketsService {
 
     console.warn("Filtro que llega", opts)
     const url = `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`;
-    const res = this.fetchPage(url);
+    const res = await this.fetchPage(url);
     console.warn("resultado", res)
     return res
   }
