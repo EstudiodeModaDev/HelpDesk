@@ -96,7 +96,7 @@ export function useNuevoTicketForm(services: Svc) {
         const subs: Subcategoria[] = (subsRaw ?? []).map((r: any) => ({
           ID: String(first(r.ID, r.Id, r.id)),
           Title: String(first(r.Title, "No mapeado")),
-          Id_categoria: String(first(r.Id_Categoria, "")),
+          Id_categoria: String(first(r.Id_categoria, "")),
         }));
 
         console.log(subs)
