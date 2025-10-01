@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { calcularFechaSolucion } from "../utils/ans";
 import { fetchHolidays } from "../Services/Festivos";
 import type { UserOption, FormState, FormErrors } from "../Models/nuevoTicket";
+import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 
 
 /* ============================
@@ -21,11 +22,6 @@ type Svc = {
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
 };
-
-// Normalizamos los modelos a una estructura consistente local
-type Categoria = { id: string; nombre: string };
-type Subcategoria = { id: string; nombre: string; categoriaId: string };
-type Articulo   = { id: string; nombre: string; subcategoriaId: string };
 
 /* ============================
    Hook principal
@@ -99,20 +95,20 @@ export function useNuevoTicketForm(services: Svc) {
         console.log("subcats: ", subsRaw)
         console.log("arts: ", artsRaw)
         const cats: Categoria[] = (catsRaw ?? []).map((r: any) => ({
-          id: String(r.ID ?? r.Id),
-          nombre: String(r.Categoria ?? r.fields?.Categoria ?? ""),
+          ID: String(r.ID ?? r.Id),
+          Title: String(r.Categoria ?? r.fields?.Categoria ?? ""),
         }));
 
         const subs: Subcategoria[] = (subsRaw ?? []).map((r: any) => ({
-          id: String(r.ID ?? r.Id),
-          nombre: String(r.Subcategoria ?? r.fields?.Subcategoria ?? ""),
-          categoriaId: String(r.Id_Categoria ?? r.fields?.Id_Categoria ?? ""),
+          ID: String(r.ID ?? r.Id),
+          Title: String(r.Subcategoria ?? r.fields?.Subcategoria ?? ""),
+          Id_categoria: String(r.Id_Categoria ?? r.fields?.Id_Categoria ?? ""),
         }));
 
         const arts: Articulo[] = (artsRaw ?? []).map((r: any) => ({
-          id: String(r.ID ?? r.Id),
-          nombre: String(r.Articulo ?? r.fields?.Articulo ?? ""),
-          subcategoriaId: String(r.Id_Subcategoria ?? r.fields?.Id_Subcategoria ?? ""),
+          ID: String(r.ID ?? r.Id),
+          Title: String(r.Articulo ?? r.fields?.Articulo ?? ""),
+          Id_subCategoria: String(r.Id_Subcategoria ?? r.fields?.Id_Subcategoria ?? ""),
         }));
 
         setCategorias(cats);
@@ -133,15 +129,15 @@ export function useNuevoTicketForm(services: Svc) {
   const subcats = useMemo<Subcategoria[]>(() => {
     const catId = String(state.categoria ?? "");
     if (!catId) return [];
-    return subcategorias.filter((s) => s.categoriaId === catId);
+    return subcategorias.filter((s) => s.Id_categoria === catId);
   }, [subcategorias, state.categoria]);
 
   const articulos = useMemo<string[]>(() => {
     const subId = String(state.subcategoria ?? "");
     if (!subId) return [];
     return articulosAll
-      .filter((a) => a.subcategoriaId === subId)
-      .map((a) => a.nombre);
+      .filter((a) => a.Id_subCategoria === subId)
+      .map((a) => a.ID);
   }, [articulosAll, state.subcategoria]);
 
   /* ============================

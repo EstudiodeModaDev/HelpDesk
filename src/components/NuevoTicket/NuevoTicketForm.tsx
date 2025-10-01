@@ -149,8 +149,8 @@ export default function NuevoTicketForm() {
             >
               <option value="">{loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}</option>
               {categorias.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
+                <option key={c.ID} value={c.ID}>
+                  {c.Title}
                 </option>
               ))}
             </select>
@@ -175,8 +175,8 @@ export default function NuevoTicketForm() {
                   : (loadingCatalogos ? "Cargando subcategorías..." : "Seleccione una subcategoría")}
               </option>
               {subcats.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.nombre}
+                <option key={s.ID} value={s.ID}>
+                  {s.Title}
                 </option>
               ))}
             </select>
