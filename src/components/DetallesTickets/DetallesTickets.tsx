@@ -3,19 +3,11 @@ import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
 import TicketHistorial from '../Seguimiento/Seguimiento'; // ajusta la ruta si es diferente
 import HtmlContent from '../Renderizador/Renderizador';
-import { useUserRoleFromSP } from '../../Funcionalidades/Usuarios';
 
-export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, onVolver: () => void}) {
+export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Ticket, onVolver: () => void, role: string}) {
   if (!ticket) return <div>Ticket no encontrado</div>;
 
   const [showSeg, setShowSeg] = React.useState(false);
-  const [role, setRole] = React.useState("Usuario");
-
-   React.useEffect(() => {
-     setRole(useUserRoleFromSP().role)
-     console.log("Resultado de effect: ", role)
-   }, [useUserRoleFromSP]);
- 
 
   const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
     .filter(Boolean)

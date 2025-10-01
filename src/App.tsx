@@ -219,7 +219,7 @@ function LoggedApp({
 
         {allow('ticketform' as NavKey) && selected === 'ticketform' && <NuevoTicketForm />}
 
-        {allow('ticketTable' as NavKey) && selected === 'ticketTable' && <TablaTickets />}
+        {allow('ticketTable' as NavKey) && selected === 'ticketTable' && <TablaTickets/>}
 
         {allow('task' as NavKey) && selected === 'task' && <TareasPage />}
 

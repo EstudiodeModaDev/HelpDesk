@@ -8,7 +8,7 @@ import { useGraphServices } from "../../graph/GrapServicesContext";
 import { calcularColorEstado, useTickets } from "../../Funcionalidades/Tickets";
 import type { SortDir, SortField, Ticket } from "../../Models/Tickets";
 import { toISODateTimeFlex } from "../../utils/Date";
-import { useIsAdmin } from "../../Funcionalidades/Usuarios";
+import { useIsAdmin, useUserRoleFromSP } from "../../Funcionalidades/Usuarios";
 
 function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; dir: SortDir}>) {
   const idx = sorts.findIndex(s => s.field === field);
@@ -21,6 +21,7 @@ export default function TablaTickets() {
   const { account } = useAuth();
   const userMail = account?.username ?? "";
   const isAdmin = useIsAdmin(userMail); // ajusta tu lógica real de roles
+  const userRole = useUserRoleFromSP(userMail)
 
   const { Tickets } = useGraphServices();
 
@@ -131,7 +132,7 @@ export default function TablaTickets() {
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
-        <DetalleTicket ticket={ticketSeleccionado} onVolver={() => setTicketSeleccionado(null)} />
+        <DetalleTicket ticket={ticketSeleccionado} onVolver={() => setTicketSeleccionado(null)} role={userRole.role} />
       ) : (
         <div className="table-wrap">
           <table>
