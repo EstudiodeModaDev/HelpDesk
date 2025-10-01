@@ -6,11 +6,9 @@ import { fetchHolidays } from "../Services/Festivos";
 import type { UserOption, FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 
-
 /* ============================
-   Tipos / mocks
+   Datos de ejemplo para selects de usuarios
    ============================ */
-
 const USUARIOS: UserOption[] = [
   { value: "practicantelisto@estudiodemoda.com.co", label: "Practicante Listo", id: 1 },
   { value: "cesar@estudiodemoda.com.co", label: "Cesar Sanchez", id: 2 },
@@ -23,9 +21,8 @@ type Svc = {
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
 };
 
-/* ============================
-   Hook principal
-   ============================ */
+// Helpers para tolerar nombres internos distintos
+const first = (...vals: any[]) => vals.find(v => v !== undefined && v !== null && v !== "");
 
 export function useNuevoTicketForm(services: Svc) {
   const { Categorias, SubCategorias, Articulos } = services;
@@ -57,9 +54,8 @@ export function useNuevoTicketForm(services: Svc) {
   const [loadingCatalogos, setLoadingCatalogos] = React.useState(false);
   const [errorCatalogos, setErrorCatalogos] = React.useState<string | null>(null);
 
-  /* ============================
-     Festivos (una sola vez)
-     ============================ */
+
+//Carga de festivos inicial
   useEffect(() => {
     let cancel = false;
     (async () => {
@@ -73,9 +69,7 @@ export function useNuevoTicketForm(services: Svc) {
     return () => { cancel = true; };
   }, []);
 
-  /* ============================
-     Cargar catálogos (una sola vez)
-     ============================ */
+//Carga de catologo de servicios
   useEffect(() => {
     let cancel = false;
     (async () => {
@@ -91,24 +85,21 @@ export function useNuevoTicketForm(services: Svc) {
 
         if (cancel) return;
 
-        console.log("cats: ", catsRaw)
-        console.log("subcats: ", subsRaw)
-        console.log("arts: ", artsRaw)
         const cats: Categoria[] = (catsRaw ?? []).map((r: any) => ({
-          ID: String(r.ID ?? r.Id),
-          Title: String(r.Categoria ?? r.fields?.Categoria ?? ""),
+          ID: String(first(r.ID, r.Id, r.id)),
+          Title: String(first(r.Title, "No mapeado")),
         }));
 
         const subs: Subcategoria[] = (subsRaw ?? []).map((r: any) => ({
-          ID: String(r.ID ?? r.Id),
-          Title: String(r.Subcategoria ?? r.fields?.Subcategoria ?? ""),
-          Id_categoria: String(r.Id_Categoria ?? r.fields?.Id_Categoria ?? ""),
+          ID: String(first(r.ID, r.Id, r.id)),
+          Title: String(first(r.Title, "No mapeado")),
+          Id_categoria: String(first(r.Id_Categoria, "")),
         }));
 
         const arts: Articulo[] = (artsRaw ?? []).map((r: any) => ({
-          ID: String(r.ID ?? r.Id),
-          Title: String(r.Articulo ?? r.fields?.Articulo ?? ""),
-          Id_subCategoria: String(r.Id_Subcategoria ?? r.fields?.Id_Subcategoria ?? ""),
+          ID: String(first(r.ID, r.Id, r.id)),
+          Title: String(first(r.Title,  "")),
+          Id_subCategoria: String(first(r.Id_Subcategoria, "")),
         }));
 
         setCategorias(cats);
@@ -129,15 +120,16 @@ export function useNuevoTicketForm(services: Svc) {
   const subcats = useMemo<Subcategoria[]>(() => {
     const catId = String(state.categoria ?? "");
     if (!catId) return [];
-    return subcategorias.filter((s) => s.Id_categoria === catId);
+    return subcategorias.filter((s) => String(s.Id_categoria) === catId);
   }, [subcategorias, state.categoria]);
 
   const articulos = useMemo<string[]>(() => {
     const subId = String(state.subcategoria ?? "");
     if (!subId) return [];
+    // devolvemos los NOMBRES para pintar el select
     return articulosAll
-      .filter((a) => a.Id_subCategoria === subId)
-      .map((a) => a.ID);
+      .filter((a) => String(a.Id_subCategoria) === subId)
+      .map((a) => a.Title);
   }, [articulosAll, state.subcategoria]);
 
   /* ============================
@@ -146,13 +138,12 @@ export function useNuevoTicketForm(services: Svc) {
   const setField = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setState((s) => ({ ...s, [k]: v }));
 
-  // Si cambia categoría, resetea subcategoría y artículo
+  // Reset dependientes cuando cambia categoría / subcategoría
   useEffect(() => {
     setState((s) => ({ ...s, subcategoria: "", articulo: "" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.categoria]);
 
-  // Si cambia subcategoría, resetea artículo
   useEffect(() => {
     setState((s) => ({ ...s, articulo: "" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,9 +186,6 @@ export function useNuevoTicketForm(services: Svc) {
         fechaSolucion: solucion.toISOString(),
       };
 
-      // Aquí enviarías el payload a tu API/SharePoint
-      // await TicketsService.create(payload);
-
       alert("Payload:\n\n" + JSON.stringify(payload, null, 2));
     } finally {
       setSubmitting(false);
@@ -213,9 +201,9 @@ export function useNuevoTicketForm(services: Svc) {
     fechaSolucion,
 
     // catálogos y derivados
-    categorias,          // todas
-    subcats,             // filtradas por categoría seleccionada
-    articulos,           // nombres filtrados por subcategoría
+    categorias,          // [{ ID, Title }]
+    subcats,             // [{ ID, Title, Id_categoria }] filtradas por categoría
+    articulos,           // string[] (nombres)
     loadingCatalogos,
     errorCatalogos,
 
