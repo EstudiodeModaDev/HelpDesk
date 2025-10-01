@@ -54,7 +54,6 @@ export class TicketsService {
         if (!this.siteId) {
         const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
         this.siteId = site?.id;
-        console.log('Resolved siteId:', this.siteId);
         if (!this.siteId) throw new Error('No se pudo resolver siteId');
         this.saveCache();
         }
@@ -163,11 +162,8 @@ export class TicketsService {
     if (opts?.filter)  qs.set('$filter', opts.filter);
     if (opts?.orderby) qs.set('$orderby', opts.orderby);
     if (opts?.top != null) qs.set('$top', String(opts.top));
-
-    console.warn("Filtro que llega", opts)
     const url = `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`;
     const res = await this.fetchPage(url);
-    console.warn("resultado", res)
     return res
   }
 

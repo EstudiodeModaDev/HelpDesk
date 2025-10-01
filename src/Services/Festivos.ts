@@ -1,7 +1,7 @@
 //Obtener los festivos desde la API pública
 export async function fetchHolidays(country = "ES"): Promise<string[]> {
   const year = new Date().getFullYear(); //Obtener el año actual
-  const url = `https://api.generadordni.es/v2/v2/holidays/holidays?country=${country}&year=${year}`;
+  const url = `https://api.generadordni.es/v2/holidays/holidays?country=${country}&year=${year}`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error("Error obteniendo festivos");

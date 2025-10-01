@@ -106,7 +106,6 @@ export function useTickets(
     const filters: string[] = [];
 
     if (!isAdmin ) {
-      console.log(userMail)
       const emailSafe = userMail.replace(/'/g, "''");
       filters.push(`(fields/CorreoSolicitante eq '${emailSafe}' or fields/CorreoObservador eq '${emailSafe}' or fields/Correoresolutor eq '${emailSafe}')`);
     }
@@ -134,7 +133,6 @@ export function useTickets(
     if (!sorts.some(s => s.field === 'id')) {
       orderParts.push('ID desc');
     }
-    console.log("FIltros tickets", filters.join(" and "))
     return {
       filter: filters.join(" and "),
       orderby: orderParts.join(","),
@@ -147,7 +145,6 @@ export function useTickets(
     setLoading(true); setError(null);
     try {
       const { items, nextLink } = await TicketsSvc.getAll(buildFilter()); // debe devolver {items,nextLink}
-      console.log("Tickets cargados:", items.length, "nextLink:", nextLink);
       setRows(items);
       setNextLink(nextLink ?? null);
       setPageIndex(1);

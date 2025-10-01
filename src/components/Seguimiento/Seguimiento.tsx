@@ -36,11 +36,10 @@ export default function TicketHistorial({
     let cancel = false;
     const load = async () => {
       setLoading(true); setError(null);
-      console.log("Role: ", role)
       try {
         const items = await Logs.getAll({
           filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`,
-          orderby: "fields/Created asc,id asc",
+          orderby: "fields/Created desc",
           top: 2000,
         });
         if (cancel) return;

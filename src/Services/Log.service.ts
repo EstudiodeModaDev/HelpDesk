@@ -52,7 +52,6 @@ export class LogService {
       if (!this.siteId) {
       const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
       this.siteId = site?.id;
-      console.log('Resolved siteId:', this.siteId);
       if (!this.siteId) throw new Error('No se pudo resolver siteId');
       this.saveCache();
       }
@@ -149,12 +148,10 @@ export class LogService {
     const query = qs.toString().replace(/\+/g, '%20');
 
     const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
-    console.log('LogService.getAll URL:', url);
 
     try {
       const res = await this.graph.get<any>(url);
       const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
-      console.log('LogService.getAll response:', mapped);
       return mapped
 
     } catch (e: any) {

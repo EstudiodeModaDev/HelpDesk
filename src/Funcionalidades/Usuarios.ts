@@ -11,7 +11,6 @@ export function useUserRoleFromSP(email?: string | null) {
   React.useEffect(() => {
     let cancel = false;
     (async () => {
-      console.log("email", email)
       if (!email) { setRole("usuario"); return; }
 
       setLoading(true); setError(null);
@@ -25,7 +24,6 @@ export function useUserRoleFromSP(email?: string | null) {
 
         const items = Array.isArray(resp) ? resp : resp?.items ?? [];
         const rolSP = items?.[0]?.Rol as string | undefined;
-        console.log("Rol normalizado", rolSP)
         if (!cancel) {
           setRole(rolSP ?? "No encontrado");
         }
@@ -70,7 +68,6 @@ export function useIsAdmin(email?: string | null) {
           "";
 
         const rol = String(rolRaw).trim().toLowerCase();
-        console.log(rol)
         const admin =
           rol === "administrador";
 

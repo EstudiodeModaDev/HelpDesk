@@ -52,7 +52,6 @@ export class UsuariosSPService {
         if (!this.siteId) {
         const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
         this.siteId = site?.id;
-        console.log('Resolved siteId:', this.siteId);
         if (!this.siteId) throw new Error('No se pudo resolver siteId');
         this.saveCache();
         }
