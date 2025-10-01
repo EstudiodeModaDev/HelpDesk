@@ -9,7 +9,7 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
   if (!ticket) return <div>Ticket no encontrado</div>;
 
   const [showSeg, setShowSeg] = React.useState(false);
-    const { role: userRole } = useUserRoleFromSP();
+    const role = useUserRoleFromSP().role;
 
   const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
     .filter(Boolean)
@@ -83,7 +83,7 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
       {showSeg && (
         <div style={{ marginTop: 16 }}>
           <TicketHistorial
-            role= {userRole ?? "Usuario"}
+            role= {role ?? "Usuario"}
             onVolver={() => setShowSeg(false)}
             ticketId={ticket.id}
             onAddClick={() => { } }
