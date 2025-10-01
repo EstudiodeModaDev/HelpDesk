@@ -134,7 +134,7 @@ export function useTickets(
     if (!sorts.some(s => s.field === 'id')) {
       orderParts.push('ID desc');
     }
-    console.log(filters.join(" and "))
+    console.log("FIltros tickets", filters.join(" and "))
     return {
       filter: filters.join(" and "),
       orderby: orderParts.join(","),

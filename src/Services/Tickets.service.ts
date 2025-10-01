@@ -159,14 +159,16 @@ export class TicketsService {
 
   async getAll(opts?: GetAllOpts): Promise<PageResult<Ticket>> {
     await this.ensureIds();
-
     const qs = new URLSearchParams({ $expand: 'fields' });
     if (opts?.filter)  qs.set('$filter', opts.filter);
     if (opts?.orderby) qs.set('$orderby', opts.orderby);
     if (opts?.top != null) qs.set('$top', String(opts.top));
 
+    console.warn("Filtro que llega", opts)
     const url = `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`;
-    return this.fetchPage(url);
+    const res = this.fetchPage(url);
+    console.warn("resultado", res)
+    return res
   }
 
   // Seguir el @odata.nextLink tal cual lo entrega Graph
