@@ -20,6 +20,7 @@ import { LogService } from '../Services/Log.service';
 import { TicketsService } from '../Services/Tickets.service';
 import { CategoriasService } from '../Services/Categorias.service';
 import { FranquiciasService } from '../Services/Franquicias.service';
+import { SubCategoriasService } from '../Services/SubCategorias.Service';
 //import { SharedServices } from '../Services/Shared.service'; // <- singular
 
 // ================== Tipos ==================
@@ -40,6 +41,7 @@ export type GraphSiteConfig = {
     Tickets: string;
     Categorias: string;
     Franquicias: string;
+    SubCategorias: string;
   };
 };
 
@@ -59,6 +61,7 @@ export type GraphServices = {
   Tickets: TicketsService;
   Categorias: CategoriasService; 
   Franquicias: FranquiciasService;
+  SubCategorias: SubCategoriasService;
   //shared: SharedServices; // <- singular
 };
 
@@ -88,6 +91,7 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     Tickets: 'Tickets',
     Categorias: 'Categorias',
     Franquicias: 'Franquicias',
+    SubCategorias: 'SubCategorias',
   },
 };
 
@@ -115,6 +119,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Tickets:                        config?.lists?.Tickets                  ?? base.lists.Tickets,
         Categorias:                     config?.lists?.Categorias               ?? base.lists.Categorias,
         Franquicias:                    config?.lists?.Franquicias              ?? base.lists.Franquicias,
+        SubCategorias:                  config?.lists?.SubCategorias            ?? base.lists.SubCategorias,
       },
     };
   }, [config]);
@@ -142,6 +147,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Tickets                   = new TicketsService(graph, hostname, sitePath, lists.Tickets);
     const Categorias                = new CategoriasService(graph, hostname, sitePath, lists.Categorias);
     const Franquicias               = new FranquiciasService(graph, hostname, sitePath, lists.Franquicias);
+    const SubCategorias             = new SubCategoriasService(graph, hostname, sitePath, lists.SubCategorias)
 
 
     // SharedService depende de UsuariosParkingService
@@ -162,7 +168,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Tickets,
         Categorias,
         Franquicias,
-      //shared,
+        SubCategorias
     };
   }, [graph, cfg]);
 
