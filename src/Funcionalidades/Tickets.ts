@@ -39,7 +39,6 @@ export function parseFechaFlex(fecha?: string): Date {
   return new Date(NaN);
 }
 
-
 export function calcularColorEstado(ticket: Ticket): string {
   const estado = (ticket.estado ?? '').toLowerCase();
 
@@ -80,7 +79,6 @@ export function calcularColorEstado(ticket: Ticket): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-
 export function useTickets(
   TicketsSvc: TicketsService,
   userMail: string,
@@ -107,9 +105,10 @@ export function useTickets(
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
 
-    if (!isAdmin && userMail?.trim()) {
+    if (!isAdmin ) {
+      if(!userMail?.trim()) {}
       const emailSafe = userMail.replace(/'/g, "''");
-      filters.push(`fields/Title eq '${emailSafe}'`);
+      filters.push(`(fields/CorreoSolicitante eq '${emailSafe}' or fields/CorreoObservador eq '${emailSafe}' or fields/Correoresolutor eq '${emailSafe}')`);
     }
 
     if (filterMode === "En curso") {
