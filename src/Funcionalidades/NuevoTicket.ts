@@ -90,6 +90,8 @@ export function useNuevoTicketForm(services: Svc) {
           Title: String(first(r.Title, "No mapeado")),
         }));
 
+        console.log(cats)
+
         const subs: Subcategoria[] = (subsRaw ?? []).map((r: any) => ({
           ID: String(first(r.ID, r.Id, r.id)),
           Title: String(first(r.Title, "No mapeado")),
@@ -119,6 +121,7 @@ export function useNuevoTicketForm(services: Svc) {
      ============================ */
   const subcats = useMemo<Subcategoria[]>(() => {
     const catId = String(state.categoria ?? "");
+    console.log(catId)
     if (!catId) return [];
     return subcategorias.filter((s) => String(s.Id_categoria) === catId);
   }, [subcategorias, state.categoria]);
