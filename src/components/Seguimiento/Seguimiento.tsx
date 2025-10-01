@@ -24,7 +24,7 @@ export default function TicketHistorial({
   className,
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
-  const isPrivileged = role === "Administrador" || role === "Tecnico"; // 👈 solo admin ve acciones
+  const isPrivileged = role === "Administrador" || role === "Tecnico"; 
 
   const { Logs } = useGraphServices();
 

@@ -22,7 +22,7 @@ type Role = 'Administrador' | 'Técnico' | 'Usuario';
 type NavItem<K extends string> = { key: K; label: string; icon?: string };
 
 type AdminKey   = 'home' | 'ticketform' | 'ticketTable' | 'task' | 'formatos' | 'reportes' | 'Inventario' | 'Administración' | 'Informacion';
-type TecnicoKey = 'home' | 'ticketTable' | 'task' | 'reportes' | 'Inventario' | 'Administración' | 'Informacion';
+type TecnicoKey = 'home' | 'ticketTable' | 'task' | 'reportes' | 'Inventario' | 'Administración' | 'Informacion' | 'ticketform';
 type UsuarioKey = 'home' | 'ticketTable';
 
 export type NavKey = AdminKey | TecnicoKey | UsuarioKey;
@@ -38,6 +38,7 @@ const NAVS_ADMIN: NavItem<AdminKey>[] = [
 
 const NAVS_TECNICO: NavItem<TecnicoKey>[] = [
   { key: 'home',        label: 'Home',     icon: '🏠' },
+  { key: 'ticketform', label: 'Nuevo Ticket',  icon: '➕' },
   { key: 'ticketTable', label: 'Tickets',  icon: '👁️' },
   { key: 'task',        label: 'Tareas',   icon: '✅' },
   { key: 'reportes',    label: 'Reportes', icon: '📊' },
