@@ -9,7 +9,13 @@ export default function DetalleTicket({ ticket, onVolver }: { ticket: Ticket, on
   if (!ticket) return <div>Ticket no encontrado</div>;
 
   const [showSeg, setShowSeg] = React.useState(false);
-    const role = useUserRoleFromSP().role;
+  const [role, setRole] = React.useState("Usuario");
+
+   React.useEffect(() => {
+     setRole(useUserRoleFromSP().role)
+     console.log("Resultado de effect: ", role)
+   }, [useUserRoleFromSP]);
+ 
 
   const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
     .filter(Boolean)
