@@ -88,9 +88,9 @@ export function useNuevoTicketForm(services: Svc) {
         setErrorCatalogos(null);
 
         const [catsRaw, subsRaw, artsRaw] = await Promise.all([
-          Categorias.getAll({ orderby: "fields/Categoria asc" }),
-          SubCategorias.getAll({ orderby: "fields/Subcategoria asc", top: 5000 }),
-          Articulos.getAll({ orderby: "fields/Articulo asc", top: 5000 }),
+          Categorias.getAll({ orderby: "fields/Title asc" }),
+          SubCategorias.getAll({ orderby: "fields/Title asc", top: 5000 }),
+          Articulos.getAll({ orderby: "fields/Title asc", top: 5000 }),
         ]);
 
         if (cancel) return;
