@@ -122,6 +122,7 @@ export function useNuevoTicketForm(services: Svc) {
   const subcats = useMemo<Subcategoria[]>(() => {
     const catId = String(state.categoria ?? "");
     if (!catId) return [];
+    console.log("base: ", subcategorias)
     const filter = subcategorias.filter((s) => String(s.Id_categoria) === catId);
     console.log(filter)
     return filter
