@@ -255,7 +255,7 @@ export function useNuevoTicketForm(services: Svc) {
         Categoria: state.categoria,       
         SubCategoria: state.subcategoria, 
         SubSubCategoria: state.articulo,  
-        IdResolutor: state.resolutor?.id,
+        //IdResolutor: state.resolutor?.id,
         Nombreresolutor: state.resolutor?.label,
         Correoresolutor: state.resolutor?.email,
         Solicitante: state.solicitante?.label,
