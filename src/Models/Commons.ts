@@ -23,3 +23,10 @@ export type UserOption = {
   email?: string;     // opcional: para mostrar/filtrar
   jobTitle?: string;  // opcional: para mostrar/filtrar
 };
+
+
+export type FlowToUser = {
+  recipient: string;            
+  message: string;
+  title?: string;
+};

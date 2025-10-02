@@ -5,7 +5,7 @@ import { calcularFechaSolucion } from "../utils/ans";
 import { fetchHolidays } from "../Services/Festivos";
 import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
-import type { UserOption } from "../Models/Commons";
+import type { FlowToUser, UserOption } from "../Models/Commons";
 import { norm } from "../utils/Commons";
 import type { TZDate } from "@date-fns/tz";
 
@@ -22,14 +22,18 @@ type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
-  Notifier?: {sendTeamsToUserViaFlow: (input: { recipient: string; message: string; title?: string }) => Promise<any>;};
 };
 
 // Helpers para tolerar nombres internos distintos
 const first = (...vals: any[]) => vals.find(v => v !== undefined && v !== null && v !== "");
 
+const flowService = React.useMemo(
+  () => new MailAndTeamsFlowRestService(),
+  []
+);
+
 export function useNuevoTicketForm(services: Svc) {
-  const { Categorias, SubCategorias, Articulos, Notifier } = services;
+  const { Categorias, SubCategorias, Articulos } = services;
 
   // ---- Estado del formulario
   const [state, setState] = useState<FormState>({
@@ -249,24 +253,38 @@ export function useNuevoTicketForm(services: Svc) {
         CorreoSolicitante: state.solicitante?.email,
         Estadodesolicitud: "En Atención",
         ANS: ANS,
-        
       };
 
-      //Notificación correo solicitante
-      await Notifier?.sendTeamsToUserViaFlow({
-        recipient: payload.CorreoSolicitante!,
-        title: `Ticket creado: ${state.motivo}`,
-        message: `
-          <p>Hola,</p>
-          <p>Se creó el ticket <b>${state.motivo}</b>.</p>
-          <ul>
-            <li><b>Solicitante:</b> ${state.solicitante?.label ?? "-"}</li>
-            <li><b>Resolutor:</b> ${state.resolutor?.label ?? "-"}</li>
-            <li><b>ANS:</b> ${ANS}${solucion ? ` (hasta ${new Date(solucion).toLocaleString("es-CO")})` : ""}</li>
+      if (payload.CorreoSolicitante) {
+        const fechaSol =
+          solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
 
-          </ul>
-        `,
-      });
+        const title = `Nuevo ticket: ${state.motivo}`;
+        const message =
+          `Se creó un ticket y fuiste asignado como resolutor.\n\n` +
+          `• Solicitante: ${state.solicitante?.label ?? "—"}\n` +
+          `• Fuente: ${state.fuente}\n` +
+          `• Categoría: ${state.categoria}\n` +
+          `• Subcategoría: ${state.subcategoria}\n` +
+          `• Artículo: ${state.articulo || "—"}\n` +
+          `• ANS: ${ANS || "—"}\n` +
+          `• Apertura: ${apertura.toLocaleString()}\n` +
+          `• Tiempo objetivo: ${fechaSol}\n`;
+
+        try {
+          await flowService.sendTeamsToUserViaFlow({
+            recipient: payload.CorreoSolicitante,
+            title,
+            message,
+          });
+          console.log("[Flow] Notificación enviada a resolutor:", payload.CorreoSolicitante);
+        } catch (err) {
+          console.error("[Flow] Error enviando a resolutor:", err);
+          // aquí podrías setear un toast si usas alguno
+        }
+      }
+
+      
 
       console.log("Payload:\n\n" + JSON.stringify(payload, null, 2));
     } finally {
@@ -296,3 +314,37 @@ export function useNuevoTicketForm(services: Svc) {
     handleSubmit,
   };
 }
+
+export class MailAndTeamsFlowRestService {
+
+  /* =================== TEAMS VÍA FLOW (HTTP) =================== */
+
+  /** NNotificaciones por flujo */
+  async sendTeamsToUserViaFlow(input: FlowToUser): Promise<any> {
+    return this.postToFlow({
+      recipient: input.recipient,
+      message: input.message,
+      title: input.title ?? "",
+      mail: true
+    });
+  }
+
+  private async postToFlow(payload: any): Promise<any> {
+
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const res = await fetch("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      throw new Error(`Flow call failed: ${res.status} ${txt}`);
+    }
+
+    const ct = res.headers.get("content-type") || "";
+    return ct.includes("application/json") ? res.json().catch(() => ({})) : {};
+  }
+}
+
