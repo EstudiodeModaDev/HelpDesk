@@ -20,7 +20,7 @@ export function calcularFechaSolucion(
   horasAns: number,
   holidays: string[]
 ): TZDate {
-  let restante = horasAns * 60; // minutos
+  let restante = horasAns * 60; 
   let actual = new TZDate(apertura, TIMEZONE); // trabajar siempre en Bogotá
 
   while (restante > 0) {
@@ -93,5 +93,6 @@ export function calcularFechaSolucion(
     }
   }
 
+  console.log("Fecha de solucion ", actual)
   return actual;
 }

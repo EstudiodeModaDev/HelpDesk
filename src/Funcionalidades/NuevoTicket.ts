@@ -7,6 +7,7 @@ import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 import type { UserOption } from "../Models/Commons";
 import { norm } from "../utils/Commons";
+import type { TZDate } from "@date-fns/tz";
 
 /* ============================
    Datos de ejemplo para selects de usuarios
@@ -217,7 +218,6 @@ export function useNuevoTicketForm(services: Svc) {
       const apertura = state.usarFechaApertura && state.fechaApertura
         ? new Date(state.fechaApertura)
         : new Date();
-      
         const horasPorANS: Record<string, number> = {
           "ANS 1": 2,
           "ANS 2": 4,
@@ -225,17 +225,22 @@ export function useNuevoTicketForm(services: Svc) {
           "ANS 4": 56,
           "ANS 5": 240,
         };
+        let solucion: TZDate | null = null
 
       const ANS = calculoANS(state.categoria, state.subcategoria, state.articulo)
-      const horasAns = horasPorANS[ANS]
+      const horasAns = horasPorANS[ANS] ?? 0
 
-      const solucion = calcularFechaSolucion(apertura, horasAns, holidays);
-      setFechaSolucion(solucion);
+      if(horasAns > 0){
+        solucion  = calcularFechaSolucion(apertura, horasAns, holidays);
+        setFechaSolucion(solucion);
+      }
+
 
       const payload = {
         ...state,
         ANS: ANS,
-        fechaSolucion: solucion.toISOString(),
+        fechaApertura: apertura,
+        fechaSolucion: solucion ? solucion.toISOString() : "",
       };
 
       alert("Payload:\n\n" + JSON.stringify(payload, null, 2));
