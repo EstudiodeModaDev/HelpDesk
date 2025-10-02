@@ -146,9 +146,11 @@ export class FranquiciasService {
     const query = qs.toString().replace(/\+/g, '%20');
 
     const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
+    console.log(url)
 
     try {
       const res = await this.graph.get<any>(url);
+      console.log("Franquicias obtenidas ", res)
       return (res.value ?? []).map((x: any) => this.toModel(x));
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
