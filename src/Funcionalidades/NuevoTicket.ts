@@ -218,14 +218,8 @@ export function useNuevoTicketForm(services: Svc) {
       const apertura = state.usarFechaApertura && state.fechaApertura
         ? new Date(state.fechaApertura)
         : new Date();
-        const horasPorANS: Record<string, number> = {
-          "ANS 1": 2,
-          "ANS 2": 4,
-          "ANS 3": 8,
-          "ANS 4": 56,
-          "ANS 5": 240,
-        };
-        let solucion: TZDate | null = null
+      const horasPorANS: Record<string, number> = { "ANS 1": 2, "ANS 2": 4, "ANS 3": 8, "ANS 4": 56, "ANS 5": 240};
+      let solucion: TZDate | null = null
 
       const ANS = calculoANS(state.categoria, state.subcategoria, state.articulo)
       console.log("ANS ", ANS)
@@ -244,7 +238,7 @@ export function useNuevoTicketForm(services: Svc) {
         fechaSolucion: solucion ? solucion.toISOString() : "",
       };
 
-      alert("Payload:\n\n" + JSON.stringify(payload, null, 2));
+      console.log("Payload:\n\n" + JSON.stringify(payload, null, 2));
     } finally {
       setSubmitting(false);
     }
