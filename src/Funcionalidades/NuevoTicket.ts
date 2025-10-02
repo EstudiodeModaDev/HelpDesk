@@ -22,13 +22,14 @@ type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
+  Notifier?: {sendTeamsToUserViaFlow: (input: { recipient: string; message: string; title?: string }) => Promise<any>;};
 };
 
 // Helpers para tolerar nombres internos distintos
 const first = (...vals: any[]) => vals.find(v => v !== undefined && v !== null && v !== "");
 
 export function useNuevoTicketForm(services: Svc) {
-  const { Categorias, SubCategorias, Articulos } = services;
+  const { Categorias, SubCategorias, Articulos, Notifier } = services;
 
   // ---- Estado del formulario
   const [state, setState] = useState<FormState>({
@@ -43,6 +44,7 @@ export function useNuevoTicketForm(services: Svc) {
     subcategoria: "",
     articulo: "",
     ANS: "",
+
     archivo: null,
   });
 
@@ -230,13 +232,41 @@ export function useNuevoTicketForm(services: Svc) {
         setFechaSolucion(solucion);
       }
 
-
+      //Objeto de creación
       const payload = {
-        ...state,
+        Title: state.motivo,
+        Descripcion: state.descripcion,
+        FechaApertura: apertura,
+        TiempoSolucion: solucion ? solucion.toISOString() : "",
+        Fuente: state.fuente,
+        Categoria: state.categoria,
+        SubCategoria: state.subcategoria,
+        SubSubCategoria: state.articulo,
+        IdResolutor: state.resolutor?.id,
+        Nombreresolutor: state.resolutor?.label,
+        Correoresolutor: state.resolutor?.email,
+        Solicitante: state.solicitante?.label,
+        CorreoSolicitante: state.solicitante?.email,
+        Estadodesolicitud: "En Atención",
         ANS: ANS,
-        fechaApertura: apertura,
-        fechaSolucion: solucion ? solucion.toISOString() : "",
+        
       };
+
+      //Notificación correo solicitante
+      await Notifier?.sendTeamsToUserViaFlow({
+        recipient: payload.CorreoSolicitante!,
+        title: `Ticket creado: ${state.motivo}`,
+        message: `
+          <p>Hola,</p>
+          <p>Se creó el ticket <b>${state.motivo}</b>.</p>
+          <ul>
+            <li><b>Solicitante:</b> ${state.solicitante?.label ?? "-"}</li>
+            <li><b>Resolutor:</b> ${state.resolutor?.label ?? "-"}</li>
+            <li><b>ANS:</b> ${ANS}${solucion ? ` (hasta ${new Date(solucion).toLocaleString("es-CO")})` : ""}</li>
+
+          </ul>
+        `,
+      });
 
       console.log("Payload:\n\n" + JSON.stringify(payload, null, 2));
     } finally {
