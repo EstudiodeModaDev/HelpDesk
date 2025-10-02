@@ -8,6 +8,7 @@ import type { FlowToUser, } from "../Models/Commons";
 import { norm } from "../utils/Commons";
 import type { TZDate } from "@date-fns/tz";
 import type { TicketsService } from "../Services/Tickets.service";
+import { toGraphDateTime } from "../utils/Date";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -88,7 +89,7 @@ export function useNuevoTicketForm(services: Svc) {
   // ---- Instancia del servicio de Flow (useRef para no depender de React.*)
   const flowServiceRef = useRef<MailAndTeamsFlowRestService | null>(null);
   if (!flowServiceRef.current) {
-    flowServiceRef.current = new MailAndTeamsFlowRestService();
+  flowServiceRef.current = new MailAndTeamsFlowRestService();
   }
 
   // Carga de festivos inicial
@@ -218,7 +219,8 @@ export function useNuevoTicketForm(services: Svc) {
     setSubmitting(true);
     try {
       const apertura = state.usarFechaApertura && state.fechaApertura ? new Date(state.fechaApertura) : new Date();
-      const aperturaISO = apertura.toISOString();
+
+
 
       const horasPorANS: Record<string, number> = {
         "ANS 1": 2,
@@ -237,12 +239,17 @@ export function useNuevoTicketForm(services: Svc) {
         setFechaSolucion(solucion);
       }
 
+      const aperturaISO  = toGraphDateTime(apertura);           
+      const tiempoSolISO = toGraphDateTime(solucion as any);        
+
+      console.log("Iniciando creación")
+
       // Objeto de creación
       const payload = {
         Title: state.motivo,
         Descripcion: state.descripcion,
         FechaApertura: aperturaISO,
-        TiempoSolucion: solucion ? solucion.toISOString() : "",
+        TiempoSolucion: tiempoSolISO,
         Fuente: state.fuente,
         Categoria: state.categoria,       // Título
         SubCategoria: state.subcategoria, // Título
@@ -256,12 +263,15 @@ export function useNuevoTicketForm(services: Svc) {
         ANS: ANS
       };
 
+      
+
       // === Crear ticket (usa el servicio inyectado)
       let createdId: string | number = "";
       if (!Tickets?.create) {
         console.error("Tickets service no disponible. Verifica el GraphServicesProvider.");
       } else {
         const created = await Tickets.create(payload);
+
         createdId = created?.ID ?? "";
         console.log("Ticket creado con ID:", createdId);
       }

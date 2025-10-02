@@ -129,6 +129,7 @@ export class TicketsService {
     `/sites/${this.siteId}/lists/${this.listId}/items`,
     { fields: record }
     );
+    console.log(res)
     return this.toModel(res);
 }
 

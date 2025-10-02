@@ -95,3 +95,25 @@ export function toCoDateTimeFlex(v?: string | Date | null): string {
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+export function toGraphDateTime(
+  v: Date | { toISOString: () => string } | string | null | undefined
+): string | undefined {
+  if (!v) return undefined;
+
+  // Si ya viene string ISO/fecha válida, respétalo
+  if (typeof v === "string") {
+    // "YYYY-MM-DD" o "YYYY-MM-DDTHH:mm:ss(.sss)Z"
+    if (/^\d{4}-\d{2}-\d{2}(T.*)?$/.test(v)) return v;
+    const d = new Date(v);
+    return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+  }
+
+  // TZDate, Date u objeto con toISOString()
+  try {
+    const iso = (v as any).toISOString?.();
+    if (typeof iso === "string" && iso) return iso;
+  } catch {}
+
+  const d = new Date(v as any);
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+}
