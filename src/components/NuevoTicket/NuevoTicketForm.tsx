@@ -106,19 +106,31 @@ export default function NuevoTicketForm() {
     [categorias]
   );
 
-  const subcats = React.useMemo(
-    () => subcategoriasAll.filter((s) => (catId != null ? String(s.Id_categoria) === String(catId) : false)),
-    [subcategoriasAll, catId]
-  );
+  const subcats = React.useMemo(() => {
+    if (catId == null) return subcategoriasAll;
+    return subcategoriasAll.filter(s => String(s.Id_categoria) === String(catId));
+  }, [subcategoriasAll, catId]);
+
   const subcatOptions = React.useMemo(
     () => subcats.map((s) => ({ value: String(s.ID), label: s.Title })),
     [subcats]
   );
 
-  const arts = React.useMemo(
-    () => articulosAll.filter((a) => (subcatId != null ? String(a.Id_subCategoria) === String(subcatId) : false)),
-    [articulosAll, subcatId]
-  );
+  const arts = React.useMemo(() => {
+    if (subcatId != null) {
+      return articulosAll.filter(a => String(a.Id_subCategoria) === String(subcatId));
+    }
+    if (catId != null) {
+      const subIds = new Set(
+        subcategoriasAll
+          .filter(s => String(s.Id_categoria) === String(catId))
+          .map(s => String(s.ID))
+      );
+      return articulosAll.filter(a => subIds.has(String(a.Id_subCategoria)));
+    }
+    return articulosAll;
+  }, [articulosAll, subcategoriasAll, catId, subcatId]);
+
   const artOptions = React.useMemo(
     () => arts.map((a) => ({ value: String(a.ID), label: a.Title })),
     [arts]
@@ -148,18 +160,46 @@ export default function NuevoTicketForm() {
   };
 
   const onSubcategoriaChange = (opt: SingleValue<{ value: string; label: string }>) => {
-    setSubcatId(opt ? opt.value : null);
+    const subId = opt ? opt.value : null;
+    setSubcatId(subId);
     setField("subcategoria", opt?.label ?? "");
-    setField("articulo", "");
+
+    if (subId) {
+      const sub = subcategoriasAll.find(s => String(s.ID) === String(subId));
+      if (sub) {
+        setCatId(sub.Id_categoria);
+        const catTitle = categorias.find(c => String(c.ID) === String(sub.Id_categoria))?.Title ?? "";
+        setField("categoria", catTitle);
+      }
+    }
   };
 
+  // Al elegir artículo: setea Subcategoría y Categoría
   const onArticuloChange = (opt: SingleValue<{ value: string; label: string }>) => {
     setField("articulo", opt?.label ?? "");
+
+    const artId = opt?.value;
+    if (artId) {
+      const art = articulosAll.find(a => String(a.ID) === String(artId));
+      if (art) {
+        // subcategoría
+        setSubcatId(art.Id_subCategoria);
+        const sub = subcategoriasAll.find(s => String(s.ID) === String(art.Id_subCategoria));
+        if (sub) {
+          setField("subcategoria", sub.Title);
+
+          // categoría
+          setCatId(sub.Id_categoria);
+          const catTitle = categorias.find(c => String(c.ID) === String(sub.Id_categoria))?.Title ?? "";
+          setField("categoria", catTitle);
+        }
+      }
+    }
   };
 
   const disabledCats = submitting || loadingCatalogos;
-  const disabledSubs = submitting || loadingCatalogos || catId == null;
-  const disabledArts = submitting || loadingCatalogos || subcatId == null;
+  const disabledSubs = submitting || loadingCatalogos
+  const disabledArts = submitting || loadingCatalogos
 
   return (
     <div className="ticket-form">

@@ -162,14 +162,6 @@ export function useNuevoTicketForm(services: Svc) {
   const setField = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setState((s) => ({ ...s, [k]: v }));
 
-  useEffect(() => {
-    setState((s) => ({ ...s, subcategoria: "", articulo: "" }));
-  }, [state.categoria]);
-
-  useEffect(() => {
-    setState((s) => ({ ...s, articulo: "" }));
-  }, [state.subcategoria]);
-
   const validate = () => {
     const e: FormErrors = {};
     if (!state.solicitante) e.solicitante = "Requerido";
@@ -179,7 +171,6 @@ export function useNuevoTicketForm(services: Svc) {
     if (!state.motivo.trim()) e.motivo = "Ingrese el motivo";
     if (!state.descripcion.trim()) e.descripcion = "Describa el problema";
     if (!state.categoria) e.categoria = "Seleccione una categoría";
-    if (!state.subcategoria) e.subcategoria = "Seleccione una subcategoría";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
