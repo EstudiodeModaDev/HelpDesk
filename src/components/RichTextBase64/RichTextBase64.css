@@ -1,0 +1,17 @@
+.rte { border: 1px solid #e6e8ec; border-radius: 12px; background: #fff; }
+.rte-toolbar {
+  display: flex; gap: 8px; padding: 8px; border-bottom: 1px solid #eef0f3;
+  background: #fafbfc; border-radius: 12px 12px 0 0;
+}
+.rte-toolbar button {
+  padding: 6px 10px; border: 1px solid #e3e6eb; border-radius: 8px; background: #fff; cursor: pointer;
+}
+.rte-toolbar .rte-sep { flex: 0 0 1px; background: #e5e7eb; margin: 0 4px; }
+
+.rte-editor {
+  min-height: 200px; padding: 12px; outline: none; border-radius: 0 0 12px 12px;
+}
+.rte-editor:empty:before {
+  content: attr(data-placeholder); color: #9aa3af; pointer-events: none;
+}
+.rte-editor img { max-width: 100%; height: auto; border-radius: 8px; }

@@ -10,8 +10,7 @@ import { useWorkers } from "../../Funcionalidades/Workers";
 import { useUsuarios } from "../../Funcionalidades/Usuarios";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import type { TicketsService } from "../../Services/Tickets.service";
-import { Editor } from "@tinymce/tinymce-react";
-import { fileToBase64 } from "../../utils/Commons";
+import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
@@ -311,35 +310,12 @@ export default function NuevoTicketForm() {
 
         {/* Descripción */}
         <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="descripcion">Descripción del problema</label>
-          <Editor
-            id="descripcion"
-            apiKey="no-api-key"
+          <label className="tf-label">Descripción del problema</label>
+          <RichTextBase64
             value={state.descripcion}
-            onEditorChange={(html) => setField("descripcion", html)}
-            init={{
-              menubar: false,
-              statusbar: false,
-              height: 260,
-              branding: false,
-              toolbar:
-                "undo redo | bold italic underline | bullist numlist | link | image | removeformat",
-              plugins: "link image paste lists",
-              paste_data_images: true,       
-              automatic_uploads: false,    
-              images_upload_handler: async (blobInfo) => {
-                const file = blobInfo.blob();
-                const b64 = await fileToBase64(file);
-                return b64;
-              },
-              content_style: `
-                body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; font-size:14px; }
-                img { max-width: 100%; height: auto; border-radius: 8px; }
-              `,
-              language: "es",
-            }}
+            onChange={(html) => setField("descripcion", html)}
+            placeholder="Describe el problema y pega capturas (Ctrl+V)…"
           />
-
           {errors.descripcion && <small className="error">{errors.descripcion}</small>}
         </div>
 
