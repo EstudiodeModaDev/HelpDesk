@@ -7,6 +7,8 @@ import type { UserOption, Worker } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
 import { useWorkers } from "../../Funcionalidades/Workers";
+import { useUsuarios } from "../../Funcionalidades/Usuarios";
+import { UsuariosSPService } from "../../Services/Usuarios.Service";
 
 // -------- utils --------
 const norm = (s: string) =>
@@ -17,8 +19,8 @@ type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
 export default function NuevoTicketForm() {
 
-  const { Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc } = useGraphServices() as
-  ReturnType<typeof useGraphServices> & { Franquicias?: FranquiciasService };
+  const { Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPService } = useGraphServices() as
+  ReturnType<typeof useGraphServices> & { Franquicias?: FranquiciasService; Usuarios?: UsuariosSPService };
 
   const {
     state, errors, submitting, fechaSolucion,
@@ -38,6 +40,13 @@ export default function NuevoTicketForm() {
     error: usersError,
     refresh,
   } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+
+    const {
+    UseruserOptions,
+    loading,
+    error,
+  } = useUsuarios(UsuariosSPService!);
+  
 
 
   const workersToUserOptions = React.useCallback(
@@ -108,7 +117,6 @@ export default function NuevoTicketForm() {
     const haystack = norm(`${label} ${email} ${job}`);
     return haystack.includes(q);
   };
-
 
   // Render de cada opción SEGURO (usa props.data)
   const Option = (props: OptionProps<UserOptionEx, false>) => {
@@ -193,17 +201,17 @@ export default function NuevoTicketForm() {
           <div className="form-group inline-group" style={{ minWidth: 300 }}>
             <label>Resolutor</label>
             <Select<UserOption, false>
-              options={userOptions}
-              placeholder={loadingUsers ? "Cargando usuarios…" : "Buscar resolutor…"}
+              options={UseruserOptions}
+              placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
               value={state.resolutor}
               onChange={(opt) => setField("resolutor", opt ?? null)}
               classNamePrefix="rs"
-              isDisabled={submitting || loadingUsers}
-              isLoading={loadingUsers}
+              isDisabled={submitting || loading}
+              isLoading={loading}
               filterOption={filterOption}
               components={{ Option }}
               noOptionsMessage={() =>
-                usersError ? "Error cargando usuarios" : "Sin coincidencias"
+                error ? "Error cargando usuarios" : "Sin coincidencias"
               }
             />
             {errors.resolutor && <small className="error">{errors.resolutor}</small>}

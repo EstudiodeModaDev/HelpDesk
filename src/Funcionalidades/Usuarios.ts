@@ -1,5 +1,8 @@
 import * as React from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
+import type { UsuariosSPService } from "../Services/Usuarios.Service";
+import type { UsuariosSP } from "../Models/Usuarios";
+import type { UserOption } from "../Models/Commons";
 
 export function useUserRoleFromSP(email?: string | null) {
   const { Usuarios } = useGraphServices(); // ajusta el nombre si tu service se llama distinto
@@ -82,4 +85,112 @@ export function useIsAdmin(email?: string | null) {
   }, [email, Usuarios]);
 
   return { isAdmin, loading, error };
+}
+
+
+export function useUsuarios(usuariosSvc: UsuariosSPService) {
+  const [usuarios, setUsuarios] = React.useState<UsuariosSP[]>([]);
+  const [UseruserOptions, setUserOptions] = React.useState<UserOption[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // paginación
+  const [pageSize, setPageSize] = React.useState<number>(10);
+  const [pageIndex, setPageIndex] = React.useState<number>(1);
+  const [nextLink, setNextLink] = React.useState<string | null>(null);
+
+
+  const mapRowToUsuario = React.useCallback((row: any): UsuariosSP => {
+    // Si el service ya aplanó, usa el nivel raíz; si no, lee de fields
+    const f = row?.fields ?? row ?? {};
+    return {
+      Id: String(row?.id ?? f.ID ?? f.Id ?? ""),
+      Title: String(f.Title ?? ""),
+      Correo: String(f.Correo ?? f.Email ?? "").trim(),
+      Rol: String(f.Rol ?? ""),
+    } as UsuariosSP;
+  }, []);
+
+  const mapUsuariosToOptions = React.useCallback((list: UsuariosSP[]): UserOption[] => {
+    return (list ?? [])
+      .map((u) => {
+        const nombre = String((u as any).Title ?? "—");
+        const correo = String((u as any).Correo ?? "").trim();
+        const rol    = String((u as any).Rol ?? "");
+        const id     = String((u as any).ID ?? correo ?? nombre);
+        return {
+          value: correo || id,   // correo como clave estable
+          label: nombre,
+          id,
+          email: correo || undefined,
+          jobTitle: rol || undefined,
+          // OJO: UserOption no tiene "source". Si quieres "source", crea UserOptionEx en el front.
+        } as UserOption;
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, []);
+
+  // --- loader principal ---
+
+  const loadUsuarios = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      // si luego quieres paginar en server: const res = await usuariosSvc.getAll({ top: pageSize });
+      const res = await usuariosSvc.getAll();
+
+      // Soporta array o { items, nextLink }
+      const itemsRaw: any[] = Array.isArray(res) ? res : (res?.items ?? []);
+      const nLink: string | null = Array.isArray(res) ? null : (res?.nextLink ?? null);
+
+      const items = itemsRaw.map(mapRowToUsuario);
+      if (cancelled) return;
+
+      setUsuarios(items);
+      setUserOptions(mapUsuariosToOptions(items));
+      setNextLink(nLink);
+      setPageIndex(1);
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error cargando usuarios");
+        setUsuarios([]);
+        setUserOptions([]);
+        setNextLink(null);
+        setPageIndex(1);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc, /* pageSize, */ mapRowToUsuario, mapUsuariosToOptions]);
+
+  React.useEffect(() => {
+    let cancel = false;
+    (async () => {
+      if (cancel) return;
+      await loadUsuarios();
+    })();
+    return () => { cancel = true; };
+  }, [loadUsuarios]);
+
+  const refreshUsuers = React.useCallback(async () => {
+    await loadUsuarios();
+  }, [loadUsuarios]);
+
+  const hasNext = !!nextLink;
+
+  return {
+    usuarios,
+    UseruserOptions,
+    loading,
+    error,
+    pageSize, setPageSize,
+    pageIndex,
+    hasNext,
+    nextLink,
+    refreshUsuers,
+  };
 }
