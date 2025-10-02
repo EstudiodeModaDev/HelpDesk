@@ -9,6 +9,7 @@ import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
 import { useWorkers } from "../../Funcionalidades/Workers";
 import { useUsuarios } from "../../Funcionalidades/Usuarios";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
+import type { TicketsService } from "../../Services/Tickets.service";
 
 // -------- utils --------
 const norm = (s: string) =>
@@ -24,9 +25,11 @@ export default function NuevoTicketForm() {
     Articulos,
     Franquicias: FranquiciasSvc,
     Usuarios: UsuariosSPServiceSvc,
+    Tickets: TicketsSvc
   } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Franquicias?: FranquiciasService;
-    Usuarios?: UsuariosSPService;
+    Franquicias: FranquiciasService;
+    Usuarios: UsuariosSPService;
+    Tickets: TicketsService
   };
 
   const {
@@ -39,7 +42,7 @@ export default function NuevoTicketForm() {
     loadingCatalogos,
     setField,
     handleSubmit,
-  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos });
+  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc });
 
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError, refresh } = useWorkers({

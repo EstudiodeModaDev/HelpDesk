@@ -1,27 +1,20 @@
 import * as React from "react";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { calcularFechaSolucion } from "../utils/ans";
 import { fetchHolidays } from "../Services/Festivos";
 import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
-import type { FlowToUser, UserOption } from "../Models/Commons";
+import type { FlowToUser, } from "../Models/Commons";
 import { norm } from "../utils/Commons";
 import type { TZDate } from "@date-fns/tz";
-
-/* ============================
-   Datos de ejemplo para selects de usuarios
-   ============================ */
-const USUARIOS: UserOption[] = [
-  { value: "practicantelisto@estudiodemoda.com.co", label: "Practicante Listo" },
-  { value: "cesar@estudiodemoda.com.co", label: "Cesar Sanchez" },
-  { value: "andres@estudiodemoda.com.co", label: "Andres Godoy" },
-];
+import type { TicketsService } from "../Services/Tickets.service";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
-};
+  Tickets?: TicketsService 
+}; 
 
 // Helpers para tolerar nombres internos distintos
 const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
@@ -33,12 +26,13 @@ export class MailAndTeamsFlowRestService {
     if (flowUrl) this.flowUrl = flowUrl;
   }
 
-  /** Notificaciones por flujo (Teams) */
+  /** Notificaciones por flujo (Teams / Correo) */
   async sendTeamsToUserViaFlow(input: FlowToUser): Promise<any> {
     return this.postToFlow({
       recipient: input.recipient,
       message: input.message,
       title: input.title ?? "",
+      mail: input.mail,
     });
   }
 
@@ -61,7 +55,7 @@ export class MailAndTeamsFlowRestService {
 }
 
 export function useNuevoTicketForm(services: Svc) {
-  const { Categorias, SubCategorias, Articulos } = services;
+  const { Categorias, SubCategorias, Articulos, Tickets } = services; // ← incluye Tickets
 
   // ---- Estado del formulario (guardamos SOLO títulos en categoria/subcategoria/articulo)
   const [state, setState] = useState<FormState>({
@@ -91,7 +85,7 @@ export function useNuevoTicketForm(services: Svc) {
   const [loadingCatalogos, setLoadingCatalogos] = useState(false);
   const [errorCatalogos, setErrorCatalogos] = useState<string | null>(null);
 
-  // ---- Instancia del servicio de Flow (sin useMemo, para evitar React null)
+  // ---- Instancia del servicio de Flow (useRef para no depender de React.*)
   const flowServiceRef = useRef<MailAndTeamsFlowRestService | null>(null);
   if (!flowServiceRef.current) {
     flowServiceRef.current = new MailAndTeamsFlowRestService();
@@ -161,33 +155,17 @@ export function useNuevoTicketForm(services: Svc) {
   }, [Categorias, SubCategorias, Articulos]);
 
   /* ============================
-     Derivados legacy (no usados por el TSX nuevo, pero conservados)
-     ============================ */
-  const subcats = useMemo<Subcategoria[]>(() => {
-    // En el diseño nuevo, state.categoria es Título; este derivado legacy quedará vacío y no se usa.
-    return [];
-  }, [subcategorias, state.categoria]);
-
-  const articulos = useMemo<string[]>(() => {
-    // En el diseño nuevo, state.subcategoria es Título; este derivado legacy no se usa.
-    return [];
-  }, [articulosAll, state.subcategoria]);
-
-  /* ============================
      Helpers de formulario
      ============================ */
   const setField = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setState((s) => ({ ...s, [k]: v }));
 
-  // Resets en cascada cuando cambia título de categoría/subcategoría (compat)
   useEffect(() => {
     setState((s) => ({ ...s, subcategoria: "", articulo: "" }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.categoria]);
 
   useEffect(() => {
     setState((s) => ({ ...s, articulo: "" }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.subcategoria]);
 
   const validate = () => {
@@ -240,6 +218,7 @@ export function useNuevoTicketForm(services: Svc) {
     setSubmitting(true);
     try {
       const apertura = state.usarFechaApertura && state.fechaApertura ? new Date(state.fechaApertura) : new Date();
+      const aperturaISO = apertura.toISOString();
 
       const horasPorANS: Record<string, number> = {
         "ANS 1": 2,
@@ -262,7 +241,7 @@ export function useNuevoTicketForm(services: Svc) {
       const payload = {
         Title: state.motivo,
         Descripcion: state.descripcion,
-        FechaApertura: apertura,
+        FechaApertura: aperturaISO,
         TiempoSolucion: solucion ? solucion.toISOString() : "",
         Fuente: state.fuente,
         Categoria: state.categoria,       // Título
@@ -274,65 +253,80 @@ export function useNuevoTicketForm(services: Svc) {
         Solicitante: state.solicitante?.label,
         CorreoSolicitante: state.solicitante?.email,
         Estadodesolicitud: "En Atención",
-        ANS: ANS,
+        ANS: ANS
       };
 
-      console.log("Payload:\n\n" + JSON.stringify(payload, null, 2));
+      // === Crear ticket (usa el servicio inyectado)
+      let createdId: string | number = "";
+      if (!Tickets?.create) {
+        console.error("Tickets service no disponible. Verifica el GraphServicesProvider.");
+      } else {
+        const created = await Tickets.create(payload);
+        createdId = created?.ID ?? "";
+        console.log("Ticket creado con ID:", createdId);
+      }
 
       /* =========================
-         NOTIFICACIÓN POR TEAMS
+         NOTIFICACIONES (Teams/Correo)
          ========================= */
-      const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
+      const idTexto = String(createdId || "—");
+      const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
 
-      if (resolutorEmail) {
-        const fechaSol = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
-        const title = `Nuevo ticket: ${state.motivo}`;
-        const message =
-          `Se creó un ticket y fuiste asignado como resolutor.\n\n` +
-          `• Solicitante: ${state.solicitante?.label ?? "—"}\n` +
-          `• Fuente: ${state.fuente}\n` +
-          `• Categoría: ${state.categoria}\n` +
-          `• Subcategoría: ${state.subcategoria}\n` +
-          `• Artículo: ${state.articulo || "—"}\n` +
-          `• ANS: ${ANS || "—"}\n` +
-          `• Apertura: ${apertura.toLocaleString()}\n` +
-          `• Tiempo objetivo: ${fechaSol}\n`;
+      // Notificar solicitante
+      const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
+      if (solicitanteEmail) {
+        const title = `Asignación de Caso - ${idTexto}`;
+        const message = `
+        <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
+        Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
+        <strong>ID del Caso:</strong> ${idTexto}<br>
+        <strong>Asunto del caso:</strong> ${payload.Title}<br>
+        <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
+        <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
+        El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
+        Este es un mensaje automático, por favor no respondas.
+        </p>`.trim();
 
         try {
           await flowServiceRef.current!.sendTeamsToUserViaFlow({
-            recipient: resolutorEmail,
+            recipient: solicitanteEmail,
             title,
             message,
+            mail: true, // si tu Flow envía correo cuando mail=true
           });
-          console.log("[Flow] Notificación enviada a resolutor:", resolutorEmail);
+        } catch (err) {
+          console.error("[Flow] Error enviando a solicitante:", err);
+        }
+      }
+
+      // Notificar resolutor
+      const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
+      if (resolutorEmail) {
+        const title = `Nuevo caso asignado - ${idTexto}`;
+        const message = `
+        <p>¡Hola!<br><br>
+        Tienes un nuevo caso asignado con estos detalles:<br><br>
+        <strong>ID del Caso:</strong> ${idTexto}<br>
+        <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
+        <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
+        <strong>Asunto:</strong> ${payload.Title}<br>
+        <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
+        Por favor, contacta al usuario para brindarle solución.<br><br>
+        Este es un mensaje automático, por favor no respondas.
+        </p>`.trim();
+
+        try {
+          await flowServiceRef.current!.sendTeamsToUserViaFlow({
+            recipient: resolutorEmail, // ← CORREGIDO (antes usabas solicitanteEmail)
+            title,
+            message,
+            mail: true,
+          });
         } catch (err) {
           console.error("[Flow] Error enviando a resolutor:", err);
         }
       }
 
-      // (Opcional) Notificar también al solicitante:
-      /*
-      const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
-      if (solicitanteEmail) {
-        try {
-          await flowServiceRef.current!.sendTeamsToUserViaFlow({
-            recipient: solicitanteEmail,
-            title: `Ticket recibido: ${state.motivo}`,
-            message:
-              `Tu solicitud fue registrada.\n\n` +
-              `• Resolutor: ${state.resolutor?.label ?? "—"}\n` +
-              `• ANS: ${ANS || "—"}\n` +
-              `• Apertura: ${apertura.toLocaleString()}\n` +
-              `• Tiempo objetivo: ${
-                solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica"
-              }\n`,
-          });
-          console.log("[Flow] Notificación enviada a solicitante:", solicitanteEmail);
-        } catch (err) {
-          console.error("[Flow] Error enviando a solicitante:", err);
-        }
-      }
-      */
     } finally {
       setSubmitting(false);
     }
@@ -347,17 +341,11 @@ export function useNuevoTicketForm(services: Svc) {
     fechaSolucion,
 
     // catálogos y derivados
-    categorias,          // [{ ID, Title }]
-    subcategoriasAll: subcategorias, // full (para filtrar en el TSX por ID)
-    articulosAll,        // full (para filtrar en el TSX por ID)
-    subcats,             // legacy (no usado)
-    articulos,           // legacy (no usado)
+    categorias,
+    subcategoriasAll: subcategorias,
+    articulosAll,
     loadingCatalogos,
     errorCatalogos,
-
-    // util
-    USUARIOS,
-
     // acciones
     handleSubmit,
   };

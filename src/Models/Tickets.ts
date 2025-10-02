@@ -1,17 +1,17 @@
 export type Ticket = {
-  id: string;
-  resolutor?: string;
-  resolutorId?: string;
-  solicitante?: string;
-  Title?: string;
+  ID?: string;
+  Nombreresolutor?: string;
+  IdResolutor?: string;
+  Solicitante?: string;
+  Title?: string; //Asunto
   FechaApertura?: string; // "dd/mm/yyyy hh:mm"
   TiempoSolucion?: string;   // "dd/mm/yyyy hh:mm"
-  estado?: string;
+  Estadodesolicitud?: string;
   observador?: string;
   Descripcion?: string;
   Categoria?: string;
-  Subcategoria?: string;
-  Articulo?: string;
+  SubCategoria?: string;
+  SubSubCategoria?: string;
   Fuente?: string;
   CorreoResolutor?: string;
   CorreoSolicitante?: string;

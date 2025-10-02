@@ -70,11 +70,12 @@ export class TicketsService {
     }
 
   // ---------- mapping ----------
+  
   private toModel(item: any): Ticket {
     const f = item?.fields ?? {};
     return {
       // Identificadores / asunto
-      id: String(f.ID ?? f.Id ?? f.id ?? item?.id ?? ''),
+      ID: String(f.ID ?? f.Id ?? f.id ?? item?.id ?? ''),
       IdCasoPadre: f.IdCasoPadre ?? null,
       Title: f.Title ?? '',
 
@@ -86,18 +87,18 @@ export class TicketsService {
       Fuente: f.Fuente ?? '',
       Descripcion: f.Descripcion ?? '',
       Categoria: f.Categoria ?? '',
-      Subcategoria: f.Subcategoria ?? f.SubCategoria ?? '',
-      Articulo: f.Articulo ?? f.SubSubCategoria ?? '',
-      estado: f.Estadodesolicitud ?? '',
+      SubCategoria: f.Subcategoria ?? f.SubCategoria ?? '',
+      SubSubCategoria: f.Articulo ?? f.SubSubCategoria ?? '',
+      Estadodesolicitud: f.Estadodesolicitud ?? '',
       ANS: f.ANS ?? '',
 
       // Resolutor
-      resolutor: f.Nombreresolutor ?? '',
-      resolutorId: f.IdResolutor ?? '',
+      Nombreresolutor: f.Nombreresolutor ?? '',
+      IdResolutor: f.IdResolutor ?? '',
       CorreoResolutor: f.Correoresolutor ?? '',
 
       // Solicitante
-      solicitante: f.Solicitante ?? '',
+      Solicitante: f.Solicitante ?? '',
       CorreoSolicitante: f.CorreoSolicitante ?? '',
 
       // Observador
