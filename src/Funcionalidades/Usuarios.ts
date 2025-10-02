@@ -117,7 +117,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
         const nombre = String((u as any).Title ?? "—");
         const correo = String((u as any).Correo ?? "").trim();
         const rol    = String((u as any).Rol ?? "");
-        const id     = String((u as any).ID ?? correo ?? nombre);
+        const id     = String((u as any).ID);
         return {
           value: correo || id,   // correo como clave estable
           label: nombre,

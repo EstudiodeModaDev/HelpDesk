@@ -249,12 +249,12 @@ export function useNuevoTicketForm(services: Svc) {
       const payload = {
         Title: state.motivo,
         Descripcion: state.descripcion,
-       // FechaApertura: aperturaISO,
-       // TiempoSolucion: tiempoSolISO,
+        FechaApertura: aperturaISO,
+        TiempoSolucion: tiempoSolISO,
         Fuente: state.fuente,
-        Categoria: state.categoria,       // Título
-        SubCategoria: state.subcategoria, // Título
-        SubSubCategoria: state.articulo,  // Título
+        Categoria: state.categoria,       
+        SubCategoria: state.subcategoria, 
+        SubSubCategoria: state.articulo,  
         IdResolutor: state.resolutor?.id,
         Nombreresolutor: state.resolutor?.label,
         Correoresolutor: state.resolutor?.email,
@@ -264,6 +264,7 @@ export function useNuevoTicketForm(services: Svc) {
         ANS: ANS
       };
 
+      console.log(payload)
       
 
       // === Crear ticket (usa el servicio inyectado)

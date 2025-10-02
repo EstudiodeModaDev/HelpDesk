@@ -125,6 +125,7 @@ export class TicketsService {
   // ---------- CRUD ----------
   async create(record: Omit<Ticket, 'ID'>) {
     await this.ensureIds();
+    console.log(record)
     const res = await this.graph.post<any>(
     `/sites/${this.siteId}/lists/${this.listId}/items`,
     { fields: record }

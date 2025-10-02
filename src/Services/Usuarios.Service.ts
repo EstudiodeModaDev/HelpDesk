@@ -71,7 +71,7 @@ export class UsuariosSPService {
   private toModel(item: any): UsuariosSP {
     const f = item?.fields ?? {};
     return {
-        Id: String(item?.id ?? ''),
+        Id: String(item?.ID ?? ''),
         Title: f.Title,
         Correo: f.Correo,
         Rol: f.Rol,
