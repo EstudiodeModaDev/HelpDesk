@@ -84,3 +84,11 @@ export async function ensureIds(
 export function  norm (s?: string){
  return (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 }
+
+export const fileToBase64 = (file: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result)); // data:image/png;base64,xxx
+    reader.onerror = () => reject(reader.error ?? new Error("Error leyendo archivo"));
+    reader.readAsDataURL(file);
+  });
