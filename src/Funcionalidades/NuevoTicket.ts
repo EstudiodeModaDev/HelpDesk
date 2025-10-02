@@ -277,8 +277,8 @@ export function useNuevoTicketForm(services: Svc) {
         const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
         const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
         const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
-      // Notificar solicitante
-
+      
+        // Notificar solicitante
       if (solicitanteEmail) {
         const title = `Asignación de Caso - ${idTexto}`;
         const message = `
@@ -304,8 +304,7 @@ export function useNuevoTicketForm(services: Svc) {
         }
       }
 
-      // Notificar resolutor
-      
+      // Notificar resolutor    
       if (resolutorEmail) {
         const title = `Nuevo caso asignado - ${idTexto}`;
         const message = `
@@ -347,8 +346,7 @@ export function useNuevoTicketForm(services: Svc) {
           articulo: "",     
           ANS: "",
           archivo: null,
-        }
-        )
+        })
       setErrors({})
     }
     } finally {
