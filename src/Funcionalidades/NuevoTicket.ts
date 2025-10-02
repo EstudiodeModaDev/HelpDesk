@@ -228,6 +228,7 @@ export function useNuevoTicketForm(services: Svc) {
         let solucion: TZDate | null = null
 
       const ANS = calculoANS(state.categoria, state.subcategoria, state.articulo)
+      console.log("ANS ", ANS)
       const horasAns = horasPorANS[ANS] ?? 0
 
       if(horasAns > 0){
