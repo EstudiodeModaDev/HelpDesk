@@ -10,16 +10,12 @@ import { useWorkers } from "../../Funcionalidades/Workers";
 import { useUsuarios } from "../../Funcionalidades/Usuarios";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
 
-// ===== utils =====
+// -------- utils --------
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 
 type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
-
-// ===== modelos mínimos (ajusta campos si tus listas usan otros nombres) =====
 type CategoriaItem = { ID: string | number; Title: string };
-type SubcategoriaItem = { ID: string | number; Title: string; CategoriaId: string | number };
-type ArticuloItem = { ID: string | number; Title: string; SubcategoriaId: string | number };
 
 export default function NuevoTicketForm() {
   const {
@@ -27,95 +23,32 @@ export default function NuevoTicketForm() {
     SubCategorias,
     Articulos,
     Franquicias: FranquiciasSvc,
-    Usuarios: UsuariosSPService,
+    Usuarios: UsuariosSPServiceSvc,
   } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     Franquicias?: FranquiciasService;
     Usuarios?: UsuariosSPService;
   };
 
-  // ===== Hook original del form (lo dejamos igual) =====
   const {
     state,
     errors,
     submitting,
-    categorias, // la dejaremos como catálogo base
+    categorias,
+    subcategoriasAll,
+    articulosAll,
     loadingCatalogos,
     setField,
     handleSubmit,
   } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos });
 
-  // ===== Cargar catálogos completos localmente para filtrar por IDs =====
-  const [subcatsAll, setSubcatsAll] = React.useState<SubcategoriaItem[]>([]);
-  const [articulosAll, setArticulosAll] = React.useState<ArticuloItem[]>([]);
-  const [loadingDeps, setLoadingDeps] = React.useState(true);
-  const [depsError, setDepsError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    let cancel = false;
-    (async () => {
-      try {
-        setLoadingDeps(true);
-        setDepsError(null);
-
-        // Se asume que tus services tienen getAll o similar; ajusta si tu API es distinta.
-        const [subs, arts] = await Promise.all([
-          SubCategorias.getAll?.() as Promise<any[]> ?? [],
-          Articulos.getAll?.() as Promise<any[]> ?? [],
-        ]);
-
-        if (cancel) return;
-
-        // Normaliza a la forma mínima que definimos arriba
-        const mSubs: SubcategoriaItem[] = (subs ?? []).map((s: any) => ({
-          ID: s.ID ?? s.Id ?? s.id,
-          Title: String(s.Title ?? s.title ?? ""),
-          CategoriaId: s.CategoriaId ?? s.CategoriaID ?? s.Categoria?.ID ?? s.Categoria?.Id ?? s.Categoria?.id,
-        }));
-
-        const mArts: ArticuloItem[] = (arts ?? []).map((a: any) => ({
-          ID: a.ID ?? a.Id ?? a.id,
-          Title: String(a.Title ?? a.title ?? a.Nombre ?? ""),
-          SubcategoriaId:
-            a.SubcategoriaId ?? a.SubcategoriaID ?? a.Subcategoria?.ID ?? a.Subcategoria?.Id ?? a.Subcategoria?.id,
-        }));
-
-        setSubcatsAll(mSubs);
-        setArticulosAll(mArts);
-      } catch (e: any) {
-        setDepsError(e?.message ?? "No fue posible cargar subcategorías/artículos");
-      } finally {
-        if (!cancel) setLoadingDeps(false);
-      }
-    })();
-    return () => {
-      cancel = true;
-    };
-  }, [SubCategorias, Articulos]);
-
-  // ===== Estado local SOLO para IDs seleccionados (encadenamiento) =====
-  const [catId, setCatId] = React.useState<string | number | null>(null);
-  const [subcatId, setSubcatId] = React.useState<string | number | null>(null);
-
-  // ===== Opciones dependientes por ID (filtradas localmente) =====
-  const subcats = React.useMemo(
-    () => subcatsAll.filter((s) => (catId != null ? s.CategoriaId === catId : false)),
-    [subcatsAll, catId]
-  );
-
-  const articulos = React.useMemo(
-    () => articulosAll.filter((a) => (subcatId != null ? a.SubcategoriaId === subcatId : false)),
-    [articulosAll, subcatId]
-  );
-
-  // ===== Integraciones de usuarios (igual que antes) =====
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError, refresh } = useWorkers({
     onlyEnabled: true,
     domainFilter: "estudiodemoda.com.co",
   });
-  const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPService!);
+  const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
 
-  // ===== Combinar opciones de usuarios (igual) =====
+  // ===== Combinar usuarios con franquicias =====
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
     for (const o of [...workersOptions, ...franqOptions]) {
@@ -125,7 +58,7 @@ export default function NuevoTicketForm() {
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, [workersOptions, franqOptions]);
 
-  // ===== Filtro de react-select (igual) =====
+  // ===== Filtro dentro del desplegable =====
   const filterOption: RSProps<UserOptionEx, false>["filterOption"] = (option, raw) => {
     const q = norm(raw);
     if (!q) return true;
@@ -167,9 +100,24 @@ export default function NuevoTicketForm() {
     );
   };
 
+  // ===== Estado local SOLO para IDs (encadenamiento por ID) =====
+  const [catId, setCatId] = React.useState<string | number | null>(null);
+  const [subcatId, setSubcatId] = React.useState<string | number | null>(null);
+
+  // ===== Filtrados locales usando los catálogos del hook =====
+  const subcats = React.useMemo(
+    () => subcategoriasAll.filter((s) => (catId != null ? String(s.Id_categoria) === String(catId) : false)),
+    [subcategoriasAll, catId]
+  );
+
+  const articulos = React.useMemo(
+    () => articulosAll.filter((a) => (subcatId != null ? String(a.Id_subCategoria) === String(subcatId) : false)),
+    [articulosAll, subcatId]
+  );
+
   // ===== Handlers que guardan SOLO títulos en el state global =====
   const onCategoriaChange = (idStr: string) => {
-    const id = idStr === "" ? null : (isNaN(Number(idStr)) ? idStr : Number(idStr));
+    const id = idStr === "" ? null : isNaN(Number(idStr)) ? idStr : Number(idStr);
     setCatId(id);
     setSubcatId(null);
 
@@ -178,43 +126,36 @@ export default function NuevoTicketForm() {
       categorias.find((c: any) => c.ID === id)?.Title ??
       "";
 
-    // Guardamos SOLO título
-    setField("categoria", catTitle);
-    // Reset en cascada (títulos)
+    setField("categoria", catTitle); // SOLO título
     setField("subcategoria", "");
     setField("articulo", "");
   };
 
   const onSubcategoriaChange = (idStr: string) => {
-    const id = idStr === "" ? null : (isNaN(Number(idStr)) ? idStr : Number(idStr));
+    const id = idStr === "" ? null : isNaN(Number(idStr)) ? idStr : Number(idStr);
     setSubcatId(id);
 
     const subTitle =
-      subcats.find((s) => String(s.ID) === String(id))?.Title ??
-      subcats.find((s) => s.ID === id)?.Title ??
-      "";
+      subcats.find((s) => String(s.ID) === String(id))?.Title ?? subcats.find((s) => s.ID === id)?.Title ?? "";
 
-    // Guardamos SOLO título
-    setField("subcategoria", subTitle);
-    // Reset artículo (título)
+    setField("subcategoria", subTitle); // SOLO título
     setField("articulo", "");
   };
 
   const onArticuloChange = (idStr: string) => {
-    const id = idStr === "" ? null : (isNaN(Number(idStr)) ? idStr : Number(idStr));
+    const id = idStr === "" ? null : isNaN(Number(idStr)) ? idStr : Number(idStr);
 
     const artTitle =
       articulos.find((a) => String(a.ID) === String(id))?.Title ??
       articulos.find((a) => a.ID === id)?.Title ??
       "";
 
-    // Guardamos SOLO título
-    setField("articulo", artTitle);
+    setField("articulo", artTitle); // SOLO título
   };
 
-  const disabledCats = submitting || loadingCatalogos || loadingDeps;
-  const disabledSubs = submitting || loadingDeps || catId == null;
-  const disabledArts = submitting || loadingDeps || subcatId == null;
+  const disabledCats = submitting || loadingCatalogos;
+  const disabledSubs = submitting || loadingCatalogos || catId == null;
+  const disabledArts = submitting || loadingCatalogos || subcatId == null;
 
   return (
     <div className="ticket-form">
@@ -269,7 +210,7 @@ export default function NuevoTicketForm() {
           </div>
         </div>
 
-        {/* Fecha de apertura */}
+        {/* Fecha de apertura (opcional) */}
         <div className="form-group checkbox-group">
           <input
             type="checkbox"
@@ -342,7 +283,7 @@ export default function NuevoTicketForm() {
           {errors.descripcion && <small className="error">{errors.descripcion}</small>}
         </div>
 
-        {/* Categoría / Subcategoría / Artículo –– encadenados por IDs locales; en state guardamos SOLO títulos */}
+        {/* Categoría / Subcategoría / Artículo – encadenados por ID local; en state guardamos SOLO títulos */}
         <div className="Categorias">
           {/* Categoría */}
           <div className="categoria-core">
@@ -355,7 +296,7 @@ export default function NuevoTicketForm() {
               disabled={disabledCats}
             >
               <option value="">
-                {loadingCatalogos || loadingDeps ? "Cargando categorías..." : "Seleccione una categoría"}
+                {loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
               </option>
               {categorias.map((c: CategoriaItem) => (
                 <option key={String(c.ID)} value={String(c.ID)}>
@@ -379,7 +320,7 @@ export default function NuevoTicketForm() {
               <option value="">
                 {catId == null
                   ? "Seleccione una categoría primero"
-                  : loadingDeps
+                  : loadingCatalogos
                   ? "Cargando subcategorías..."
                   : "Seleccione una subcategoría"}
               </option>
@@ -399,7 +340,6 @@ export default function NuevoTicketForm() {
               id="articulo"
               className="categoria-select"
               value={
-                // No guardamos ID en state, así que derivamos el ID seleccionado desde el título guardado (si aplica)
                 state.articulo
                   ? String(articulos.find((a) => a.Title === state.articulo)?.ID ?? "")
                   : ""
@@ -410,7 +350,7 @@ export default function NuevoTicketForm() {
               <option value="">
                 {subcatId == null
                   ? "Seleccione una subcategoría primero"
-                  : loadingDeps
+                  : loadingCatalogos
                   ? "Cargando artículos..."
                   : "Seleccione un artículo"}
               </option>
@@ -433,14 +373,12 @@ export default function NuevoTicketForm() {
             onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
             disabled={submitting}
           />
-          {state.archivo && <small className="file-hint">Archivo: {state.archivo.name}</small>}
         </div>
 
         {/* Submit */}
-        <button type="submit" disabled={submitting || loadingDeps}>
+        <button type="submit" disabled={submitting || loadingCatalogos}>
           {submitting ? "Enviando..." : "Enviar Ticket"}
         </button>
-        {depsError && <small className="error" style={{ display: "block", marginTop: 8 }}>{depsError}</small>}
       </form>
     </div>
   );
