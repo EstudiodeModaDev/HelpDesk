@@ -146,12 +146,11 @@ export class FranquiciasService {
     const query = qs.toString().replace(/\+/g, '%20');
 
     const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
-    console.log(url)
 
     try {
       const res = await this.graph.get<any>(url);
-      const mappedRes = res.value ?? [].map((x: any) => this.toModel(x))
-      console.log("Franquicias obtenidas ", mappedRes)
+      const mappedRes = (res.value ?? []).map((x: any) => this.toModel(x));
+      console.log(mappedRes)
       return (mappedRes);
 
     } catch (e: any) {
