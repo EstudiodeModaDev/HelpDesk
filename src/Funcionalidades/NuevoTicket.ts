@@ -240,7 +240,8 @@ export function useNuevoTicketForm(services: Svc) {
       }
 
       const aperturaISO  = toGraphDateTime(apertura);           
-      const tiempoSolISO = toGraphDateTime(solucion as any);        
+      const tiempoSolISO = toGraphDateTime(solucion as any);  
+      console.log(aperturaISO, tiempoSolISO)      
 
       console.log("Iniciando creación")
 
@@ -248,8 +249,8 @@ export function useNuevoTicketForm(services: Svc) {
       const payload = {
         Title: state.motivo,
         Descripcion: state.descripcion,
-        FechaApertura: aperturaISO,
-        TiempoSolucion: tiempoSolISO,
+       // FechaApertura: aperturaISO,
+       // TiempoSolucion: tiempoSolISO,
         Fuente: state.fuente,
         Categoria: state.categoria,       // Título
         SubCategoria: state.subcategoria, // Título
