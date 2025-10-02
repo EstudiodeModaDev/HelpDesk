@@ -1,4 +1,3 @@
-// src/hooks/useUserRoleFromSP.ts
 import * as React from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 

@@ -1,17 +1,27 @@
-// src/hooks/useWorkers.ts (100% Graph)
+// src/hooks/useWorkers.ts (Graph + opcional SharePoint)
 import * as React from 'react';
 import { useAuth } from '../auth/authContext';
 import { GraphRest } from '../graph/GraphRest';
 import type { Worker } from '../Models/Commons';
 
+/* ================= Types & Options ================= */
+
 type Options = {
-  onlyEnabled?: boolean;
-  domainFilter?: string;
-  previewLimit?: number;
+  onlyEnabled?: boolean;                 // Graph: accountEnabled eq true
+  domainFilter?: string;                 // e.g. "estudiodemoda.com.co"
+  previewLimit?: number;                 // recorta el resultado final
+  spListService?: {                      // OPCIONAL: servicio de lista SP
+    getAll: (opts?: any) => Promise<any[]>;
+  };
+  spOrderBy?: string;                    // ej: "fields/Title asc"
+  spTop?: number;                        // ej: 5000
+  spFilter?: string;                     // filtro OData para SP
 };
 
 const norm = (s: string) =>
-  s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+  (s ?? '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+
+/* ================= Cache ================= */
 
 type CacheKey = string;
 const cache: Record<CacheKey, { data: Worker[] | null; promise: Promise<Worker[]> | null }> = {};
@@ -20,10 +30,17 @@ function cacheKey(opts: Options) {
   return JSON.stringify({
     onlyEnabled: opts.onlyEnabled ?? true,
     domainFilter: (opts.domainFilter ?? '').toLowerCase(),
+    previewLimit: opts.previewLimit ?? null,
+    hasSP: !!opts.spListService,
+    spOrderBy: opts.spOrderBy ?? '',
+    spTop: opts.spTop ?? 0,
+    spFilter: opts.spFilter ?? '',
   });
 }
 
-function mapRaw(u: any, i: number): Worker {
+/* ================= Mappers ================= */
+
+function mapGraphUser(u: any, i: number): Worker {
   const id = u.id ?? u.userPrincipalName ?? u.mail ?? i;
   return {
     id: String(id),
@@ -33,54 +50,71 @@ function mapRaw(u: any, i: number): Worker {
   };
 }
 
+function mapSPRowToWorker(r: any): Worker {
+  const f = r?.fields ?? r ?? {};
+  return {
+    id: String(r.ID ?? r.Id ?? f.ID ?? f.Id ?? ''),
+    displayName: String(
+      f.Nombre ?? f.DisplayName ?? f.Title ?? r.Nombre ?? r.DisplayName ?? r.Title ?? '—'
+    ),
+    mail: String(f.Correo ?? f.Email ?? r.Correo ?? r.Email ?? ''),
+    jobTitle: String(f.Cargo ?? r.Cargo ?? ''),
+  };
+}
+
+/* ================= Fetchers ================= */
+
 async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Worker[]> {
-  const key = cacheKey(opts);
-  if (cache[key]?.data) return cache[key]!.data as Worker[];
-  if (!cache[key]) cache[key] = { data: null, promise: null };
+  const onlyEnabled = opts.onlyEnabled ?? true;
+  const domain = (opts.domainFilter ?? '').toLowerCase();
 
-  if (!cache[key]!.promise) {
-    const onlyEnabled = opts.onlyEnabled ?? true;
-    const domain = (opts.domainFilter ?? '').toLowerCase();
+  const select = encodeURIComponent('id,displayName,mail,userPrincipalName,jobTitle,accountEnabled');
+  const top = 999;
+  const filters: string[] = [];
+  if (onlyEnabled) filters.push('accountEnabled eq true');
 
-    const select = encodeURIComponent('id,displayName,mail,userPrincipalName,jobTitle,accountEnabled');
-    const top = 999;
-    const filters: string[] = [];
-    if (onlyEnabled) filters.push('accountEnabled eq true');
+  let url = `/users?$select=${select}&$top=${top}` + (filters.length ? `&$filter=${encodeURIComponent(filters.join(' and '))}` : '');
+  const acc: any[] = [];
 
-    let url = `/users?$select=${select}&$top=${top}` + (filters.length ? `&$filter=${encodeURIComponent(filters.join(' and '))}` : '');
-    const acc: any[] = [];
-
-    async function pageLoop() {
-      while (url) {
-        const page = await graph.get<any>(url);
-        const rows: any[] = Array.isArray(page?.value) ? page.value : [];
-        acc.push(...rows);
-        const next = page?.['@odata.nextLink'] as string | undefined;
-        url = next ? next.replace('https://graph.microsoft.com/v1.0', '') : '';
-      }
-    }
-
-    cache[key]!.promise = pageLoop()
-      .then(() => {
-        // dedupe por email (mail || UPN)
-        const emailToUser = new Map<string, any>();
-        for (const u of acc) {
-          const email = String(u.mail || u.userPrincipalName || '').trim().toLowerCase();
-          if (!email) continue;
-          if (domain && !email.endsWith(`@${domain}`)) continue;
-          if (!emailToUser.has(email)) emailToUser.set(email, u);
-        }
-        const mapped = Array.from(emailToUser.values()).map(mapRaw);
-        cache[key]!.data = mapped;
-        return mapped;
-      })
-      .finally(() => {
-        cache[key]!.promise = null;
-      });
+  while (url) {
+    const page = await graph.get<any>(url);
+    const rows: any[] = Array.isArray(page?.value) ? page.value : [];
+    acc.push(...rows);
+    const next = page?.['@odata.nextLink'] as string | undefined;
+    url = next ? next.replace('https://graph.microsoft.com/v1.0', '') : '';
   }
 
-  return cache[key]!.promise as Promise<Worker[]>;
+  // dedupe por email + filtro por dominio
+  const emailToUser = new Map<string, any>();
+  for (const u of acc) {
+    const email = String(u.mail || u.userPrincipalName || '').trim().toLowerCase();
+    if (!email) continue;
+    if (domain && !email.endsWith(`@${domain}`)) continue;
+    if (!emailToUser.has(email)) emailToUser.set(email, u);
+  }
+  return Array.from(emailToUser.values()).map(mapGraphUser);
 }
+
+async function fetchUsersFromSharePoint(opts: Options): Promise<Worker[]> {
+  if (!opts.spListService) return [];
+  const items = await opts.spListService.getAll({
+    orderby: opts.spOrderBy ?? 'fields/Title asc',
+    top: opts.spTop ?? 5000,
+    ...(opts.spFilter ? { filter: opts.spFilter } : {}),
+  });
+
+  const domain = (opts.domainFilter ?? '').toLowerCase();
+  const mapped = (items ?? []).map(mapSPRowToWorker);
+
+  // Filtra por dominio si se pide
+  return mapped.filter(w => {
+    const email = String(w.mail ?? '').toLowerCase();
+    if (!email) return false;
+    return domain ? email.endsWith(`@${domain}`) : true;
+  });
+}
+
+/* ================= Hook principal ================= */
 
 export function useWorkers(options: Options = {}) {
   const { ready, getToken } = useAuth();
@@ -95,8 +129,46 @@ export function useWorkers(options: Options = {}) {
     setLoading(true);
     setError(null);
     try {
-      const graph = new GraphRest(getToken);
-      const data = await fetchUsersFromGraph(graph, options);
+      // cache
+      if (cache[key]?.data) {
+        const cached = cache[key]!.data!;
+        setWorkers(typeof options.previewLimit === 'number' ? cached.slice(0, options.previewLimit) : cached);
+        return;
+      }
+      if (!cache[key]) cache[key] = { data: null, promise: null };
+
+      if (!cache[key]!.promise) {
+        const graph = new GraphRest(getToken);
+        cache[key]!.promise = (async () => {
+          const [fromGraph, fromSP] = await Promise.all([
+            fetchUsersFromGraph(graph, options),
+            fetchUsersFromSharePoint(options),
+          ]);
+
+          // Fusionar y dedup por email (preferimos Graph si hay conflicto)
+          const emailToWorker = new Map<string, Worker>();
+          for (const g of fromGraph) {
+            const email = String(g.mail ?? '').trim().toLowerCase();
+            if (email) emailToWorker.set(email, g);
+          }
+          for (const s of fromSP) {
+            const email = String(s.mail ?? '').trim().toLowerCase();
+            if (!email) continue;
+            if (!emailToWorker.has(email)) emailToWorker.set(email, s);
+          }
+
+          const merged = Array.from(emailToWorker.values());
+          // opcional: orden alfabético
+          merged.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+
+          cache[key]!.data = merged;
+          return merged;
+        })().finally(() => {
+          cache[key]!.promise = null;
+        });
+      }
+
+      const data = await cache[key]!.promise!;
       setWorkers(typeof options.previewLimit === 'number' ? data.slice(0, options.previewLimit) : data);
     } catch (e: any) {
       setWorkers([]);
@@ -104,7 +176,7 @@ export function useWorkers(options: Options = {}) {
     } finally {
       setLoading(false);
     }
-  }, [ready, getToken, options]);
+  }, [ready, getToken, key, options]);
 
   React.useEffect(() => { load(); }, [load, key]);
 
@@ -116,8 +188,7 @@ export function useWorkers(options: Options = {}) {
 
   const refresh = React.useCallback(async () => {
     if (!ready) return;
-    // invalida cache para estas opciones y recarga
-    cache[key] = { data: null, promise: null };
+    cache[key] = { data: null, promise: null }; // invalida cache
     await load();
   }, [ready, load, key]);
 
