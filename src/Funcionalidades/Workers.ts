@@ -1,27 +1,21 @@
-// src/hooks/useWorkers.ts (Graph + opcional SharePoint)
+// src/hooks/useWorkers.ts
 import * as React from 'react';
 import { useAuth } from '../auth/authContext';
 import { GraphRest } from '../graph/GraphRest';
-import type { Worker } from '../Models/Commons';
-
-/* ================= Types & Options ================= */
+import type { UserOption, Worker } from '../Models/Commons';
 
 type Options = {
-  onlyEnabled?: boolean;                 // Graph: accountEnabled eq true
-  domainFilter?: string;                 // e.g. "estudiodemoda.com.co"
-  previewLimit?: number;                 // recorta el resultado final
-  spListService?: {                      // OPCIONAL: servicio de lista SP
-    getAll: (opts?: any) => Promise<any[]>;
-  };
-  spOrderBy?: string;                    // ej: "fields/Title asc"
-  spTop?: number;                        // ej: 5000
-  spFilter?: string;                     // filtro OData para SP
+  onlyEnabled?: boolean;
+  domainFilter?: string;
+  previewLimit?: number;
+  spListService?: { getAll: (opts?: any) => Promise<any[]> };
+  spOrderBy?: string;
+  spTop?: number;
+  spFilter?: string;
 };
 
 const norm = (s: string) =>
   (s ?? '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
-
-/* ================= Cache ================= */
 
 type CacheKey = string;
 const cache: Record<CacheKey, { data: Worker[] | null; promise: Promise<Worker[]> | null }> = {};
@@ -37,8 +31,6 @@ function cacheKey(opts: Options) {
     spFilter: opts.spFilter ?? '',
   });
 }
-
-/* ================= Mappers ================= */
 
 function mapGraphUser(u: any, i: number): Worker {
   const id = u.id ?? u.userPrincipalName ?? u.mail ?? i;
@@ -62,8 +54,6 @@ function mapSPRowToWorker(r: any): Worker {
   };
 }
 
-/* ================= Fetchers ================= */
-
 async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Worker[]> {
   const onlyEnabled = opts.onlyEnabled ?? true;
   const domain = (opts.domainFilter ?? '').toLowerCase();
@@ -84,7 +74,6 @@ async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Wor
     url = next ? next.replace('https://graph.microsoft.com/v1.0', '') : '';
   }
 
-  // dedupe por email + filtro por dominio
   const emailToUser = new Map<string, any>();
   for (const u of acc) {
     const email = String(u.mail || u.userPrincipalName || '').trim().toLowerCase();
@@ -106,7 +95,6 @@ async function fetchUsersFromSharePoint(opts: Options): Promise<Worker[]> {
   const domain = (opts.domainFilter ?? '').toLowerCase();
   const mapped = (items ?? []).map(mapSPRowToWorker);
 
-  // Filtra por dominio si se pide
   return mapped.filter(w => {
     const email = String(w.mail ?? '').toLowerCase();
     if (!email) return false;
@@ -114,25 +102,38 @@ async function fetchUsersFromSharePoint(opts: Options): Promise<Worker[]> {
   });
 }
 
-/* ================= Hook principal ================= */
-
 export function useWorkers(options: Options = {}) {
   const { ready, getToken } = useAuth();
   const [workers, setWorkers] = React.useState<Worker[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [workersOptions, setWorkersOptions] = React.useState<UserOption[]>([]);
+  const [loadingWorkers, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   const key = cacheKey(options);
+
+  // === helpers ===
+  const mapWorkersToOptions = React.useCallback((list: Worker[]): UserOption[] => {
+    return (list ?? [])
+      .map((u) => ({
+        value: (u.mail || String(u.id) || '').trim(),
+        label: u.displayName || u.mail || '—',
+        id: u.id != null ? String(u.id) : undefined,
+        email: u.mail,
+        jobTitle: u.jobTitle,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, []);
 
   const load = React.useCallback(async () => {
     if (!ready) return;
     setLoading(true);
     setError(null);
     try {
-      // cache
       if (cache[key]?.data) {
         const cached = cache[key]!.data!;
-        setWorkers(typeof options.previewLimit === 'number' ? cached.slice(0, options.previewLimit) : cached);
+        const sliced = typeof options.previewLimit === 'number' ? cached.slice(0, options.previewLimit) : cached;
+        setWorkers(sliced);
+        setWorkersOptions(mapWorkersToOptions(sliced));
         return;
       }
       if (!cache[key]) cache[key] = { data: null, promise: null };
@@ -145,7 +146,6 @@ export function useWorkers(options: Options = {}) {
             fetchUsersFromSharePoint(options),
           ]);
 
-          // Fusionar y dedup por email (preferimos Graph si hay conflicto)
           const emailToWorker = new Map<string, Worker>();
           for (const g of fromGraph) {
             const email = String(g.mail ?? '').trim().toLowerCase();
@@ -158,7 +158,6 @@ export function useWorkers(options: Options = {}) {
           }
 
           const merged = Array.from(emailToWorker.values());
-          // opcional: orden alfabético
           merged.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
 
           cache[key]!.data = merged;
@@ -169,15 +168,19 @@ export function useWorkers(options: Options = {}) {
       }
 
       const data = await cache[key]!.promise!;
-      setWorkers(typeof options.previewLimit === 'number' ? data.slice(0, options.previewLimit) : data);
+      const sliced = typeof options.previewLimit === 'number' ? data.slice(0, options.previewLimit) : data;
+      setWorkers(sliced);
+      setWorkersOptions(mapWorkersToOptions(sliced)); // <-- faltaba setear en la rama no-cache
     } catch (e: any) {
       setWorkers([]);
+      setWorkersOptions([]);
       setError(e?.message ?? 'Error cargando usuarios');
     } finally {
       setLoading(false);
     }
-  }, [ready, getToken, key, options]);
+  }, [ready, getToken, key, options.previewLimit, mapWorkersToOptions]); // usa solo lo necesario
 
+  // MUEVE el useEffect DESPUÉS de declarar `load`
   React.useEffect(() => { load(); }, [load, key]);
 
   const filter = React.useCallback((term: string) => {
@@ -188,9 +191,9 @@ export function useWorkers(options: Options = {}) {
 
   const refresh = React.useCallback(async () => {
     if (!ready) return;
-    cache[key] = { data: null, promise: null }; // invalida cache
+    cache[key] = { data: null, promise: null };
     await load();
   }, [ready, load, key]);
 
-  return { workers, loading, error, filter, refresh };
+  return { workers, workersOptions, loadingWorkers, error, filter, refresh };
 }

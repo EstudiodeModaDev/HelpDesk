@@ -3,7 +3,7 @@ import Select, { components, type OptionProps, type Props as RSProps } from "rea
 import "./NuevoTicketForm.css";
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import type { FranquiciasService } from "../../Services/Franquicias.service";
-import type { UserOption, Worker } from "../../Models/Commons";
+import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
 import { useWorkers } from "../../Funcionalidades/Workers";
@@ -29,14 +29,14 @@ export default function NuevoTicketForm() {
   } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos });
 
   const {
-    franquicias,        
+  franqOptions,   
     loading: loadingFranq,
     error: franqError,
   } = useFranquicias(FranquiciasSvc!);
 
   const {
-    workers,
-    loading: loadingUsers,
+    workersOptions,
+    loadingWorkers,
     error: usersError,
     refresh,
   } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
@@ -48,63 +48,14 @@ export default function NuevoTicketForm() {
   } = useUsuarios(UsuariosSPService!);
   
 
-
-  const workersToUserOptions = React.useCallback(
-    (ws: Worker[]): UserOption[] =>
-      ws
-        .map((w) => ({
-          value: (w.mail || String(w.id) || "").trim(), // valor estable (correo recomendado)
-          label: w.displayName || w.mail || "—",
-          id: w.id != null ? String(w.id) : undefined,  // id SIEMPRE string para evitar choques de tipo
-          email: w.mail,
-          jobTitle: w.jobTitle,
-        }))
-        // orden opcional por label
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    []
-  );
-
-  const franqToUserOptions = React.useCallback(
-  (fs: any[]): UserOptionEx[] =>
-    (fs ?? [])
-      .map((f) => {
-        // Ajusta estos campos a tu modelo real de Franquicias
-        const nombre = String(f.Nombre1 ?? f.Title ?? f.DisplayName ?? "—");
-        const correo = String(f.Correo ?? f.Email ?? "").trim();
-        const cargo  = "Franquicia";
-        const id     = String(f.ID ?? f.Id ?? f.id ?? correo ?? nombre);
-        return {
-          value: correo || id,         // preferimos correo como clave estable
-          label: nombre,
-          id,
-          email: correo || undefined,
-          jobTitle: cargo || undefined,
-          source: "Franquicia",
-        } as UserOptionEx;
-      })
-      .sort((a, b) => a.label.localeCompare(b.label)),
-  []
-);
-
-  
-  const franqOptions: UserOptionEx[] = React.useMemo(
-    () => franqToUserOptions(franquicias),
-    [franquicias, franqToUserOptions]
-  );
-
-  const userOptions: UserOption[] = React.useMemo(
-    () => workersToUserOptions(workers),
-    [workers, workersToUserOptions]
-  );
-
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
-    for (const o of [...userOptions, ...franqOptions]) {
+    for (const o of [...workersOptions, ...franqOptions]) {
       const key = (o.value || "").toLowerCase();
       if (!map.has(key)) map.set(key, o);
     }
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
-  }, [userOptions, franqOptions]);
+  }, [workersOptions, franqOptions]);
 
   const filterOption: RSProps<UserOptionEx, false>["filterOption"] = (option, raw) => {
     const q = norm(raw);
@@ -118,7 +69,6 @@ export default function NuevoTicketForm() {
     return haystack.includes(q);
   };
 
-  // Render de cada opción SEGURO (usa props.data)
   const Option = (props: OptionProps<UserOptionEx, false>) => {
     const { data, label } = props;
     return (
@@ -173,7 +123,7 @@ export default function NuevoTicketForm() {
                 onClick={refresh}                 // refresca workers
                 className="mini-reload"
                 title="Recargar usuarios"
-                disabled={loadingUsers || submitting}
+                disabled={loadingWorkers || submitting}
               >
                 ⟳
               </button>
@@ -181,15 +131,15 @@ export default function NuevoTicketForm() {
             <Select<UserOptionEx, false>
               options={combinedOptions}
               placeholder={
-                (loadingUsers || loadingFranq)
+                (loadingWorkers || loadingFranq)
                   ? "Cargando opciones…"
                   : "Buscar solicitante…"
               }
               value={state.solicitante as UserOptionEx | null}
               onChange={(opt) => setField("solicitante", opt ?? null)}
               classNamePrefix="rs"
-              isDisabled={submitting || loadingUsers || loadingFranq}
-              isLoading={loadingUsers || loadingFranq}
+              isDisabled={submitting || loadingWorkers || loadingFranq}
+              isLoading={loadingWorkers || loadingFranq}
               filterOption={filterOption}
               components={{ Option }}
               noOptionsMessage={() =>
