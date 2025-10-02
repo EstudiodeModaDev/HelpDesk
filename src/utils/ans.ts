@@ -1,15 +1,33 @@
 // src/utils/ans.ts
 import { addMinutes, isSaturday, isSunday } from "date-fns";
 import { TZDate } from "@date-fns/tz";
+import type { Holiday } from "festivos-colombianos";
 
 const TIMEZONE = "America/Bogota";
 const WORK_START = 7;  // 7:00 am
 const WORK_END = 17;   // 5:00 pm
 
-function isHoliday(date: TZDate, holidays: string[]): boolean {
-  const ymd = date.toISOString().slice(0, 10);
-  return holidays.includes(ymd);
-}
+
+const toYMD = (d: Date) => {
+  const dd = new Date(d);
+  dd.setHours(12, 0, 0, 0);
+  const y = dd.getFullYear();
+  const m = String(dd.getMonth() + 1).padStart(2, "0");
+  const day = String(dd.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
+// Toma una cadena que puede venir como ISO y devuelve "YYYY-MM-DD"
+const sliceYMD = (s?: string) => (s ? s.slice(0, 10) : "");
+
+// ¿La fecha es feriado?
+export const isHoliday = (date: Date, holidays: Holiday[]) => {
+  const ymd = toYMD(date);
+  return holidays.some(h =>
+    sliceYMD(h.holiday) === ymd || sliceYMD(h.celebrationDay) === ymd
+  );
+};
+
 
 /**
  * Calcula fecha de solución respetando días hábiles 7am–5pm y festivos.
@@ -18,7 +36,7 @@ function isHoliday(date: TZDate, holidays: string[]): boolean {
 export function calcularFechaSolucion(
   apertura: Date,
   horasAns: number,
-  holidays: string[]
+  holidays: Holiday[]
 ): TZDate {
   let restante = horasAns * 60; 
   let actual = new TZDate(apertura, TIMEZONE); // trabajar siempre en Bogotá

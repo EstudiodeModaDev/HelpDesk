@@ -1,9 +1,7 @@
-import holidaysColombia from "festivos-colombianos";
+import holidaysColombia, { type Holiday } from "festivos-colombianos";
 
-export async function fetchHolidays(): Promise<string[]> {
+export async function fetchHolidays(): Promise<Holiday[]> {
   const year = new Date().getFullYear(); //Obtener el año actual
   const holidays = holidaysColombia(year);
-  const arrayFormated= holidays.map((h: any) => h.holidays); 
-  console.log(holidays)
-  return arrayFormated
+  return holidays
 }

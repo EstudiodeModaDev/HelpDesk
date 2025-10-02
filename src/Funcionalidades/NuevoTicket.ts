@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import { calcularFechaSolucion } from "../utils/ans";
-import { fetchHolidays } from "../Services/Festivos";
+import { fetchHolidays} from "../Services/Festivos";
 import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 import type { FlowToUser, } from "../Models/Commons";
@@ -9,6 +9,7 @@ import { norm } from "../utils/Commons";
 import type { TZDate } from "@date-fns/tz";
 import type { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
+import type { Holiday } from "festivos-colombianos";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -76,7 +77,7 @@ export function useNuevoTicketForm(services: Svc) {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
-  const [holidays, setHolidays] = useState<string[]>([]);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null);
 
   // ---- Catálogos
