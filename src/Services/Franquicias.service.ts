@@ -72,7 +72,7 @@ export class FranquiciasService {
     const f = item?.fields ?? {};
     return {
         Id: String(item?.id ?? ''),
-        Title: f.Title, //tipo de caso
+        Title: f.Title, 
         Ciudad: f.Ciudad,
         Correo: f.Correo,
         Direccion: f.Direccion,
@@ -150,8 +150,10 @@ export class FranquiciasService {
 
     try {
       const res = await this.graph.get<any>(url);
-      console.log("Franquicias obtenidas ", res)
-      return (res.value ?? []).map((x: any) => this.toModel(x));
+      const mappedRes = res.value ?? [].map((x: any) => this.toModel(x))
+      console.log("Franquicias obtenidas ", mappedRes)
+      return (mappedRes);
+
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
       const code = e?.error?.code ?? e?.code;
