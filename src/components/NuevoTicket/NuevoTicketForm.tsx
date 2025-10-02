@@ -363,7 +363,6 @@ export default function NuevoTicketForm() {
                 </option>
               ))}
             </select>
-            {errors.articulo && <small className="error">{errors.articulo}</small>}
           </div>
         </div>
 

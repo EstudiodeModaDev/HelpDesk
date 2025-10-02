@@ -179,7 +179,6 @@ export function useNuevoTicketForm(services: Svc) {
     if (!state.descripcion.trim()) e.descripcion = "Describa el problema";
     if (!state.categoria) e.categoria = "Seleccione una categoría";
     if (!state.subcategoria) e.subcategoria = "Seleccione una subcategoría";
-    if (!state.articulo) e.articulo = "Seleccione un artículo";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -243,8 +242,6 @@ export function useNuevoTicketForm(services: Svc) {
       const tiempoSolISO = toGraphDateTime(solucion as any);  
       console.log(aperturaISO, tiempoSolISO)      
 
-      console.log("Iniciando creación")
-
       // Objeto de creación
       const payload = {
         Title: state.motivo,
@@ -255,7 +252,6 @@ export function useNuevoTicketForm(services: Svc) {
         Categoria: state.categoria,       
         SubCategoria: state.subcategoria, 
         SubSubCategoria: state.articulo,  
-        //IdResolutor: state.resolutor?.id,
         Nombreresolutor: state.resolutor?.label,
         Correoresolutor: state.resolutor?.email,
         Solicitante: state.solicitante?.label,
@@ -276,16 +272,13 @@ export function useNuevoTicketForm(services: Svc) {
 
         createdId = created?.ID ?? "";
         console.log("Ticket creado con ID:", createdId);
-      }
 
-      /* =========================
-         NOTIFICACIONES (Teams/Correo)
-         ========================= */
-      const idTexto = String(createdId || "—");
-      const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
-
+        const idTexto = String(createdId || "—");
+        const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
+        const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
+        const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
       // Notificar solicitante
-      const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
+
       if (solicitanteEmail) {
         const title = `Asignación de Caso - ${idTexto}`;
         const message = `
@@ -312,7 +305,7 @@ export function useNuevoTicketForm(services: Svc) {
       }
 
       // Notificar resolutor
-      const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
+      
       if (resolutorEmail) {
         const title = `Nuevo caso asignado - ${idTexto}`;
         const message = `
@@ -339,6 +332,25 @@ export function useNuevoTicketForm(services: Svc) {
         }
       }
 
+      //Limpiar formularior
+      setState( 
+        {
+          solicitante: null,
+          resolutor: null,
+          usarFechaApertura: false,
+          fechaApertura: null,
+          fuente: "",
+          motivo: "",
+          descripcion: "",
+          categoria: "",   
+          subcategoria: "", 
+          articulo: "",     
+          ANS: "",
+          archivo: null,
+        }
+        )
+      setErrors({})
+    }
     } finally {
       setSubmitting(false);
     }
