@@ -24,7 +24,8 @@ export function useFranquicias(
     setLoading(true); setError(null);
     try {
     console.log("Iniciando franquicias")
-      const { items, nextLink } = await FranquiciasSvc.getAll();
+      const res =  await FranquiciasSvc.getAll();
+       const items: Franquicias[] = Array.isArray(res) ? res : (res?.items ?? []);
       console.log("Franquicias obtenidas: ", items)
       setFranquicias(items);
       console.log("franquicias guardadas: ", franquicias)
