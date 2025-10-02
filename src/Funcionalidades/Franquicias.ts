@@ -23,12 +23,15 @@ export function useFranquicias(
   const loadFranquicias = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
+    console.log("Iniciando franquicias")
       const { items, nextLink } = await FranquiciasSvc.getAll();
+      console.log("Franquicias obtenidas: ", items)
       setFranquicias(items);
+      console.log("franquicias guardadas: ", franquicias)
       setNextLink(nextLink ?? null);
       setPageIndex(1);
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando tickets");
+      setError(e?.message ?? "Error cargando franquicias");
       setFranquicias([]);
       setNextLink(null);
       setPageIndex(1);
