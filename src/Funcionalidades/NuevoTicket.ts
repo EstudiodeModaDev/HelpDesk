@@ -97,7 +97,7 @@ export function useNuevoTicketForm(services: Svc) {
     let cancel = false;
     (async () => {
       try {
-        const hs = await fetchHolidays("CO");
+        const hs = await fetchHolidays();
         if (!cancel) setHolidays(hs);
       } catch (e) {
         if (!cancel) console.error("Error festivos:", e);
