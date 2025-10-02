@@ -12,6 +12,7 @@ export type FormState = {
   subcategoria: string;
   articulo: string;
   archivo: File | null;
+  ANS?: "";
 };
 
 

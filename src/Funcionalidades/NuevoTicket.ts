@@ -6,6 +6,7 @@ import { fetchHolidays } from "../Services/Festivos";
 import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 import type { UserOption } from "../Models/Commons";
+import { norm } from "../utils/Commons";
 
 /* ============================
    Datos de ejemplo para selects de usuarios
@@ -40,6 +41,7 @@ export function useNuevoTicketForm(services: Svc) {
     categoria: "",
     subcategoria: "",
     articulo: "",
+    ANS: "",
     archivo: null,
   });
 
@@ -167,6 +169,45 @@ export function useNuevoTicketForm(services: Svc) {
     return Object.keys(e).length === 0;
   };
 
+  const calculoANS = (categoria: string, subcategoria: string, articulo?: string): string => {
+    const KEYWORDS = {
+      "ANS 1": [
+        "monitor principal",
+        "bloqueo general",
+        "sesiones bloqueadas",
+      ],
+      "ANS 2": [
+        "internet",
+      ],
+      "ANS 4": [
+        "acompanamiento, embalaje y envio de equipo", // sin tildes tras normalizar
+        "cambio",
+        "entrega de equipo",
+        "repotenciacion",
+        "entrega",
+      ],
+      "ANS 5": [
+        "alquiler",
+        "cotizacion/compras",
+        "cotizacion",
+        "compras",
+      ],
+    } as const;
+    const EXCLUDE = ["actividad masiva", "cierre de tienda", "apertura de tiendas"];
+    const combinacion = norm(`${categoria} ${subcategoria} ${articulo ?? ""}`);
+
+    if (EXCLUDE.some(k => combinacion.includes(norm(k)))) {
+      return ""; // No lleva ANS
+    }
+
+    if (KEYWORDS["ANS 1"].some(k => combinacion.includes(norm(k)))) return "ANS 1";
+    if (KEYWORDS["ANS 2"].some(k => combinacion.includes(norm(k)))) return "ANS 2";
+    if (KEYWORDS["ANS 4"].some(k => combinacion.includes(norm(k)))) return "ANS 4";
+    if (KEYWORDS["ANS 5"].some(k => combinacion.includes(norm(k)))) return "ANS 5";
+
+    return "ANS 3";
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -176,16 +217,24 @@ export function useNuevoTicketForm(services: Svc) {
       const apertura = state.usarFechaApertura && state.fechaApertura
         ? new Date(state.fechaApertura)
         : new Date();
+      
+        const horasPorANS: Record<string, number> = {
+          "ANS 1": 2,
+          "ANS 2": 4,
+          "ANS 3": 8,
+          "ANS 4": 56,
+          "ANS 5": 240,
+        };
 
-      // TODO: traer horas ANS reales desde tu mapa
-      const horasAns = 2;
+      const ANS = calculoANS(state.categoria, state.subcategoria, state.articulo)
+      const horasAns = horasPorANS[ANS]
 
       const solucion = calcularFechaSolucion(apertura, horasAns, holidays);
       setFechaSolucion(solucion);
 
       const payload = {
         ...state,
-        ansHoras: horasAns,
+        ANS: ANS,
         fechaSolucion: solucion.toISOString(),
       };
 

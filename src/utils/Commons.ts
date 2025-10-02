@@ -79,3 +79,8 @@ export async function ensureIds(
 
   return { siteId, listId };
 }
+
+
+export function  norm (s?: string){
+ return (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+}
