@@ -9,14 +9,14 @@ export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Tick
 
   const [showSeg, setShowSeg] = React.useState(false);
 
-  const categoria = [ticket.Categoria, ticket.Subcategoria, ticket.Articulo]
+  const categoria = [ticket.Categoria, ticket.SubCategoria, ticket.SubSubCategoria]
     .filter(Boolean)
     .join(' > ');
 
   return (
     <div className="detalle-ticket">
       <button className="btn-volver" onClick={onVolver}>← Volver</button>
-      <h2>Asunto ticket #{ticket.id}</h2>
+      <h2>Asunto ticket #{ticket.ID}</h2>
 
       <div className="fila">
         <div className="campo">
@@ -43,11 +43,11 @@ export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Tick
       <div className="fila">
         <div className="campo">
           <label>Resolutor del caso</label>
-          <span>{ticket.resolutor || '–'}</span>
+          <span>{ticket.Nombreresolutor || '–'}</span>
         </div>
         <div className="campo">
           <label>Solicitante del ticket</label>
-          <span>{ticket.solicitante || '–'}</span>
+          <span>{ticket.Solicitante || '–'}</span>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Tick
       <div className="fila">
         <div className="campo">
           <label>Estado del caso</label>
-          <span>{ticket.estado || '–'}</span>
+          <span>{ticket.Estadodesolicitud || '–'}</span>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Tick
           <TicketHistorial
             role= {role ?? "Usuario"}
             onVolver={() => setShowSeg(false)}
-            ticketId={ticket.id}
+            ticketId={ticket.ID!}
             onAddClick={() => { } }
             onViewClick={() => { } }
           />

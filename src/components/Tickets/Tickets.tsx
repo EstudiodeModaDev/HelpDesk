@@ -58,7 +58,7 @@ export default function TablaTickets() {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter((t) => {
-      const texto = `${t.resolutor ?? ""} ${t.solicitante ?? ""} ${t.Title ?? ""} ${t.id}`.toLowerCase();
+      const texto = `${t.Nombreresolutor ?? ""} ${t.Solicitante ?? ""} ${t.Title ?? ""} ${t.ID}`.toLowerCase();
       return texto.includes(q);
     });
   }, [rows, search]);
@@ -201,14 +201,14 @@ export default function TablaTickets() {
             <tbody>
               {filtered.map((ticket) => (
                 <tr
-                  key={ticket.id}
+                  key={ticket.ID}
                   onClick={() => setTicketSeleccionado(ticket)}
                   tabIndex={0}
                   onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setTicketSeleccionado(ticket)}
                 >
-                  <td>{ticket.id}</td>
-                  <td>{ticket.resolutor}</td>
-                  <td>{ticket.solicitante}</td>
+                  <td>{ticket.ID}</td>
+                  <td>{ticket.Nombreresolutor}</td>
+                  <td>{ticket.Solicitante}</td>
                   <td>{ticket.Title}</td>
                   <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
                   <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "No tiene fecha máxima"}</td>
@@ -216,7 +216,7 @@ export default function TablaTickets() {
                     <span
                       className="estado-circulo"
                       style={{ backgroundColor: calcularColorEstado(ticket) }}
-                      title={ticket.estado || "Sin estado"}
+                      title={ticket.Estadodesolicitud || "Sin estado"}
                     />
                   </td>
                 </tr>

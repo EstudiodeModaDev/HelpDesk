@@ -40,7 +40,7 @@ export function parseFechaFlex(fecha?: string): Date {
 }
 
 export function calcularColorEstado(ticket: Ticket): string {
-  const estado = (ticket.estado ?? '').toLowerCase();
+  const estado = (ticket.Estadodesolicitud ?? '').toLowerCase();
 
   if (estado === 'cerrado' || estado === 'cerrado fuera de tiempo') {
     return 'rgba(0,0,0,1)'; // negro para cerrados
