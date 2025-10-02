@@ -28,7 +28,7 @@ export default function NuevoTicketForm() {
 
   const {franqOptions, loading: loadingFranq, error: franqError} = useFranquicias(FranquiciasSvc!);
 
-  const {workersOptions, loadingWorkers, error: usersError, refresh} = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+  const {workersOptions, loadingWorkers, error: usersError} = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
 
   const {UseruserOptions, loading, error} = useUsuarios(UsuariosSPService!);
   
@@ -94,9 +94,6 @@ export default function NuevoTicketForm() {
           <div className="form-group inline-group" style={{ minWidth: 300 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <label>Solicitante</label>
-              <button type="button" onClick={refresh} className="mini-reload" title="Recargar usuarios" disabled={loadingWorkers || submitting} >
-                ⟳
-              </button>
             </div>
             <Select<UserOptionEx, false>
               options={combinedOptions}
