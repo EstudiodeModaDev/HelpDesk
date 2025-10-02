@@ -13,9 +13,6 @@ export type FormState = {
   articulo: string;
   archivo: File | null;
   ANS?: "";
-  IdResolutor: string
-  nombreResolutor: string
-  correoResolutor: string
 };
 
 
