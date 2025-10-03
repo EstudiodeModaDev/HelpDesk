@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useRef} from "react";
+import "./RichTextBase64.css"
 
 type Props = {
   value: string;                          // HTML

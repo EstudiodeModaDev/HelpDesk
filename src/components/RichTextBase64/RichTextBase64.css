@@ -1,54 +1,162 @@
-/* === Overrides: borde del área y botones más pequeños ================== */
-
-/* Toolbar más compacta */
-.rte-toolbar {
-  gap: 6px;                  /* antes 8px */
-  padding: 8px;              /* antes 10px */
+/* === Tokens (fáciles de tunear) === */
+.rte {
+  --rte-bg: #fff;
+  --rte-surface: #ffffff;
+  --rte-border: #e5e7eb;        /* gris claro */
+  --rte-border-hover: #d1d5db;
+  --rte-border-focus: #94a3b8;  /* slate-400 */
+  --rte-text: #0f172a;          /* slate-900 */
+  --rte-text-muted: #64748b;    /* slate-500 */
+  --rte-primary: #0ea5e9;       /* sky-500 */
+  --rte-primary-ghost: #e0f2fe;
+  --rte-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --rte-radius: 10px;           /* suaviza bordes */
+  --rte-btn-radius: 8px;
+  --rte-btn-size: 28px;         /* botones pequeños */
+  --rte-gap: 6px;
+  --rte-toolbar-h: 40px;        /* toolbar más compacta */
 }
 
-/* Botones mini (pill) */
-.rte-toolbar button {
-  padding: 6px 10px;         /* antes 8px 12px */
-  font-size: 12px;           /* antes 13px */
-  border-radius: 999px;
-  line-height: 1;            /* que se vean más densos */
-  min-height: 30px;          /* alto cómodo */
-}
-
-.rte-toolbar button i,
-.rte-toolbar button u {
-  font-size: 12px;           /* iconitos/texto sutil */
-}
-
-/* Área de texto con borde propio */
-.rte-editor {
-  /* añade un borde interno y separación de la caja general */
-  border: 1px solid var(--rte-border);
-  border-radius: 10px;
-  margin: 12px;              /* para que el borde no pegue contra los edges del contenedor */
-  padding: 12px 14px;        /* un pelín más compacto */
+/* === Contenedor === */
+.rte {
   background: var(--rte-bg);
+  color: var(--rte-text);
+  border: 1px solid var(--rte-border);
+  border-radius: var(--rte-radius);
+  box-shadow: var(--rte-shadow);
+  overflow: hidden; /* redondeado real */
+  display: flex;
+  flex-direction: column;
 }
 
-/* Estado de foco accesible en el área de texto */
-.rte-editor:focus {
+/* === Toolbar (fila compacta) === */
+.rte-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rte-gap);
+  min-height: var(--rte-toolbar-h);
+  padding: 6px 8px;
+  background: #f8fafc; /* fondo muy claro tipo app */
+  border-bottom: 1px solid var(--rte-border);
+}
+
+/* Separador fino */
+.rte-toolbar .rte-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--rte-border);
+  margin: 0 2px;
+}
+
+/* Botón “micro” */
+.rte-toolbar > button {
+  display: inline-grid;
+  place-items: center;
+  height: var(--rte-btn-size);
+  min-width: var(--rte-btn-size);
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--rte-btn-radius);
+  background: transparent;
+  color: var(--rte-text);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 40ms ease;
+  user-select: none;
+}
+
+.rte-toolbar > button:hover {
+  background: #f1f5f9;              /* hover tenue */
+  border-color: var(--rte-border-hover);
+}
+
+.rte-toolbar > button:active {
+  transform: translateY(0.5px);
+}
+
+/* íconos simples en <i>, <u> */
+.rte-toolbar i, .rte-toolbar u, .rte-toolbar b {
+  font-style: normal;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* === Editor === */
+.rte-editor {
+  padding: 14px 16px;
+  min-height: 180px;                /* área visible */
+  background: var(--rte-surface);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--rte-ring), .25);
-  border-color: rgba(var(--rte-ring), .55);
 }
 
-/* Móvil aún más compacto */
-@media (max-width: 640px) {
-  .rte-toolbar { gap: 5px; padding: 6px; }
-  .rte-toolbar button { padding: 5px 9px; font-size: 11.5px; min-height: 28px; }
-  .rte-editor { margin: 10px; padding: 10px 12px; }
+/* Borde visible del área de edición (como pediste) */
+.rte-editor {
+  border-top: 1px solid transparent; /* ya hay un border-bottom en toolbar */
 }
 
-/* Dark mode opcional: bordes visibles también */
-.dark .rte-editor {
-  border-color: var(--rte-border);
+/* Enfocado: resalta contenedor completo */
+.rte:focus-within {
+  border-color: var(--rte-border-focus);
+  box-shadow: 0 0 0 3px var(--rte-primary-ghost), var(--rte-shadow);
 }
-.dark .rte-editor:focus {
-  border-color: rgba(var(--rte-ring), .55);
-  box-shadow: 0 0 0 3px rgba(var(--rte-ring), .25);
+
+/* Placeholder cuando está vacío */
+.rte-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--rte-text-muted);
+  pointer-events: none;
 }
+
+/* Contenido tipográfico agradable */
+.rte-editor h1, .rte-editor h2, .rte-editor h3 {
+  line-height: 1.25;
+  margin: 0.6em 0 0.3em;
+  font-weight: 700;
+}
+.rte-editor h1 { font-size: 1.375rem; } /* ~22px, similar a la captura */
+.rte-editor h2 { font-size: 1.2rem; }
+.rte-editor h3 { font-size: 1.05rem; }
+
+.rte-editor p {
+  margin: 0.5em 0;
+  color: var(--rte-text);
+  font-size: 0.95rem;
+}
+
+/* Links con color y subrayado al pasar */
+.rte-editor a {
+  color: var(--rte-primary);
+  text-decoration: none;
+}
+.rte-editor a:hover {
+  text-decoration: underline;
+}
+
+/* Listas con buen espaciado */
+.rte-editor ul, .rte-editor ol {
+  padding-left: 1.25rem;
+  margin: 0.4em 0 0.6em;
+}
+.rte-editor li { margin: 0.2em 0; }
+
+/* Imágenes responsivas (si no usas inline style) */
+.rte-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Código inline similar al botón </> de la barra */
+.rte-editor code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #f1f5f9;
+  border: 1px solid var(--rte-border);
+  border-radius: 6px;
+  padding: 0 4px;
+  font-size: 0.85em;
+}
+
+/* === Variante “readOnly” (opcional) === */
+.rte.readonly .rte-toolbar { display: none; }
+.rte.readonly .rte-editor { padding-top: 16px; }
