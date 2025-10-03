@@ -10,13 +10,16 @@ import type { UserOption } from "../../../Models/Commons";
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 
-export default function Reasignar({ ticket }: { ticket: Ticket }) {
+type ReasignarProps = {
+  ticket: Ticket;
+};
+
+export default function Reasignar({ ticket }: ReasignarProps) {
   // Servicios
   const { Usuarios } = useGraphServices() as { Usuarios: UsuariosSPService };
 
   // Hook de reasignación (usa resolutor + nota)
-  const { state, setField, errors, submitting, handleReasignar } =
-    useRecategorizarTicket({ Usuarios }, ticket);
+  const { state, setField, errors, submitting, handleReasignar } = useRecategorizarTicket({ Usuarios }, ticket);
 
   // Hook de usuarios (fuente del combo)
   const { UseruserOptions, loading, error } = useUsuarios(Usuarios!);
@@ -59,8 +62,6 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
 
   return (
     <form className="tf-grid" onSubmit={handleReasignar} noValidate>
-      <h3 style={{ marginBottom: 12 }}>Reasignar ticket #{ticket.ID}</h3>
-
       <div className="tf-field tf-col-2">
         <label className="tf-label">Nuevo resolutor</label>
         <Select<UserOption, false>

@@ -156,8 +156,8 @@ export default function DetalleTicket({
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
           <div className="modal-card">
             <div className="modal-head">
-              <h3>Recategorizar ticket #{ticket.ID}</h3>
-              <button className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">✕</button>
+              <h3>Reasignar ticket #{ticket.ID}</h3>
+              <button className="modal-close" onClick={() => setshowReasig(false)} aria-label="Cerrar">✕</button>
             </div>
             <div className="modal-body">
               {/* Pasamos role y onDone para cerrar al finalizar */}
