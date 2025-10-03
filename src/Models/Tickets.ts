@@ -22,4 +22,4 @@ export type Ticket = {
 
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
-export type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';
+export type SortField = 'ID' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';

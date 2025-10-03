@@ -141,12 +141,12 @@ export default function TablaTickets() {
                 <th
                   role="button"
                   tabIndex={0}
-                  onClick={(e) => toggleSort('id', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('id', e.shiftKey); }}
+                  onClick={(e) => toggleSort('ID', e.shiftKey)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('ID', e.shiftKey); }}
                   aria-label="Ordenar por ID"
                   style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
-                  ID {renderSortIndicator('id', sorts)}
+                  ID {renderSortIndicator('ID', sorts)}
                 </th>
 
                 <th
