@@ -9,56 +9,57 @@ import TareasPage from './components/Tareas/Tareas';
 import Formatos from './components/Formatos/Formatos';
 
 import type { User } from './Models/User';
-import { GraphServicesProvider } from './graph/GrapServicesContext';
+import { GraphServicesProvider, useGraphServices } from './graph/GrapServicesContext';
 
 import { AuthProvider, useAuth } from './auth/authContext';
 import { useUserRoleFromSP } from './Funcionalidades/Usuarios';
+import CajerosPOSForm from './components/CajerosPOS/CajerosPOS';
+
+import type { TicketsService } from './Services/Tickets.service';
+import type { UsuariosSPService } from './Services/Usuarios.Service';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
-//Roles de la aplicación
+// Roles de la aplicación
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
 
+// Navegación
 type NavItem<K extends string> = { key: K; label: string; icon?: string };
 
-type AdminKey   = 'home' | 'ticketform' | 'ticketTable' | 'task' | 'formatos' | 'reportes' | 'Inventario' | 'Administración' | 'Informacion';
-type TecnicoKey = 'home' | 'ticketTable' | 'task' | 'reportes' | 'Inventario' | 'Administración' | 'Informacion' | 'ticketform';
-type UsuarioKey = 'home' | 'ticketTable';
-
-export type NavKey = AdminKey | TecnicoKey | UsuarioKey;
-
-const NAVS_ADMIN: NavItem<AdminKey>[] = [
+const NAVS_ADMIN: NavItem<string>[] = [
   { key: 'home',        label: 'Home',         icon: '🏠' },
   { key: 'ticketform',  label: 'Nuevo Ticket', icon: '➕' },
   { key: 'ticketTable', label: 'Ver Tickets',  icon: '👁️' },
   { key: 'task',        label: 'Tareas',       icon: '✅' },
   { key: 'formatos',    label: 'Formatos',     icon: '👥' },
   { key: 'reportes',    label: 'Reportes',     icon: '📊' },
+  { key: 'cajpos',      label: 'Cajeros POS',  icon: '💳' },
 ];
 
-const NAVS_TECNICO: NavItem<TecnicoKey>[] = [
-  { key: 'home',        label: 'Home',     icon: '🏠' },
-  { key: 'ticketform', label: 'Nuevo Ticket',  icon: '➕' },
-  { key: 'ticketTable', label: 'Tickets',  icon: '👁️' },
-  { key: 'task',        label: 'Tareas',   icon: '✅' },
-  { key: 'reportes',    label: 'Reportes', icon: '📊' },
+const NAVS_TECNICO: NavItem<string>[] = [
+  { key: 'home',        label: 'Home',         icon: '🏠' },
+  { key: 'ticketform',  label: 'Nuevo Ticket', icon: '➕' },
+  { key: 'ticketTable', label: 'Tickets',      icon: '👁️' },
+  { key: 'task',        label: 'Tareas',       icon: '✅' },
+  { key: 'cajpos',      label: 'Cajeros POS',  icon: '💳' },
 ];
 
-const NAVS_USUARIO: NavItem<UsuarioKey>[] = [
+const NAVS_USUARIO: NavItem<string>[] = [
   { key: 'home',        label: 'Home',         icon: '🏠' },
   { key: 'ticketTable', label: 'Mis Tickets',  icon: '👁️' },
 ];
 
 function getNavsForRole(role: Role | string) {
   switch (role) {
-    case 'Administrador': return NAVS_ADMIN as readonly NavItem<NavKey>[];
-    case 'Tecnico':       return NAVS_TECNICO as readonly NavItem<NavKey>[];
+    case 'Administrador': return NAVS_ADMIN as readonly NavItem<string>[];
+    case 'Tecnico':       return NAVS_TECNICO as readonly NavItem<string>[];
+    case 'Técnico':       return NAVS_TECNICO as readonly NavItem<string>[];
     case 'Usuario':
-    default:              return NAVS_USUARIO as readonly NavItem<NavKey>[];
+    default:              return NAVS_USUARIO as readonly NavItem<string>[];
   }
 }
 
-function hasNav(navs: readonly NavItem<NavKey>[], key: NavKey) {
+function hasNav(navs: readonly NavItem<string>[], key: string) {
   return navs.some(n => n.key === key);
 }
 
@@ -96,9 +97,9 @@ function HeaderBar(props: {
 
 /* ---------------------- UI: Sidebar ---------------------- */
 function Sidebar(props: {
-  navs: readonly NavItem<NavKey>[];
-  selected: NavKey;
-  onSelect: (k: NavKey) => void;
+  navs: readonly NavItem<string>[];
+  selected: string;
+  onSelect: (k: string) => void;
 }) {
   const { navs, selected, onSelect } = props;
   return (
@@ -194,14 +195,20 @@ function LoggedApp({
 }) {
   const { role } = useUserRoleFromSP(user!.mail); // 'Administrador' | 'Técnico' | 'Usuario'
   const navs = getNavsForRole(role);
-  const [selected, setSelected] = React.useState<NavKey>(navs[0].key);
+  const [selected, setSelected] = React.useState<string>(navs[0].key);
+
+  // 🔌 Trae servicios Graph aquí (ya estamos dentro de GraphServicesProvider)
+  const { Tickets, Usuarios } = useGraphServices() as {
+    Tickets: TicketsService;
+    Usuarios: UsuariosSPService;
+  };
 
   // Si cambia el rol y el tab actual ya no existe, cae al primero del menú del rol
   React.useEffect(() => {
     if (!hasNav(navs, selected)) setSelected(navs[0].key);
   }, [role, navs, selected]);
 
-  const allow = (key: NavKey) => hasNav(navs, key);
+  const allow = (key: string) => hasNav(navs, key);
 
   return (
     <div className="page layout layout--withSidebar">
@@ -217,15 +224,23 @@ function LoggedApp({
       <main className="content content--withSidebar">
         {selected === 'home' && <Home />}
 
-        {allow('ticketform' as NavKey) && selected === 'ticketform' && <NuevoTicketForm />}
+        {allow('ticketform') && selected === 'ticketform' && <NuevoTicketForm />}
 
-        {allow('ticketTable' as NavKey) && selected === 'ticketTable' && <TablaTickets/>}
+        {allow('ticketTable') && selected === 'ticketTable' && <TablaTickets />}
 
-        {allow('task' as NavKey) && selected === 'task' && <TareasPage />}
+        {allow('task') && selected === 'task' && <TareasPage />}
 
-        {allow('formatos' as NavKey) && selected === 'formatos' && <Formatos />}
+        {allow('formatos') && selected === 'formatos' && <Formatos />}
 
-        {allow('reportes' as NavKey) && selected === 'reportes' && <div>Reportes (WIP)</div>}
+        {/* ✅ Cajeros POS: pasa servicios reales desde el context */}
+        {allow('cajpos') && selected === 'cajpos' && Usuarios && (
+          <CajerosPOSForm services={{ Tickets, Usuarios }} />
+        )}
+
+        {/* Fallback por si aún no cargan los servicios */}
+        {allow('cajpos') && selected === 'cajpos' && !Usuarios && (
+          <div>Cargando servicios…</div>
+        )}
       </main>
     </div>
   );

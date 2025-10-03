@@ -24,17 +24,18 @@ export type UserOption = {
   jobTitle?: string;  // opcional: para mostrar/filtrar
 };
 
-
-export type FlowToUser = {
-  recipient: string;            
-  message: string;
-  title?: string;
-  mail: boolean
-};
-
 export type Reasignar = {
     IDCandidato: number;            
     Nota: string;
     IDCaso: number;
     IDSolicitante: number
+}
+
+export type SPCajerosPOS = {
+    Usuario: number;            
+    CorreoUsuario: string;
+    Cedula: number;
+    CO: number
+    CorreoTercero: number
+    Compañia: number
 }

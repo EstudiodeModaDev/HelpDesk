@@ -5,7 +5,7 @@ import TicketHistorial from '../Seguimiento/Seguimiento';
 import HtmlContent from '../Renderizador/Renderizador';
 import { toISODateTimeFlex } from '../../utils/Date';
 import Recategorizar from './ModalRecategorizar/Recategorizar';
-import Reasignar from './ModalRecategorizar/Recategorizar';
+import Reasignar from './Reasignar/Reasignar';
 
 // Helper: ¿tiene permiso para recategorizar?
 const hasRecatRole = (r?: string) => {
@@ -161,10 +161,7 @@ export default function DetalleTicket({
             </div>
             <div className="modal-body">
               {/* Pasamos role y onDone para cerrar al finalizar */}
-              <Reasignar
-                ticket={ticket}
-                //onDone={() => setShowRecat(false)}
-              />
+              <Reasignar></Reasignar>
             </div>
           </div>
         </div>

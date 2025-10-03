@@ -1,15 +1,17 @@
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { calcularFechaSolucion, calculoANS } from "../utils/ans";
 import { fetchHolidays} from "../Services/Festivos";
 import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
-import type { FlowToUser, GetAllOpts, } from "../Models/Commons";
+import type {  GetAllOpts, } from "../Models/Commons";
+import type { FlowToUser } from "../Models/FlujosPA";
 import type { TZDate } from "@date-fns/tz";
 import type { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
+import { FlowClient } from "./FlowClient";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -21,41 +23,6 @@ type Svc = {
 
 // Helpers para tolerar nombres internos distintos
 export const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
-
-export class MailAndTeamsFlowRestService {
-  private flowUrl: string =
-    "https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4";
-  constructor(flowUrl?: string) {
-    if (flowUrl) this.flowUrl = flowUrl;
-  }
-
-  /** Notificaciones por flujo (Teams / Correo) */
-  async sendTeamsToUserViaFlow(input: FlowToUser): Promise<any> {
-    return this.postToFlow({
-      recipient: input.recipient,
-      message: input.message,
-      title: input.title ?? "",
-      mail: input.mail,
-    });
-  }
-
-  private async postToFlow(payload: any): Promise<any> {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const res = await fetch(this.flowUrl, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`Flow call failed: ${res.status} ${txt}`);
-    }
-
-    const ct = res.headers.get("content-type") || "";
-    return ct.includes("application/json") ? res.json().catch(() => ({})) : {};
-  }
-}
 
 export function useNuevoTicketForm(services: Svc) {
   const { Categorias, SubCategorias, Articulos, Tickets, Usuarios } = services;
@@ -88,10 +55,7 @@ export function useNuevoTicketForm(services: Svc) {
   const [errorCatalogos, setErrorCatalogos] = useState<string | null>(null);
 
   // ---- Instancia del servicio de Flow (useRef para no depender de React.*)
-  const flowServiceRef = useRef<MailAndTeamsFlowRestService | null>(null);
-  if (!flowServiceRef.current) {
-  flowServiceRef.current = new MailAndTeamsFlowRestService();
-  }
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
   // Carga de festivos inicial
   useEffect(() => {
@@ -286,11 +250,11 @@ export function useNuevoTicketForm(services: Svc) {
           </p>`.trim();
 
           try {
-            await flowServiceRef.current!.sendTeamsToUserViaFlow({
+            await notifyFlow.invoke<FlowToUser, any>({
               recipient: solicitanteEmail,
               title,
               message,
-              mail: true, // si tu Flow envía correo cuando mail=true
+              mail: true, 
             });
           } catch (err) {
             console.error("[Flow] Error enviando a solicitante:", err);
@@ -313,8 +277,8 @@ export function useNuevoTicketForm(services: Svc) {
           </p>`.trim();
 
           try {
-            await flowServiceRef.current!.sendTeamsToUserViaFlow({
-              recipient: resolutorEmail, // ← CORREGIDO (antes usabas solicitanteEmail)
+            await notifyFlow.invoke<FlowToUser, any>({
+              recipient: resolutorEmail, 
               title,
               message,
               mail: true,

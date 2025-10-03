@@ -13,7 +13,7 @@ const norm = (s: string) =>
 
 type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
-export default function NuevoTicketForm() {
+export default function Reasignar() {
   const {
     Categorias,
     SubCategorias,
