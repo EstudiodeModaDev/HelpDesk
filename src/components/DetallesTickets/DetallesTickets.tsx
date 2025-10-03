@@ -5,6 +5,7 @@ import TicketHistorial from '../Seguimiento/Seguimiento';
 import HtmlContent from '../Renderizador/Renderizador';
 import { toISODateTimeFlex } from '../../utils/Date';
 import Recategorizar from './ModalRecategorizar/Recategorizar'; // ⬅️ ajusta la ruta real
+import Reasignar from './ModalRecategorizar/Recategorizar';
 
 // Helper: ¿tiene permiso para recategorizar?
 const hasRecatRole = (r?: string) => {
@@ -25,6 +26,7 @@ export default function DetalleTicket({
 
   const [showSeg, setShowSeg] = React.useState(false);
   const [showRecat, setShowRecat] = React.useState(false);
+  const [showReasig, setshowReasig] = React.useState(false);
 
   const categoria = [ticket.Categoria, ticket.SubCategoria, ticket.SubSubCategoria]
     .filter(Boolean)
@@ -48,7 +50,6 @@ export default function DetalleTicket({
           {canRecategorizar ? (
             <button
               type="button"
-              className="link-like"
               onClick={() => setShowRecat(true)}
               title="Recategorizar ticket"
             >
@@ -74,7 +75,17 @@ export default function DetalleTicket({
       <div className="fila">
         <div className="campo">
           <label>Resolutor del caso</label>
-          <span>{ticket.Nombreresolutor || '–'}</span>
+          {canRecategorizar ? (
+            <button
+              type="button"
+              onClick={() => setshowReasig(true)}
+              title="Recategorizar ticket"
+            >
+              {ticket.Nombreresolutor  || '–'}
+            </button>
+          ) : (
+            <span title="No tiene permisos para recategorizar">{ticket.Nombreresolutor || '–'}</span>
+          )}
         </div>
         <div className="campo">
           <label>Solicitante del ticket</label>
@@ -132,6 +143,25 @@ export default function DetalleTicket({
             <div className="modal-body">
               {/* Pasamos role y onDone para cerrar al finalizar */}
               <Recategorizar
+                ticket={ticket}
+                //onDone={() => setShowRecat(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==== Modal de reasignación ==== */}
+      {showReasig && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
+          <div className="modal-card">
+            <div className="modal-head">
+              <h3>Recategorizar ticket #{ticket.ID}</h3>
+              <button className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">✕</button>
+            </div>
+            <div className="modal-body">
+              {/* Pasamos role y onDone para cerrar al finalizar */}
+              <Reasignar
                 ticket={ticket}
                 //onDone={() => setShowRecat(false)}
               />
