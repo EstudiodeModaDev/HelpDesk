@@ -99,7 +99,7 @@ export function useTickets(
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
 
-  const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
+  const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'ID', dir: 'desc' }]);
 
   // construir filtro OData
   const buildFilter = React.useCallback((): GetAllOpts => {
@@ -130,7 +130,7 @@ export function useTickets(
       .filter(Boolean);
 
     // Estabilidad de orden: si no incluiste 'id', agrega 'id desc' como desempate.
-    if (!sorts.some(s => s.field === 'id')) {
+    if (!sorts.some(s => s.field === 'ID')) {
       orderParts.push('ID desc');
     }
     return {
@@ -185,7 +185,7 @@ export function useTickets(
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   const sortFieldToOData: Record<SortField, string> = {
-    id: 'ID',
+    ID: 'ID',
     FechaApertura: 'fields/FechaApertura',
     TiempoSolucion: 'fields/TiempoSolucion',
     Title: 'fields/Title',
