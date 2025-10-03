@@ -117,3 +117,9 @@ export function toGraphDateTime(
   const d = new Date(v as any);
   return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
 }
+
+export function toUtcIso(d?: Date | null): string | null {
+  if (!d || isNaN(d.getTime())) return null;
+  // toISOString() SIEMPRE retorna UTC con sufijo 'Z'
+  return d.toISOString();
+}

@@ -8,7 +8,7 @@ import type { FlowToUser, } from "../Models/Commons";
 import { norm } from "../utils/Commons";
 import type { TZDate } from "@date-fns/tz";
 import type { TicketsService } from "../Services/Tickets.service";
-import { toGraphDateTime } from "../utils/Date";
+import { toGraphDateTime, toUtcIso } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
 
 type Svc = {
@@ -211,8 +211,6 @@ export function useNuevoTicketForm(services: Svc) {
     try {
       const apertura = state.usarFechaApertura && state.fechaApertura ? new Date(state.fechaApertura) : new Date();
 
-
-
       const horasPorANS: Record<string, number> = {
         "ANS 1": 2,
         "ANS 2": 4,
@@ -231,7 +229,7 @@ export function useNuevoTicketForm(services: Svc) {
       }
 
       const aperturaISO  = toGraphDateTime(apertura);           
-      const tiempoSolISO = toGraphDateTime(solucion as any);  
+      const tiempoSolISO = toGraphDateTime(toUtcIso(solucion as any));  
       console.log(aperturaISO, tiempoSolISO)      
 
       // Objeto de creación
