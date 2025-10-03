@@ -31,3 +31,10 @@ export type FlowToUser = {
   title?: string;
   mail: boolean
 };
+
+export type Reasignar = {
+    IDCandidato: number;            
+    Nota: string;
+    IDCaso: number;
+    IDSolicitante: number
+}

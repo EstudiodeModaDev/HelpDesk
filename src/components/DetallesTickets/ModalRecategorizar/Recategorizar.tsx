@@ -1,211 +1,123 @@
 import * as React from "react";
-import Select, { type SingleValue } from "react-select";
-import "./Recategorizar.css";
+import Select, {type SingleValue } from "react-select";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
-import type { TicketsService } from "../../../Services/Tickets.service";
-import { useRecategorizarTicket } from "../../../Funcionalidades/Recategorizar";
+import type { UsuariosSPService } from "../../../Services/Usuarios.Service";
 import type { Ticket } from "../../../Models/Tickets";
+import { useRecategorizarTicket } from "../../../Funcionalidades/Reasignar"; 
+import type { GetAllOpts } from "../../../Models/Commons";
 
-const norm = (s: string) => (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
-type CategoriaItem = { ID: string | number; Title: string };
+type ResolutorOption = { value: string; label: string; email: string };
 
-export default function Recategorizar({ ticket }: { ticket: Ticket }) {
-  const {
-    Categorias,
-    SubCategorias,
-    Articulos,
-    Tickets: TicketsSvc,
-  } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Tickets: TicketsService;
-  };
+const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
 
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleRecategorizar,
-    } = useRecategorizarTicket({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc }, ticket);
+export default function Reasignar({ ticket }: { ticket: Ticket }) {
+  // Solo necesitamos Usuarios para listar resolutores
+  const { Usuarios } = useGraphServices() as { Usuarios: UsuariosSPService };
 
-  // ====== Filtro genérico (insensible a acentos) para react-select
-  const makeFilter = () =>
-    (option: { label?: string }, raw: string) => {
-      const q = norm(raw);
-      if (!q) return true;
-      const label = option?.label ?? "";
-      return norm(label).includes(q);
-  };
-
-  // ====== Estado local de IDs (para encadenar por ID) pero guardando títulos en state global
-  const [catId, setCatId] = React.useState<string | number | null>(null);
-  const [subcatId, setSubcatId] = React.useState<string | number | null>(null);
-
-  // ====== Opciones para selects (react-select)
-  const catOptions = React.useMemo(
-    () => categorias.map((c: CategoriaItem) => ({ value: String(c.ID), label: c.Title })),
-    [categorias]
+  // Usa tu hook (que reasigna)
+  const { state, setField, errors, submitting, handleReasignar } = useRecategorizarTicket(
+    { Usuarios },
+    ticket
   );
 
-  const subcats = React.useMemo(() => {
-    if (catId == null) return subcategoriasAll;
-    return subcategoriasAll.filter(s => String(s.Id_categoria) === String(catId));
-  }, [subcategoriasAll, catId]);
+  // Cargar resolutores candidatos (Técnicos activos y disponibles)
+  const [options, setOptions] = React.useState<ResolutorOption[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
-  const subcatOptions = React.useMemo(
-    () => subcats.map((s) => ({ value: String(s.ID), label: s.Title })),
-    [subcats]
-  );
+  const loadTecnicos = React.useCallback(async (q: string = "") => {
+    setLoading(true);
+    try {
+      // Filtra por rol + estado; si quieres agregar búsqueda por nombre, añade un $filter extra
+      const baseFilter =
+        "Rol eq 'Tecnico' and Activo eq true and Disponible eq 'Disponible'";
 
-  const arts = React.useMemo(() => {
-    if (subcatId != null) {
-      return articulosAll.filter(a => String(a.Id_subCategoria) === String(subcatId));
+      // Si hay texto, filtra por Title (nombre) que contenga q (SharePoint no soporta contains en OData clásico;
+      // si tienes Search habilitado, puedes usar startswith. Aquí ejemplo con startswith):
+      const searchFilter = q
+        ? ` and (startswith(Title,'${escapeOData(q)}') or startswith(Correo,'${escapeOData(q)}'))`
+        : "";
+
+      const opts: GetAllOpts = {
+        filter: baseFilter + searchFilter,
+        top: 50,
+        orderby: "fields/Title asc",
+      };
+
+      const rows = await Usuarios.getAll(opts);
+      const mapped = (rows ?? []).map((u: any) => ({
+        value: String(u.ID),
+        label: String(u.Title ?? u.Nombre ?? u.Correo ?? "—"),
+        email: String(u.Correo ?? ""),
+      })) as ResolutorOption[];
+
+      setOptions(mapped);
+    } catch (e) {
+      console.error("Error cargando técnicos:", e);
+      setOptions([]);
+    } finally {
+      setLoading(false);
     }
-    if (catId != null) {
-      const subIds = new Set(
-        subcategoriasAll
-          .filter(s => String(s.Id_categoria) === String(catId))
-          .map(s => String(s.ID))
-      );
-      return articulosAll.filter(a => subIds.has(String(a.Id_subCategoria)));
+  }, [Usuarios]);
+
+  React.useEffect(() => {
+    loadTecnicos();
+  }, [loadTecnicos]);
+
+  const valueOption: ResolutorOption | null = React.useMemo(() => {
+    if (!state.resolutor?.email) return null;
+    const found = options.find(o => o.email === state.resolutor?.email);
+    return found ?? { value: "", label: state.resolutor?.label ?? state.resolutor?.email ?? "", email: state.resolutor.email };
+  }, [state.resolutor, options]);
+
+  const onChangeResolutor = (opt: SingleValue<ResolutorOption>) => {
+    if (!opt) {
+      setField("resolutor", null);
+      return;
     }
-    return articulosAll;
-  }, [articulosAll, subcategoriasAll, catId, subcatId]);
-
-  const artOptions = React.useMemo(
-    () => arts.map((a) => ({ value: String(a.ID), label: a.Title })),
-    [arts]
-  );
-
-  // ====== Valores seleccionados para react-select (a partir del título en state)
-  const catValue = React.useMemo(
-    () => (state.categoria ? catOptions.find((o) => o.label === state.categoria) ?? null : null),
-    [state.categoria, catOptions]
-  );
-  const subcatValue = React.useMemo(
-    () => (state.subcategoria ? subcatOptions.find((o) => o.label === state.subcategoria) ?? null : null),
-    [state.subcategoria, subcatOptions]
-  );
-  const artValue = React.useMemo(
-    () => (state.articulo ? artOptions.find((o) => o.label === state.articulo) ?? null : null),
-    [state.articulo, artOptions]
-  );
-
-  // ====== Handlers (guardan SOLO título en state y manejan IDs locales)
-  const onCategoriaChange = (opt: SingleValue<{ value: string; label: string }>) => {
-    setCatId(opt ? opt.value : null);
-    setSubcatId(null);
-    setField("categoria", opt?.label ?? "");
-    setField("subcategoria", "");
-    setField("articulo", "");
+    // Tu hook necesita state.resolutor con .email
+    setField("resolutor", { value: opt.value, label: opt.label, email: opt.email } as any);
   };
-
-  const onSubcategoriaChange = (opt: SingleValue<{ value: string; label: string }>) => {
-    const subId = opt ? opt.value : null;
-    setSubcatId(subId);
-    setField("subcategoria", opt?.label ?? "");
-
-    if (subId) {
-      const sub = subcategoriasAll.find(s => String(s.ID) === String(subId));
-      if (sub) {
-        setCatId(sub.Id_categoria);
-        const catTitle = categorias.find(c => String(c.ID) === String(sub.Id_categoria))?.Title ?? "";
-        setField("categoria", catTitle);
-      }
-    }
-  };
-
-  // Al elegir artículo: setea Subcategoría y Categoría
-  const onArticuloChange = (opt: SingleValue<{ value: string; label: string }>) => {
-    setField("articulo", opt?.label ?? "");
-
-    const artId = opt?.value;
-    if (artId) {
-      const art = articulosAll.find(a => String(a.ID) === String(artId));
-      if (art) {
-        // subcategoría
-        setSubcatId(art.Id_subCategoria);
-        const sub = subcategoriasAll.find(s => String(s.ID) === String(art.Id_subCategoria));
-        if (sub) {
-          setField("subcategoria", sub.Title);
-
-          // categoría
-          setCatId(sub.Id_categoria);
-          const catTitle = categorias.find(c => String(c.ID) === String(sub.Id_categoria))?.Title ?? "";
-          setField("categoria", catTitle);
-        }
-      }
-    }
-  };
-
-  const disabledCats = submitting || loadingCatalogos;
-  const disabledSubs = submitting || loadingCatalogos
-  const disabledArts = submitting || loadingCatalogos
 
   return (
-    <div className="ticket-form">
-      <h2 className="tf-title">Recategorizar Ticket</h2>
+    <form className="tf-grid" onSubmit={handleReasignar} noValidate>
+      <h3 style={{ marginBottom: 12 }}>Reasignar ticket #{ticket.ID}</h3>
 
-      <form onSubmit={handleRecategorizar} noValidate className="tf-grid">
+      <div className="tf-field tf-col-2">
+        <label className="tf-label">Nuevo resolutor</label>
+        <Select
+          classNamePrefix="rs"
+          options={options}
+          value={valueOption}
+          isLoading={loading}
+          onChange={onChangeResolutor}
+          onInputChange={(q) => {
+            // búsqueda “al vuelo”
+            loadTecnicos(q);
+            return q;
+          }}
+          isClearable
+          placeholder={loading ? "Cargando técnicos..." : "Seleccione un técnico"}
+          noOptionsMessage={() => (loading ? "Cargando..." : "Sin resultados")}
+        />
+        {errors.resolutor && <small className="error">{errors.resolutor}</small>}
+      </div>
 
-        {/* Categoría / Subcategoría / Artículo */}
-        <div className="tf-field">
-          <label className="tf-label">Categoría</label>
-          <Select
-            classNamePrefix="rs"
-            options={catOptions}
-            value={catValue}
-            onChange={onCategoriaChange}
-            isDisabled={disabledCats}
-            placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
-            filterOption={makeFilter()}
-            isClearable
-          />
-          {errors.categoria && <small className="error">{errors.categoria}</small>}
-        </div>
+      <div className="tf-field tf-col-2">
+        <label className="tf-label">Nota (opcional)</label>
+        <textarea
+          className="tf-textarea"
+          rows={4}
+          value={state.Nota ?? ""}
+          onChange={(e) => setField("Nota", e.target.value)}
+          placeholder="Motivo o contexto de la reasignación…"
+        />
+      </div>
 
-        <div className="tf-field">
-          <label className="tf-label">Subcategoría</label>
-          <Select
-            classNamePrefix="rs"
-            options={subcatOptions}
-            value={subcatValue}
-            onChange={onSubcategoriaChange}
-            isDisabled={disabledSubs}
-            placeholder={
-              catId == null
-                ? "Seleccione una categoría primero"
-                : loadingCatalogos
-                ? "Cargando subcategorías..."
-                : "Seleccione una subcategoría"
-            }
-            filterOption={makeFilter()}
-            isClearable
-          />
-          {errors.subcategoria && <small className="error">{errors.subcategoria}</small>}
-        </div>
-
-        <div className="tf-field tf-col-2">
-          <label className="tf-label">Artículo</label>
-          <Select
-            classNamePrefix="rs"
-            options={artOptions}
-            value={artValue}
-            onChange={onArticuloChange}
-            isDisabled={disabledArts}
-            placeholder={
-              subcatId == null
-                ? "Seleccione una subcategoría primero"
-                : loadingCatalogos
-                ? "Cargando artículos..."
-                : "Seleccione un artículo"
-            }
-            filterOption={makeFilter()}
-            isClearable
-          />
-          {/* Si quieres mostrar error de artículo obligatorio, vuelve a validarlo en el hook */}
-        </div>
-        {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
-            {submitting ? "Enviando..." : "Recategorizar Ticket"}
-          </button>
-        </div>
-      </form>
-    </div>
+      <div className="tf-actions tf-col-2">
+        <button type="submit" className="tf-submit" disabled={submitting}>
+          {submitting ? "Reasignando..." : "Reasignar"}
+        </button>
+      </div>
+    </form>
   );
 }

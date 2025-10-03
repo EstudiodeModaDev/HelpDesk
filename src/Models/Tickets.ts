@@ -1,3 +1,5 @@
+import type { UserOption } from "./Commons";
+
 export type Ticket = {
   ID?: string;
   Nombreresolutor?: string;
@@ -25,6 +27,11 @@ export type FormRecategorizarState = {
   subcategoria: string;
   articulo: string;
 };
+
+export type FormReasignarState = {
+    resolutor: UserOption | null;
+    Nota: string
+}
 
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
