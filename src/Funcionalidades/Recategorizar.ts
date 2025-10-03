@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { calcularFechaSolucion, calculoANS } from "../utils/ans";
 import { fetchHolidays } from "../Services/Festivos";
 import type { FormErrors } from "../Models/nuevoTicket";
@@ -9,7 +9,9 @@ import type { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime /* o toUtcIso */ } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
 import type { FormRecategorizarState, Ticket } from "../Models/Tickets";
-import { first, MailAndTeamsFlowRestService } from "./NuevoTicket";
+import { first } from "./NuevoTicket";
+import { FlowClient } from "./FlowClient";
+import type { FlowToUser } from "../Models/FlujosPA";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -106,8 +108,13 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
     return Object.keys(e).length === 0;
   };
 
-  const flowServiceRef = useRef<MailAndTeamsFlowRestService | null>(null);
-  if (!flowServiceRef.current) flowServiceRef.current = new MailAndTeamsFlowRestService();
+  const notifyFlow = React.useMemo(
+    () =>
+      new FlowClient(
+        "https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4"
+      ),
+    []
+  );
 
   const handleRecategorizar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,14 +186,14 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
           `.trim();
 
           try {
-            await flowServiceRef.current!.sendTeamsToUserViaFlow({
-              recipient: solicitanteEmail,
+            await notifyFlow.invoke<FlowToUser, any>({
+              recipient: solicitanteEmail, 
               title,
               message,
               mail: true,
             });
           } catch (err) {
-            console.error("[Flow] Error enviando a solicitante:", err);
+            console.error("[Flow] Error enviando a resolutor:", err);
           }
         }
 
