@@ -1,81 +1,60 @@
 import * as React from "react";
-import Select, {type SingleValue } from "react-select";
+import Select, { type SingleValue } from "react-select";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { UsuariosSPService } from "../../../Services/Usuarios.Service";
 import type { Ticket } from "../../../Models/Tickets";
-import { useRecategorizarTicket } from "../../../Funcionalidades/Reasignar"; 
-import type { GetAllOpts } from "../../../Models/Commons";
+import { useRecategorizarTicket } from "../../../Funcionalidades/Reasignar";
+import { useUsuarios } from "../../../Funcionalidades/Usuarios";
+import type { UserOption } from "../../../Models/Commons";
 
-type ResolutorOption = { value: string; label: string; email: string };
-
-const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
+const norm = (s: string) =>
+  (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 
 export default function Reasignar({ ticket }: { ticket: Ticket }) {
-  // Solo necesitamos Usuarios para listar resolutores
+  // Servicios
   const { Usuarios } = useGraphServices() as { Usuarios: UsuariosSPService };
 
-  // Usa tu hook (que reasigna)
-  const { state, setField, errors, submitting, handleReasignar } = useRecategorizarTicket(
-    { Usuarios },
-    ticket
-  );
+  // Hook de reasignación (usa resolutor + nota)
+  const { state, setField, errors, submitting, handleReasignar } =
+    useRecategorizarTicket({ Usuarios }, ticket);
 
-  // Cargar resolutores candidatos (Técnicos activos y disponibles)
-  const [options, setOptions] = React.useState<ResolutorOption[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  // Hook de usuarios (fuente del combo)
+  const { UseruserOptions, loading, error } = useUsuarios(Usuarios!);
 
-  const loadTecnicos = React.useCallback(async (q: string = "") => {
-    setLoading(true);
-    try {
-      // Filtra por rol + estado; si quieres agregar búsqueda por nombre, añade un $filter extra
-      const baseFilter =
-        "Rol eq 'Tecnico' and Activo eq true and Disponible eq 'Disponible'";
+  // Filtra: solo técnicos activos y disponibles (si esos campos existen en cada opción)
+  const techOptions = React.useMemo(() => {
+    return (UseruserOptions ?? []).filter((o: any) => {
+      const rol = (o?.Rol ?? o?.rol ?? "").toString().toLowerCase();
+      const activo = o?.Activo ?? o?.activo;
+      const disponible = (o?.Disponible ?? o?.disponible ?? "").toString().toLowerCase();
+      // Si no hay metadata, al menos devuelve todos para no dejar vacío
+      if (rol === "" && activo === undefined && disponible === "") return true;
+      return (rol === "tecnico" || rol === "técnico") && Boolean(activo) && disponible === "disponible";
+    }) as UserOption[];
+  }, [UseruserOptions]);
 
-      // Si hay texto, filtra por Title (nombre) que contenga q (SharePoint no soporta contains en OData clásico;
-      // si tienes Search habilitado, puedes usar startswith. Aquí ejemplo con startswith):
-      const searchFilter = q
-        ? ` and (startswith(Title,'${escapeOData(q)}') or startswith(Correo,'${escapeOData(q)}'))`
-        : "";
+  // Búsqueda insensible a acentos por label/email/jobTitle si viene
+  const userFilter = (option: any, raw: string) => {
+    const q = norm(raw);
+    if (!q) return true;
+    const label = option?.label ?? "";
+    const data = option?.data as any;
+    const email = data?.email ?? data?.Correo ?? "";
+    const job = data?.jobTitle ?? "";
+    return norm(`${label} ${email} ${job}`).includes(q);
+  };
 
-      const opts: GetAllOpts = {
-        filter: baseFilter + searchFilter,
-        top: 50,
-        orderby: "fields/Title asc",
-      };
+  // Valor seleccionado (por email o por value)
+  const valueOption = React.useMemo(() => {
+    if (!state.resolutor) return null;
+    const byEmail = techOptions.find((o: any) => (o?.email ?? o?.Correo) === state.resolutor?.email);
+    if (byEmail) return byEmail as UserOption;
+    const byValue = techOptions.find((o) => o.value === (state.resolutor as any)?.value);
+    return (byValue ?? null) as SingleValue<UserOption>;
+  }, [state.resolutor, techOptions]);
 
-      const rows = await Usuarios.getAll(opts);
-      const mapped = (rows ?? []).map((u: any) => ({
-        value: String(u.ID),
-        label: String(u.Title ?? u.Nombre ?? u.Correo ?? "—"),
-        email: String(u.Correo ?? ""),
-      })) as ResolutorOption[];
-
-      setOptions(mapped);
-    } catch (e) {
-      console.error("Error cargando técnicos:", e);
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [Usuarios]);
-
-  React.useEffect(() => {
-    loadTecnicos();
-  }, [loadTecnicos]);
-
-  const valueOption: ResolutorOption | null = React.useMemo(() => {
-    if (!state.resolutor?.email) return null;
-    const found = options.find(o => o.email === state.resolutor?.email);
-    return found ?? { value: "", label: state.resolutor?.label ?? state.resolutor?.email ?? "", email: state.resolutor.email };
-  }, [state.resolutor, options]);
-
-  const onChangeResolutor = (opt: SingleValue<ResolutorOption>) => {
-    if (!opt) {
-      setField("resolutor", null);
-      return;
-    }
-    // Tu hook necesita state.resolutor con .email
-    setField("resolutor", { value: opt.value, label: opt.label, email: opt.email } as any);
+  const onChangeResolutor = (opt: SingleValue<UserOption>) => {
+    setField("resolutor", (opt ?? null) as any); // tu hook espera { value,label,email }
   };
 
   return (
@@ -84,20 +63,16 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
 
       <div className="tf-field tf-col-2">
         <label className="tf-label">Nuevo resolutor</label>
-        <Select
+        <Select<UserOption, false>
           classNamePrefix="rs"
-          options={options}
+          options={techOptions}
           value={valueOption}
           isLoading={loading}
           onChange={onChangeResolutor}
-          onInputChange={(q) => {
-            // búsqueda “al vuelo”
-            loadTecnicos(q);
-            return q;
-          }}
           isClearable
-          placeholder={loading ? "Cargando técnicos..." : "Seleccione un técnico"}
-          noOptionsMessage={() => (loading ? "Cargando..." : "Sin resultados")}
+          filterOption={userFilter as any}
+          placeholder={loading ? "Cargando usuarios…" : "Seleccione un técnico"}
+          noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin resultados")}
         />
         {errors.resolutor && <small className="error">{errors.resolutor}</small>}
       </div>
