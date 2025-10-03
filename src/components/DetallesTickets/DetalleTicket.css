@@ -142,3 +142,62 @@
     margin-bottom: 10px;
   }
 }
+
+/* Botón con look de enlace para la categoría */
+.link-like {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #0ea5e9;      /* sky-500 */
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+}
+.link-like:hover { color: #0284c7; }    /* sky-600 */
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5); /* slate-900/50 */
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+}
+.modal-card {
+  width: min(880px, 92vw);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  overflow: hidden;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.modal-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.modal-close {
+  background: transparent;
+  border: 1px solid transparent;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.modal-close:hover {
+  background: #f1f5f9;
+  border-color: #e5e7eb;
+}
+.modal-body {
+  padding: 16px;
+  max-height: 75vh;
+  overflow: auto;
+}
+

@@ -42,7 +42,7 @@ export default function NuevoTicketForm() {
     loadingCatalogos,
     setField,
     handleSubmit,
-  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc });
+  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc });
 
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({

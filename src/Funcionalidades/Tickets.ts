@@ -138,7 +138,7 @@ export function useTickets(
       orderby: orderParts.join(","),
       top: pageSize,
     };
-  }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize, sorts]); // ← agrega 'sorts' a deps
+  }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize, sorts]); 
 
   // cargar primera página (o recargar)
   const loadFirstPage = React.useCallback(async () => {

@@ -1,17 +1,36 @@
 import * as React from 'react';
 import type { Ticket } from '../../Models/Tickets';
 import './DetalleTicket.css';
-import TicketHistorial from '../Seguimiento/Seguimiento'; // ajusta la ruta si es diferente
+import TicketHistorial from '../Seguimiento/Seguimiento';
 import HtmlContent from '../Renderizador/Renderizador';
+import { toISODateTimeFlex } from '../../utils/Date';
+import Recategorizar from './ModalRecategorizar/Recategorizar'; // ⬅️ ajusta la ruta real
 
-export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Ticket, onVolver: () => void, role: string}) {
+// Helper: ¿tiene permiso para recategorizar?
+const hasRecatRole = (r?: string) => {
+  const v = (r ?? '').trim().toLowerCase();
+  return v === 'administrador' || v === 'tecnico' || v === 'técnico';
+};
+
+export default function DetalleTicket({
+  ticket,
+  onVolver,
+  role,
+}: {
+  ticket: Ticket;
+  onVolver: () => void;
+  role: string;
+}) {
   if (!ticket) return <div>Ticket no encontrado</div>;
 
   const [showSeg, setShowSeg] = React.useState(false);
+  const [showRecat, setShowRecat] = React.useState(false);
 
   const categoria = [ticket.Categoria, ticket.SubCategoria, ticket.SubSubCategoria]
     .filter(Boolean)
     .join(' > ');
+
+  const canRecategorizar = hasRecatRole(role);
 
   return (
     <div className="detalle-ticket">
@@ -23,20 +42,32 @@ export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Tick
           <label>Asunto</label>
           <span>{ticket.Title}</span>
         </div>
+
         <div className="campo">
           <label>Categoría</label>
-          <span>{categoria || '–'}</span>
+          {canRecategorizar ? (
+            <button
+              type="button"
+              className="link-like"
+              onClick={() => setShowRecat(true)}
+              title="Recategorizar ticket"
+            >
+              {categoria || '–'}
+            </button>
+          ) : (
+            <span title="No tiene permisos para recategorizar">{categoria || '–'}</span>
+          )}
         </div>
       </div>
 
-      <div className='fila'>
+      <div className="fila">
         <div className="campo">
           <label>Fecha de Apertura</label>
-          <span>{ticket.FechaApertura || '–'}</span>
+          <span>{toISODateTimeFlex(ticket.FechaApertura) || '–'}</span>
         </div>
         <div className="campo">
           <label>Fecha máxima de solución</label>
-          <span>{ticket.TiempoSolucion || '–'}</span>
+          <span>{toISODateTimeFlex(ticket.TiempoSolucion) || '–'}</span>
         </div>
       </div>
 
@@ -81,12 +112,31 @@ export default function DetalleTicket({ ticket, onVolver, role }: { ticket: Tick
       {showSeg && (
         <div style={{ marginTop: 16 }}>
           <TicketHistorial
-            role= {role ?? "Usuario"}
+            role={role ?? 'Usuario'}
             onVolver={() => setShowSeg(false)}
             ticketId={ticket.ID!}
-            onAddClick={() => { } }
-            onViewClick={() => { } }
+            onAddClick={() => {}}
+            onViewClick={() => {}}
           />
+        </div>
+      )}
+
+      {/* ==== Modal de Recategorización ==== */}
+      {showRecat && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
+          <div className="modal-card">
+            <div className="modal-head">
+              <h3>Recategorizar ticket #{ticket.ID}</h3>
+              <button className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">✕</button>
+            </div>
+            <div className="modal-body">
+              {/* Pasamos role y onDone para cerrar al finalizar */}
+              <Recategorizar
+                ticket={ticket}
+                //onDone={() => setShowRecat(false)}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

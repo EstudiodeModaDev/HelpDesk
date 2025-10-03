@@ -2,6 +2,7 @@
 import { addMinutes, isSaturday, isSunday } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import type { Holiday } from "festivos-colombianos";
+export type ANSLevel = 'ANS 1' | 'ANS 2' | 'ANS 3' | 'ANS 4' | 'ANS 5' | '';
 
 const TIMEZONE = "America/Bogota";
 const WORK_START = 7;  // 7:00 am
@@ -114,3 +115,50 @@ export function calcularFechaSolucion(
   console.log("Fecha de solucion ", actual)
   return actual;
 }
+
+const KEYWORDS: Record<Exclude<ANSLevel, ''>, string[]> = {
+  'ANS 1': ['monitor principal', 'bloqueo general', 'sesiones bloqueadas'],
+  'ANS 2': ['internet'],
+  'ANS 4': [
+    'acompanamiento, embalaje y envio de equipo',
+    'cambio',
+    'entrega de equipo',
+    'repotenciacion',
+    'entrega',
+  ],
+  'ANS 5': ['alquiler', 'cotizacion/compras', 'cotizacion', 'compras'],
+  'ANS 3': []
+};
+
+const EXCLUDE = ['actividad masiva', 'cierre de tienda', 'apertura de tiendas'];
+
+/** Normaliza: quita tildes/diacríticos, lowercase y trim. */
+export const norm = (s: string) =>
+  s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+
+/** Determina el ANS por palabras clave/exclusiones. */
+export function calculoANS(
+  categoria: string,
+  subcategoria: string,
+  articulo?: string
+): ANSLevel {
+  const combinacion = norm(`${categoria} ${subcategoria} ${articulo ?? ''}`);
+
+  if (EXCLUDE.some(k => combinacion.includes(norm(k)))) return '';
+
+  if (KEYWORDS['ANS 1'].some(k => combinacion.includes(norm(k)))) return 'ANS 1';
+  if (KEYWORDS['ANS 2'].some(k => combinacion.includes(norm(k)))) return 'ANS 2';
+  if (KEYWORDS['ANS 4'].some(k => combinacion.includes(norm(k)))) return 'ANS 4';
+  if (KEYWORDS['ANS 5'].some(k => combinacion.includes(norm(k)))) return 'ANS 5';
+
+  return 'ANS 3';
+}
+
+/** (Opcional) Mapa de horas por ANS para reuso. */
+export const HORAS_POR_ANS: Record<Exclude<ANSLevel, ''>, number> = {
+  'ANS 1': 2,
+  'ANS 2': 4,
+  'ANS 3': 8,
+  'ANS 4': 56,
+  'ANS 5': 240,
+};

@@ -1,25 +1,26 @@
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
-import { calcularFechaSolucion } from "../utils/ans";
+import { calcularFechaSolucion, calculoANS } from "../utils/ans";
 import { fetchHolidays} from "../Services/Festivos";
 import type { FormState, FormErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
-import type { FlowToUser, } from "../Models/Commons";
-import { norm } from "../utils/Commons";
+import type { FlowToUser, GetAllOpts, } from "../Models/Commons";
 import type { TZDate } from "@date-fns/tz";
 import type { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
+import type { UsuariosSPService } from "../Services/Usuarios.Service";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
-  Tickets?: TicketsService 
+  Tickets?: TicketsService;
+  Usuarios: UsuariosSPService
 }; 
 
 // Helpers para tolerar nombres internos distintos
-const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
+export const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
 
 export class MailAndTeamsFlowRestService {
   private flowUrl: string =
@@ -57,9 +58,8 @@ export class MailAndTeamsFlowRestService {
 }
 
 export function useNuevoTicketForm(services: Svc) {
-  const { Categorias, SubCategorias, Articulos, Tickets } = services; // ← incluye Tickets
+  const { Categorias, SubCategorias, Articulos, Tickets, Usuarios } = services;
 
-  // ---- Estado del formulario (guardamos SOLO títulos en categoria/subcategoria/articulo)
   const [state, setState] = useState<FormState>({
     solicitante: null,
     resolutor: null,
@@ -175,34 +175,6 @@ export function useNuevoTicketForm(services: Svc) {
     return Object.keys(e).length === 0;
   };
 
-  const calculoANS = (categoria: string, subcategoria: string, articulo?: string): string => {
-    const KEYWORDS = {
-      "ANS 1": ["monitor principal", "bloqueo general", "sesiones bloqueadas"],
-      "ANS 2": ["internet"],
-      "ANS 4": [
-        "acompanamiento, embalaje y envio de equipo", // sin tildes tras normalizar
-        "cambio",
-        "entrega de equipo",
-        "repotenciacion",
-        "entrega",
-      ],
-      "ANS 5": ["alquiler", "cotizacion/compras", "cotizacion", "compras"],
-    } as const;
-    const EXCLUDE = ["actividad masiva", "cierre de tienda", "apertura de tiendas"];
-    const combinacion = norm(`${categoria} ${subcategoria} ${articulo ?? ""}`);
-
-    if (EXCLUDE.some((k) => combinacion.includes(norm(k)))) {
-      return ""; // No lleva ANS
-    }
-
-    if (KEYWORDS["ANS 1"].some((k) => combinacion.includes(norm(k)))) return "ANS 1";
-    if (KEYWORDS["ANS 2"].some((k) => combinacion.includes(norm(k)))) return "ANS 2";
-    if (KEYWORDS["ANS 4"].some((k) => combinacion.includes(norm(k)))) return "ANS 4";
-    if (KEYWORDS["ANS 5"].some((k) => combinacion.includes(norm(k)))) return "ANS 5";
-
-    return "ANS 3";
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -250,8 +222,39 @@ export function useNuevoTicketForm(services: Svc) {
         ANS: ANS
       };
 
-      console.log(payload)
-      
+      //Ibtener el resolutor y sumarle un caso en el mes
+      try {
+        const email = payload.Correoresolutor?.trim();
+        if (!email) {
+          console.warn("No hay Correoresolutor en el payload; no se puede incrementar conteo.");
+        } else {
+          // 1) Buscar resolutor por correo (top 1)
+          const opts: GetAllOpts = {
+            filter: `Correo eq '${email}'`,
+            top: 1,
+          };
+
+          const rows = await Usuarios.getAll(opts);
+          const resolutorRow = rows?.[0];
+
+          if (!resolutorRow) {
+            console.warn("No se encontró resolutor con ese correo:", email);
+          } else {
+            // 2) Calcular nuevo conteo de casos (normaliza null/undefined)
+            const prev = Number(resolutorRow.Numerodecasos ?? 0);
+            const next = prev + 1;
+
+            // 3) Hacer update (espera Promise)
+            const updated = await Usuarios.update(String(resolutorRow.ID), {
+              Numerodecasos: next,
+            });
+
+            console.log("Resolutor actualizado:", updated);
+          }
+        }
+      } catch (err) {
+        console.error("Error actualizando contador del resolutor:", err);
+      }
 
       // === Crear ticket (usa el servicio inyectado)
       let createdId: string | number = "";
@@ -268,81 +271,81 @@ export function useNuevoTicketForm(services: Svc) {
         const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
         const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
       
-        // Notificar solicitante
-      if (solicitanteEmail) {
-        const title = `Asignación de Caso - ${idTexto}`;
-        const message = `
-        <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
-        Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
-        <strong>ID del Caso:</strong> ${idTexto}<br>
-        <strong>Asunto del caso:</strong> ${payload.Title}<br>
-        <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
-        <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
-        El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
-        Este es un mensaje automático, por favor no respondas.
-        </p>`.trim();
+          // Notificar solicitante
+        if (solicitanteEmail) {
+          const title = `Asignación de Caso - ${idTexto}`;
+          const message = `
+          <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
+          Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
+          <strong>ID del Caso:</strong> ${idTexto}<br>
+          <strong>Asunto del caso:</strong> ${payload.Title}<br>
+          <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
+          <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
+          El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
 
-        try {
-          await flowServiceRef.current!.sendTeamsToUserViaFlow({
-            recipient: solicitanteEmail,
-            title,
-            message,
-            mail: true, // si tu Flow envía correo cuando mail=true
-          });
-        } catch (err) {
-          console.error("[Flow] Error enviando a solicitante:", err);
+          try {
+            await flowServiceRef.current!.sendTeamsToUserViaFlow({
+              recipient: solicitanteEmail,
+              title,
+              message,
+              mail: true, // si tu Flow envía correo cuando mail=true
+            });
+          } catch (err) {
+            console.error("[Flow] Error enviando a solicitante:", err);
+          }
         }
-      }
 
-      // Notificar resolutor    
-      if (resolutorEmail) {
-        const title = `Nuevo caso asignado - ${idTexto}`;
-        const message = `
-        <p>¡Hola!<br><br>
-        Tienes un nuevo caso asignado con estos detalles:<br><br>
-        <strong>ID del Caso:</strong> ${idTexto}<br>
-        <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
-        <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
-        <strong>Asunto:</strong> ${payload.Title}<br>
-        <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
-        Por favor, contacta al usuario para brindarle solución.<br><br>
-        Este es un mensaje automático, por favor no respondas.
-        </p>`.trim();
+        // Notificar resolutor    
+        if (resolutorEmail) {
+          const title = `Nuevo caso asignado - ${idTexto}`;
+          const message = `
+          <p>¡Hola!<br><br>
+          Tienes un nuevo caso asignado con estos detalles:<br><br>
+          <strong>ID del Caso:</strong> ${idTexto}<br>
+          <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
+          <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
+          <strong>Asunto:</strong> ${payload.Title}<br>
+          <strong>Fecha máxima de solución:</strong> ${fechaSolTexto}<br><br>
+          Por favor, contacta al usuario para brindarle solución.<br><br>
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
 
-        try {
-          await flowServiceRef.current!.sendTeamsToUserViaFlow({
-            recipient: resolutorEmail, // ← CORREGIDO (antes usabas solicitanteEmail)
-            title,
-            message,
-            mail: true,
-          });
-        } catch (err) {
-          console.error("[Flow] Error enviando a resolutor:", err);
+          try {
+            await flowServiceRef.current!.sendTeamsToUserViaFlow({
+              recipient: resolutorEmail, // ← CORREGIDO (antes usabas solicitanteEmail)
+              title,
+              message,
+              mail: true,
+            });
+          } catch (err) {
+            console.error("[Flow] Error enviando a resolutor:", err);
+          }
         }
-      }
 
-      //Limpiar formularior
-      setState( 
-        {
-          solicitante: null,
-          resolutor: null,
-          usarFechaApertura: false,
-          fechaApertura: null,
-          fuente: "",
-          motivo: "",
-          descripcion: "",
-          categoria: "",   
-          subcategoria: "", 
-          articulo: "",     
-          ANS: "",
-          archivo: null,
-        })
-      setErrors({})
-    }
-    } finally {
-      setSubmitting(false);
-    }
-  };
+        //Limpiar formularior
+        setState( 
+          {
+            solicitante: null,
+            resolutor: null,
+            usarFechaApertura: false,
+            fechaApertura: null,
+            fuente: "",
+            motivo: "",
+            descripcion: "",
+            categoria: "",   
+            subcategoria: "", 
+            articulo: "",     
+            ANS: "",
+            archivo: null,
+          })
+        setErrors({})
+      }
+      } finally {
+        setSubmitting(false);
+      }
+    };
 
   return {
     // estado de formulario

@@ -20,6 +20,12 @@ export type Ticket = {
   CorreoObservador?: string;
 };
 
+export type FormRecategorizarState = {
+  categoria: string;
+  subcategoria: string;
+  articulo: string;
+};
+
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
 export type SortField = 'ID' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';

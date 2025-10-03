@@ -15,5 +15,4 @@ export type FormState = {
   ANS?: "";
 };
 
-
 export type FormErrors = Partial<Record<keyof FormState, string>>;
