@@ -4,7 +4,7 @@ import './DetalleTicket.css';
 import TicketHistorial from '../Seguimiento/Seguimiento';
 import HtmlContent from '../Renderizador/Renderizador';
 import { toISODateTimeFlex } from '../../utils/Date';
-import Recategorizar from './ModalRecategorizar/Recategorizar'; // ⬅️ ajusta la ruta real
+import Recategorizar from './ModalRecategorizar/Recategorizar';
 import Reasignar from './ModalRecategorizar/Recategorizar';
 
 // Helper: ¿tiene permiso para recategorizar?

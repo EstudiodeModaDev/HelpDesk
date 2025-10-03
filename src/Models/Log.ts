@@ -1,5 +1,5 @@
 export type Log = {
-    Id: string;
+    Id?: string;
     Title: string; //Id caso
     Descripcion: string;
     Tipo_de_accion: string;

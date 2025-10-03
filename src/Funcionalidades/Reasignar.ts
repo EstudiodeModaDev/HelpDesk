@@ -5,10 +5,13 @@ import type { TicketsService } from "../Services/Tickets.service";
 import type { FormReasignarState, Ticket } from "../Models/Tickets";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import type { GetAllOpts, Reasignar } from "../Models/Commons";
+import type { LogService } from "../Services/Log.service";
+import type { Log } from "../Models/Log";
 
 type Svc = {
   Tickets?: TicketsService;
   Usuarios: UsuariosSPService;
+  Logs: LogService
 };
 
 export class RecategorizarService {
@@ -42,13 +45,12 @@ export class RecategorizarService {
 const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
 
 export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
-  const { Usuarios } = services;
+  const { Usuarios, Logs } = services;
 
   const [state, setState] = useState<FormReasignarState>({ resolutor: null, Nota: " " });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
-  // ✅ usa el tipo de estado correcto
   const setField = <K extends keyof FormReasignarState>(k: K, v: FormReasignarState[K]) =>
     setState((s) => ({ ...s, [k]: v }));
 
@@ -95,13 +97,35 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
       if (!candidato?.ID) throw new Error(`No se encontró candidato con correo ${candidatoMail}`);
       if (!solicitante?.ID) throw new Error(`No se encontró solicitante con correo ${solicitanteMail}`);
 
-      // Llamada al Flow (await para capturar error)
       const payloadFlow: Reasignar = {
         IDCandidato: Number(candidato.ID),
         IDSolicitante: Number(solicitante.ID),
         IDCaso: Number(ticket.ID),
         Nota: state.Nota ?? "",
       };
+
+      const payloadLog: Log = {
+        Title: ticket.Title ?? "",
+        Actor: solicitante.Title,
+        CorreoActor: solicitante.CorreoSolicitante,
+        Descripcion: `${solicitante.Title} ha solicitando el caso con ID ${ticket.ID} a ${candidato.Title}`,
+        Tipo_de_accion: "Reasignación de caso"
+      }
+
+      try {
+          const created = await Logs.create(payloadLog);
+
+          if (!created) {
+            throw new Error("Respuesta inesperada del servicio de Logs.");
+          }
+          console.log("[Logs] creado:", created);
+          return created;
+        } catch (err) {
+          console.error("[Logs.create] error:", err, { payloadLog });
+          const msg = err instanceof Error ? err.message : String(err);
+          throw new Error(`No se pudo registrar el log: ${msg}`);
+        }
+      
 
       const resp = await flowServiceRef.current!.sendTeamsToUserViaFlow(payloadFlow);
       console.log("[Flow] Reasignación enviada:", resp);
