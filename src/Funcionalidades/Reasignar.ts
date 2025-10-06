@@ -44,7 +44,7 @@ export class RecategorizarService {
 
 const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
 
-export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
+export function useReasignarTicket(services: Svc, ticket: Ticket) {
   const { Usuarios, Logs } = services;
 
   const [state, setState] = useState<FormReasignarState>({ resolutor: null, Nota: " " });

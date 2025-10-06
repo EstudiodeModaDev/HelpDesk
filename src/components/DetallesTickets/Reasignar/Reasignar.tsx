@@ -1,32 +1,25 @@
 import Select, { components, type OptionProps } from "react-select";
 import "./Reasignar.css";
-import type { FranquiciasService } from "../../../Services/Franquicias.service";
 import type { UserOption } from "../../../Models/Commons";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
-import { useNuevoTicketForm } from "../../../Funcionalidades/NuevoTicket";
 import { useUsuarios } from "../../../Funcionalidades/Usuarios";
 import { UsuariosSPService } from "../../../Services/Usuarios.Service";
-import type { TicketsService } from "../../../Services/Tickets.service";
+import { useReasignarTicket } from "../../../Funcionalidades/Reasignar";
+import type { Ticket } from "../../../Models/Tickets";
+import type { LogService } from "../../../Services/Log.service";
 
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 
 type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 
-export default function Reasignar() {
-  const {
-    Categorias,
-    SubCategorias,
-    Articulos,
-    Usuarios: UsuariosSPServiceSvc,
-    Tickets: TicketsSvc,
-  } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Franquicias: FranquiciasService;
+export default function Reasignar({ ticket }: { ticket: Ticket }) {
+  const {Usuarios: UsuariosSPServiceSvc, Logs: LogSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
+    Logs : LogService;
     Usuarios: UsuariosSPService;
-    Tickets: TicketsService;
   };
 
-  const {state, errors, submitting, loadingCatalogos, setField, handleSubmit,} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc });
+  const {state, errors, submitting, setField, handleReasignar} = useReasignarTicket({Usuarios: UsuariosSPServiceSvc, Logs: LogSvc }, ticket);
   const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
 
   // ====== Filtro genérico (insensible a acentos) para react-select
@@ -63,7 +56,7 @@ export default function Reasignar() {
     <div className="ticket-form">
       <h2 className="tf-title">Reasignar Ticket</h2>
 
-      <form onSubmit={handleSubmit} noValidate className="tf-grid">
+      <form onSubmit={handleReasignar} noValidate className="tf-grid">
 
         {/* Resolutor */}
         <div className="tf-field">
@@ -86,7 +79,7 @@ export default function Reasignar() {
 
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit" onClick={() => handleSubmit}>
+          <button disabled={submitting || loading} className="tf-submit" onClick={() => handleReasignar}>
             {submitting ? "Enviando..." : "Enviar solicitud"}
           </button>
         </div>

@@ -161,7 +161,7 @@ export default function DetalleTicket({
             </div>
             <div className="modal-body">
               {/* Pasamos role y onDone para cerrar al finalizar */}
-              <Reasignar></Reasignar>
+              <Reasignar ticket={ticket}></Reasignar>
             </div>
           </div>
         </div>
