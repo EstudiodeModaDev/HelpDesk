@@ -2,16 +2,14 @@ import * as React from "react";
 import "./CajerosPOS.css"; // importa el css que nos diste
 import { useCajerosPOS } from "../../Funcionalidades/CajerosPos";
 import type { TicketsService } from "../../Services/Tickets.service";
-import type { UsuariosSPService } from "../../Services/Usuarios.Service";
 import { useAuth } from "../../auth/authContext";
 import Select, { type SingleValue } from "react-select";
+import type { LogService } from "../../Services/Log.service";
 
-
-// Si los traes por contexto, puedes reemplazar estas props por useGraphServices()
 type Props = {
   services: {
     Tickets?: TicketsService;
-    Usuarios: UsuariosSPService;
+    Log: LogService
   };
 };
 
