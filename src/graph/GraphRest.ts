@@ -63,6 +63,15 @@ export class GraphRest {
     return txt as unknown as T;
   }
 
+  async getBlob(path: string) {
+      const token = await this.getToken(); // mismo token que ya te sirve
+      const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Graph ${res.status}`);
+    return await res.blob();
+  }
+
   // Helpers públicos
   get<T = any>(path: string, init?: RequestInit) {
     return this.call<T>('GET', path, undefined, init);

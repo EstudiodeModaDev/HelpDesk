@@ -199,33 +199,33 @@ export function useWorkers(options: Options = {}) {
 }
 
 export function useUserPhoto(userPrincipalName?: string) {
-  const { getToken } = useAuth(); // o el método que uses
+  const { getToken } = useAuth();
   const [url, setUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let abort = false;
     (async () => {
+      if (!userPrincipalName) return;
+
       try {
-        if (!userPrincipalName) return;
-        const token = await getToken(); 
-        const res = await fetch(
-          `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(userPrincipalName)}/photo/$value`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        const graph = new GraphRest(getToken);
+
+
+
+        const blob = await graph.getBlob(
+          `/users/${encodeURIComponent(userPrincipalName)}/photos/64x64/$value`
         );
-        if (!res.ok) {
-          // 404 si no tiene foto
-          return;
-        }
-        const blob = await res.blob();
+
         const reader = new FileReader();
         reader.onloadend = () => { if (!abort) setUrl(String(reader.result)); };
         reader.readAsDataURL(blob);
-      } catch {
-        // ignora o loggea
+      } catch (e: any) {
+        console.warn("[Graph photo]", e?.message ?? e);
       }
     })();
     return () => { abort = true; };
   }, [userPrincipalName, getToken]);
 
-  return url; // data URL o null
+  return url;
 }
+
