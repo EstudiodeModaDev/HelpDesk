@@ -116,8 +116,19 @@ export default function DetalleTicket({
         </div>
 
         <div className="campo">
-          <label>Observador</label>
-          <span>{ticket.observador || '–'}</span>
+          <label>Observador del caso</label>
+          {canRecategorizar ? (
+            <button
+              type="button"
+              className="as-text"   
+              onClick={() => setShowObservador(true)}
+              title="Asignar observador ticket"
+            >
+              {ticket.observador  || '–'}
+            </button>
+          ) : (
+            <span title="No tiene permisos para nombrar un observador">{ticket.observador || 'No hay observador asignado'}</span>
+          )}
         </div>
       </div>
 
