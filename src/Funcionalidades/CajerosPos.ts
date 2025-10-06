@@ -28,7 +28,7 @@ export function useCajerosPOS(services: Svc) {
   const flowCajerosPos = React.useMemo(
     () =>
       new FlowClient(
-        "https://<TU-ENV>/powerautomate/automations/direct/workflows/<id>/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=<sig>"
+        "https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9e646942a74f421db298f1e50639c71f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=vX4mq2EHHJKfpdpVcf9JsckTEmGjz8xN9-UrRE5AO5E"
       ),
     []
   );
