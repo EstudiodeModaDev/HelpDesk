@@ -61,7 +61,7 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
         {/* Resolutor */}
         <div className="tf-field">
           <label className="tf-label">Nuevo Resolutor</label>
-          <Select<UserOption, false>
+          <Select<UserOptionEx, false>
             options={UseruserOptions}
             placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
             value={state.resolutor}
