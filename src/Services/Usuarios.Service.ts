@@ -151,6 +151,7 @@ export class UsuariosSPService {
 
     try {
       const res = await this.graph.get<any>(url);
+      console.log(res)
       return (res.value ?? []).map((x: any) => this.toModel(x));
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
