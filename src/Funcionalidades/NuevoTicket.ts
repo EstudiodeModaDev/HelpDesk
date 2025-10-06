@@ -12,6 +12,7 @@ import { toGraphDateTime } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import { FlowClient } from "./FlowClient";
+import type { LogService } from "../Services/Log.service";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -19,13 +20,14 @@ type Svc = {
   Articulos: { getAll: (opts?: any) => Promise<any[]> };
   Tickets?: TicketsService;
   Usuarios: UsuariosSPService
+  Logs: LogService
 }; 
 
 // Helpers para tolerar nombres internos distintos
 export const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
 
 export function useNuevoTicketForm(services: Svc) {
-  const { Categorias, SubCategorias, Articulos, Tickets, Usuarios } = services;
+  const { Categorias, SubCategorias, Articulos, Tickets, Usuarios, Logs} = services;
 
   const [state, setState] = useState<FormState>({
     solicitante: null,
@@ -234,6 +236,16 @@ export function useNuevoTicketForm(services: Svc) {
         const fechaSolTexto = solucion ? new Date(solucion as unknown as string).toLocaleString() : "No aplica";
         const solicitanteEmail = state.solicitante?.email || state.solicitante?.value || "";
         const resolutorEmail = state.resolutor?.email || state.resolutor?.value || "";
+
+        //Crear Log
+        Logs.create({
+            Actor: "Sitema", 
+            Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${idTexto}`, 
+            CorreoActor: "", 
+            Tipo_de_accion: 
+            "Creacion", 
+            Title: idTexto
+          })
       
           // Notificar solicitante
         if (solicitanteEmail) {

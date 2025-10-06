@@ -11,6 +11,7 @@ import { useUsuarios } from "../../Funcionalidades/Usuarios";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
+import type { LogService } from "../../Services/Log.service";
 
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
@@ -26,10 +27,12 @@ export default function NuevoTicketForm() {
     Franquicias: FranquiciasSvc,
     Usuarios: UsuariosSPServiceSvc,
     Tickets: TicketsSvc,
+    Logs: LogsSvc
   } = useGraphServices() as ReturnType<typeof useGraphServices> & {
     Franquicias: FranquiciasService;
     Usuarios: UsuariosSPService;
     Tickets: TicketsService;
+    Logs: LogService
   };
 
   const {
@@ -42,7 +45,7 @@ export default function NuevoTicketForm() {
     loadingCatalogos,
     setField,
     handleSubmit,
-  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc });
+  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
 
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
