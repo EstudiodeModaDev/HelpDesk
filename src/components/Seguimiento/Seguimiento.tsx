@@ -3,6 +3,7 @@ import "./Seguimiento.css";
 import HtmlContent from "../Renderizador/Renderizador";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
+import { useUserPhoto } from "../../Funcionalidades/Workers";
 
 type Tab = "seguimiento" | "solucion";
 
@@ -16,13 +17,6 @@ type Props = {
   className?: string;
 };
 
-const tipoToClass = (tipo?: string) => {
-  const t = (tipo ?? "").toLowerCase();
-  if (t.includes("solución") || t.includes("solucion")) return "solucion";
-  if (t.includes("creacion") || t.includes("creacion")) return "creacion";
-  return "default";
-};
-
 export default function TicketHistorial({
   role,
   ticketId,
@@ -31,7 +25,7 @@ export default function TicketHistorial({
   className,
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
-  const isPrivileged = role === "Administrador" || role === "Tecnico"; 
+  const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
 
   const { Logs } = useGraphServices();
 
@@ -42,7 +36,8 @@ export default function TicketHistorial({
   React.useEffect(() => {
     let cancel = false;
     const load = async () => {
-      setLoading(true); setError(null);
+      setLoading(true);
+      setError(null);
       try {
         const items = await Logs.getAll({
           filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`,
@@ -61,18 +56,18 @@ export default function TicketHistorial({
       }
     };
     load();
-    return () => { cancel = true; };
+    return () => {
+      cancel = true;
+    };
   }, [ticketId, Logs]);
 
   return (
     <div className={className ?? ""} style={{ padding: 16 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>
-          Agregar :
-        </span>
+        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Agregar :</span>
 
-        {/* 👇 Tabs SOLO para admins */}
+        {/* Tabs SOLO para admins/técnicos */}
         {isPrivileged && (
           <div style={{ display: "flex", gap: 8 }}>
             <button
@@ -94,7 +89,10 @@ export default function TicketHistorial({
 
         <div style={{ marginLeft: "auto" }}>
           <button type="button" className="th-back" onClick={onVolver}>
-            <span className="th-back-icon" aria-hidden>←</span> Volver
+            <span className="th-back-icon" aria-hidden>
+              ←
+            </span>{" "}
+            Volver
           </button>
         </div>
       </div>
@@ -110,25 +108,41 @@ export default function TicketHistorial({
         )}
 
         {mensajes.map((m) => (
-          <div key={m.Id} className="th-row">
-            <div className="th-left">
-              <div className="th-avatar">
-                <div className="th-avatar-fallback" aria-hidden>👤</div>
-              </div>
-              <div className="th-meta">
-                <div className="th-nombre">{m.Actor}</div>
-                <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>
-              </div>
-            </div>
-
-            <div className="th-right">
-            <div className={`th-bubble th-${tipoToClass(m.Tipo_de_accion)}`} aria-label={`Mensaje tipo ${m.Tipo_de_accion ?? "general"}`}>
-                {m.Title && <HtmlContent className="th-title" html={m.Title} />}
-                <HtmlContent className="th-text" html={m.Descripcion} />
-              </div>
-            </div>
-          </div>
+          <HistRow key={m.Id} m={m} />
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Subcomponente: una fila del historial (usa la foto por Graph) ---------- */
+
+function HistRow({ m }: { m: Log }) {
+  // Usa el correo del actor si lo tienes; si no, puedes intentar con m.Actor (no ideal)
+  const upn = m.CorreoActor || undefined;
+  const photoUrl = useUserPhoto(upn); // <- Opción A (tu hook)
+
+  return (
+    <div className="th-row">
+      <div className="th-left th-left--stack">
+        <div className="th-avatar">
+          {photoUrl ? (
+            <img src={photoUrl} alt={m.Actor ?? "Usuario"} className="th-avatar-img" />
+          ) : (
+            <div className="th-avatar-fallback" aria-hidden>
+              👤
+            </div>
+          )}
+        </div>
+        <div className="th-nombre">{m.Actor}</div>
+        <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>
+      </div>
+
+      <div className="th-right">
+        <div className={`th-bubble th-${tipoToClass(m.Tipo_de_accion)}`}>
+          {m.Title && <HtmlContent className="th-title" html={m.Title} />}
+          <HtmlContent className="th-text" html={m.Descripcion} />
+        </div>
       </div>
     </div>
   );
@@ -144,7 +158,7 @@ function mapItemsToMensajes(items: any[]): Log[] {
     Title: it.Title ?? undefined,
     Descripcion: it.Descripcion ?? "",
     Tipo_de_accion: it.Tipo_de_accion,
-    CorreoActor: it.CorreoActor
+    CorreoActor: it.CorreoActor,
   }));
 }
 
@@ -164,5 +178,17 @@ function formatDateTime(iso: string) {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(
+    d.getMinutes()
+  )}`;
+}
+
+function tipoToClass(tipo?: string) {
+  const t = (tipo ?? "").toLowerCase();
+  if (t.includes("solución") || t.includes("solucion")) return "solucion";
+  if (t.includes("seguimiento")) return "seguimiento";
+  if (t.includes("reasign")) return "reasignacion";
+  if (t.includes("cierre") || t.includes("cerrado")) return "cierre";
+  if (t.includes("sistema")) return "sistema";
+  return "default";
 }
