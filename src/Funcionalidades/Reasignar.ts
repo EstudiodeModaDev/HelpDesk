@@ -11,12 +11,14 @@ import type { Log } from "../Models/Log";
 type Svc = {
   Tickets?: TicketsService;
   Usuarios: UsuariosSPService;
-  Logs: LogService
+  Logs: LogService;
 };
 
 export class RecategorizarService {
   private flowUrl: string =
-    "https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d17c9915a48f4b0d8e8a1fa90f007ba8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5uBiLoVQS7tiJ0i5xL13qMlBmzDSoee9kmAqcHTPIh0";
+    (import.meta as any).env?.VITE_FLOW_REASIGNAR_URL ??
+    "<<<MOVER_A_ENV_Y_REEMPLAZAR>>>"; // evita hardcodear el sig=
+
   constructor(flowUrl?: string) {
     if (flowUrl) this.flowUrl = flowUrl;
   }
@@ -47,7 +49,7 @@ const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
 export function useReasignarTicket(services: Svc, ticket: Ticket) {
   const { Usuarios, Logs } = services;
 
-  const [state, setState] = useState<FormReasignarState>({ resolutor: null, Nota: " " });
+  const [state, setState] = useState<FormReasignarState>({ resolutor: null, Nota: "" });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -64,7 +66,7 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
   const flowServiceRef = useRef<RecategorizarService | null>(null);
   if (!flowServiceRef.current) flowServiceRef.current = new RecategorizarService();
 
-  const handleReasignar = async (e: React.FormEvent) => {
+  const handleReasignar = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
 
@@ -74,7 +76,7 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
       const solicitanteMail = ticket?.CorreoResolutor;
 
       if (!candidatoMail) throw new Error("No se proporcionó correo del candidato (resolutor).");
-      if (!solicitanteMail) throw new Error("No se encontró correo del solicitante/resolutor previo en el ticket.");
+      if (!solicitanteMail) throw new Error("No se encontró correo del resolutor previo en el ticket.");
 
       // Filtros OData
       const filterCandidato: GetAllOpts = {
@@ -104,33 +106,27 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
         Nota: state.Nota ?? "",
       };
 
-      const payloadLog: Log = {
-        Title: ticket.Title ?? "",
-        Actor: solicitante.Title,
-        CorreoActor: solicitante.CorreoSolicitante,
-        Descripcion: `${solicitante.Title} ha solicitando el caso con ID ${ticket.ID} a ${candidato.Title}`,
-        Tipo_de_accion: "Reasignación de caso"
-      }
-
-      try {
-          const created = await Logs.create(payloadLog);
-
-          if (!created) {
-            throw new Error("Respuesta inesperada del servicio de Logs.");
-          }
-          console.log("[Logs] creado:", created);
-          return created;
-        } catch (err) {
-          console.error("[Logs.create] error:", err, { payloadLog });
-          const msg = err instanceof Error ? err.message : String(err);
-          throw new Error(`No se pudo registrar el log: ${msg}`);
-        }
-      
-
+      // 1) Enviar la reasignación por Flow
       const resp = await flowServiceRef.current!.sendTeamsToUserViaFlow(payloadFlow);
       console.log("[Flow] Reasignación enviada:", resp);
 
-      setState({ resolutor: null, Nota: " " });
+      // 2) Registrar Log (si falla, que no bloquee la UI)
+      const payloadLog: Log = {
+        Title: ticket.Title ?? "",
+        Actor: solicitante.Title,
+        CorreoActor: solicitante.Correo ?? solicitanteMail, // <- usa 'Correo'
+        Descripcion: `${solicitante.Title} ha reasignado el caso ID ${ticket.ID} a ${candidato.Title}`,
+        Tipo_de_accion: "Reasignación de caso",
+      };
+      try {
+        const created = await Logs.create(payloadLog);
+        if (!created) console.warn("[Logs.create] respuesta vacía/inesperada", { payloadLog });
+      } catch (logErr) {
+        console.error("[Logs.create] error:", logErr, { payloadLog });
+        // opcional: setErrors(prev => ({...prev, general: "Reasignación hecha, pero no se pudo registrar el log."}));
+      }
+
+      setState({ resolutor: null, Nota: "" });
       setErrors({});
     } catch (err) {
       console.error("Error en reasignación:", err);
@@ -140,11 +136,5 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
     }
   };
 
-  return {
-    state,
-    setField,
-    errors,
-    submitting,
-    handleReasignar,
-  };
+  return { state, setField, errors, submitting, handleReasignar };
 }
