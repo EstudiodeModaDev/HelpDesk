@@ -98,8 +98,8 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
       const candidato = candidatos?.[0];
       const solicitante = solicitantes?.[0];
 
-      if (!candidato?.ID) throw new Error(`No se encontró candidato con correo ${candidatoMail}`);
-      if (!solicitante?.ID) throw new Error(`No se encontró solicitante con correo ${solicitanteMail}`);
+      if (!candidato?.Id) throw new Error(`No se encontró candidato con correo ${candidatoMail}`);
+      if (!solicitante?.Id) throw new Error(`No se encontró solicitante con correo ${solicitanteMail}`);
 
       const payloadFlow: Reasignar = {
         IDCandidato: Number(candidato.ID),
