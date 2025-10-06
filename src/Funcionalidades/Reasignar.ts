@@ -90,9 +90,9 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
 
       // 2) Registrar Log (si falla, que no bloquee la UI)
       const payloadLog: Log = {
-        Title: ticket.Title ?? "",
+        Title: ticket.ID ?? "",
         Actor: solicitante.Title,
-        CorreoActor: solicitante.Correo ?? solicitanteMail, // <- usa 'Correo'
+        CorreoActor: solicitante.Correo ?? solicitanteMail,
         Descripcion: `${solicitante.Title} ha reasignado el caso ID ${ticket.ID} a ${candidato.Title}`,
         Tipo_de_accion: "Reasignación de caso",
       };
