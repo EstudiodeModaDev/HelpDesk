@@ -28,3 +28,10 @@ export type FlowToSP = {
   Compañia: string;
   CO: string
 };
+
+export type FlowToReasign = {
+  IDCandidato: number;            
+  Nota: string;
+  IDCaso: number;
+  IDSolicitante: number;
+};

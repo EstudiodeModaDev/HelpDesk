@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import type { FormErrors } from "../Models/nuevoTicket";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { FormReasignarState, Ticket } from "../Models/Tickets";
@@ -7,42 +7,14 @@ import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import type { GetAllOpts, Reasignar } from "../Models/Commons";
 import type { LogService } from "../Services/Log.service";
 import type { Log } from "../Models/Log";
+import { FlowClient } from "./FlowClient";
+import type { FlowToReasign } from "../Models/FlujosPA";
 
 type Svc = {
   Tickets?: TicketsService;
   Usuarios: UsuariosSPService;
   Logs: LogService;
 };
-
-export class RecategorizarService {
-  private flowUrl: string =
-    (import.meta as any).env?.VITE_FLOW_REASIGNAR_URL ??
-    "<<<MOVER_A_ENV_Y_REEMPLAZAR>>>"; // evita hardcodear el sig=
-
-  constructor(flowUrl?: string) {
-    if (flowUrl) this.flowUrl = flowUrl;
-  }
-
-  async sendTeamsToUserViaFlow(input: Reasignar): Promise<any> {
-    return this.postToFlow({
-      IDCandidato: input.IDCandidato,
-      Nota: input.Nota ?? "",
-      IDCaso: input.IDCaso ?? "",
-      IDSolicitante: input.IDSolicitante,
-    });
-  }
-
-  private async postToFlow(payload: any): Promise<any> {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const res = await fetch(this.flowUrl, { method: "POST", headers, body: JSON.stringify(payload) });
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`Flow call failed: ${res.status} ${txt}`);
-    }
-    const ct = res.headers.get("content-type") || "";
-    return ct.includes("application/json") ? res.json().catch(() => ({})) : {};
-  }
-}
 
 const escapeOData = (s: string) => String(s ?? "").replace(/'/g, "''");
 
@@ -63,8 +35,7 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
     return Object.keys(e).length === 0;
   };
 
-  const flowServiceRef = useRef<RecategorizarService | null>(null);
-  if (!flowServiceRef.current) flowServiceRef.current = new RecategorizarService();
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d17c9915a48f4b0d8e8a1fa90f007ba8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5uBiLoVQS7tiJ0i5xL13qMlBmzDSoee9kmAqcHTPIh0")
 
   const handleReasignar = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -102,14 +73,19 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
       if (!solicitante?.Id) throw new Error(`No se encontró solicitante con correo ${solicitanteMail}`);
 
       const payloadFlow: Reasignar = {
-        IDCandidato: Number(candidato.ID),
-        IDSolicitante: Number(solicitante.ID),
+        IDCandidato: Number(candidato.Id),
+        IDSolicitante: Number(solicitante.Id),
         IDCaso: Number(ticket.ID),
         Nota: state.Nota ?? "",
       };
 
       // 1) Enviar la reasignación por Flow
-      const resp = await flowServiceRef.current!.sendTeamsToUserViaFlow(payloadFlow);
+      const resp =  await notifyFlow.invoke<FlowToReasign, any>({
+                    IDCandidato: payloadFlow.IDCandidato,
+                    IDCaso: payloadFlow.IDCaso,
+                    IDSolicitante: payloadFlow.IDSolicitante,
+                    Nota: payloadFlow.Nota, 
+                  });
       console.log("[Flow] Reasignación enviada:", resp);
 
       // 2) Registrar Log (si falla, que no bloquee la UI)
