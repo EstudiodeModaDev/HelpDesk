@@ -16,6 +16,13 @@ type Props = {
   className?: string;
 };
 
+const tipoToClass = (tipo?: string) => {
+  const t = (tipo ?? "").toLowerCase();
+  if (t.includes("solución") || t.includes("solucion")) return "solucion";
+  if (t.includes("creacion") || t.includes("creacion")) return "creacion";
+  return "default";
+};
+
 export default function TicketHistorial({
   role,
   ticketId,
@@ -115,7 +122,7 @@ export default function TicketHistorial({
             </div>
 
             <div className="th-right">
-              <div className="th-bubble">
+            <div className={`th-bubble th-${tipoToClass(m.Tipo_de_accion)}`} aria-label={`Mensaje tipo ${m.Tipo_de_accion ?? "general"}`}>
                 {m.Title && <HtmlContent className="th-title" html={m.Title} />}
                 <HtmlContent className="th-text" html={m.Descripcion} />
               </div>

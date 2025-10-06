@@ -43,7 +43,7 @@ export function useAsignarObservador(services: Svc, ticket: Ticket) {
         Title: ticket.ID ?? "",
         Actor: ticket.Nombreresolutor ?? "",
         CorreoActor: ticket.CorreoResolutor ?? "",
-        Descripcion: `${ticket.CorreoResolutor} ha asignado como observador del ticket con ID #${ticket.ID} a ${state.observador}`,
+        Descripcion: `${ticket.Nombreresolutor} ha asignado como observador del ticket con ID #${ticket.ID} a ${state.observador?.label}`,
         Tipo_de_accion: "Asignacion observador",
       };
       try {

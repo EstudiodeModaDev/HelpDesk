@@ -98,3 +98,25 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+.th-bubble{
+  background: #c2c3c4;            /* slate-50 */
+  border: 1px solid #c2c3c4;      /* slate-200 */
+  border-left: 4px solid #c2c3c4; /* slate-300 */
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* tipos */
+.th-bubble.th-creacion{
+  background: #bbf7d0;            /* sky-50 */
+  border-color: #bbf7d0;
+  border-left-color: #bbf7d0;     /* sky-400 */
+}
+
+.th-bubble.th-solucion{
+  background: #38bdf8;            /* green-50 */
+  border-color: #38bdf8;
+  border-left-color: #38bdf8;     /* emerald-400 */
+}
+
