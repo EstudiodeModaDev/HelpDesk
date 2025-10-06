@@ -98,10 +98,10 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
       };
       try {
         const created = await Logs.create(payloadLog);
+        console.log(created)
         if (!created) console.warn("[Logs.create] respuesta vacía/inesperada", { payloadLog });
       } catch (logErr) {
         console.error("[Logs.create] error:", logErr, { payloadLog });
-        // opcional: setErrors(prev => ({...prev, general: "Reasignación hecha, pero no se pudo registrar el log."}));
       }
 
       setState({ resolutor: null, Nota: "" });
