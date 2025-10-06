@@ -9,7 +9,7 @@ import type { LogService } from "../../Services/Log.service";
 type Props = {
   services: {
     Tickets?: TicketsService;
-    Log: LogService
+    Logs: LogService
   };
 };
 

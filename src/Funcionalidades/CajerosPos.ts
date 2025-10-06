@@ -10,7 +10,7 @@ import type { LogService } from "../Services/Log.service";
 
 type Svc = {
   Tickets?: TicketsService;
-  Log: LogService
+  Logs: LogService
 };
 
 // Helpers
@@ -18,7 +18,7 @@ export const first = (...vals: any[]) =>
   vals.find((v) => v !== undefined && v !== null && v !== "");
 
 export function useCajerosPOS(services: Svc) {
-  const { Tickets, Log } = services;
+  const { Tickets, Logs } = services;
 
   const [state, setState] = useState<FormStateCajeros>({Cedula: "", CO: "", Compañia: "", CorreoTercero: "", resolutor: null, solicitante: null, usuario: "",});
   const [errors, setErrors] = useState<FormErrors>({});
@@ -87,7 +87,7 @@ export function useCajerosPOS(services: Svc) {
           Title: createdId
         }
         
-        const createdLog = Log.create(payloadLog)
+        const createdLog = Logs.create(payloadLog)
         console.log(createdLog)
       }
 

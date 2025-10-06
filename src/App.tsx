@@ -17,6 +17,7 @@ import CajerosPOSForm from './components/CajerosPOS/CajerosPOS';
 
 import type { TicketsService } from './Services/Tickets.service';
 import type { UsuariosSPService } from './Services/Usuarios.Service';
+import type { LogService } from './Services/Log.service';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -198,9 +199,10 @@ function LoggedApp({
   const [selected, setSelected] = React.useState<string>(navs[0].key);
 
   // 🔌 Trae servicios Graph aquí (ya estamos dentro de GraphServicesProvider)
-  const { Tickets, Usuarios } = useGraphServices() as {
+  const { Tickets, Usuarios, Logs } = useGraphServices() as {
     Tickets: TicketsService;
     Usuarios: UsuariosSPService;
+    Logs: LogService
   };
 
   // Si cambia el rol y el tab actual ya no existe, cae al primero del menú del rol
@@ -234,7 +236,7 @@ function LoggedApp({
 
         {/* ✅ Cajeros POS: pasa servicios reales desde el context */}
         {allow('cajpos') && selected === 'cajpos' && Usuarios && (
-          <CajerosPOSForm services={{ Tickets, Usuarios }} />
+          <CajerosPOSForm services={{ Tickets, Logs }} />
         )}
 
         {/* Fallback por si aún no cargan los servicios */}
