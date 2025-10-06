@@ -86,7 +86,7 @@ export default function Reasignar() {
 
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
+          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit" onClick={() => handleSubmit}>
             {submitting ? "Enviando..." : "Enviar solicitud"}
           </button>
         </div>
