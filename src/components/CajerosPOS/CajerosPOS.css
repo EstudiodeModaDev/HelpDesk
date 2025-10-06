@@ -1,29 +1,29 @@
-/* ===============================
-   DetalleTicket.css
-   =============================== */
-
-:root{
-  --fg:#0b2b6a;           /* título/valores */
-  --muted:#6b7280;        /* labels */
-  --border:#e5e7eb;
-  --surface:#ffffff;
-  --surface-2:#f9fafb;
-  --accent:#62d4bf;       /* verde botón */
-  --accent-600:#48b7a3;
-  --ghost:#f1f5f9;
-
-  --radius:14px;
-  --shadow:0 10px 24px rgba(0,0,0,.06);
-}
+/* Reseteo para evitar desbordes por padding/border */
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
 /* Contenedor principal */
 .detalle-ticket{
+  --fg:#0b2b6a;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --surface:#ffffff;
+  --ghost:#f1f5f9;
+  --accent:#62d4bf;
+  --accent-600:#48b7a3;
+
+  color: var(--fg);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
   padding: 18px 20px 22px;
-  color: var(--fg);
+
+  /* Evita que el contenido ensanche el card */
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* Título */
@@ -34,197 +34,89 @@
   letter-spacing: .2px;
 }
 
-/* Fila a 2 columnas */
+/* Grid fluido: 2 cols en desktop, 1 en móvil */
 .fila{
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px 36px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
 }
 .fila:last-of-type{ border-bottom: 0; }
 
-/* Campo */
-.campo{
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* En pantallas angostas: 1 columna */
+@media (max-width: 820px){
+  .fila{ grid-template-columns: 1fr; }
 }
 
-/* Label */
+/* Campo/label */
+.campo{ min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .campo > label{
-  font-size: .78rem;
-  color: var(--muted);
-  font-weight: 700;
-  letter-spacing: .3px;
+  font-size: .78rem; color: var(--muted); font-weight: 700; letter-spacing: .3px;
 }
 
-/* Inputs / Textareas */
+/* Inputs y selects a 100% */
 .campo input,
-.campo select,
 .campo textarea{
-  appearance: none;
   width: 100%;
+  min-width: 0;
   border: 1px solid var(--border);
-  background: #fff;
-  color: #0f172a;
   border-radius: 10px;
   padding: 10px 12px;
-  font-size: .95rem;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-}
-
-.campo textarea{
-  resize: vertical;
-  min-height: 96px;
-}
-
-.campo input::placeholder,
-.campo textarea::placeholder{
-  color: #94a3b8; /* slate-400 */
-}
-
-/* Focus */
-.campo input:focus,
-.campo select:focus,
-.campo textarea:focus{
-  outline: none;
-  border-color: #93c5fd;        /* sky-300 */
-  box-shadow: 0 0 0 4px rgba(14, 165, 233, .15); /* sky-500/15 */
-}
-
-/* Valor renderizado (si colocas spans de lectura) */
-.campo > span{
-  font-size: 1rem;
+  font: inherit;
   color: #0f172a;
-  line-height: 1.45;
-  word-break: break-word;
+  background: #fff;
+  outline: none;
+}
+.campo input:focus,
+.campo textarea:focus{
+  border-color: #94a3b8;               /* slate-300 */
+  box-shadow: 0 0 0 3px rgba(148,163,184,.25);
 }
 
-/* Medios incrustados en descripción */
-.campo > span img,
-.campo > span video{
-  display: block;
-  max-width: 100%;
-  height: auto;
+/* react-select: usa classNamePrefix="rs" */
+.rs__control{
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+}
+.rs__control--is-focused{
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 0 3px rgba(148,163,184,.25) !important;
+}
+.rs__value-container{ padding: 6px 10px !important; }
+.rs__placeholder{ color: #9ca3af !important; }         /* slate-400 */
+.rs__menu{
+  z-index: 50;                       /* por si hay modales */
+  overflow: hidden;
   border-radius: 10px;
-  margin-top: 10px;
-  background: #000;
+  border: 1px solid var(--border);
 }
+.rs__option{ cursor: pointer; }
+.rs__option--is-focused{ background: #f1f5f9 !important; } /* slate-100 */
+.rs__option--is-selected{ background: #e2e8f0 !important; }/* slate-200 */
 
-/* Mensajes de error */
-.campo small{
-  color: #b91c1c; /* red-700 */
-  font-weight: 600;
-}
-
-/* Botón primario (aprovecha .btn-volver de tu estilo) */
+/* Botón submit (tu estilo verde) */
 .btn-volver{
   appearance: none;
   border: none;
-  background: var(--ghost);
-  color: #0f172a;
+  background: var(--accent);
+  color: #083b35;
   padding: 10px 16px;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 700;
-  margin-top: 6px;
+  font-weight: 600;
   transition: transform .06s ease, box-shadow .2s ease, background .2s;
 }
 .btn-volver:hover{
+  background: var(--accent-600);
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(2,6,23,.08);
+  box-shadow: 0 8px 18px rgba(72,183,163,.25);
 }
 .btn-volver:active{ transform: translateY(0); }
 
-/* Botón dentro del contenedor como primario verde */
-.detalle-ticket > form > div:last-of-type > .btn-volver,
-.detalle-ticket > div > .btn-volver{
-  background: var(--accent);
-  color: #083b35;
-}
-.detalle-ticket > form > div:last-of-type > .btn-volver:hover,
-.detalle-ticket > div > .btn-volver:hover{
-  background: var(--accent-600);
-  box-shadow: 0 8px 18px rgba(72,183,163,.25);
-}
-
-/* Link-like (si lo usas) */
-.link-like {
-  background: none;
-  border: none;
-  padding: 0;
-  color: #0ea5e9;      /* sky-500 */
-  cursor: pointer;
-  text-decoration: underline;
-  font: inherit;
-}
-.link-like:hover { color: #0284c7; }    /* sky-600 */
-
-/* Modal (por si reutilizas el patrón) */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  display: grid;
-  place-items: center;
-  z-index: 9999;
-}
-.modal-card {
-  width: min(880px, 92vw);
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.18);
-  overflow: hidden;
-}
-.modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid #e5e7eb;
-}
-.modal-head h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
-}
-.modal-close {
-  background: transparent;
-  border: 1px solid transparent;
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.modal-close:hover {
-  background: #f1f5f9;
-  border-color: #e5e7eb;
-}
-.modal-body {
-  padding: 16px;
-  max-height: 75vh;
-  overflow: auto;
-}
-
-/* Responsive */
-@media (max-width: 960px){
-  .fila{
-    grid-template-columns: 1fr 1fr;
-    gap: 18px 22px;
-  }
-}
-@media (max-width: 680px){
-  .fila{
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  .detalle-ticket{
-    padding: 14px;
-  }
-  .detalle-ticket h2{
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-}
+/* Mensajes de error */
+.campo small{ display: block; margin-top: 4px; }

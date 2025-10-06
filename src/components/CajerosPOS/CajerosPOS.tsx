@@ -108,6 +108,11 @@ export default function CajerosPOSForm({ services }: Props) {
                 setField("Compañia", opt?.value ?? "")
               }
               isClearable
+              styles={{
+                container: (base) => ({ ...base, width: "100%" }),
+                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              }}
+              menuPortalTarget={typeof document !== "undefined" ? document.body : null}
             />
             {(errors as any).Compañia && (
               <small style={{ color: "#b91c1c" }}>
