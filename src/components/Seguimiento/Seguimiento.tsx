@@ -123,13 +123,6 @@ export default function TicketHistorial({
           </div>
         ))}
       </div>
-
-      {/* Footer: lo dejo como está (visible para todos) */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
-        <button className="th-history-link" type="button" onClick={() => setTab("seguimiento")}>
-          Historial completo
-        </button>
-      </div>
     </div>
   );
 }
