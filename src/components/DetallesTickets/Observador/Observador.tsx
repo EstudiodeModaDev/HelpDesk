@@ -25,7 +25,7 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
     Logs: LogService
     Tickets: TicketsService
   };
-  const {state,errors, submitting, setField, handleReasignar,} = useAsignarObservador({Logs: LogsSvc, Tickets: TicketSvc}, ticket);
+  const {state,errors, submitting, setField, handleObservador,} = useAsignarObservador({Logs: LogsSvc, Tickets: TicketSvc}, ticket);
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, domainFilter: "estudiodemoda.com.co",});
 
@@ -72,7 +72,7 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
     <div className="ticket-form">
       <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={handleReasignar} noValidate className="tf-grid">
+      <form onSubmit={handleObservador} noValidate className="tf-grid">
         {/* Solicitante */}
         <div className="tf-field">
           <label className="tf-label">Solicitante</label>
@@ -95,7 +95,7 @@ export default function AsignarObservador({ticket}: {ticket: Ticket}) {
         {/* Submit */}
         <div className="tf-actions tf-col-2">
           <button type="submit" disabled={submitting } className="tf-submit">
-            {submitting ? "Enviando..." : "Enviar Ticket"}
+            {submitting ? "Asignando..." : "Asignar observador"}
           </button>
         </div>
       </form>

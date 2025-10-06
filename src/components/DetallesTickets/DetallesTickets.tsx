@@ -124,10 +124,10 @@ export default function DetalleTicket({
               onClick={() => setShowObservador(true)}
               title="Asignar observador ticket"
             >
-              {ticket.observador  || '–'}
+              {ticket.Observador  || '–'}
             </button>
           ) : (
-            <span title="No tiene permisos para nombrar un observador">{ticket.observador || 'No hay observador asignado'}</span>
+            <span title="No tiene permisos para nombrar un observador">{ticket.Observador || 'No hay observador asignado'}</span>
           )}
         </div>
       </div>

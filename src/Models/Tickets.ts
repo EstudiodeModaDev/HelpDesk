@@ -9,7 +9,7 @@ export type Ticket = {
   FechaApertura?: string; // "dd/mm/yyyy hh:mm"
   TiempoSolucion?: string;   // "dd/mm/yyyy hh:mm"
   Estadodesolicitud?: string;
-  observador?: string;
+  Observador?: string;
   Descripcion?: string;
   Categoria?: string;
   SubCategoria?: string;

@@ -28,14 +28,14 @@ export function useAsignarObservador(services: Svc, ticket: Ticket) {
     return Object.keys(e).length === 0;
   };
 
-  const handleReasignar = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleObservador = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) return;
 
     setSubmitting(true);
     try {
       // 1) Asignar observador
-      const res =  await Tickets.update(ticket.ID ?? "", {observador: state.observador?.label, CorreoObservador: state.observador?.email})
+      const res =  await Tickets.update(ticket.ID ?? "", {Observador: state.observador?.label, CorreoObservador: state.observador?.email})
       console.log("[Flow] Observador asignado:", res);
 
       // 2) Registrar Log (si falla, que no bloquee la UI)
@@ -64,5 +64,5 @@ export function useAsignarObservador(services: Svc, ticket: Ticket) {
     }
   };
 
-  return { state, setField, errors, submitting, handleReasignar };
+  return { state, setField, errors, submitting, handleObservador };
 }

@@ -102,7 +102,7 @@ export class TicketsService {
       CorreoSolicitante: f.CorreoSolicitante ?? '',
 
       // Observador
-      observador: f.Observador ?? '',
+      Observador: f.Observador ?? '',
       CorreoObservador: f.CorreoObservador ?? '',
     };
   }
