@@ -80,11 +80,11 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
 
       // Filtros OData
       const filterCandidato: GetAllOpts = {
-        filter: `Correo eq '${escapeOData(candidatoMail)}'`,
+        filter: `fields/Correo eq '${escapeOData(candidatoMail)}'`,
         top: 1,
       };
       const filterSolicitante: GetAllOpts = {
-        filter: `Correo eq '${escapeOData(solicitanteMail)}'`,
+        filter: `fields/Correo eq '${escapeOData(solicitanteMail)}'`,
         top: 1,
       };
 
