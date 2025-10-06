@@ -6,6 +6,7 @@ import HtmlContent from '../Renderizador/Renderizador';
 import { toISODateTimeFlex } from '../../utils/Date';
 import Recategorizar from './ModalRecategorizar/Recategorizar';
 import Reasignar from './Reasignar/Reasignar';
+import AsignarObservador from './Observador/Observador';
 
 // Helper: ¿tiene permiso para recategorizar?
 const hasRecatRole = (r?: string) => {
@@ -27,6 +28,7 @@ export default function DetalleTicket({
   const [showSeg, setShowSeg] = React.useState(false);
   const [showRecat, setShowRecat] = React.useState(false);
   const [showReasig, setshowReasig] = React.useState(false);
+  const [showObservador, setShowObservador] = React.useState(false);
 
   const categoria = [ticket.Categoria, ticket.SubCategoria, ticket.SubSubCategoria]
     .filter(Boolean)
@@ -37,7 +39,7 @@ export default function DetalleTicket({
   return (
     <div className="detalle-ticket">
       <button className="btn-volver" onClick={onVolver}>← Volver</button>
-      <h2>Asunto ticket #{ticket.ID}</h2>
+      <h2>Detalles Ticket #{ticket.ID}</h2>
 
       <div className="fila">
         <div className="campo">
@@ -50,6 +52,7 @@ export default function DetalleTicket({
           {canRecategorizar ? (
             <button
               type="button"
+              className="as-text"   
               onClick={() => setShowRecat(true)}
               title="Recategorizar ticket"
             >
@@ -64,11 +67,11 @@ export default function DetalleTicket({
       <div className="fila">
         <div className="campo">
           <label>Fecha de Apertura</label>
-          <span>{toISODateTimeFlex(ticket.FechaApertura) || '–'}</span>
+          <span>{toISODateTimeFlex(ticket.FechaApertura)|| '–'}</span>
         </div>
         <div className="campo">
           <label>Fecha máxima de solución</label>
-          <span>{toISODateTimeFlex(ticket.TiempoSolucion) || '–'}</span>
+          <span>{`${toISODateTimeFlex(ticket.TiempoSolucion)} (${ticket.ANS})` || 'No hay fecha de solución establecida'}</span>
         </div>
       </div>
 
@@ -78,6 +81,7 @@ export default function DetalleTicket({
           {canRecategorizar ? (
             <button
               type="button"
+              className="as-text"   
               onClick={() => setshowReasig(true)}
               title="Recategorizar ticket"
             >
@@ -95,8 +99,8 @@ export default function DetalleTicket({
 
       <div className="fila">
         <div className="campo">
-          <label>Descripción del caso</label>
-          <span><HtmlContent html={ticket.Descripcion} /></span>
+          <label>Estado del caso</label>
+          <span>{ticket.Estadodesolicitud || '–'}</span>
         </div>
 
         <div className="campo">
@@ -107,8 +111,13 @@ export default function DetalleTicket({
 
       <div className="fila">
         <div className="campo">
-          <label>Estado del caso</label>
-          <span>{ticket.Estadodesolicitud || '–'}</span>
+          <label>Descripción del caso</label>
+          <span><HtmlContent html={ticket.Descripcion} /></span>
+        </div>
+
+        <div className="campo">
+          <label>Observador</label>
+          <span>{ticket.observador || '–'}</span>
         </div>
       </div>
 
@@ -160,8 +169,22 @@ export default function DetalleTicket({
               <button className="modal-close" onClick={() => setshowReasig(false)} aria-label="Cerrar">✕</button>
             </div>
             <div className="modal-body">
-              {/* Pasamos role y onDone para cerrar al finalizar */}
               <Reasignar ticket={ticket}></Reasignar>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==== Modal de observador ==== */}
+      {showObservador && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
+          <div className="modal-card">
+            <div className="modal-head">
+              <h3>Asignar observador a ticket #{ticket.ID}</h3>
+              <button className="modal-close" onClick={() => setShowObservador(false)} aria-label="Cerrar">✕</button>
+            </div>
+            <div className="modal-body">
+              <AsignarObservador ticket={ticket}/>
             </div>
           </div>
         </div>

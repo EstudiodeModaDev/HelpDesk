@@ -33,6 +33,10 @@ export type FormReasignarState = {
     Nota: string
 }
 
+export type FormObservadorState = {
+    observador: UserOption | null;
+}
+
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
 export type SortField = 'ID' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';
