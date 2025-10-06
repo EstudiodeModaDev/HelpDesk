@@ -3,13 +3,14 @@ import { useState } from "react";
 import type { FormErrors } from "../Models/nuevoTicket";
 import type { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
-import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import type { FlowToSP, FormErrorsCajeros, FormStateCajeros } from "../Models/FlujosPA";
 import { FlowClient } from "./FlowClient";
+import type { Log } from "../Models/Log";
+import type { LogService } from "../Services/Log.service";
 
 type Svc = {
   Tickets?: TicketsService;
-  Usuarios: UsuariosSPService;
+  Log: LogService
 };
 
 // Helpers
@@ -17,18 +18,9 @@ export const first = (...vals: any[]) =>
   vals.find((v) => v !== undefined && v !== null && v !== "");
 
 export function useCajerosPOS(services: Svc) {
-  const { Tickets } = services;
+  const { Tickets, Log } = services;
 
-  const [state, setState] = useState<FormStateCajeros>({
-    Cedula: "",
-    CO: "",
-    Compañia: "",
-    CorreoTercero: "",
-    resolutor: null,
-    solicitante: null,
-    usuario: "",
-  });
-
+  const [state, setState] = useState<FormStateCajeros>({Cedula: "", CO: "", Compañia: "", CorreoTercero: "", resolutor: null, solicitante: null, usuario: "",});
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -63,7 +55,7 @@ export function useCajerosPOS(services: Svc) {
     setSubmitting(true);
     try {
 
-      // 1) Crear ticket en la lista
+      // 1) Crear ticket en la lista y log
       const payloadTicket = {
         Title: `Creación de usuario POS para ${state.solicitante?.label ?? ""}`,
         Descripcion: `Se ha creado un usuario POS para ${state.solicitante?.label ?? ""}, se enviarán las credenciales de forma interna`,
@@ -86,8 +78,19 @@ export function useCajerosPOS(services: Svc) {
       } else {
         const created = await Tickets.create(payloadTicket);
         createdId = created?.ID ?? "";
-        console.log("Ticket creado con ID:", createdId);
+              
+        const payloadLog: Log = {
+          Actor: state.solicitante?.label ?? "",
+          CorreoActor: state.solicitante?.email ?? "",
+          Descripcion: `Se ha creado un usuario POS para ${state.solicitante?.label ?? ""}, se enviarán las credenciales de forma interna`,
+          Tipo_de_accion: "Solucion",
+          Title: createdId
+        }
+        
+        const createdLog = Log.create(payloadLog)
+        console.log(createdLog)
       }
+
 
       // 2) Invocar Flow de Cajeros POS
       try {
