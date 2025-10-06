@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import type { FormErrors } from "../Models/nuevoTicket";
+import type { FormErrors, FormReasignarErrors } from "../Models/nuevoTicket";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { FormReasignarState, Ticket } from "../Models/Tickets";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
@@ -22,7 +22,7 @@ export function useReasignarTicket(services: Svc, ticket: Ticket) {
   const { Usuarios, Logs } = services;
 
   const [state, setState] = useState<FormReasignarState>({ resolutor: null, Nota: "" });
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<FormReasignarErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
   const setField = <K extends keyof FormReasignarState>(k: K, v: FormReasignarState[K]) =>

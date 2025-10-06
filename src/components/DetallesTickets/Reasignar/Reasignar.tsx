@@ -1,4 +1,8 @@
-import Select, { components, type OptionProps } from "react-select";
+import Select, {
+  components,
+  type OptionProps,
+  type FilterOptionOption
+} from "react-select";
 import "./Reasignar.css";
 import type { UserOption } from "../../../Models/Commons";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
@@ -11,26 +15,32 @@ import type { LogService } from "../../../Services/Log.service";
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 
-type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
+type UserOptionEx = UserOption & {
+  source?: "Empleado" | "Franquicia";
+  email?: string;
+  jobTitle?: string;
+};
 
 export default function Reasignar({ ticket }: { ticket: Ticket }) {
-  const {Usuarios: UsuariosSPServiceSvc, Logs: LogSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    Logs : LogService;
-    Usuarios: UsuariosSPService;
-  };
+  const { Usuarios: UsuariosSPServiceSvc, Logs: LogSvc } =
+    (useGraphServices() as ReturnType<typeof useGraphServices> & {
+      Logs: LogService;
+      Usuarios: UsuariosSPService;
+    });
 
-  const {state, errors, submitting, setField, handleReasignar} = useReasignarTicket({Usuarios: UsuariosSPServiceSvc, Logs: LogSvc }, ticket);
+  const { state, errors, submitting, setField, handleReasignar } =
+    useReasignarTicket({ Usuarios: UsuariosSPServiceSvc, Logs: LogSvc }, ticket);
+
   const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
 
-  // ====== Filtro genérico (insensible a acentos) para react-select
-
-  const userFilter = (option: any, raw: string) => {
+  // filtro insensible a acentos
+  const userFilter = (option: FilterOptionOption<UserOptionEx>, raw: string) => {
     const q = norm(raw);
     if (!q) return true;
     const label = option?.label ?? "";
     const data = option?.data as UserOptionEx | undefined;
-    const email = (data as any)?.email ?? "";
-    const job = (data as any)?.jobTitle ?? "";
+    const email = data?.email ?? "";
+    const job = data?.jobTitle ?? "";
     const haystack = norm(`${label} ${email} ${job}`);
     return haystack.includes(q);
   };
@@ -42,8 +52,8 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
         <div className="rs-opt">
           <div className="rs-opt__text">
             <span className="rs-opt__title">{label}</span>
-            {(data as any).email && <span className="rs-opt__meta">{(data as any).email}</span>}
-            {(data as any).jobTitle && <span className="rs-opt__meta">{(data as any).jobTitle}</span>}
+            {data.email && <span className="rs-opt__meta">{data.email}</span>}
+            {data.jobTitle && <span className="rs-opt__meta">{data.jobTitle}</span>}
           </div>
           {data.source && <span className="rs-opt__tag">{data.source}</span>}
         </div>
@@ -51,35 +61,68 @@ export default function Reasignar({ ticket }: { ticket: Ticket }) {
     );
   };
 
+  const selectId = "select-resolutor";
+  const noteId = "reasignacion-nota";
+  const nota = state.Nota ?? "";
+  const maxLen = 500;
 
   return (
     <div className="ticket-form">
       <h2 className="tf-title">Reasignar Ticket</h2>
 
       <form onSubmit={handleReasignar} noValidate className="tf-grid">
-
         {/* Resolutor */}
         <div className="tf-field">
-          <label className="tf-label">Nuevo Resolutor</label>
+          <label className="tf-label" htmlFor={selectId}>Nuevo Resolutor</label>
           <Select<UserOptionEx, false>
-            options={UseruserOptions}
+            inputId={selectId}
+            options={UseruserOptions as UserOptionEx[]}
             placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
-            value={state.resolutor}
+            value={state.resolutor as UserOptionEx | null}
             onChange={(opt) => setField("resolutor", opt ?? null)}
             classNamePrefix="rs"
             isDisabled={submitting || loading}
             isLoading={loading}
-            filterOption={userFilter as any}
-            components={{ Option: Option as any }}
+            loadingMessage={() => "Cargando…"}
+            filterOption={userFilter}
+            components={{ Option }}
             noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
             isClearable
+            aria-invalid={Boolean(errors.resolutor) || undefined}
           />
           {errors.resolutor && <small className="error">{errors.resolutor}</small>}
         </div>
 
+        {/* Nota (razón de la reasignación) */}
+        <div className="tf-field">
+          <label className="tf-label" htmlFor={noteId}>Nota (razón de la reasignación)</label>
+          <textarea
+            id={noteId}
+            className="tf-textarea"
+            placeholder="Explica brevemente por qué reasignas este ticket…"
+            value={nota}
+            maxLength={maxLen}
+            onChange={(e) => setField("Nota", e.target.value)}
+            rows={4}
+            disabled={submitting}
+            aria-describedby={`${noteId}-help ${noteId}-counter`}
+          />
+          <div className="tf-help" id={`${noteId}-help`}>
+            Esta nota se enviará junto con la reasignación.
+          </div>
+          <div className="tf-counter" id={`${noteId}-counter`}>
+            {nota.length}/{maxLen}
+          </div>
+          {errors.Nota && <small className="error">{errors.Nota}</small>}
+        </div>
+
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button disabled={submitting || loading} className="tf-submit" onClick={() => handleReasignar}>
+          <button
+            type="submit"
+            disabled={submitting || loading}
+            className="tf-submit"
+          >
             {submitting ? "Enviando..." : "Enviar solicitud"}
           </button>
         </div>
