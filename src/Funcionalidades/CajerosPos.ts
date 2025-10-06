@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
 import type { FormErrors } from "../Models/nuevoTicket";
-import type { GetAllOpts } from "../Models/Commons";
 import type { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
@@ -17,16 +16,14 @@ type Svc = {
 export const first = (...vals: any[]) =>
   vals.find((v) => v !== undefined && v !== null && v !== "");
 
-/** Hook de alta de “Cajeros POS” + creación de ticket + actualización de casos del resolutor + disparo de Flow */
 export function useCajerosPOS(services: Svc) {
-  const { Tickets, Usuarios } = services;
+  const { Tickets } = services;
 
   const [state, setState] = useState<FormStateCajeros>({
     Cedula: "",
     CO: "",
     Compañia: "",
     CorreoTercero: "",
-    CorreoUsuario: "",
     resolutor: null,
     solicitante: null,
     usuario: "",
@@ -35,7 +32,7 @@ export function useCajerosPOS(services: Svc) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
-  // Instancia del Flow (REEMPLAZA LA URL)
+  // Instancia del Flow
   const flowCajerosPos = React.useMemo(
     () =>
       new FlowClient(
@@ -54,8 +51,6 @@ export function useCajerosPOS(services: Svc) {
     if (!state.CO) e.CO = "Por favor digite un CO";
     if (!state.Cedula) e.Cedula = "Por favor una cédula";
     if (!state.Compañia.trim()) e.Compañia = "Por favor seleccione una compañía";
-    if (!state.CorreoTercero.trim()) e.CorreoTercero = "Por favor digite el correo del tercero";
-    if (!state.CorreoUsuario.trim()) e.CorreoUsuario = "Por favor digite el correo del usuario";
 
     setErrors(e as unknown as FormErrors);
     return Object.keys(e).length === 0;
@@ -67,6 +62,7 @@ export function useCajerosPOS(services: Svc) {
 
     setSubmitting(true);
     try {
+
       // 1) Crear ticket en la lista
       const payloadTicket = {
         Title: `Creación de usuario POS para ${state.solicitante?.label ?? ""}`,
@@ -77,8 +73,7 @@ export function useCajerosPOS(services: Svc) {
         Categoria: "Siesa",
         SubCategoria: "POS",
         SubSubCategoria: "Creacion de usuario nuevo",
-        Nombreresolutor: state.resolutor?.label,
-        Correoresolutor: state.resolutor?.email,
+        Nombreresolutor: "Automatizaciones",
         Solicitante: state.solicitante?.label,
         CorreoSolicitante: state.solicitante?.email,
         Estadodesolicitud: "Cerrado",
@@ -94,52 +89,25 @@ export function useCajerosPOS(services: Svc) {
         console.log("Ticket creado con ID:", createdId);
       }
 
-      // 2) Actualizar contador de casos del resolutor (si hay resolutor)
-      try {
-        const email = payloadTicket.Correoresolutor?.trim();
-        if (email) {
-          const opts: GetAllOpts = {
-            filter: `Correo eq '${email.replace(/'/g, "''")}'`,
-            top: 1,
-          };
-          const rows = await Usuarios.getAll(opts);
-          const resolutorRow = rows?.[0];
-          if (resolutorRow?.ID != null) {
-            const prev = Number(resolutorRow.Numerodecasos ?? 0);
-            const next = prev + 1;
-            const updated = await Usuarios.update(String(resolutorRow.ID), { Numerodecasos: next });
-            console.log("Resolutor actualizado:", updated);
-          } else {
-            console.warn("No se encontró resolutor con ese correo:", email);
-          }
-        } else {
-          console.warn("No hay Correoresolutor en el payload; no se puede incrementar conteo.");
-        }
-      } catch (err) {
-        console.error("Error actualizando contador del resolutor:", err);
-      }
-
-      // 3) Invocar Flow de Cajeros POS
+      // 2) Invocar Flow de Cajeros POS
       try {
         await flowCajerosPos.invoke<FlowToSP, any>({
           Cedula: state.Cedula,
-          CO: state.CO,
           Compañia: state.Compañia,
-          CorreoTercero: state.CorreoTercero,
-          CorreoUsuario: state.CorreoUsuario,
-          Usuario: state.CorreoUsuario,
+          CorreoTercero: state.solicitante?.email ?? "",
+          Usuario: state.solicitante?.label ?? "" ,        
+          CO: state.CO,
         });
       } catch (err) {
         console.error("[Flow] Error invocando flujo Cajeros POS:", err);
       }
 
-      // 4) Limpiar formulario
+      // 3) Limpiar formulario
       setState({
         Cedula: "",
         CO: "",
         Compañia: "",
         CorreoTercero: "",
-        CorreoUsuario: "",
         resolutor: null,
         solicitante: null,
         usuario: "",

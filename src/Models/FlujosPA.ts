@@ -4,7 +4,6 @@ export type FormStateCajeros = {
     solicitante: UserOption | null;
     resolutor: UserOption | null;
     usuario: string;
-    CorreoUsuario: string ;
     Cedula: string;
     CO: string;
     CorreoTercero: string;
@@ -22,7 +21,6 @@ export type FlowToUser = {
 
 export type FlowToSP = {
   Usuario: string;            
-  CorreoUsuario: string;
   Cedula: string;
   CorreoTercero: string;
   Compañia: string;
