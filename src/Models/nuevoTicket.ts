@@ -16,8 +16,16 @@ export type FormState = {
   ANS?: "";
 };
 
+export type FormDocumentarState = {
+  documentacion: string;
+  resolutor: string;
+  correoresolutor: string;
+};
+
 export type FormErrors = Partial<Record<keyof FormState, string>>;
 
 export type FormReasignarErrors = Partial<Record<keyof FormReasignarState, string>>
 
 export type FormObservadorErrors = Partial<Record<keyof FormObservadorState, string>>
+
+export type FormDocErrors = Partial<Record<keyof FormDocumentarState, string>>

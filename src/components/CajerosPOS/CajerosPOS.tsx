@@ -132,3 +132,6 @@ export default function CajerosPOSForm({ services }: Props) {
     </div>
   );
 }
+
+
+//TODO: Aplicar un paso mas, recibe en el correo de listo x correo, eso lo mueve a una carpeta ultimos 2 digitos de la cedula de la persoan fue como se creo el usuario (Primera inicial nombre 1 y2, apellido 2 ultimos digitos de la cedula) y envia correo con los datos a la persona
