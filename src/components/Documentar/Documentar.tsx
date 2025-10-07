@@ -1,4 +1,4 @@
-import "./NuevoTicketForm.css";
+import "./Documentar.css";
 import type { FranquiciasService } from "../../Services/Franquicias.service";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
