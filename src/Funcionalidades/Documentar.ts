@@ -60,7 +60,6 @@ export function useDocumentarTicket(services: Svc) {
   ) => {
     e.preventDefault();
     if (!validate()) return;
-    alert("Funcionando")
     setSubmitting(true);
     try {
       // 1) Crear log
@@ -73,16 +72,16 @@ export function useDocumentarTicket(services: Svc) {
       };
 
       await Logs.create(logPayload);
-
       // (Opcional) subir archivo si aplica
       // if (state.archivo) { await Logs.attach(logId, state.archivo) }
+      setState({archivo: null, correoresolutor: "", documentacion: "", resolutor: ""})
 
       // 2) Si es solución, cerrar ticket con estado correcto
       if (tipo === "solucion") {
         if (!Tickets) throw new Error("Servicio Tickets no disponible.");
         const estadoActual = norm(ticket.Estadodesolicitud ?? "");
-        const nuevoEstado =
-          estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
+        const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
+        alert("Caso cerrado. Enviando notificación al solicitante")
         await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
         if (ticket.CorreoSolicitante) {
           const title = `Cierre de Ticket - ${ticket.ID}`;
@@ -97,6 +96,7 @@ export function useDocumentarTicket(services: Svc) {
             </p>`.trim();
 
           try {
+            console.log("Enviando notificación")
             await notifyFlow.invoke<FlowToUser, any>({
               recipient: ticket.ID!,
               title,

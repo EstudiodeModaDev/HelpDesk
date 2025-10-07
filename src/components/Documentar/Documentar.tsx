@@ -53,7 +53,7 @@ export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "so
 
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting} className="tf-submit" onClick={() => alert("Hola")}>
+          <button type="submit" disabled={submitting} className="tf-submit">
             {submitting ? "Enviando..." : "Guardar documentación"}
           </button>
         </div>
