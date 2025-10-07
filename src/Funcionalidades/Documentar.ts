@@ -63,7 +63,7 @@ export function useDocumentarTicket(services: Svc) {
   ) => {
     e.preventDefault();
     if (!validate()) return;
-
+    alert("Funcionando")
     setSubmitting(true);
     try {
       // 1) Crear log

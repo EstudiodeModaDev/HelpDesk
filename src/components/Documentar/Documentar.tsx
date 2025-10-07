@@ -26,11 +26,7 @@ export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "so
     <div className="ticket-form">
       <h2 className="tf-title">Documentar {tipo} del ticket #{ticket.ID}</h2>
 
-      <form
-        onSubmit={(e) => handleSubmit(e, tipo, ticket, account!)}
-        noValidate
-        className="tf-grid"
-      >
+      <form onSubmit={(e) => handleSubmit(e, tipo, ticket, account!)} noValidate className="tf-grid">
         {/* Documentación */}
         <div className="tf-field tf-col-2">
           <label className="tf-label">Descripción de {tipo}</label>
@@ -57,7 +53,7 @@ export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "so
 
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting} className="tf-submit">
+          <button type="submit" disabled={submitting} className="tf-submit" onClick={() => alert("Hola")}>
             {submitting ? "Enviando..." : "Guardar documentación"}
           </button>
         </div>
