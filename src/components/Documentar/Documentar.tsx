@@ -8,25 +8,66 @@ import type { LogService } from "../../Services/Log.service";
 import { useAuth } from "../../auth/authContext";
 import type { Ticket } from "../../Models/Tickets";
 import { useDocumentarTicket } from "../../Funcionalidades/Documentar";
+import { usePlantillas } from "../../Funcionalidades/Plantillas";
+import type { PlantillasService } from "../../Services/Plantillas.service";
+import React from "react";
 
 export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "solucion" | "seguimiento" }) {
-  const { Tickets: TicketsSvc, Logs: LogsSvc } =
+  const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc } =
     (useGraphServices() as ReturnType<typeof useGraphServices> & {
       Franquicias: FranquiciasService;
       Usuarios: UsuariosSPService;
       Tickets: TicketsService;
       Logs: LogService;
+      Plantillas: PlantillasService;
     });
 
-  const { account } = useAuth(); // usuario logueado
+  const { account } = useAuth();
   const { state, errors, submitting, setField, handleSubmit } =
     useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc });
+
+  // ⬇️ usamos también loading/error por si quieres feedback
+  const { ListaPlantillas, loading: loadingPlantillas, error: errorPlantillas } = usePlantillas(PlantillasSvc);
+
+  // ⬇️ estado local para el select (opcional)
+  const [plantillaId, setPlantillaId] = React.useState<string>("");
+
+  const onSelectPlantilla = (id: string) => {
+    setPlantillaId(id);
+    const p = (ListaPlantillas ?? []).find(pl => pl.Id === id);
+    if (!p) return;
+    // Asumimos que CamposPlantilla trae HTML listo para el editor
+    setField("documentacion", p.CamposPlantilla ?? "");
+  };
 
   return (
     <div className="ticket-form">
       <h2 className="tf-title">Documentar {tipo} del ticket #{ticket.ID}</h2>
 
       <form onSubmit={(e) => handleSubmit(e, tipo, ticket, account!)} noValidate className="tf-grid">
+
+        {/* === NUEVO: Selector de plantilla === */}
+        <div className="tf-field tf-col-2">
+          <label className="tf-label" htmlFor="plantilla">Usar plantilla</label>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <select
+              id="plantilla"
+              className="tf-input"
+              value={plantillaId}
+              onChange={(e) => onSelectPlantilla(e.target.value)}
+              disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}
+            >
+              <option value="">{loadingPlantillas ? "Cargando plantillas..." : "— Selecciona una plantilla —"}</option>
+              {(ListaPlantillas ?? []).map(p => (
+                <option key={p.Id} value={p.Id}>{p.Title}</option>
+              ))}
+            </select>
+            {errorPlantillas && <small className="error">{errorPlantillas}</small>}
+          </div>
+          <small className="hint">Al seleccionar, se insertará el contenido de la plantilla en el editor.</small>
+        </div>
+        {/* === /NUEVO === */}
+
         {/* Documentación */}
         <div className="tf-field tf-col-2">
           <label className="tf-label">Descripción de {tipo}</label>
