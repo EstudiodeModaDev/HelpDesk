@@ -3,48 +3,54 @@ import "./Seguimiento.css";
 import HtmlContent from "../Renderizador/Renderizador";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
-import type { Ticket } from "../../Models/Tickets";
+import type { Ticket } from "../../Models/Tickets";              // <-- NUEVO
 import { useUserPhoto } from "../../Funcionalidades/Workers";
-import Documentar from "../Documentar/Documentar";
+import Documentar from "../Documentar/Documentar";               // <-- NUEVO
 
 type Tab = "seguimiento" | "solucion";
-type Mode = "detalle" | "documentar";
+type Mode = "detalle" | "documentar";                            // <-- NUEVO
 
 type Props = {
   role: string;
-  ticket?: Ticket;          // <- si ya lo tienes, pásalo y evitas fetch
+  ticketId: string | number;
   onVolver?: () => void;
+  onAddClick?: (m: Log) => void;
+  onViewClick?: (m: Log) => void;
   defaultTab?: Tab;
   className?: string;
 };
 
 export default function TicketHistorial({
   role,
-  ticket,
+  ticketId,
   onVolver,
   defaultTab = "solucion",
   className,
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
-  const [mode, setMode] = React.useState<Mode>("detalle"); // <- modo actual
+  const [mode, setMode] = React.useState<Mode>("detalle");       // <-- NUEVO
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
 
-  const { Logs } = useGraphServices();
+  const { Logs, Tickets } = useGraphServices();                   // <-- Tickets para traer el ticket
 
-  // Historial (solo se monta en modo "detalle")
   const [mensajes, setMensajes] = React.useState<Log[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Ticket para Documentar
+  const [ticket, setTicket] = React.useState<Ticket | null>(null);
+  const [loadingTicket, setLoadingTicket] = React.useState(false);
+
+  // Cargar historial SOLO en modo detalle
   React.useEffect(() => {
-    if (mode !== "detalle") return; // <- si no estamos en detalle, NO cargues nada
+    if (mode !== "detalle") return;                               // <-- evita cargar cuando documentas
     let cancel = false;
     const load = async () => {
       setLoading(true);
       setError(null);
       try {
         const items = await Logs.getAll({
-          filter: `fields/Title eq '${ticket!.ID ?? ""}'`,
+          filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`,
           orderby: "fields/Created desc",
           top: 2000,
         });
@@ -61,54 +67,75 @@ export default function TicketHistorial({
     };
     load();
     return () => { cancel = true; };
-  }, [Logs, mode]);
+  }, [ticketId, Logs, mode]);                                     // <-- depende de mode
 
-  /* =========================
-     MODO DOCUMENTAR (solo Documentar + Volver)
-     ========================= */
+  // Cargar ticket cuando entras a Documentar
+  React.useEffect(() => {
+    if (mode !== "documentar") return;
+    if (!Tickets) return;
+    let cancel = false;
+    const fetchTicket = async () => {
+      setLoadingTicket(true);
+      try {
+        const t = await Tickets.get(String(ticketId));
+        if (!cancel) setTicket(t);
+      } finally {
+        if (!cancel) setLoadingTicket(false);
+      }
+    };
+    fetchTicket();
+    return () => { cancel = true; };
+  }, [mode, ticketId, Tickets]);
+
+  // =======================
+  // Vista Documentar (solo Documentar + Volver)
+  // =======================
   if (mode === "documentar") {
     return (
       <div className={className ?? ""} style={{ padding: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 12, gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
           <button type="button" className="th-back" onClick={() => setMode("detalle")}>
             <span className="th-back-icon" aria-hidden>←</span> Volver al detalle
           </button>
         </div>
+
+        {loadingTicket && !ticket && <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>}
         {ticket && (
           <Documentar
-            key={`doc-${tab}-${ticket.ID}`}        // fuerza remontar al cambiar tipo
+            key={`doc-${tab}-${ticketId}`}                         // remonta el form al cambiar tipo
             ticket={ticket}
-            tipo={tab}                             // "solucion" | "seguimiento"
+            tipo={tab}                                             // "seguimiento" | "solucion"
           />
         )}
       </div>
     );
   }
 
-  /* =========================
-     MODO DETALLE (historial + botones)
-     ========================= */
+  // =======================
+  // Vista Detalle (historial)
+  // =======================
   return (
     <div className={className ?? ""} style={{ padding: 16 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Historial</span>
+        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Agregar :</span>
 
+        {/* Tabs SOLO para admins/técnicos */}
         {isPrivileged && (
           <div style={{ display: "flex", gap: 8 }}>
             <button
               type="button"
-              onClick={() => { setTab("seguimiento"); setMode("documentar"); }}
-              className="th-tab"
+              onClick={() => { setTab("seguimiento"); setMode("documentar"); }}  // <-- cambia vista aquí
+              className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
             >
-              + Seguimiento
+              Seguimiento
             </button>
             <button
               type="button"
-              onClick={() => { setTab("solucion"); setMode("documentar"); }}
-              className="th-tab"
+              onClick={() => { setTab("solucion"); setMode("documentar"); }}     // <-- cambia vista aquí
+              className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
             >
-              + Solución
+              Solución
             </button>
           </div>
         )}
@@ -120,19 +147,25 @@ export default function TicketHistorial({
         </div>
       </div>
 
-      {/* Caja principal (historial) */}
+      {/* Caja principal */}
       <div className="th-box">
-        {loading && mensajes.length === 0 && <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>}
+        {loading && mensajes.length === 0 && (
+          <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>
+        )}
         {error && <p style={{ color: "#b91c1c", padding: 16 }}>{error}</p>}
-        {!loading && !error && mensajes.length === 0 && <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>}
+        {!loading && !error && mensajes.length === 0 && (
+          <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>
+        )}
 
-        {mensajes.map((m) => (<HistRow key={m.Id} m={m} />))}
+        {mensajes.map((m) => (
+          <HistRow key={m.Id} m={m} />
+        ))}
       </div>
     </div>
   );
 }
 
-/* ---------- Subcomponente: una fila del historial ---------- */
+/* ---------- Subcomponente: una fila del historial (usa la foto por Graph) ---------- */
 
 function HistRow({ m }: { m: Log }) {
   const upn = m.CorreoActor || undefined;

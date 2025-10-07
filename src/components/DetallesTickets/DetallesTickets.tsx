@@ -145,6 +145,9 @@ export default function DetalleTicket({
           <TicketHistorial
             role={role ?? 'Usuario'}
             onVolver={() => setShowSeg(false)}
+            ticketId={ticket.ID!}
+            onAddClick={() => {}}
+            onViewClick={() => {}}
           />
         </div>
       )}
