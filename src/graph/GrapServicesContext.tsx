@@ -79,7 +79,7 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
   sitePath: '/sites/TransformacionDigital/IN/HD',
   lists: {
     Sociedades: 'Sociedades',
-    Proveedores: 'Proeedores de internet',
+    Proveedores: 'Proveedores de internet',
     Plantillas: 'Plantillas',
     Internet: 'Internet',
     CasosHijosRequeridos: 'Casos hijos requeridos',
