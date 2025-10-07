@@ -3,44 +3,48 @@ import "./Seguimiento.css";
 import HtmlContent from "../Renderizador/Renderizador";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
+import type { Ticket } from "../../Models/Tickets";
 import { useUserPhoto } from "../../Funcionalidades/Workers";
+import Documentar from "../Documentar/Documentar";
 
 type Tab = "seguimiento" | "solucion";
+type Mode = "detalle" | "documentar";
 
 type Props = {
   role: string;
-  ticketId: string | number;
+  ticket?: Ticket;          // <- si ya lo tienes, pásalo y evitas fetch
   onVolver?: () => void;
-  onAddClick?: (m: Log) => void;
-  onViewClick?: (m: Log) => void;
   defaultTab?: Tab;
   className?: string;
 };
 
 export default function TicketHistorial({
   role,
-  ticketId,
+  ticket,
   onVolver,
   defaultTab = "solucion",
   className,
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
+  const [mode, setMode] = React.useState<Mode>("detalle"); // <- modo actual
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
 
   const { Logs } = useGraphServices();
 
+  // Historial (solo se monta en modo "detalle")
   const [mensajes, setMensajes] = React.useState<Log[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    if (mode !== "detalle") return; // <- si no estamos en detalle, NO cargues nada
     let cancel = false;
     const load = async () => {
       setLoading(true);
       setError(null);
       try {
         const items = await Logs.getAll({
-          filter: `fields/Title eq '${String(ticketId).replace(/'/g, "''")}'`,
+          filter: `fields/Title eq '${ticket!.ID ?? ""}'`,
           orderby: "fields/Created desc",
           top: 2000,
         });
@@ -56,71 +60,83 @@ export default function TicketHistorial({
       }
     };
     load();
-    return () => {
-      cancel = true;
-    };
-  }, [ticketId, Logs]);
+    return () => { cancel = true; };
+  }, [Logs, mode]);
 
+  /* =========================
+     MODO DOCUMENTAR (solo Documentar + Volver)
+     ========================= */
+  if (mode === "documentar") {
+    return (
+      <div className={className ?? ""} style={{ padding: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 12, gap: 8 }}>
+          <button type="button" className="th-back" onClick={() => setMode("detalle")}>
+            <span className="th-back-icon" aria-hidden>←</span> Volver al detalle
+          </button>
+        </div>
+        {ticket && (
+          <Documentar
+            key={`doc-${tab}-${ticket.ID}`}        // fuerza remontar al cambiar tipo
+            ticket={ticket}
+            tipo={tab}                             // "solucion" | "seguimiento"
+          />
+        )}
+      </div>
+    );
+  }
+
+  /* =========================
+     MODO DETALLE (historial + botones)
+     ========================= */
   return (
     <div className={className ?? ""} style={{ padding: 16 }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Agregar :</span>
+        <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Historial</span>
 
-        {/* Tabs SOLO para admins/técnicos */}
         {isPrivileged && (
           <div style={{ display: "flex", gap: 8 }}>
             <button
               type="button"
-              onClick={() => setTab("seguimiento")}
-              className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
+              onClick={() => { setTab("seguimiento"); setMode("documentar"); }}
+              className="th-tab"
             >
-              Seguimiento
+              + Seguimiento
             </button>
             <button
               type="button"
-              onClick={() => setTab("solucion")}
-              className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
+              onClick={() => { setTab("solucion"); setMode("documentar"); }}
+              className="th-tab"
             >
-              Solución
+              + Solución
             </button>
           </div>
         )}
 
         <div style={{ marginLeft: "auto" }}>
           <button type="button" className="th-back" onClick={onVolver}>
-            <span className="th-back-icon" aria-hidden>
-              ←
-            </span>{" "}
-            Volver
+            <span className="th-back-icon" aria-hidden>←</span> Volver
           </button>
         </div>
       </div>
 
-      {/* Caja principal */}
+      {/* Caja principal (historial) */}
       <div className="th-box">
-        {loading && mensajes.length === 0 && (
-          <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>
-        )}
+        {loading && mensajes.length === 0 && <p style={{ opacity: 0.7, padding: 16 }}>Cargando mensajes…</p>}
         {error && <p style={{ color: "#b91c1c", padding: 16 }}>{error}</p>}
-        {!loading && !error && mensajes.length === 0 && (
-          <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>
-        )}
+        {!loading && !error && mensajes.length === 0 && <p style={{ opacity: 0.7, padding: 16 }}>No hay mensajes.</p>}
 
-        {mensajes.map((m) => (
-          <HistRow key={m.Id} m={m} />
-        ))}
+        {mensajes.map((m) => (<HistRow key={m.Id} m={m} />))}
       </div>
     </div>
   );
 }
 
-/* ---------- Subcomponente: una fila del historial (usa la foto por Graph) ---------- */
+/* ---------- Subcomponente: una fila del historial ---------- */
 
 function HistRow({ m }: { m: Log }) {
-  // Usa el correo del actor si lo tienes; si no, puedes intentar con m.Actor (no ideal)
   const upn = m.CorreoActor || undefined;
-  const photoUrl = useUserPhoto(upn); // <- Opción A (tu hook)
+  const photoUrl = useUserPhoto(upn);
 
   return (
     <div className="th-row">
@@ -129,9 +145,7 @@ function HistRow({ m }: { m: Log }) {
           {photoUrl ? (
             <img src={photoUrl} alt={m.Actor ?? "Usuario"} className="th-avatar-img" />
           ) : (
-            <div className="th-avatar-fallback" aria-hidden>
-              👤
-            </div>
+            <div className="th-avatar-fallback" aria-hidden>👤</div>
           )}
         </div>
         <div className="th-nombre">{m.Actor}</div>

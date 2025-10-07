@@ -10,14 +10,17 @@ import type { Ticket } from "../../Models/Tickets";
 import { useDocumentarTicket } from "../../Funcionalidades/Documentar";
 
 export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "solucion" | "seguimiento" }) {
-  const { Tickets: TicketsSvc, Logs: LogsSvc } = (useGraphServices() as ReturnType<typeof useGraphServices> & {
+  const { Tickets: TicketsSvc, Logs: LogsSvc } =
+    (useGraphServices() as ReturnType<typeof useGraphServices> & {
       Franquicias: FranquiciasService;
       Usuarios: UsuariosSPService;
       Tickets: TicketsService;
       Logs: LogService;
     });
+
   const { account } = useAuth(); // usuario logueado
-  const { state, errors, submitting, setField, handleSubmit } = useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc });
+  const { state, errors, submitting, setField, handleSubmit } =
+    useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc });
 
   return (
     <div className="ticket-form">
