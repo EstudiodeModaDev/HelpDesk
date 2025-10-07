@@ -39,9 +39,6 @@ export function useDocumentarTicket(services: Svc) {
     const texto = (state.documentacion ?? "").trim();
     if (!texto) e.documentacion = "Por favor escriba la documentación.";
     else if (texto.length < 50) e.documentacion = "Mínimo 50 caracteres.";
-    // Si el archivo es opcional, omite esta validación
-    // if (!state.archivo) e.archivo = "Adjunte un archivo";
-    if (!state.resolutor.trim()) e.resolutor = "Requerido.";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
