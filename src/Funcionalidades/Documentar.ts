@@ -98,7 +98,7 @@ export function useDocumentarTicket(services: Svc) {
           try {
             console.log("Enviando notificación")
             await notifyFlow.invoke<FlowToUser, any>({
-              recipient: ticket.ID!,
+              recipient: ticket.CorreoSolicitante,
               title,
               message,
               mail: true, 
