@@ -1,6 +1,6 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts } from '../Models/Commons';
-import type { Internet } from '../Models/Internet';
+import type { InternetTiendas } from '../Models/Internet';
 
 export class InternetService {
   private graph!: GraphRest;
@@ -15,7 +15,7 @@ export class InternetService {
     graph: GraphRest,
     hostname = 'estudiodemoda.sharepoint.com',
     sitePath = '/sites/TransformacionDigital/IN/HD',
-    listName = 'Internet'     
+    listName = 'Internet Tiendas'     
   ) {
     this.graph = graph;
     this.hostname = hostname;
@@ -68,28 +68,26 @@ export class InternetService {
 
 
   // ---------- mapping ----------
-  private toModel(item: any): Internet {
+  private toModel(item: any): InternetTiendas {
     const f = item?.fields ?? {};
     return {
-        Id: String(item?.id ?? ''),
+        ID: String(item?.id ?? item?.ID ?? item?.Id ?? ''),
         Title: f.Title,
-        Empresa: f.Empresa,
-        Cedula: f.Cedula,
-        Nombre: f.Nombre,
-        Apellidos: f.Apellidos,
-        Telefono: f.Telefono,
-        Identificador: f.Identificador,
-        Descripcion: f.Descripcion,
-        Tienda: f.Tienda,
-        Ciudad: f.Ciudad,
-        Centrocomercial: f.Centrocomercial,
-        Local: f.Local,
-        Proveedor: f.Proveedor
+        Centro_x0020_Comercial: item.Centro_x0020_Comercial,
+        Compa_x00f1__x00ed_a: item.Compa_x00f1__x00ed_a,
+        CORREO: item.CORREO,
+        DIRECCI_x00d3_N: item.DIRECCI_x00d3_N,
+        IDENTIFICADOR: item.Identificador,
+        Local: item.local,
+        Nota: item.Nota,
+        PROVEEDOR: item.PROVEEDOR,
+        SERVICIO_x0020_COMPARTIDO: item.SERVICIO_x0020_COMPARTIDO,
+        Tienda: item.Tienda
     };
   }
 
   // ---------- CRUD ----------
-  async create(record: Omit<Internet, 'ID'>) {
+  async create(record: Omit<InternetTiendas, 'ID'>) {
     await this.ensureIds()
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
@@ -98,7 +96,7 @@ export class InternetService {
     return this.toModel(res);
   }
 
-  async update(id: string, changed: Partial<Omit<Internet, 'ID'>>) {
+  async update(id: string, changed: Partial<Omit<InternetTiendas, 'ID'>>) {
     await this.ensureIds()
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,

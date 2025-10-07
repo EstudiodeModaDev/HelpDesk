@@ -1,0 +1,130 @@
+.esc-form {
+  padding: 16px;
+}
+
+.esc-title {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.esc-search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0 16px 0;
+}
+
+.esc-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(30,41,59,0.08);
+  padding: 16px;
+}
+
+.esc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 16px;
+}
+
+@media (max-width: 1024px) {
+  .esc-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .esc-grid { grid-template-columns: 1fr; }
+}
+
+.esc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.esc-col-2 {
+  grid-column: 1 / -1; /* ocupa el ancho completo */
+}
+
+.esc-input {
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+  background: #fff;
+}
+
+.esc-input:focus {
+  outline: 2px solid rgba(0,0,0,0.25);
+  outline-offset: 2px;
+}
+
+.esc-button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #fff;
+  cursor: pointer;
+}
+
+.esc-attachments {
+  margin-top: 12px;
+}
+
+.esc-attachments-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.esc-asterisk { color: #0b2a7a; } /* solo un acento visual */
+
+.esc-attachments-box {
+  border: 2px solid #132b7a; /* similar al azul del borde en la captura */
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 110px;
+  background: #fff;
+}
+
+.esc-muted {
+  margin: 0 0 12px 0;
+  opacity: 0.8;
+}
+
+.esc-files {
+  margin: 0 0 8px 0;
+  padding-left: 16px;
+}
+
+.esc-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.esc-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.esc-primary {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #1d7167;      /* verde similar al de la captura */
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.esc-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

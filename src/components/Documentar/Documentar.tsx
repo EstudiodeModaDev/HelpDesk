@@ -11,6 +11,7 @@ import { useDocumentarTicket } from "../../Funcionalidades/Documentar";
 import { usePlantillas } from "../../Funcionalidades/Plantillas";
 import type { PlantillasService } from "../../Services/Plantillas.service";
 import React from "react";
+import EscalamientoInternet from "./EscalamientoProveedor/Escalamiento";
 
 export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "solucion" | "seguimiento" }) {
   const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc } =
@@ -23,14 +24,13 @@ export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "so
     });
 
   const { account } = useAuth();
-  const { state, errors, submitting, setField, handleSubmit } =
-    useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc });
+  const { state, errors, submitting, setField, handleSubmit } = useDocumentarTicket({ Tickets: TicketsSvc, Logs: LogsSvc });
 
   // ⬇️ usamos también loading/error por si quieres feedback
   const { ListaPlantillas, loading: loadingPlantillas, error: errorPlantillas } = usePlantillas(PlantillasSvc);
 
-  // ⬇️ estado local para el select (opcional)
   const [plantillaId, setPlantillaId] = React.useState<string>("");
+  const [showEscalar, setShowEscalar] = React.useState<boolean>(false)
 
   const onSelectPlantilla = (id: string) => {
     setPlantillaId(id);
@@ -97,8 +97,14 @@ export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "so
           <button type="submit" disabled={submitting} className="tf-submit">
             {submitting ? "Enviando..." : "Guardar documentación"}
           </button>
+          
+          <button type="button" disabled={submitting} className="tf-submit" onClick={() => setShowEscalar(!showEscalar)}>
+            {showEscalar ? "Ocultar escalamiento" : "Escalar a proveedor"}
+          </button>
         </div>
       </form>
+
+      {showEscalar && <EscalamientoInternet ticket={ticket}/>}
     </div>
   );
 }

@@ -1,181 +1,130 @@
-:root {
-  --tf-bg: #ffffff;
-  --tf-fg: #1f2937;
-  --tf-muted: #6b7280;
-  --tf-border: #e5e7eb;
-  --tf-focus: #2563eb;
-  --tf-error: #ef4444;
-  --tf-radius: 14px;
-  --tf-gap: 16px;
-}
-
+/* Contenedor general: usar todo el alto disponible */
 .ticket-form {
-  background: var(--tf-bg);
-  color: var(--tf-fg);
-  border: 1px solid var(--tf-border);
-  border-radius: var(--tf-radius);
-  padding: 24px;
-  max-width: 900px;
-  margin: 24px auto;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0; /* importante para que los hijos puedan crecer */
 }
 
+/* Título sin alterar colores */
 .tf-title {
-  margin: 0 0 16px;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
+  margin: 0 0 12px 0;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
+/* Grid principal: ocupa todo el espacio vertical */
 .tf-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--tf-gap);
+  grid-template-columns: 1fr;      /* una columna por defecto */
+  grid-auto-rows: min-content;     /* las filas se ajustan a su contenido */
+  gap: 12px;
+  flex: 1;                         /* que crezca y ocupe el alto sobrante */
+  min-height: 0;                   /* permite overflow dentro del grid */
 }
 
-.tf-col-2 {
-  grid-column: span 2;
+/* Dos columnas en pantallas grandes, manteniendo spans por defecto */
+@media (min-width: 1024px) {
+  .tf-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 }
 
+/* Cada campo */
 .tf-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0; /* para truncar bien contenidos largos */
 }
 
+/* Campos que deben ocupar el ancho completo del grid */
+.tf-col-2 {
+  grid-column: 1 / -1;
+}
+
+/* Etiquetas e inputs (no cambiamos colores) */
 .tf-label {
-  font-size: 13px;
-  color: var(--tf-muted);
-}
-
-.tf-input {
-  border: 1px solid var(--tf-border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  background: #fff;
-}
-
-.tf-input:focus {
-  border-color: var(--tf-focus);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.tf-checkbox {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--tf-fg);
-}
-
-.tf-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.tf-submit {
-  background: var(--tf-focus);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  min-width: 160px;
-  transition: transform 0.06s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 6px 16px rgba(37,99,235,0.25);
 }
 
-.tf-submit:hover {
-  transform: translateY(-1px);
+.tf-input,
+.tf-field select,
+.tf-field input[type="file"] {
+  width: 100%;
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.12);
+  outline: none;
 }
 
-.tf-submit:disabled {
-  background: #93c5fd;
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-/* Mensajes de error */
+/* Mensajes */
 .error {
-  color: var(--tf-error);
   font-size: 12px;
 }
 
-/* react-select theme (classNamePrefix="rs") */
-.rs__control {
-  border: 1px solid var(--tf-border) !important;
-  border-radius: 10px !important;
-  min-height: 40px;
-  box-shadow: none !important;
+.hint {
+  font-size: 12px;
+  opacity: 0.8;
 }
 
-.rs__control--is-focused {
-  border-color: var(--tf-focus) !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+/* === Hacer que el editor ocupe el alto disponible === */
+/* Detecta el campo que contiene el editor y le permite crecer */
+.tf-field:has(.ql-container),
+.tf-field:has(.richtext-root) {
+  flex: 1;         /* que este campo use el espacio vertical libre */
+  min-height: 0;
 }
 
-.rs__placeholder {
-  color: var(--tf-muted) !important;
-  font-size: 14px;
-}
-
-.rs__single-value {
-  font-size: 14px;
-}
-
-.rs__menu {
-  border-radius: 12px !important;
-  overflow: hidden;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12) !important;
-}
-
-.rs__option {
-  font-size: 14px;
-}
-
-/* Opción enriquecida para usuarios */
-.rs-opt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.rs-opt__text {
+/* Ajustes típicos para Quill (o tu RichText) sin tocar colores */
+.tf-field .ql-container {
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
-}
-
-.rs-opt__title {
-  font-weight: 600;
-}
-
-.rs-opt__meta {
-  font-size: 12px;
-  color: var(--tf-muted);
-}
-
-.rs-opt__tag {
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 999px;
+  height: 100%;
+  min-height: 260px;    /* alto mínimo cómodo */
+  border-radius: 8px;
   border: 1px solid rgba(0,0,0,0.12);
-  color: var(--tf-muted);
-  white-space: nowrap;
 }
 
-/* Responsive */
-@media (max-width: 800px) {
-  .tf-grid {
-    grid-template-columns: 1fr;
-  }
-  .tf-col-2 {
-    grid-column: span 1;
-  }
+.tf-field .ql-toolbar {
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+
+.tf-field .ql-editor {
+  flex: 1;
+  min-height: 200px;
+  overflow: auto;  /* scroll interno si el contenido crece */
+}
+
+/* Botonera: pegada abajo y siempre visible */
+.tf-actions {
+  grid-column: 1 / -1;
+  position: sticky;     /* se “ancla” al fondo del contenedor scroll */
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  background: inherit;  /* respeta tu color de fondo actual */
+}
+
+/* Botón submit (no cambiamos color) */
+.tf-submit {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.12);
+  cursor: pointer;
+}
+
+/* Accesibilidad: focus visible sin alterar tu color */
+.tf-input:focus,
+.tf-field select:focus,
+.tf-submit:focus,
+.tf-field .ql-container:focus-within {
+  outline: 2px solid rgba(0,0,0,0.25);
+  outline-offset: 2px;
 }
