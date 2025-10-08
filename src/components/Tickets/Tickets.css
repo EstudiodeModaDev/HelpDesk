@@ -101,7 +101,7 @@
 /* === Contenedor de tabla con scroll horizontal === */
 .table-wrap{
   width:100%;
-  overflow-x:auto;                 /* scroll si no cabe */
+  overflow-x:auto;             
   border:1px solid var(--border);
   border-radius:var(--radius);
   box-shadow:var(--shadow-md);
