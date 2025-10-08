@@ -13,7 +13,7 @@ import type { PlantillasService } from "../../Services/Plantillas.service";
 import React from "react";
 import EscalamientoInternet from "./EscalamientoProveedor/Escalamiento";
 
-export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "solucion" | "seguimiento" }) {
+export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; tipo: "solucion" | "seguimiento"; onDone?: () => void | Promise<void>}) {
   const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc } =
     (useGraphServices() as ReturnType<typeof useGraphServices> & {
       Franquicias: FranquiciasService;
@@ -44,7 +44,7 @@ export default function Documentar({ ticket, tipo }: { ticket: Ticket; tipo: "so
     <div className="ticket-form">
       <h2 className="tf-title">Documentar {tipo} del ticket #{ticket.ID}</h2>
 
-      <form onSubmit={(e) => handleSubmit(e, tipo, ticket, account!)} noValidate className="tf-grid">
+      <form onSubmit={(e) => {handleSubmit(e, tipo, ticket, account!); onDone}} noValidate className="tf-grid">
 
         {/* === NUEVO: Selector de plantilla === */}
         <div className="tf-field tf-col-2">

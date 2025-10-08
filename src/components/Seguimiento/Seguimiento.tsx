@@ -91,25 +91,47 @@ export default function TicketHistorial({
   // Vista Documentar (solo Documentar + Volver)
   // =======================
   if (mode === "documentar") {
-    return (
-      <div className={className ?? ""} style={{ padding: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-          <button type="button" className="th-back" onClick={() => setMode("detalle")}>
-            <span className="th-back-icon" aria-hidden>←</span> Volver al detalle
-          </button>
-        </div>
+    // Cerrar con tecla Escape
+    React.useEffect(() => {
+      const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMode("detalle"); };
+      window.addEventListener("keydown", onKey);
+      return () => window.removeEventListener("keydown", onKey);
+    }, []);
 
-        {loadingTicket && !ticket && <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>}
-        {ticket && (
-          <Documentar
-            key={`doc-${tab}-${ticketId}`}                         // remonta el form al cambiar tipo
-            ticket={ticket}
-            tipo={tab}                                             // "seguimiento" | "solucion"
-          />
-        )}
+    // Cerrar al hacer clic fuera de la tarjeta
+    const onOverlayClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+      if (e.target === e.currentTarget) setMode("detalle");
+    };
+
+    return (
+      <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={tab === "seguimiento" ? "Agregar seguimiento" : "Agregar solución"} onMouseDown={onOverlayClick}>
+        <div className="modal-card modal--lg" role="document">
+          <div className="modal-head">
+            <h3>{tab === "seguimiento" ? "Agregar seguimiento" : "Agregar solución"}</h3>
+            <button className="modal-close" onClick={() => setMode("detalle")} aria-label="Cerrar">✕</button>
+          </div>
+
+          <div className="modal-body">
+            {loadingTicket && !ticket && (
+              <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>
+            )}
+
+            {ticket && (
+              <Documentar
+                key={`doc-${tab}-${ticketId}`}   // remonta el form al cambiar tipo
+                ticket={ticket}
+                tipo={tab}                        // "seguimiento" | "solucion"
+                onDone={() => setMode("detalle")} // si tu Documentar expone un callback
+              />
+            )}
+          </div>
+        </div>
       </div>
     );
   }
+
+  const estado = (ticket?.Estadodesolicitud ?? '').toLowerCase().trim();
+  const isClosed = estado.includes('cerrado');
 
   // =======================
   // Vista Detalle (historial)
@@ -121,7 +143,7 @@ export default function TicketHistorial({
         <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Agregar :</span>
 
         {/* Tabs SOLO para admins/técnicos */}
-        {isPrivileged && !(ticket?.Estadodesolicitud?.toLowerCase().trim().includes('cerrado')) && (
+        {isPrivileged && !isClosed && (
           <div style={{ display: "flex", gap: 8 }}>
             <button
               type="button"
@@ -187,7 +209,6 @@ function HistRow({ m }: { m: Log }) {
 
       <div className="th-right">
         <div className={`th-bubble th-${tipoToClass(m.Tipo_de_accion)}`}>
-          {m.Title && <HtmlContent className="th-title" html={m.Title} />}
           <HtmlContent className="th-text" html={m.Descripcion} />
         </div>
       </div>
