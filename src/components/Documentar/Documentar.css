@@ -1,52 +1,59 @@
-/* Contenedor general: usar todo el alto disponible */
-.ticket-form {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 100%;
-  min-height: 0; /* importante para que los hijos puedan crecer */
+:root {
+  --tf-bg: #ffffff;
+  --tf-border: #e6e6ea;
+  --tf-border-strong: #d7d7dd;
+  --tf-text: #1a1a1a;
+  --tf-muted: #6b7280;
+  --tf-primary: #2563eb;    /* Botón principal (Guardar) */
+  --tf-primary-contrast: #ffffff;
+  --tf-secondary: #6b7280;  /* Botón secundario (Escalar) */
+  --tf-secondary-contrast: #ffffff;
+
+  --tf-radius: 12px;
+  --tf-gap: 16px;
+  --tf-gap-lg: 20px;
+  --tf-pad: 14px;
+  --tf-shadow: 0 6px 24px rgba(2, 6, 23, 0.06);
 }
 
-/* Título sin alterar colores */
+.ticket-form {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--tf-bg);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border);
+  border-radius: var(--tf-radius);
+  padding: calc(var(--tf-pad) * 1.2);
+  box-shadow: var(--tf-shadow);
+  position: relative; /* para posicionar el botón secundario */
+}
+
 .tf-title {
-  margin: 0 0 12px 0;
-  font-weight: 800;
+  margin: 0 0 var(--tf-gap-lg);
+  font-size: 1.25rem;
+  font-weight: 700;
   line-height: 1.2;
 }
 
-/* Grid principal: ocupa todo el espacio vertical */
 .tf-grid {
   display: grid;
-  grid-template-columns: 1fr;      /* una columna por defecto */
-  grid-auto-rows: min-content;     /* las filas se ajustan a su contenido */
-  gap: 12px;
-  flex: 1;                         /* que crezca y ocupe el alto sobrante */
-  min-height: 0;                   /* permite overflow dentro del grid */
+  grid-template-columns: 1fr 1fr;
+  gap: var(--tf-gap-lg);
 }
 
-/* Dos columnas en pantallas grandes, manteniendo spans por defecto */
-@media (min-width: 1024px) {
-  .tf-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-}
-
-/* Cada campo */
-.tf-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0; /* para truncar bien contenidos largos */
-}
-
-/* Campos que deben ocupar el ancho completo del grid */
+/* Span de 2 columnas */
 .tf-col-2 {
   grid-column: 1 / -1;
 }
 
-/* Etiquetas e inputs (no cambiamos colores) */
+.tf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .tf-label {
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
@@ -54,94 +61,125 @@
 .tf-field select,
 .tf-field input[type="file"] {
   width: 100%;
-  display: block;
+  box-sizing: border-box;
+  border: 1px solid var(--tf-border-strong);
+  background: #fff;
+  border-radius: 10px;
   padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12);
+  font: inherit;
   outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
 }
 
-/* Mensajes */
-.error {
-  font-size: 12px;
+.tf-input:focus,
+.tf-field select:focus,
+.tf-field input[type="file"]:focus {
+  border-color: var(--tf-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .hint {
-  font-size: 12px;
-  opacity: 0.8;
+  color: var(--tf-muted);
+  font-size: 0.85rem;
 }
 
-/* === Hacer que el editor ocupe el alto disponible === */
-/* Detecta el campo que contiene el editor y le permite crecer */
-.tf-field:has(.ql-container),
-.tf-field:has(.richtext-root) {
-  flex: 1;         /* que este campo use el espacio vertical libre */
-  min-height: 0;
+.error {
+  color: #b91c1c;
+  font-size: 0.85rem;
 }
 
-/* Ajustes típicos para Quill (o tu RichText) sin tocar colores */
-.tf-field .ql-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 260px;    /* alto mínimo cómodo */
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12);
+/* Editor RichTextBase64 contenedor (si el componente expone una clase propia, ajústalo) */
+.tf-field .richtext,
+.tf-field .ql-container, /* por si internamente usa Quill */
+.tf-field .rtb-container { /* alias genérico */
+  min-height: 180px;
+  border: 1px solid var(--tf-border-strong);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.tf-field .ql-toolbar {
-  border-radius: 8px 8px 0 0;
-  border-bottom: 1px solid rgba(0,0,0,0.12);
-}
-
-.tf-field .ql-editor {
-  flex: 1;
-  min-height: 200px;
-  overflow: auto;  /* scroll interno si el contenido crece */
-}
-
-/* Botonera: pegada abajo y siempre visible */
+/* Acciones */
 .tf-actions {
-  grid-column: 1 / -1;
-  position: sticky;     /* se “ancla” al fondo del contenedor scroll */
-  bottom: 0;
   display: flex;
+  gap: 10px;
+  align-items: center;
   justify-content: flex-end;
-  gap: 8px;
-  padding-top: 8px;
-  background: inherit;  /* respeta tu color de fondo actual */
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--tf-border);
 }
 
-/* Botón submit (no cambiamos color) */
-.tf-submit {
+/* Botón base */
+.tf-submit,
+.btn {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
   padding: 10px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12);
+  font-weight: 600;
   cursor: pointer;
+  transition: transform 80ms ease, filter 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.06);
 }
 
-/* Accesibilidad: focus visible sin alterar tu color */
-.tf-input:focus,
-.tf-field select:focus,
-.tf-submit:focus,
-.tf-field .ql-container:focus-within {
-  outline: 2px solid rgba(0,0,0,0.25);
-  outline-offset: 2px;
+/* Primario (Guardar) */
+.tf-submit {
+  background: var(--tf-primary);
+  color: var(--tf-primary-contrast);
+}
+.tf-submit:disabled {
+  filter: grayscale(0.4) brightness(0.95);
+  cursor: not-allowed;
+}
+.tf-submit:not(:disabled):hover {
+  filter: brightness(0.95);
+}
+.tf-submit:active {
+  transform: translateY(1px);
 }
 
-.tabla-tickets{
-  padding-left: 0;
-  padding-right: 0;
+/* Secundario (Escalar) — NO compite visualmente */
+.tf-secondary {
+  background: var(--tf-secondary);
+  color: var(--tf-secondary-contrast);
+}
+.tf-secondary:hover {
+  filter: brightness(1.05);
+}
+.tf-secondary:active {
+  transform: translateY(1px);
 }
 
-.tabla-tickets > .detalle-ticket{
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+/* Botón “Escalar a proveedor” fijo en esquina inferior izquierda */
+.btn-escalar {
+  position: absolute;
+  left: calc(var(--tf-pad) * 1.2);
+  bottom: calc(var(--tf-pad) * 1.2);
+  z-index: 5;
 }
 
-.detalle-ticket--bleed{
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+/* Espaciado para evitar que el botón fijo tape el contenido en pantallas pequeñas */
+.ticket-form::after {
+  content: "";
+  display: block;
+  height: 46px; /* altura aproximada del botón */
+}
+
+/* Responsivo */
+@media (max-width: 960px) {
+  .tf-grid {
+    grid-template-columns: 1fr;
+  }
+  .tf-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .btn-escalar {
+    position: static;        /* en móvil se integra en el flujo */
+    order: -1;               /* aparece primero */
+    margin-bottom: 8px;
+  }
+  .ticket-form::after {
+    height: 0; /* sin botón fijo, no se necesita relleno */
+  }
 }

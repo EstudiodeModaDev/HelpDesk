@@ -148,6 +148,7 @@ export default function DetalleTicket({
             ticketId={ticket.ID!}
             onAddClick={() => {}}
             onViewClick={() => {}}
+            ticket={ticket}
           />
         </div>
       )}

@@ -18,6 +18,7 @@ type Props = {
   onViewClick?: (m: Log) => void;
   defaultTab?: Tab;
   className?: string;
+  ticket: Ticket
 };
 
 export default function TicketHistorial({
@@ -26,20 +27,17 @@ export default function TicketHistorial({
   onVolver,
   defaultTab = "solucion",
   className,
+  ticket
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
   const [mode, setMode] = React.useState<Mode>("detalle");       // <-- NUEVO
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
 
-  const { Logs, Tickets } = useGraphServices();                   // <-- Tickets para traer el ticket
+  const { Logs } = useGraphServices();                   // <-- Tickets para traer el ticket
 
   const [mensajes, setMensajes] = React.useState<Log[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  // Ticket para Documentar
-  const [ticket, setTicket] = React.useState<Ticket | null>(null);
-  const [loadingTicket, setLoadingTicket] = React.useState(false);
 
   // Cargar historial SOLO en modo detalle
   React.useEffect(() => {
@@ -69,24 +67,6 @@ export default function TicketHistorial({
     return () => { cancel = true; };
   }, [ticketId, Logs, mode]);                                     // <-- depende de mode
 
-  // Cargar ticket cuando entras a Documentar
-  React.useEffect(() => {
-    if (mode !== "documentar") return;
-    if (!Tickets) return;
-    let cancel = false;
-    const fetchTicket = async () => {
-      setLoadingTicket(true);
-      try {
-        const t = await Tickets.get(String(ticketId));
-        if (!cancel) setTicket(t);
-      } finally {
-        if (!cancel) setLoadingTicket(false);
-      }
-    };
-    fetchTicket();
-    return () => { cancel = true; };
-  }, [mode, ticketId, Tickets]);
-
   // =======================
   // Vista Documentar (solo Documentar + Volver)
   // =======================
@@ -99,7 +79,7 @@ export default function TicketHistorial({
           </button>
         </div>
 
-        {loadingTicket && !ticket && <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>}
+        {!ticket && <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>}
         {ticket && (
           <Documentar
             key={`doc-${tab}-${ticketId}`}                         // remonta el form al cambiar tipo
@@ -112,7 +92,7 @@ export default function TicketHistorial({
   }
 
   const estado = (ticket?.Estadodesolicitud ?? '').toLowerCase().trim();
-  const isClosed = estado.includes('cerrado');
+  const isClosed = estado.includes('Cerrado');
 
   // =======================
   // Vista Detalle (historial)
