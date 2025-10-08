@@ -2,6 +2,7 @@ import type { FormStateActa, TipoUsuario } from "../../../../Models/ActasEntrega
 import { useActaEntrega } from "../../../../Funcionalidades/ActaEntrega";
 import type { Ticket } from "../../../../Models/Tickets";
 import { Toggle } from "../../../Toggle/Toggle";
+import "./InfoActa.css"
 
 type Props = {
   onSubmit?: (payload: any) => void;
@@ -14,9 +15,6 @@ const TIPO_COMPUTADOR_OPTIONS: Record<TipoUsuario, Array<string>> = {
   "Usuario de diseño": ["Portátil Apple", "Escritorio Apple", "Portátil Windows", "Escritorio Windows"],
   "Tienda": ["Portátil Windows", "Escritorio Windows"],
 };
-
-
-
 
 /* ===== Componente principal ===== */
 export default function InfoActaEntrega({ticket }: Props) {
