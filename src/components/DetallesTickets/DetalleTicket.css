@@ -1,14 +1,14 @@
 /* ===============================
-   DetalleTicket.css
+   DetalleTicket.css (full width)
    =============================== */
 
 :root{
-  --fg:#0b2b6a;           /* título/valores */
-  --muted:#6b7280;        /* labels */
+  --fg:#0b2b6a;
+  --muted:#6b7280;
   --border:#e5e7eb;
   --surface:#ffffff;
   --surface-2:#f9fafb;
-  --accent:#62d4bf;       /* verde botón */
+  --accent:#62d4bf;
   --accent-600:#48b7a3;
   --ghost:#f1f5f9;
 
@@ -16,7 +16,7 @@
   --shadow:0 10px 24px rgba(0,0,0,.06);
 }
 
-/* Contenedor principal */
+/* Contenedor principal: ocupa todo el ancho posible */
 .detalle-ticket{
   background: var(--surface);
   border: 1px solid var(--border);
@@ -24,6 +24,21 @@
   box-shadow: var(--shadow);
   padding: 18px 20px 22px;
   color: var(--fg);
+  width: 100%;
+  max-width: none;          /* quita límites */
+  box-sizing: border-box;   /* respeta padding dentro del ancho */
+}
+
+/* Variante opcional por si quieres forzarlo a full-bleed */
+.detalle-ticket.detalle-ticket--full {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Si tu layout tiene un contenedor con padding,
+   puedes “sangrar” horizontalmente para usar todo el ancho visual */
+.detalle-ticket.detalle-ticket--bleed {
+  margin-inline: calc(-1 * max(16px, 2vw)); /* se ajusta al padding del padre */
 }
 
 /* Título */
@@ -34,7 +49,7 @@
   letter-spacing: .2px;
 }
 
-/* Fila a 2 columnas, separador sutil */
+/* Fila a 2 columnas, que se expanda mejor en desktop grandes */
 .fila{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -44,15 +59,28 @@
 }
 .fila:last-of-type{ border-bottom: 0; }
 
+/* Aumenta densidad en pantallas XL */
+@media (min-width: 1280px){
+  .fila{
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 28px;
+    row-gap: 18px;
+  }
+  /* Cada campo ocupa 6 columnas por defecto (dos por fila) */
+  .fila .campo{ grid-column: span 6; }
+  /* Descripción ocupa el ancho completo */
+  .fila .campo.campo-descripcion{ grid-column: 1 / -1; }
+}
+
 /* Cada campo */
 .campo{
-  min-width: 0; /* evita overflow en textos largos */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* Label pequeño gris (como en la imagen) */
+/* Label */
 .campo > label{
   font-size: .78rem;
   color: var(--muted);
@@ -60,7 +88,7 @@
   letter-spacing: .3px;
 }
 
-/* Valor: más grande, buen interlineado */
+/* Valor */
 .campo > span{
   font-size: 1rem;
   color: #0f172a;
@@ -68,7 +96,7 @@
   word-break: break-word;
 }
 
-/* Imágenes/adjuntos dentro de la descripción */
+/* Render HTML dentro de descripción */
 .campo > span img,
 .campo > span video{
   display: block;
@@ -76,10 +104,10 @@
   height: auto;
   border-radius: 10px;
   margin-top: 10px;
-  background: #000; /* para videos con bandas */
+  background: #000;
 }
 
-/* Botón volver (arriba) */
+/* Botón volver */
 .btn-volver{
   appearance: none;
   border: none;
@@ -98,7 +126,7 @@
 }
 .btn-volver:active{ transform: translateY(0); }
 
-/* Botón “Seguimiento ticket” (estilo primario verde) */
+/* Botón verde “Seguimiento ticket” */
 .detalle-ticket > div > .btn-volver{
   background: var(--accent);
   color: #083b35;
@@ -110,16 +138,10 @@
   box-shadow: 0 8px 18px rgba(72,183,163,.25);
 }
 
-/* Bloques que necesitan más altura (descripción como en la imagen) */
-.campo:has(> label:contains("Descripción")),
-.campo:has(> label:contains("Descripción del caso")){
-  grid-column: 1 / -1;        /* ocupa ambas columnas */
-}
+/* Marca explícita a la descripción para ocupar todo el ancho (añade class en JSX) */
+.campo.campo-descripcion{ grid-column: 1 / -1; }
 
-/* Tip para navegadores sin :contains – fallback por id/clase opcional */
-/* .campo.campo-descripcion { grid-column: 1 / -1; } */
-
-/* Microdetalle: alinear valores con muchos saltos de línea */
+/* Microdetalle */
 .campo > span > br + br { line-height: 1.1; }
 
 /* Responsive */
@@ -143,29 +165,29 @@
   }
 }
 
-/* Botón con look de enlace para la categoría */
+/* Link-like (categoría / resolutor editables) */
 .link-like {
   background: none;
   border: none;
   padding: 0;
-  color: #0ea5e9;      /* sky-500 */
+  color: #0ea5e9;
   cursor: pointer;
   text-decoration: underline;
   font: inherit;
 }
-.link-like:hover { color: #0284c7; }    /* sky-600 */
+.link-like:hover { color: #0284c7; }
 
-/* Modal */
+/* Modal ancho y alto cómodos */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5); /* slate-900/50 */
+  background: rgba(15, 23, 42, 0.5);
   display: grid;
   place-items: center;
   z-index: 9999;
 }
 .modal-card {
-  width: min(880px, 92vw);
+  width: min(1100px, 96vw);  /* más ancho */
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 12px 40px rgba(0,0,0,.18);
@@ -197,11 +219,11 @@
 }
 .modal-body {
   padding: 16px;
-  max-height: 75vh;
+  max-height: 78vh; /* un poco más alto */
   overflow: auto;
 }
 
-/* Botón que se ve como texto normal */
+/* Botón texto */
 .as-text{
   background: none;
   border: 0;
@@ -209,18 +231,14 @@
   margin: 0;
   color: inherit;
   font: inherit;
-  cursor: pointer;        /* mantiene accesibilidad y foco por teclado */
+  cursor: pointer;
   text-align: left;
   line-height: inherit;
   border-radius: 0;
 }
-
-/* Opcional: subrayado sutil en hover para indicar que es interactivo */
 .as-text:hover { text-decoration: underline; }
-
-/* Foco visible para accesibilidad */
 .as-text:focus-visible{
-  outline: 2px solid #94a3b8;   /* slate-300 */
+  outline: 2px solid #94a3b8;
   outline-offset: 2px;
   border-radius: 4px;
 }
