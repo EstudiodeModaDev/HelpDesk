@@ -1,45 +1,19 @@
-/* ===============================
-   DetalleTicket.css (full width)
-   =============================== */
-
-:root{
-  --fg:#0b2b6a;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --surface:#ffffff;
-  --surface-2:#f9fafb;
-  --accent:#62d4bf;
-  --accent-600:#48b7a3;
-  --ghost:#f1f5f9;
-
-  --radius:14px;
-  --shadow:0 10px 24px rgba(0,0,0,.06);
-}
-
-/* Contenedor principal: ocupa todo el ancho posible */
+/* ====== Layout general a ancho completo ====== */
 .detalle-ticket{
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px 20px 22px;
-  color: var(--fg);
   width: 100%;
-  max-width: none;          /* quita límites */
-  box-sizing: border-box;   /* respeta padding dentro del ancho */
+  max-width: 100%;
+  margin-inline: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
+  padding: 18px 20px 22px;
+  color: #0b2b6a;
 }
 
-/* Variante opcional por si quieres forzarlo a full-bleed */
-.detalle-ticket.detalle-ticket--full {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* Si tu layout tiene un contenedor con padding,
-   puedes “sangrar” horizontalmente para usar todo el ancho visual */
-.detalle-ticket.detalle-ticket--bleed {
-  margin-inline: calc(-1 * max(16px, 2vw)); /* se ajusta al padding del padre */
-}
+/* (Opcional) Si tu contenedor padre limita el ancho y quieres
+   que la tarjeta “sangre” de borde a borde de la ventana:
+   .detalle-ticket { width: 100vw; margin-left: calc(50% - 50vw); } */
 
 /* Título */
 .detalle-ticket h2{
@@ -49,28 +23,19 @@
   letter-spacing: .2px;
 }
 
-/* Fila a 2 columnas, que se expanda mejor en desktop grandes */
+/* ====== Grid de campos: 3 columnas ====== */
 .fila{
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 cols */
   gap: 24px 36px;
   padding: 14px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e5e7eb;
 }
 .fila:last-of-type{ border-bottom: 0; }
 
-/* Aumenta densidad en pantallas XL */
-@media (min-width: 1280px){
-  .fila{
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 28px;
-    row-gap: 18px;
-  }
-  /* Cada campo ocupa 6 columnas por defecto (dos por fila) */
-  .fila .campo{ grid-column: span 6; }
-  /* Descripción ocupa el ancho completo */
-  .fila .campo.campo-descripcion{ grid-column: 1 / -1; }
-}
+/* Utilidades de span para campos largos */
+.campo--span-2 { grid-column: span 2; }
+.campo--span-3 { grid-column: 1 / -1; } /* ocupa las 3 columnas */
 
 /* Cada campo */
 .campo{
@@ -79,16 +44,12 @@
   flex-direction: column;
   gap: 6px;
 }
-
-/* Label */
 .campo > label{
   font-size: .78rem;
-  color: var(--muted);
+  color: #6b7280;
   font-weight: 700;
   letter-spacing: .3px;
 }
-
-/* Valor */
 .campo > span{
   font-size: 1rem;
   color: #0f172a;
@@ -96,7 +57,7 @@
   word-break: break-word;
 }
 
-/* Render HTML dentro de descripción */
+/* Descripción con ancho completo (aplícale .campo--span-3 en JSX) */
 .campo > span img,
 .campo > span video{
   display: block;
@@ -111,7 +72,7 @@
 .btn-volver{
   appearance: none;
   border: none;
-  background: var(--ghost);
+  background: #f1f5f9;
   color: #0f172a;
   padding: 8px 12px;
   border-radius: 10px;
@@ -126,119 +87,45 @@
 }
 .btn-volver:active{ transform: translateY(0); }
 
-/* Botón verde “Seguimiento ticket” */
+/* Botón “Seguimiento ticket” (look primario) */
 .detalle-ticket > div > .btn-volver{
-  background: var(--accent);
+  background: #62d4bf;
   color: #083b35;
   padding: 10px 16px;
   margin-top: 10px;
 }
 .detalle-ticket > div > .btn-volver:hover{
-  background: var(--accent-600);
+  background: #48b7a3;
   box-shadow: 0 8px 18px rgba(72,183,163,.25);
 }
 
-/* Marca explícita a la descripción para ocupar todo el ancho (añade class en JSX) */
-.campo.campo-descripcion{ grid-column: 1 / -1; }
-
-/* Microdetalle */
-.campo > span > br + br { line-height: 1.1; }
-
-/* Responsive */
-@media (max-width: 960px){
-  .fila{
-    grid-template-columns: 1fr 1fr;
-    gap: 18px 22px;
-  }
-}
-@media (max-width: 680px){
-  .fila{
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  .detalle-ticket{
-    padding: 14px;
-  }
-  .detalle-ticket h2{
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-}
-
-/* Link-like (categoría / resolutor editables) */
-.link-like {
-  background: none;
-  border: none;
-  padding: 0;
-  color: #0ea5e9;
-  cursor: pointer;
-  text-decoration: underline;
-  font: inherit;
-}
-.link-like:hover { color: #0284c7; }
-
-/* Modal ancho y alto cómodos */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  display: grid;
-  place-items: center;
-  z-index: 9999;
-}
-.modal-card {
-  width: min(1100px, 96vw);  /* más ancho */
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.18);
-  overflow: hidden;
-}
-.modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid #e5e7eb;
-}
-.modal-head h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
-}
-.modal-close {
-  background: transparent;
-  border: 1px solid transparent;
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.modal-close:hover {
-  background: #f1f5f9;
-  border-color: #e5e7eb;
-}
-.modal-body {
-  padding: 16px;
-  max-height: 78vh; /* un poco más alto */
-  overflow: auto;
-}
-
-/* Botón texto */
+/* Link-like (categoría clickeable) */
+.link-like,
 .as-text{
   background: none;
   border: 0;
   padding: 0;
   margin: 0;
-  color: inherit;
-  font: inherit;
+  color: #0ea5e9;
   cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
   text-align: left;
   line-height: inherit;
-  border-radius: 0;
 }
-.as-text:hover { text-decoration: underline; }
+.link-like:hover, .as-text:hover { color: #0284c7; }
 .as-text:focus-visible{
   outline: 2px solid #94a3b8;
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ====== Breakpoints ====== */
+@media (max-width: 1100px){
+  .fila{ grid-template-columns: repeat(2, minmax(0,1fr)); } /* 2 cols */
+}
+@media (max-width: 700px){
+  .fila{ grid-template-columns: 1fr; gap: 14px; } /* 1 col */
+  .detalle-ticket{ padding: 14px; }
+  .detalle-ticket h2{ font-size: 1rem; margin-bottom: 10px; }
 }

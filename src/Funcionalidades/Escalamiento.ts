@@ -173,8 +173,8 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setError(null);
         try {
             const created = LogSvc.create({
-                Actor: account?.username ?? "",
-                CorreoActor: account?.name ?? "",
+                Actor: account?.name ?? "",
+                CorreoActor: account?.username ?? "",
                 Tipo_de_accion: "seguimiento",
                 Descripcion: `Se ha iniciado un escalamiento de internet al proveedor: ${state.proveedor} para la tienda: ${state.tienda}`,
                 Title: ticketId

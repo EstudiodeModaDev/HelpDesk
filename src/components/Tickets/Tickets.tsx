@@ -67,8 +67,6 @@ export default function TablaTickets() {
 
   return (
     <div className="tabla-tickets">
-      <h2>Listado de Tickets</h2>
-
       {/* Barra de filtros (oculta en detalle) */}
       {!ticketSeleccionado && (
         <div
