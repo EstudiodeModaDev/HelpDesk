@@ -21,14 +21,16 @@ const ALLOWED = ["image/png", "image/jpeg", "application/pdf"]; // ajusta
 const MAX_FILES = 10;
 
 async function fileToBase64(file: File): Promise<string> {
-  const buf = await file.arrayBuffer();
-  let binary = "";
-  const bytes = new Uint8Array(buf);
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk) as any);
-  }
-  return btoa(binary);
+  // Lee como data URL: "data:<mime>;base64,<BASE64>"
+  const b64 = await new Promise<string>((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result));
+    fr.onerror = () => reject(fr.error ?? new Error("No se pudo leer el archivo"));
+    fr.readAsDataURL(file);
+  });
+  // Devuelve solo el payload base64 (lo que espera tu Flow)
+  const comma = b64.indexOf(",");
+  return comma >= 0 ? b64.slice(comma + 1) : b64;
 }
 
 const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a031c29889694d0184b5f480c5dc9834/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=WFf3MbRjOYrUiFpzepTr0aeEM4zSyBBds-RLDxejy1I")
