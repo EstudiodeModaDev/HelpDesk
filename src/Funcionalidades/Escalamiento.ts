@@ -20,7 +20,7 @@ const MAX_BYTES = MAX_MB * 1024 * 1024;
 const ALLOWED = ["image/png", "image/jpeg", "application/pdf"]; // ajusta
 const MAX_FILES = 10;
 
-/*async function fileToBase64(file: File): Promise<string> {
+async function fileToBase64(file: File): Promise<string> {
   const buf = await file.arrayBuffer();
   let binary = "";
   const bytes = new Uint8Array(buf);
@@ -29,7 +29,7 @@ const MAX_FILES = 10;
     binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk) as any);
   }
   return btoa(binary);
-}*/
+}
 
 const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a031c29889694d0184b5f480c5dc9834/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=WFf3MbRjOYrUiFpzepTr0aeEM4zSyBBds-RLDxejy1I")
 
@@ -181,7 +181,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
             alert("Se ha iniciado el escalamiento de servicio de internet")
             try {
             await notifyFlow.invoke<Escalamiento, any>({
-                adjuntos: [], //await Promise.all((state.adjuntos ?? []).map(async (f) => ({name: f.name, size: f.size, type:f.type || "application/octet-stream", contentBase: await fileToBase64(f)}))),
+                adjuntos: await Promise.all((state.adjuntos ?? []).map(async (f) => ({name: f.name, size: f.size, type:f.type || "application/octet-stream", contentBase: await fileToBase64(f)}))),
                 apellidos: state.apellidos,
                 cedula: state.cedula,
                 centroComercial: state.centroComercial,
@@ -207,8 +207,8 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         } finally {
         setLoading(false);
         }
-},
-[IntTiendasSvc, SociedadesSvc, correoSolicitante]
+    },
+    [IntTiendasSvc, SociedadesSvc, correoSolicitante]
 );
 
 
