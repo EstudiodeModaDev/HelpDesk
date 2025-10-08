@@ -152,3 +152,20 @@
   .th-left.th-left--stack{ flex-direction: row; gap: 12px; text-align: left; align-items: center; }
   .th-nombre, .th-fecha{ text-align: left; }
 }
+
+.tabla-tickets{
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.tabla-tickets > .detalle-ticket{
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.detalle-ticket--bleed{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
