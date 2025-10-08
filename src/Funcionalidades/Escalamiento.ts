@@ -135,6 +135,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
             //Si hay tienda, busca la compañía por Title (ajusta el campo si es otro)
             if (tiendaSel) {
                 const compName = (tiendaSel as any).Compa_x00f1__x00ed_a ?? (tiendaSel as any).Compania ?? "";
+                console.log(compName)
                 const compEsc = String(compName).replace(/'/g, "''");
 
                 // Busca la sociedad por Título exacto
