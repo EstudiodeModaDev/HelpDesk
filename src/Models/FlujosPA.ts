@@ -41,7 +41,8 @@ export type Escalamiento = {
   cedula: string,
   telefono: string,
   descripcion: string,
-  adjuntos: AdjuntoPayload[]
+  adjuntos: AdjuntoPayload[],
+  para: string
 }
 
 export type FlowToSP = {

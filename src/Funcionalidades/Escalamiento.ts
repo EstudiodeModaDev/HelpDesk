@@ -181,6 +181,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
             })
             console.log(created)
             alert("Se ha iniciado el escalamiento de servicio de internet")
+            const correoPara =   state.proveedor.toLowerCase() === "tigo" ? "soportecnicoempresarial@tigo.com.co" : "cliente.co@claro.com.co";
             try {
             await notifyFlow.invoke<Escalamiento, any>({
                 adjuntos: await Promise.all((state.adjuntos ?? []).map(async (f) => ({name: f.name, size: f.size, type:f.type || "application/octet-stream", contentBase: await fileToBase64(f)}))),
@@ -196,7 +197,8 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
                 nombre: state.nombre,
                 proveedor: state.proveedor,
                 telefono: state.telefono,
-                tienda: state.tienda
+                tienda: state.tienda,
+                para: correoPara
             });
             alert("Se ha enviado el correo.")
             } catch (err) {
