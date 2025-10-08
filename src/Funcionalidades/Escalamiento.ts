@@ -139,7 +139,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
 
                 // Busca la sociedad por Título exacto
                 const sociedades = await SociedadesSvc.getAll({
-                filter: `fields/ID eq ${compName}`,
+                filter: `ID eq ${compName}`,
                 top: 1,
                 });
 
