@@ -19,7 +19,7 @@ const TIPO_COMPUTADOR_OPTIONS: Record<TipoUsuario, Array<string>> = {
 /* ===== Componente principal ===== */
 export default function InfoActaEntrega({ticket }: Props) {
 
-    const {state, setField, items, toggleEntrega, handleSubmit, ITEMS_CON_TIPO_COMPUTADOR} = useActaEntrega(ticket?.ID ?? "");
+    const {state, setField, items, toggleEntrega, handleSubmit, ITEMS_CON_TIPO_COMPUTADOR, errors} = useActaEntrega(ticket?.ID ?? "");
     const tipoActual = state.tipoUsuario || "Usuario administrativo";
     const opcionesTipoPC = TIPO_COMPUTADOR_OPTIONS[tipoActual as TipoUsuario] ?? [
         "Portátil",
@@ -37,76 +37,52 @@ export default function InfoActaEntrega({ticket }: Props) {
       <div className="acta-grid">
         <div className="acta-field">
           <label>Número de ticket</label>
-          <input
-            className="acta-input"
-            value={state.numeroTicket}
-            onChange={(e) => setField("numeroTicket", e.target.value)}
-            placeholder=""
-          />
+          <input className="acta-input" value={state.numeroTicket} onChange={(e) => setField("numeroTicket", e.target.value)} placeholder=""/>
         </div>
 
         <div className="acta-field">
           <label>*Sede de destino</label>
-          <input
-            className="acta-input"
-            value={state.sedeDestino}
-            onChange={(e) => setField("sedeDestino", e.target.value)}
-          />
+          <input className="acta-input" value={state.sedeDestino} onChange={(e) => setField("sedeDestino", e.target.value)}/>
+          {errors.sedeDestino && <small className="error">{errors.sedeDestino}</small>}
         </div>
 
         <div className="acta-field">
           <label>*Persona (Quien recibe)</label>
-          <input
-            className="acta-input"
-            value={state.persona}
-            onChange={(e) => setField("persona", e.target.value)}
-          />
+          <input className="acta-input" value={state.persona} onChange={(e) => setField("persona", e.target.value)}/>
+          {errors.persona && <small className="error">{errors.persona}</small>}
         </div>
 
         <div className="acta-field">
           <label>*Correo (Quien Recibe)</label>
-          <input
-            className="acta-input"
-            type="email"
-            value={state.correo}
-            onChange={(e) => setField("correo", e.target.value)}
-          />
+          <input className="acta-input" type="email" value={state.correo} onChange={(e) => setField("correo", e.target.value)}/>
+          {errors.correo && <small className="error">{errors.correo}</small>}          
         </div>
 
         <div className="acta-field">
           <label>*Número de cédula (Quien recibe)</label>
-          <input
-            className="acta-input"
-            value={state.cedula}
-            onChange={(e) => setField("cedula", e.target.value)}
-          />
+          <input className="acta-input" value={state.cedula} onChange={(e) => setField("cedula", e.target.value)}/>
+          {errors.cedula && <small className="error">{errors.cedula}</small>}      
         </div>
 
         <div className="acta-field">
           <label>*Tipo de usuario</label>
-          <select
-            className="acta-input"
-            value={state.tipoUsuario}
-            onChange={(e) => setField("tipoUsuario", e.target.value as TipoUsuario)}
-          >
+          <select className="acta-input" value={state.tipoUsuario} onChange={(e) => setField("tipoUsuario", e.target.value as TipoUsuario)}>
             <option value="">Seleccione…</option>
             <option>Usuario administrativo</option>
             <option>Usuario de diseño</option>
             <option>Tienda nueva</option>
           </select>
+          {errors.tipoUsuario && <small className="error">{errors.tipoUsuario}</small>}      
         </div>
 
         <div className="acta-field">
           <label>*¿Estos equipos se enviarán?</label>
-          <select
-            className="acta-input"
-            value={state.enviarEquipos}
-            onChange={(e) => setField("enviarEquipos", e.target.value as string)}
-          >
+          <select className="acta-input" value={state.enviarEquipos} onChange={(e) => setField("enviarEquipos", e.target.value as string)}>
             <option value="">Seleccione…</option>
             <option value="No">No</option>
             <option value="Sí">Sí</option>
           </select>
+          {errors.enviarEquipos && <small className="error">{errors.enviarEquipos}</small>}            
         </div>
       </div>
 
@@ -116,11 +92,8 @@ export default function InfoActaEntrega({ticket }: Props) {
       <div className="entregas-grid">
         {items.map((it) => (
           <div key={it} className="entrega-item">
-            <Toggle
-              checked={!!state.entregas[it]}
-              onChange={(v) => toggleEntrega(it, v)}
-              label={it}
-            />
+            <Toggle checked={!!state.entregas[it]} onChange={(v) => toggleEntrega(it, v)} label={it}/>
+            {errors.entregas && <small className="error">{errors.entregas}</small>}            
           </div>
         ))}
 
