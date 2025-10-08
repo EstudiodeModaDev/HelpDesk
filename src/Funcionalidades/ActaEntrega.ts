@@ -3,8 +3,7 @@ import * as React from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import { useAuth } from "../auth/authContext";
 import type { LogService } from "../Services/Log.service";
-import type { FormEscalamientoStateErrors } from "../Models/nuevoTicket";
-import type { FormStateActa, TipoUsuario } from "../Models/ActasEntrega";
+import type { FormActaStateErrors, FormStateActa, TipoUsuario } from "../Models/ActasEntrega";
 import type { ActasdeentregaService } from "../Services/Actasdeentrega.service";
 
 /* ===== Config ===== */
@@ -26,7 +25,7 @@ export function useActaEntrega(ticketId: string) {
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [errors, setErrors] = React.useState<FormEscalamientoStateErrors>({});
+  const [errors, setErrors] = React.useState<FormActaStateErrors>({});
 
   const [state, setState] = React.useState<FormStateActa>({
     numeroTicket: ticketId,
@@ -47,8 +46,7 @@ export function useActaEntrega(ticketId: string) {
     setLoading(false);
   }, []);
 
-  const setField = <K extends keyof FormStateActa>(k: K, v: FormStateActa[K]) =>
-    setState((s) => ({ ...s, [k]: v }));
+  const setField = <K extends keyof FormStateActa>(k: K, v: FormStateActa[K]) => setState((s) => ({ ...s, [k]: v }));
 
   /** Ítems según tipo de usuario */
   const items = React.useMemo(() => {
@@ -73,27 +71,26 @@ export function useActaEntrega(ticketId: string) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.tipoUsuario, items]);
 
-  const toggleEntrega = (key: string, v: boolean) =>
-    setState((s) => ({ ...s, entregas: { ...s.entregas, [key]: v } }));
+  const toggleEntrega = (key: string, v: boolean) => setState((s) => ({ ...s, entregas: { ...s.entregas, [key]: v } }));
+
+  const requiereTipoComputador = Object.entries(state.entregas).some(([k, v]) => v && ITEMS_CON_TIPO_COMPUTADOR.has(k));
+
+  const validate = () => {
+    const e: FormActaStateErrors = {};
+    if (!state.cedula) e.cedula = "Digite la cedula de quien recibe";
+    if (!state.correo) e.correo = "Digite el correo de quien recibe";
+    if (state.entregas) e.entregas = "Debe seleccionar al menos un objeto a entregar";
+    if (!state.enviarEquipos) e.enviarEquipos = "Debe definir si los equipos se enviaran";
+    if (!state.persona.trim()) e.persona = "Escriba el nombre completo de quien recibe";
+    if (!state.tipoUsuario) e.tipoUsuario = "Seleccione a que tipo de usuario se le hara la entrega";
+    if(requiereTipoComputador && !state.tipoComputador) e.tipoComputador= "Seleccione el tipo de compurador"
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const errs: string[] = [];
-    if (!state.persona.trim()) errs.push("Persona (quien recibe) es obligatorio.");
-    if (!state.cedula.trim()) errs.push("Número de cédula es obligatorio.");
-    if (!state.tipoUsuario) errs.push("Tipo de usuario es obligatorio.");
-    if (!state.enviarEquipos) errs.push("¿Estos equipos se enviarán? es obligatorio.");
-
-    const requiereTipoComputador = Object.entries(state.entregas)
-      .some(([k, v]) => v && ITEMS_CON_TIPO_COMPUTADOR.has(k));
-    if (requiereTipoComputador && !state.tipoComputador)
-      errs.push("Seleccione el tipo de computador.");
-
-    if (errs.length) {
-      alert("Corrige:\n- " + errs.join("\n- "));
-      return;
-    }
+    if(!validate()) return; 
 
     try {
       setLoading(true);

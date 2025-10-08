@@ -23,3 +23,5 @@ export type FormStateActa = {
   tipoComputador?: "Portátil" | "Escritorio" | "";
   entregas: Record<string, boolean>;
 };
+
+export type FormActaStateErrors = Partial<Record<keyof FormStateActa, string>>;
