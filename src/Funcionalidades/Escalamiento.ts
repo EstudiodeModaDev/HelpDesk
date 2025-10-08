@@ -139,22 +139,23 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
 
                 // Busca la sociedad por Título exacto
                 const sociedades = await SociedadesSvc.get(compName)
+                console.log(sociedades)
 
                 setCompania(sociedades ?? null);
                 setState({
                     apellidos: account?.name!,
                     cedula: "",
-                    centroComercial: infoInternet?.Centro_x0020_Comercial ?? "",
-                    ciudad: infoInternet?.Title ?? "",
+                    centroComercial: tiendaSel?.Centro_x0020_Comercial ?? "",
+                    ciudad: tiendaSel?.Title ?? "",
                     descripcion: "",
-                    empresa: infoInternet?.Compa_x00f1__x00ed_a ?? "",
-                    identificador: infoInternet?.IDENTIFICADOR ?? "",
-                    local: infoInternet?.Local ?? "",
-                    nit: compania?.Nit ?? "",
+                    empresa: sociedades.Title ?? "",
+                    identificador: tiendaSel?.IDENTIFICADOR ?? "",
+                    local: tiendaSel?.Local ?? "",
+                    nit: sociedades?.Nit ?? "",
                     nombre: account?.username ?? "",
-                    proveedor: infoInternet?.PROVEEDOR ?? "",
+                    proveedor: tiendaSel?.PROVEEDOR ?? "",
                     telefono: "313 745 3700/319 254 9920",
-                    tienda: infoInternet?.Tienda ?? "",
+                    tienda: tiendaSel?.Tienda ?? "",
                     adjuntos: []
                 })
             } else {
