@@ -86,6 +86,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         console.log("Bucando tienda")
         const correoNorm = normLower(correoSolicitante);
         const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
+        console.log(Tiendas)
         const tiendaSel = Tiendas[0]
         console.log(tiendaSel)
         setInfoInternet(tiendaSel)
@@ -131,6 +132,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         try {
              // Busca la tienda por CORREO (usa top:1 si esperas único resultado)
             const tiendas = await IntTiendasSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' fields/IDENTIFICADOR eq '${term}')`, top: 1, });
+
             const tiendaSel = tiendas?.[0] ?? null;
             setInfoInternet(tiendaSel);
 

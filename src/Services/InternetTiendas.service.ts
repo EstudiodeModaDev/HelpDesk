@@ -124,6 +124,7 @@ export class InternetTiendasService {
   async getAll(opts?: GetAllOpts) {
     await this.ensureIds()
 
+    console.log("opciones ", opts)
     // ID -> id, Title -> fields/Title (cuando NO está prefijado con '/')
     const normalizeFieldTokens = (s: string) =>
       s
@@ -156,6 +157,7 @@ export class InternetTiendasService {
 
     try {
       const res = await this.graph.get<any>(url);
+      console.log(res)
       return (res.value ?? []).map((x: any) => this.toModel(x));
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
