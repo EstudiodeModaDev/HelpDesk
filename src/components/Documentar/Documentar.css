@@ -190,6 +190,8 @@
   z-index: 5;
 }
 
+.btn-acta { position:absolute; left:16px; bottom:64px; z-index:5; }
+
 
 .btn-escalar {
   position: absolute;

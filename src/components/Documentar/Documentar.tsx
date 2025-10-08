@@ -45,7 +45,11 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
   return (
     <div className="ticket-form">
       <h2 className="tf-title">
-        {showEscalar ? "Escalamiento internet" : `Documentar ${tipo} del ticket #${ticket.ID}`}
+        {showEscalar
+          ? "Escalamiento internet"
+          : showActaEntrega
+          ? "Nueva acta de entrega"
+          : `Documentar ${tipo} del ticket #${ticket.ID}`}
       </h2>
 
       {/* === SOLO DOCUMENTACIÓN CUANDO showEscalar = false === */}
@@ -101,20 +105,32 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
           </div>
 
           {/* Acciones (esquinas) */}
-          <div className="tf-actions tf-col-2">
-            <button type="submit" disabled={submitting} className="tf-submit btn-save">
-              {submitting ? "Enviando..." : "Guardar documentación"}
-            </button>
+            <div className="tf-actions tf-col-2">
+              <button type="submit" disabled={submitting} className="tf-submit btn-save">
+                {submitting ? "Enviando..." : "Guardar documentación"}
+              </button>
 
-            <button type="button" disabled={submitting} className="tf-secondary btn-escalar" onClick={() => setShowEscalar(true)}>
-              Escalar a proveedor de internet
-            </button>
+              {/* Escalar: esquina inferior izquierda (secundario) */}
+              <button
+                type="button"
+                disabled={submitting}
+                className="tf-secondary btn-escalar"
+                onClick={() => setShowEscalar(true)}
+              >
+                Escalar a proveedor de internet
+              </button>
 
-            <button type="button" disabled={submitting} className="tf-secondary btn-escalar" onClick={() => setShowActaEntrega(true)}>
-              Generar Acta de Entrega
-            </button>
-          </div>
-        </form>
+              {/* Acta: misma esquina, pero un poco más arriba para no montarse */}
+              <button
+                type="button"
+                disabled={submitting}
+                className="tf-secondary btn-acta"
+                onClick={() => setShowActaEntrega(true)}
+              >
+                Generar Acta de Entrega
+              </button>
+            </div>
+          </form>
       ) : (
         <>
           {/* === SOLO ESCALAMIENTO CUANDO showEscalar = true === */}
@@ -127,7 +143,7 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
             <button
               type="button"
               className="tf-secondary btn-escalar"
-              onClick={() => setShowEscalar(false)}
+              onClick={() => {setShowEscalar(false); setShowActaEntrega(false)}}
             >
               Volver a documentación
             </button>
