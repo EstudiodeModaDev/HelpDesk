@@ -174,7 +174,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
     const e: FormEscalamientoStateErrors = {};
     if (state.adjuntos.length < 1) e.adjuntos = "Debe adjuntar al menos una prueba del problema";
     if (!state.apellidos) e.apellidos = "Digite sus apellidos";
-    if (state.cedula) e.cedula = "Seleccione la fecha";
+    if (!state.cedula) e.cedula = "Digite su cédula";
     if (!state.centroComercial) e.centroComercial = "Digite el centro comercial en el que se ubica la tienda";
     if (!state.ciudad.trim()) e.ciudad = "Ingrese la ciudad de la tienda";
     if (!state.descripcion.trim()) e.descripcion = "Seleccione la descripción mas acorde a su problema";
@@ -187,10 +187,10 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
     if (!state.tienda) e.tienda = "Escriba el nombre de la tienda";
     setErrors(e);
     return Object.keys(e).length === 0;
-    };
+    } ;
 
     const handleSubmit = React.useCallback(async () => {
-        if(!validate) return;
+        if(!validate()) return;
         setLoading(true);
         setError(null);
         try {
