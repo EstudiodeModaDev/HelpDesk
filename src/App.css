@@ -2,12 +2,14 @@
 :root{
   --sb-width: 260px;
   --sb-bg: #1f2a3a;        /* azul gris oscuro del screenshot */
-  --sb-bg-2: #223247;      /* hover */
+  --sb-bg-2: #223247;
+  --sb-pad-x: 12px;
   --sb-text: #e9eef7;
   --sb-text-dim: #a9b4c7;
   --accent: #007bff;       /* barra vertical azul brillante */
   --header-h: 64px;
   --content-bg: #f6f8fb;
+  --sb-indent: 12px; 
   --ring: rgba(0,123,255,.35);
 }
 
@@ -15,6 +17,17 @@
 .page.layout{
   min-height: 100vh;
   background: var(--content-bg);
+}
+
+.layout.layout--withSidebar{
+  display: grid;
+  grid-template-columns: var(--sb-width) 1fr;
+  min-height: 100vh;
+}
+
+.content.content--withSidebar{
+  min-width: 0;             
+  overflow: hidden;
 }
 
 .layout--withSidebar .sidebar{
@@ -27,6 +40,20 @@
   grid-template-rows: auto 1fr auto;
   border-right: 1px solid rgba(255,255,255,.05);
   z-index: 1;
+}
+
+.sidebar{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: var(--sb-width);
+  min-width: var(--sb-width);
+  background: #182330;        
+  color: #e5ecf6;
+  overflow-y: auto;
+  overflow-x: hidden;        
+  padding: 12px var(--sb-pad-x) 16px;
+  box-sizing: border-box;
 }
 
 /* ====== Header top bar ====== */
@@ -86,12 +113,9 @@
 
 /* ====== Sidebar internals ====== */
 .sidebar__header{
-  font-size: 20px;
   font-weight: 800;
-  letter-spacing: .8px;
-  padding: 22px 18px 14px 18px;
-  color: #ffffff;
-  text-transform: uppercase;          /* "HELPDESK" style */
+  letter-spacing: .5px;
+  margin: 6px 0 10px;
 }
 
 .sidebar__nav{
@@ -100,23 +124,27 @@
   gap: 4px;
 }
 
+.sb-ul{ list-style: none; margin: 0; padding: 0; }
+.sb-li{ margin: 2px 0; }
+
 .sideItem{
-  --pad-x: 12px;
-  position: relative;
-  display: grid;
-  grid-template-columns: 28px 1fr;
-  align-items: center;
-  gap: 8px;
   width: 100%;
-  padding: 10px var(--pad-x);
+  display: flex;
+  align-items: flex-start;     /* permite varias líneas */
+  gap: 8px;
   border: 0;
   background: transparent;
-  color: var(--sb-text);
-  border-radius: 10px;
+  color: #eaf2ff;
+  border-radius: 12px;
   text-align: left;
   cursor: pointer;
-  font-size: 14px;
+
+  /* permite envolver; sin altura fija */
+  white-space: normal;
+  line-height: 1.2;
+  padding: 8px 10px;
 }
+
 
 .sideItem__icon{ opacity:.9; filter:saturate(.9); }
 .sideItem__label{ white-space: nowrap; }
@@ -124,6 +152,8 @@
 .sideItem:hover{
   background: var(--sb-bg-2);
 }
+.caret{ width: 14px; display:inline-block; transform: translateY(2px); transition: transform .15s ease; }
+.caret.rot{ transform: rotate(90deg) translateY(2px); }
 
 .sideItem:focus-visible{
   outline: none;
@@ -132,8 +162,23 @@
 
 /* Acento azul al costado derecho cuando está activo */
 .sideItem--active{
-  background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+  background: rgba(255,255,255,.08);
+  color: #ffffff;
 }
+
+.sideItem--folder{ color: #d5dfef; }
+.sideItem--leaf  { color: #eef4ff; }
+
+.sideItem,
+.sideItem--leaf,
+.sideItem--folder{
+  /* evita que el texto sobresalga a la derecha */
+  overflow: hidden;
+  text-overflow: ellipsis;     /* si hay una palabra larguísima sin espacios */
+  word-wrap: break-word;       /* corta palabras largas */
+}
+
+
 .sideItem--active::after{
   content: "";
   position: absolute;
@@ -161,6 +206,15 @@
 }
 .content--withSidebar{
   margin-left: var(--sb-width);
+}
+
+.sidebar::-webkit-scrollbar{ width: 10px; }
+.sidebar::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.12);
+  border-radius: 10px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.20);
 }
 
 /* ====== Responsive ====== */
