@@ -1,154 +1,148 @@
-/* Tabs */
-.th-tab {
-  border: none;
-  background: #a3a3a3;
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-}
-.th-tab--active {
-  background: #6bbbe2; /* azul suave como en la captura */
-  color: #0b2b3a;
+/* ====== Layout general a ancho completo ====== */
+.detalle-ticket{
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.06);
+  padding: 18px 20px 22px;
+  color: #0b2b6a;
 }
 
-.th-left.th-left--stack{
-  display: flex;
-  flex-direction: column;
-  align-items: center;     
-  text-align: center;       
-  gap: 8px;
+/* (Opcional) Si tu contenedor padre limita el ancho y quieres
+   que la tarjeta “sangre” de borde a borde de la ventana:
+   .detalle-ticket { width: 100vw; margin-left: calc(50% - 50vw); } */
+
+/* Título */
+.detalle-ticket h2{
+  margin: 4px 0 16px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: .2px;
 }
 
-/* Volver */
-.th-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid #c7cbd1;
-  background: #f7f9fb;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
-.th-back-icon { font-weight: 700; }
-
-/* Caja principal */
-.th-box {
-  border: 2px solid #c7cbd1;
-  border-radius: 6px;
-  background: #ffffff;
-  padding: 16px;
-  min-height: 320px;
-}
-
-/* Fila */
-.th-row {
+/* ====== Grid de campos: 3 columnas ====== */
+.fila{
   display: grid;
-  grid-template-columns: 180px 1fr; 
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 cols */
+  gap: 24px 36px;
   padding: 14px 0;
   border-bottom: 1px solid #e5e7eb;
 }
-.th-row:last-child{ border-bottom: 0; }
+.fila:last-of-type{ border-bottom: 0; }
 
-/* Columna izquierda */
-.th-left { display: flex; gap: 12px; align-items: flex-start; }
-.th-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: #e6eefc;        /* azulito suave */
-  display: grid;
-  place-items: center;
-}
-.th-avatar-img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.th-avatar-fallback{
-  font-size: 34px;
-  line-height: 1;
-}
-.th-meta { display: flex; flex-direction: column; }
-.th-nombre{
-  font-weight: 800;
-  color: #0b2b6a;            /* tu primario */
-}
-.th-fecha{
-  color: #374151;            /* slate-700 */
-  font-size: .92rem;
-}
+/* Utilidades de span para campos largos */
+.campo--span-2 { grid-column: span 2; }
+.campo--span-3 { grid-column: 1 / -1; } /* ocupa las 3 columnas */
 
-/* Columna derecha */
-.th-right { position: relative; }
-.th-bubble {
-  background: #78c38a; /* verde similar */
-  color: #0b2b0b;
-  border-radius: 6px;
-  padding: 12px 14px;
-  max-width: 860px;
-}
-.th-title { font-weight: 800; margin-bottom: 6px; }
-.th-text { line-height: 1.45; }
-
-/* Acciones flotantes (solo admin/tecnico) */
-.th-actions {
-  position: absolute;
-  right: -6px;
-  top: -10px;
+/* Cada campo */
+.campo{
+  min-width: 0;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
 }
-.th-action-btn {
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  border: 2px solid #2e2a8a;
-  background: #ffffff;
-  color: #2e2a8a;
-  font-weight: 800;
-  line-height: 1;
-  cursor: pointer;
+.campo > label{
+  font-size: .78rem;
+  color: #6b7280;
+  font-weight: 700;
+  letter-spacing: .3px;
 }
-.th-action-btn:hover { background: #eef2ff; }
+.campo > span{
+  font-size: 1rem;
+  color: #0f172a;
+  line-height: 1.45;
+  word-break: break-word;
+}
 
-/* Link inferior */
-.th-history-link {
-  margin-top: 8px;
-  background: transparent;
+/* Descripción con ancho completo (aplícale .campo--span-3 en JSX) */
+.campo > span img,
+.campo > span video{
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 10px;
+  background: #000;
+}
+
+/* Botón volver */
+.btn-volver{
+  appearance: none;
   border: none;
-  color: #2b6cb0;
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 10px;
+  transition: transform .06s ease, box-shadow .2s ease, background .2s;
+}
+.btn-volver:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(2,6,23,.08);
+}
+.btn-volver:active{ transform: translateY(0); }
+
+/* Botón “Seguimiento ticket” (look primario) */
+.detalle-ticket > div > .btn-volver{
+  background: #62d4bf;
+  color: #083b35;
+  padding: 10px 16px;
+  margin-top: 10px;
+}
+.detalle-ticket > div > .btn-volver:hover{
+  background: #48b7a3;
+  box-shadow: 0 8px 18px rgba(72,183,163,.25);
+}
+
+/* Link-like (categoría clickeable) */
+.link-like,
+.as-text{
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: #0ea5e9;
   cursor: pointer;
   text-decoration: underline;
+  font: inherit;
+  text-align: left;
+  line-height: inherit;
+}
+.link-like:hover, .as-text:hover { color: #0284c7; }
+.as-text:focus-visible{
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-.th-bubble{
-  background: #c2c3c4;            /* slate-50 */
-  border: 1px solid #c2c3c4;      /* slate-200 */
-  border-left: 4px solid #c2c3c4; /* slate-300 */
-  border-radius: 12px;
-  padding: 10px 12px;
+/* ====== Breakpoints ====== */
+@media (max-width: 1100px){
+  .fila{ grid-template-columns: repeat(2, minmax(0,1fr)); } /* 2 cols */
+}
+@media (max-width: 700px){
+  .fila{ grid-template-columns: 1fr; gap: 14px; } /* 1 col */
+  .detalle-ticket{ padding: 14px; }
+  .detalle-ticket h2{ font-size: 1rem; margin-bottom: 10px; }
 }
 
-/* tipos */
-.th-bubble.th-creacion{
-  background: #bbf7d0;            /* sky-50 */
-  border-color: #bbf7d0;
-  border-left-color: #bbf7d0;     /* sky-400 */
+.tabla-tickets{
+  padding-left: 0;
+  padding-right: 0;
 }
 
-.th-bubble.th-solucion{
-  background: #38bdf8;            /* green-50 */
-  border-color: #38bdf8;
-  border-left-color: #38bdf8;     /* emerald-400 */
+.tabla-tickets > .detalle-ticket{
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
 }
 
-@media (max-width: 780px){
-  .th-row{ grid-template-columns: 1fr; }
-  .th-left.th-left--stack{ flex-direction: row; gap: 12px; text-align: left; align-items: center; }
-  .th-nombre, .th-fecha{ text-align: left; }
+.detalle-ticket--bleed{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
 }
