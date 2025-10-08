@@ -94,11 +94,11 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
 
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting} className="tf-submit">
+          <button type="submit" disabled={submitting} className="tf-submit btn-save">
             {submitting ? "Enviando..." : "Guardar documentación"}
           </button>
           
-          <button type="button" disabled={submitting} className="tf-submit" onClick={() => setShowEscalar(!showEscalar)}>
+          <button type="button" disabled={submitting} className="tf-secondary btn-escalar" onClick={() => setShowEscalar(!showEscalar)}>
             {showEscalar ? "Ocultar escalamiento" : "Escalar a proveedor"}
           </button>
         </div>

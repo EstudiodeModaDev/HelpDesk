@@ -18,14 +18,13 @@
 
 .ticket-form {
   width: 100%;
+  max-width: none;         
+  margin: 0;              
   box-sizing: border-box;
-  background: var(--tf-bg);
-  color: var(--tf-text);
-  border: 1px solid var(--tf-border);
-  border-radius: var(--tf-radius);
-  padding: calc(var(--tf-pad) * 1.2);
-  box-shadow: var(--tf-shadow);
-  position: relative; /* para posicionar el botón secundario */
+  position: relative;     
+  padding-bottom: 72px; 
+  padding-right: 40px;   
+  padding-left: 40px;   
 }
 
 .tf-title {
@@ -118,8 +117,8 @@
   padding: 10px 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 80ms ease, filter 120ms ease, box-shadow 120ms ease;
-  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.06);
+  box-shadow: 0 4px 14px rgba(2,6,23,0.06);
+  transition: transform 80ms ease, filter 120ms ease;
 }
 
 /* Primario (Guardar) */
@@ -138,9 +137,9 @@
   transform: translateY(1px);
 }
 
-/* Secundario (Escalar) — NO compite visualmente */
+
 .tf-secondary {
-  background: var(--tf-secondary);
+  background: #6b7280;
   color: var(--tf-secondary-contrast);
 }
 .tf-secondary:hover {
@@ -162,7 +161,7 @@
 .ticket-form::after {
   content: "";
   display: block;
-  height: 46px; /* altura aproximada del botón */
+  height: 56px;
 }
 
 /* Responsivo */
@@ -182,4 +181,19 @@
   .ticket-form::after {
     height: 0; /* sin botón fijo, no se necesita relleno */
   }
+}
+
+.btn-save {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 5;
+}
+
+
+.btn-escalar {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 5;
 }
