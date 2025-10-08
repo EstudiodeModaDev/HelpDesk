@@ -12,6 +12,9 @@
   --bg-content: var(--content-bg);
   --sb-indent: 12px;
   --ring: rgba(0,123,255,.35);
+  --header-bg: #ffffff;
+  --header-text: #0b2b6a;
+  --header-sub: #6b7a90; 
 }
 
 /* ===================== PAGE LAYOUT ===================== */
@@ -89,43 +92,54 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #182330;
-  color: #fff;
+  background:  var(--header-bg);
+  color: var(--header-text);
   padding: 10px 16px;
   border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  min-height: var(--header-h);
 }
+
+.layout--withSidebar .headerRow{ left: auto; }
 
 .brand h1{
   margin: 0;
   font-size: 18px;
-  letter-spacing: .5px;
-  color: #0b2b6a;
   font-weight: 700;
+  color: var(--header-text);
+  letter-spacing: .5px;
 }
 
 .userCluster{
+  margin-left: auto;      /* empuja a la derecha */
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .avatar{
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  display: grid; place-items: center;
+  display: grid;
+  place-items: center;
   background: #e9eef7;
-  color: #0b2b6a;
+  color: var(--header-text);
   font-weight: 700;
 }
 
-.userInfo{ line-height: 1.1; }
-.userName{ font-size: 13px; color:#0b2b6a; font-weight:600; }
-.userMail{ font-size: 12px; color:#6b7a90; }
+.userInfo{ line-height: 1.1; text-align: left; }
+.userName{ font-size: 13px; color: var(--header-text); font-weight: 600; }
+.userMail{ font-size: 12px; color: var(--header-sub); }
+
 
 .btn-logout{
-  margin-left: 6px;
   border: 1px solid #e1e7f0;
   background: #fff;
+  color: #111827;
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -139,11 +153,11 @@
 
 .content.content--withSidebar{
   grid-area: content;
-  min-width: 0;      /* evita overflow horizontal */
+  min-width: 0;
   background: var(--bg-content);
   padding: 16px;
   z-index: 1;
-  overflow: auto;    /* scroll normal del contenido */
+  overflow: auto;
 }
 
 /* ===================== ÁRBOL / MENÚ ===================== */
