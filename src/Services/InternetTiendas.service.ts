@@ -71,18 +71,18 @@ export class InternetTiendasService {
   private toModel(item: any): InternetTiendas {
     const f = item?.fields ?? {};
     return {
-        ID: String(item?.id ?? item?.ID ?? item?.Id ?? ''),
+        ID: String(f?.id ?? f?.ID ?? f?.Id ?? ''),
         Title: f.Title,
-        Centro_x0020_Comercial: item.Centro_x0020_Comercial,
-        Compa_x00f1__x00ed_a: item.Compa_x00f1__x00ed_a,
-        CORREO: item.CORREO,
-        DIRECCI_x00d3_N: item.DIRECCI_x00d3_N,
-        IDENTIFICADOR: item.Identificador,
-        Local: item.local,
-        Nota: item.Nota,
-        PROVEEDOR: item.PROVEEDOR,
-        SERVICIO_x0020_COMPARTIDO: item.SERVICIO_x0020_COMPARTIDO,
-        Tienda: item.Tienda
+        Centro_x0020_Comercial: f.Centro_x0020_Comercial,
+        Compa_x00f1__x00ed_a: f.Compa_x00f1__x00ed_a,
+        CORREO: f.CORREO,
+        DIRECCI_x00d3_N: f.DIRECCI_x00d3_N,
+        IDENTIFICADOR: f.Identificador,
+        Local: f.local,
+        Nota: f.Nota,
+        PROVEEDOR: f.PROVEEDOR,
+        SERVICIO_x0020_COMPARTIDO: f.SERVICIO_x0020_COMPARTIDO,
+        Tienda: f.Tienda
     };
   }
 
