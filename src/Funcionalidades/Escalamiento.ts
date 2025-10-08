@@ -127,7 +127,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setError(null);
         try {
              // Busca la tienda por CORREO (usa top:1 si esperas único resultado)
-            const tiendas = await IntTiendasSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' fields/IDENTIFICADOR eq '${term}')`, top: 1, });
+            const tiendas = await IntTiendasSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' or fields/IDENTIFICADOR eq '${term}')`, top: 1, });
 
             const tiendaSel = tiendas?.[0] ?? null;
             setInfoInternet(tiendaSel);
