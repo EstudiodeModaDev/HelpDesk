@@ -42,69 +42,95 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
 
   return (
     <div className="ticket-form">
-      <h2 className="tf-title">Documentar {tipo} del ticket #{ticket.ID}</h2>
+      <h2 className="tf-title">
+        {showEscalar ? "Escalamiento internet" : `Documentar ${tipo} del ticket #${ticket.ID}`}
+      </h2>
 
-      <form onSubmit={(e) => {handleSubmit(e, tipo, ticket, account!); onDone}} noValidate className="tf-grid">
-
-        {/* === NUEVO: Selector de plantilla === */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="plantilla">Usar plantilla</label>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <select
-              id="plantilla"
-              className="tf-input"
-              value={plantillaId}
-              onChange={(e) => onSelectPlantilla(e.target.value)}
-              disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}
-            >
-              <option value="">{loadingPlantillas ? "Cargando plantillas..." : "— Selecciona una plantilla —"}</option>
-              {(ListaPlantillas ?? []).map(p => (
-                <option key={p.Id} value={p.Id}>{p.Title}</option>
-              ))}
-            </select>
-            {errorPlantillas && <small className="error">{errorPlantillas}</small>}
+      {/* === SOLO DOCUMENTACIÓN CUANDO showEscalar = false === */}
+      {!showEscalar ? (
+        <form
+          onSubmit={(e) => { handleSubmit(e, tipo, ticket, account!);  if (onDone) onDone();}}
+          noValidate
+          className="tf-grid"
+        >
+          {/* Selector de plantilla */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label" htmlFor="plantilla">Usar plantilla</label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <select
+                id="plantilla"
+                className="tf-input"
+                value={plantillaId}
+                onChange={(e) => onSelectPlantilla(e.target.value)}
+                disabled={submitting || loadingPlantillas || !ListaPlantillas?.length}
+              >
+                <option value="">{loadingPlantillas ? "Cargando plantillas..." : "— Selecciona una plantilla —"}</option>
+                {(ListaPlantillas ?? []).map(p => (
+                  <option key={p.Id} value={p.Id}>{p.Title}</option>
+                ))}
+              </select>
+              {errorPlantillas && <small className="error">{errorPlantillas}</small>}
+            </div>
+            <small className="hint">Al seleccionar, se insertará el contenido de la plantilla en el editor.</small>
           </div>
-          <small className="hint">Al seleccionar, se insertará el contenido de la plantilla en el editor.</small>
-        </div>
-        {/* === /NUEVO === */}
 
-        {/* Documentación */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label">Descripción de {tipo}</label>
-          <RichTextBase64
-            value={state.documentacion}
-            onChange={(html) => setField("documentacion", html)}
-            placeholder="Describe el problema y pega capturas (Ctrl+V)…"
-          />
-          {errors.documentacion && <small className="error">{errors.documentacion}</small>}
-        </div>
+          {/* Documentación */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label">Descripción de {tipo}</label>
+            <RichTextBase64
+              value={state.documentacion}
+              onChange={(html) => setField("documentacion", html)}
+              placeholder="Describe el problema y pega capturas (Ctrl+V)…"
+            />
+            {errors.documentacion && <small className="error">{errors.documentacion}</small>}
+          </div>
 
-        {/* Archivo */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
-          <input
-            id="archivo"
-            type="file"
-            onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
-            disabled={submitting}
-            className="tf-input"
-          />
-          {errors.archivo && <small className="error">{errors.archivo}</small>}
-        </div>
+          {/* Archivo */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
+            <input
+              id="archivo"
+              type="file"
+              onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
+              disabled={submitting}
+              className="tf-input"
+            />
+            {errors.archivo && <small className="error">{errors.archivo}</small>}
+          </div>
 
-        {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting} className="tf-submit btn-save">
-            {submitting ? "Enviando..." : "Guardar documentación"}
-          </button>
-          
-          <button type="button" disabled={submitting} className="tf-secondary btn-escalar" onClick={() => setShowEscalar(!showEscalar)}>
-            {showEscalar ? "Ocultar escalamiento" : "Escalar a proveedor"}
-          </button>
-        </div>
-      </form>
+          {/* Acciones (esquinas) */}
+          <div className="tf-actions tf-col-2">
+            <button type="submit" disabled={submitting} className="tf-submit btn-save">
+              {submitting ? "Enviando..." : "Guardar documentación"}
+            </button>
 
-      {showEscalar && <EscalamientoInternet ticket={ticket}/>}
+            <button
+              type="button"
+              disabled={submitting}
+              className="tf-secondary btn-escalar"
+              onClick={() => setShowEscalar(true)}
+            >
+              Escalar a proveedor
+            </button>
+          </div>
+        </form>
+      ) : (
+        <>
+          {/* === SOLO ESCALAMIENTO CUANDO showEscalar = true === */}
+          <EscalamientoInternet ticket={ticket} />
+
+          {/* Botón para volver a documentación, en la misma esquina izquierda */}
+          <div className="tf-actions tf-col-2">
+            <button
+              type="button"
+              className="tf-secondary btn-escalar"
+              onClick={() => setShowEscalar(false)}
+            >
+              Volver a documentación
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
