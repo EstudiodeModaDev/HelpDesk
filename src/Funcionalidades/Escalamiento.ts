@@ -83,17 +83,20 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setError(null);
         try {
 
-        // buscar por correo del solicitante (usa CORREO si existe; si no, Title)
+        console.log("Bucando tienda")
         const correoNorm = normLower(correoSolicitante);
         const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
         const tiendaSel = Tiendas[0]
+        console.log(tiendaSel)
         setInfoInternet(tiendaSel)
 
         if (tiendaSel) {
+            console.log("Bucando compañia")
             const compNorm = normUpper((tiendaSel as any).Compa_x00f1__x00ed_a);
             const Companias = await SociedadesSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
             const comp = (Companias ?? []).find((s: Sociedades) => normUpper(s.Title) === compNorm) ?? null;
             setCompania(comp);
+            console.log(comp)
 
             //Setear state
             setState({
