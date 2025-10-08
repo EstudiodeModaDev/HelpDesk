@@ -41,12 +41,15 @@ export default function DetalleTicket({
       <button className="btn-volver" onClick={onVolver}>← Volver</button>
       <h2>Detalles Ticket #{ticket.ID}</h2>
 
+      {/*Fila con descripcion, asunto y categoria*/}
       <div className="fila">
+        {/*Asunto*/}
         <div className="campo">
           <label>Asunto</label>
           <span>{ticket.Title}</span>
         </div>
 
+        {/*Categoria*/}
         <div className="campo">
           <label>Categoría</label>
           {canRecategorizar ? (
@@ -62,20 +65,36 @@ export default function DetalleTicket({
             <span title="No tiene permisos para recategorizar">{categoria || '–'}</span>
           )}
         </div>
+
+        {/*Descripción*/}
+        <div className="campo">
+          <label>Descripción del caso</label>
+          <span><HtmlContent html={ticket.Descripcion} /></span>
+        </div>
       </div>
 
+      {/*Fila con Estado, fecha Apertura y fecha Maxima*/}
       <div className="fila">
+        {/*Fecha de apertura*/}
         <div className="campo">
           <label>Fecha de Apertura</label>
           <span>{toISODateTimeFlex(ticket.FechaApertura)|| '–'}</span>
         </div>
+        {/*Fecha maxima*/}
         <div className="campo">
           <label>Fecha máxima de solución</label>
           <span>{`${toISODateTimeFlex(ticket.TiempoSolucion)} (${ticket.ANS})` || 'No hay fecha de solución establecida'}</span>
         </div>
+        {/*Estado*/}
+        <div className="campo">
+          <label>Estado del caso</label>
+          <span>{ticket.Estadodesolicitud || '–'}</span>
+        </div>
       </div>
 
+      {/*Fila con resolutor, solicitante y descripcion*/}
       <div className="fila">
+        {/*Resolutor*/}
         <div className="campo">
           <label>Resolutor del caso</label>
           {canRecategorizar ? (
@@ -91,30 +110,12 @@ export default function DetalleTicket({
             <span title="No tiene permisos para recategorizar">{ticket.Nombreresolutor || '–'}</span>
           )}
         </div>
+        {/*Solicitante*/}
         <div className="campo">
           <label>Solicitante del ticket</label>
           <span>{ticket.Solicitante || '–'}</span>
         </div>
-      </div>
-
-      <div className="fila">
-        <div className="campo">
-          <label>Estado del caso</label>
-          <span>{ticket.Estadodesolicitud || '–'}</span>
-        </div>
-
-        <div className="campo">
-          <label>Fuente de solicitud</label>
-          <span>{ticket.Fuente || '–'}</span>
-        </div>
-      </div>
-
-      <div className="fila">
-        <div className="campo">
-          <label>Descripción del caso</label>
-          <span><HtmlContent html={ticket.Descripcion} /></span>
-        </div>
-
+        {/*Observador*/}
         <div className="campo">
           <label>Observador del caso</label>
           {canRecategorizar ? (
@@ -129,6 +130,13 @@ export default function DetalleTicket({
           ) : (
             <span title="No tiene permisos para nombrar un observador">{ticket.Observador || 'No hay observador asignado'}</span>
           )}
+        </div>
+      </div>
+
+      <div className="fila">
+        <div className="campo">
+          <label>Fuente de solicitud</label>
+          <span>{ticket.Fuente || '–'}</span>
         </div>
       </div>
 
