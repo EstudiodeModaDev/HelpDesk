@@ -77,7 +77,7 @@ export default function EscalamientoInternet({ticket,}: Props) {
 
           <div className="esc-field">
             <label>* Centro comercial</label>
-            <input className="esc-input"value={state.centroComercial} onChange={(e) => setField("centroComercial", e.target.value)} required/>
+            <input className="esc-input" value={state.centroComercial} onChange={(e) => setField("centroComercial", e.target.value)} required/>
           </div>
 
           <div className="esc-field">

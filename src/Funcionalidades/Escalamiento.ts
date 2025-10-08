@@ -208,7 +208,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(false);
         }
     },
-    [IntTiendasSvc, SociedadesSvc, correoSolicitante]
+    [IntTiendasSvc, SociedadesSvc, correoSolicitante, state, notifyFlow, LogSvc]
 );
 
 
