@@ -147,7 +147,10 @@ export class SociedadesService {
 
     try {
       const res = await this.graph.get<any>(url);
-      return (res.value ?? []).map((x: any) => this.toModel(x));
+      console.log("Res sociedades ", res)
+      const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
+      console.log("Sociedades mapped ", mapped)
+      return mapped
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
       const code = e?.error?.code ?? e?.code;
