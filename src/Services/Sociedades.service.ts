@@ -2,7 +2,6 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts } from '../Models/Commons';
 import type { Sociedades } from '../Models/Sociedades';
-import { ensureIds, esc } from '../utils/Commons';
 
 export class SociedadesService {
   private graph!: GraphRest;
@@ -24,6 +23,51 @@ export class SociedadesService {
     this.sitePath = sitePath.startsWith('/') ? sitePath : `/${sitePath}`;
     this.listName = listName;
   }
+
+
+  private esc(s: string) { return String(s).replace(/'/g, "''"); }
+
+  // cache (mem + localStorage opcional)
+  private loadCache() {
+      try {
+      const k = `sp:${this.hostname}${this.sitePath}:${this.listName}`;
+      const raw = localStorage.getItem(k);
+      if (raw) {
+          const { siteId, listId } = JSON.parse(raw);
+          this.siteId = siteId || this.siteId;
+          this.listId = listId || this.listId;
+      }
+      } catch {}
+  }
+
+  private saveCache() {
+      try {
+      const k = `sp:${this.hostname}${this.sitePath}:${this.listName}`;
+      localStorage.setItem(k, JSON.stringify({ siteId: this.siteId, listId: this.listId }));
+      } catch {}
+  }
+
+  private async ensureIds() {
+      if (!this.siteId || !this.listId) this.loadCache();
+
+      if (!this.siteId) {
+      const site = await this.graph.get<any>(`/sites/${this.hostname}:${this.sitePath}`);
+      this.siteId = site?.id;
+      if (!this.siteId) throw new Error('No se pudo resolver siteId');
+      this.saveCache();
+      }
+
+      if (!this.listId) {
+      const lists = await this.graph.get<any>(
+          `/sites/${this.siteId}/lists?$filter=displayName eq '${this.esc(this.listName)}'`
+      );
+      const list = lists?.value?.[0];
+      if (!list?.id) throw new Error(`Lista no encontrada: ${this.listName}`);
+      this.listId = list.id;
+      this.saveCache();
+      }
+  }
+
   // ---------- mapping ----------
   private toModel(item: any): Sociedades {
     const f = item?.fields ?? {};
@@ -36,7 +80,7 @@ export class SociedadesService {
 
   // ---------- CRUD ----------
   async create(record: Omit<Sociedades, 'ID'>) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds()
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
       { fields: record }
@@ -45,7 +89,7 @@ export class SociedadesService {
   }
 
   async update(id: string, changed: Partial<Omit<Sociedades, 'ID'>>) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds()
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
       changed
@@ -57,12 +101,12 @@ export class SociedadesService {
   }
 
   async delete(id: string) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds()
     await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
   }
 
   async get(id: string) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds()
     const res = await this.graph.get<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
     );
@@ -70,8 +114,7 @@ export class SociedadesService {
   }
 
   async getAll(opts?: GetAllOpts) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
-
+    await this.ensureIds()
     // ID -> id, Title -> fields/Title (cuando NO está prefijado con '/')
     const normalizeFieldTokens = (s: string) =>
       s
@@ -121,10 +164,10 @@ export class SociedadesService {
 
   // ---------- helpers de consulta (opcionales) ----------
   async findByNit(Nit: string, top = 1) {
-    await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    await this.ensureIds()
     const qs = new URLSearchParams({
       $expand: 'fields',
-      $filter: `fields/Nit eq '${esc(Nit)}'`,
+      $filter: `fields/Nit eq '${this.esc(Nit)}'`,
       $top: String(top),
     });
     const res = await this.graph.get<any>(
