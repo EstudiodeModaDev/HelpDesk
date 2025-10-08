@@ -9,6 +9,7 @@ import type { LogService } from "../Services/Log.service";
 import { FlowClient } from "./FlowClient";
 import type { Escalamiento, } from "../Models/FlujosPA";
 import type { InternetTiendasService } from "../Services/InternetTiendas.service";
+import type { FormEscalamientoStateErrors } from "../Models/nuevoTicket";
 
 const normLower = (s?: string | null) =>
   String(s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
@@ -62,6 +63,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         descripcion: "",
         adjuntos: [],
     });
+    const [errors, setErrors] = React.useState<FormEscalamientoStateErrors>({});
     const setField = <K extends keyof FormEscalamientoState>(k: K, v: FormEscalamientoState[K]) => setState((s) => ({ ...s, [k]: v }));
 
 
@@ -168,7 +170,27 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
     [IntTiendasSvc, SociedadesSvc, correoSolicitante]
     );
 
+    const validate = () => {
+    const e: FormEscalamientoStateErrors = {};
+    if (state.adjuntos.length < 1) e.adjuntos = "Debe adjuntar al menos una prueba del problema";
+    if (!state.apellidos) e.apellidos = "Digite sus apellidos";
+    if (state.cedula) e.cedula = "Seleccione la fecha";
+    if (!state.centroComercial) e.centroComercial = "Digite el centro comercial en el que se ubica la tienda";
+    if (!state.ciudad.trim()) e.ciudad = "Ingrese la ciudad de la tienda";
+    if (!state.descripcion.trim()) e.descripcion = "Seleccione la descripción mas acorde a su problema";
+    if (!state.empresa) e.empresa = "Escriba la compañia a la que pertence la tienda";
+    if (!state.identificador) e.identificador = "Escriba el identificador de servicio de la tienda";
+    if (!state.local) e.local = "Escriba el local en el que se ubica la tienda";
+    if (!state.nit) e.nit = "Escriba el NIT de la compañia a la que pertenece la tienda";
+    if (!state.nombre) e.nombre = "Escriba su nombre";
+    if (!state.proveedor) e.proveedor = "Escriba el proveedor de internet de la tienda";
+    if (!state.tienda) e.tienda = "Escriba el nombre de la tienda";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+    };
+
     const handleSubmit = React.useCallback(async () => {
+        if(!validate) return;
         setLoading(true);
         setError(null);
         try {
@@ -237,6 +259,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
     state,
     setField,
     handleFiles,
-    handleSubmit
+    handleSubmit,
+    errors
   };
 }

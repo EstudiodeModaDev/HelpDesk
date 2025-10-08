@@ -1,4 +1,5 @@
 import type { UserOption } from "./Commons";
+import type { FormEscalamientoState } from "./Internet";
 import type { FormObservadorState, FormReasignarState } from "./Tickets";
 
 export type FormState = {
@@ -29,3 +30,5 @@ export type FormReasignarErrors = Partial<Record<keyof FormReasignarState, strin
 export type FormObservadorErrors = Partial<Record<keyof FormObservadorState, string>>
 
 export type FormDocErrors = Partial<Record<keyof FormDocumentarState, string>>
+
+export type FormEscalamientoStateErrors = Partial<Record<keyof FormEscalamientoState, string>>;
