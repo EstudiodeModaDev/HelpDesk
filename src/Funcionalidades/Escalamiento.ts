@@ -82,13 +82,9 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-
-        console.log("Bucando tienda")
         const correoNorm = normLower(correoSolicitante);
         const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
-        console.log(Tiendas)
         const tiendaSel = Tiendas[0]
-        console.log(tiendaSel)
         setInfoInternet(tiendaSel)
 
         if (tiendaSel) {

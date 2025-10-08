@@ -21,6 +21,7 @@ import { TicketsService } from '../Services/Tickets.service';
 import { CategoriasService } from '../Services/Categorias.service';
 import { FranquiciasService } from '../Services/Franquicias.service';
 import { SubCategoriasService } from '../Services/SubCategorias.Service';
+import {InternetTiendasService } from '../Services/InternetTiendas.service'
 //import { SharedServices } from '../Services/Shared.service'; // <- singular
 
 // ================== Tipos ==================
@@ -42,6 +43,7 @@ export type GraphSiteConfig = {
     Categorias: string;
     Franquicias: string;
     SubCategorias: string;
+    InternetTiendas: string
   };
 };
 
@@ -62,7 +64,8 @@ export type GraphServices = {
   Categorias: CategoriasService; 
   Franquicias: FranquiciasService;
   SubCategorias: SubCategoriasService;
-  //shared: SharedServices; // <- singular
+  InternetTiendas: InternetTiendasService
+
 };
 
 // ================== Contexto ==================
@@ -92,6 +95,7 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     Categorias: 'Categorias',
     Franquicias: 'Franquicias',
     SubCategorias: 'SubCategorias',
+    InternetTiendas: 'Internet Tiendas'
   },
 };
 
@@ -115,11 +119,12 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Anuncios:                       config?.lists?.Anuncios                 ?? base.lists.Anuncios,
         Articulos:                      config?.lists?.Articulos                ?? base.lists.Articulos,
         Usuarios:                       config?.lists?.Usuarios                 ?? base.lists.Usuarios,
-        Logs:                            config?.lists?.Logs                      ?? base.lists.Logs,
+        Logs:                           config?.lists?.Logs                     ?? base.lists.Logs,
         Tickets:                        config?.lists?.Tickets                  ?? base.lists.Tickets,
         Categorias:                     config?.lists?.Categorias               ?? base.lists.Categorias,
         Franquicias:                    config?.lists?.Franquicias              ?? base.lists.Franquicias,
         SubCategorias:                  config?.lists?.SubCategorias            ?? base.lists.SubCategorias,
+        InternetTiendas:                config?.lists?.InternetTiendas          ?? base.lists.InternetTiendas,
       },
     };
   }, [config]);
@@ -143,11 +148,12 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Anuncios                  = new AnunciosService(graph, hostname, sitePath, lists.Anuncios);
     const Articulos                 = new ArticulosService(graph, hostname, sitePath, lists.Articulos);
     const Usuarios                  = new UsuariosSPService(graph, hostname, sitePath, lists.Usuarios);
-    const Logs                       = new LogService(graph, hostname, sitePath, lists.Logs);
+    const Logs                      = new LogService(graph, hostname, sitePath, lists.Logs);
     const Tickets                   = new TicketsService(graph, hostname, sitePath, lists.Tickets);
     const Categorias                = new CategoriasService(graph, hostname, sitePath, lists.Categorias);
     const Franquicias               = new FranquiciasService(graph, hostname, sitePath, lists.Franquicias);
-    const SubCategorias             = new SubCategoriasService(graph, hostname, sitePath, lists.SubCategorias)
+    const SubCategorias             = new SubCategoriasService(graph, hostname, sitePath, lists.SubCategorias);
+    const InternetTiendas            = new InternetTiendasService(graph, hostname, sitePath, lists.InternetTiendas)
 
 
     // SharedService depende de UsuariosParkingService
@@ -168,7 +174,8 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Tickets,
         Categorias,
         Franquicias,
-        SubCategorias
+        SubCategorias,
+        InternetTiendas
     };
   }, [graph, cfg]);
 
