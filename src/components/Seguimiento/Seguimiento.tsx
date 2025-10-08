@@ -121,7 +121,7 @@ export default function TicketHistorial({
         <span style={{ fontSize: 22, fontWeight: 700, marginRight: 12 }}>Agregar :</span>
 
         {/* Tabs SOLO para admins/técnicos */}
-        {isPrivileged && !ticket?.Estadodesolicitud?.includes('cerrado') && (
+        {isPrivileged && !ticket?.Estadodesolicitud?.toLowerCase().includes('cerrado') && (
           <div style={{ display: "flex", gap: 8 }}>
             <button
               type="button"

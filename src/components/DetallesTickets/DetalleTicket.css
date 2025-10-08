@@ -1,148 +1,190 @@
-/* ====== Layout general a ancho completo ====== */
-.detalle-ticket{
-  width: 100%;
-  max-width: 100%;
-  margin-inline: 0;
-  background: #fff;
+/* ====== Contenedor general ====== */
+.detalle-ticket {
+  display: block;
+  gap: 16px;
+}
+
+/* Botón volver (ya lo tienes, dejo base por si acaso) */
+.btn-volver{
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.06);
-  padding: 18px 20px 22px;
-  color: #0b2b6a;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-/* (Opcional) Si tu contenedor padre limita el ancho y quieres
-   que la tarjeta “sangre” de borde a borde de la ventana:
-   .detalle-ticket { width: 100vw; margin-left: calc(50% - 50vw); } */
-
-/* Título */
-.detalle-ticket h2{
-  margin: 4px 0 16px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: .2px;
-}
-
-/* ====== Grid de campos: 3 columnas ====== */
+/* ====== Cada FILA: 3 columnas iguales ====== */
 .fila{
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 cols */
-  gap: 24px 36px;
-  padding: 14px 0;
-  border-bottom: 1px solid #e5e7eb;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 columnas iguales */
+  gap: 16px;
+  align-items: start;           /* todas alineadas arriba */
+  margin-bottom: 12px;
 }
-.fila:last-of-type{ border-bottom: 0; }
 
-/* Utilidades de span para campos largos */
-.campo--span-2 { grid-column: span 2; }
-.campo--span-3 { grid-column: 1 / -1; } /* ocupa las 3 columnas */
-
-/* Cada campo */
+/* ====== Cada CAMPO (celda) ====== */
 .campo{
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;                 /* IMPORTANT: evita overflow horizontal */
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
 }
+
+/* Etiqueta del campo */
 .campo > label{
-  font-size: .78rem;
-  color: #6b7280;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: .3px;
-}
-.campo > span{
-  font-size: 1rem;
-  color: #0f172a;
-  line-height: 1.45;
-  word-break: break-word;
+  color: #475569;
+  letter-spacing: .02em;
 }
 
-/* Descripción con ancho completo (aplícale .campo--span-3 en JSX) */
-.campo > span img,
-.campo > span video{
+/* Valor del campo: que pueda crecer hacia abajo */
+.campo > span,
+.campo > button.as-text{
   display: block;
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
-  margin-top: 10px;
-  background: #000;
+  min-width: 0;
+  line-height: 1.35;
+  overflow-wrap: anywhere;      /* corta palabras largas */
+  word-break: break-word;
+  white-space: normal;          /* NO una sola línea; permite varias */
+  text-align: left;
 }
 
-/* Botón volver */
-.btn-volver{
-  appearance: none;
-  border: none;
-  background: #f1f5f9;
-  color: #0f172a;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 10px;
-  transition: transform .06s ease, box-shadow .2s ease, background .2s;
-}
-.btn-volver:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(2,6,23,.08);
-}
-.btn-volver:active{ transform: translateY(0); }
-
-/* Botón “Seguimiento ticket” (look primario) */
-.detalle-ticket > div > .btn-volver{
-  background: #62d4bf;
-  color: #083b35;
-  padding: 10px 16px;
-  margin-top: 10px;
-}
-.detalle-ticket > div > .btn-volver:hover{
-  background: #48b7a3;
-  box-shadow: 0 8px 18px rgba(72,183,163,.25);
-}
-
-/* Link-like (categoría clickeable) */
-.link-like,
+/* Botón “as-text” (clickable pero luce como texto) */
 .as-text{
-  background: none;
-  border: 0;
+  appearance: none;
+  background: transparent;
+  border: none;
   padding: 0;
   margin: 0;
-  color: #0ea5e9;
+  color: #0f172a;
   cursor: pointer;
-  text-decoration: underline;
-  font: inherit;
-  text-align: left;
-  line-height: inherit;
 }
-.link-like:hover, .as-text:hover { color: #0284c7; }
-.as-text:focus-visible{
-  outline: 2px solid #94a3b8;
-  outline-offset: 2px;
-  border-radius: 4px;
+.as-text:hover{ text-decoration: underline; }
+
+/* ====== HtmlContent interno (por si llega con etiquetas) ====== */
+.campo .HtmlContent,
+.campo .th-text{
+  white-space: pre-wrap;        /* respeta saltos de línea */
+  overflow-wrap: anywhere;
 }
 
-/* ====== Breakpoints ====== */
-@media (max-width: 1100px){
-  .fila{ grid-template-columns: repeat(2, minmax(0,1fr)); } /* 2 cols */
+/* ====== Opcional: responsive ====== */
+@media (max-width: 1200px){
+  .fila{ grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 @media (max-width: 700px){
-  .fila{ grid-template-columns: 1fr; gap: 14px; } /* 1 col */
-  .detalle-ticket{ padding: 14px; }
-  .detalle-ticket h2{ font-size: 1rem; margin-bottom: 10px; }
+  .fila{ grid-template-columns: 1fr; }
 }
 
-.tabla-tickets{
-  padding-left: 0;
-  padding-right: 0;
+/* ====== Utilidades opcionales ======
+   Por si algún día necesitas que un campo ocupe más columnas: */
+.campo--span-2{ grid-column: span 2; }
+.campo--span-3{ grid-column: span 3; }
+
+/* ============================================================
+   ================   MODALES (añadidos)   ====================
+   ============================================================ */
+
+/* Fondo del modal */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, .45);           /* slate-900/45 */
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  padding: 24px;                                /* safe area para pantallas pequeñas */
+  animation: overlay-fade .18s ease-out;
 }
 
-.tabla-tickets > .detalle-ticket{
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+/* Tarjeta del modal */
+.modal-card{
+  width: 100%;
+  max-width: 720px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 48px rgba(2,6,23,.20), 0 8px 16px rgba(2,6,23,.10);
+  overflow: hidden;                              /* redondeado real */
+  animation: modal-pop .18s ease-out;
 }
 
-.detalle-ticket--bleed{
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+/* Cabezera */
+.modal-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;                          /* slate-50 */
+}
+.modal-head h3{
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0b2b6a;
+}
+
+/* Cuerpo con scroll si es largo */
+.modal-body{
+  padding: 16px;
+  max-height: min(70vh, 800px);
+  overflow: auto;
+}
+
+/* Botón cerrar */
+.modal-close{
+  appearance: none;
+  border: none;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #0f172a;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background .15s ease, transform .06s ease, box-shadow .2s ease;
+}
+.modal-close:hover{
+  background: #f1f5f9;
+  box-shadow: 0 6px 14px rgba(2,6,23,.08);
+}
+.modal-close:active{ transform: translateY(1px); }
+.modal-close:focus-visible{
+  outline: 2px solid #94a3b8;
+  outline-offset: 3px;
+}
+
+/* Tamaños alternativos (por si reusas modales con otras vistas) */
+.modal-card.modal--sm{ max-width: 520px; }
+.modal-card.modal--lg{ max-width: 960px; }
+
+/* Breakpoints del modal (más cómodo en móvil) */
+@media (max-width: 700px){
+  .modal-card{
+    max-width: 100%;
+    border-radius: 12px;
+  }
+  .modal-body{ max-height: 75vh; }
+}
+
+/* Animaciones */
+@keyframes overlay-fade{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
+}
+@keyframes modal-pop{
+  from{ opacity: 0; transform: translateY(10px) scale(.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
 }
