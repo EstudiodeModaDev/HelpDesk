@@ -129,3 +129,20 @@
   .detalle-ticket{ padding: 14px; }
   .detalle-ticket h2{ font-size: 1rem; margin-bottom: 10px; }
 }
+
+.tabla-tickets{
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.tabla-tickets > .detalle-ticket{
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.detalle-ticket--bleed{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
