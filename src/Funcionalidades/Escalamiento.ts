@@ -5,10 +5,10 @@ import { useAuth } from "../auth/authContext";
 import type { SociedadesService } from "../Services/Sociedades.service";
 import type { FormEscalamientoState, InternetTiendas } from "../Models/Internet";
 import type { Sociedades } from "../Models/Sociedades";
-import type { ProveedoresService } from "../Services/Proveedores.service";
 import type { LogService } from "../Services/Log.service";
 import { FlowClient } from "./FlowClient";
 import type { Escalamiento, } from "../Models/FlujosPA";
+import type { InternetTiendasService } from "../Services/InternetTiendas.service";
 
 const normLower = (s?: string | null) =>
   String(s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
@@ -35,10 +35,10 @@ const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b
 
 export function useEscalamiento(correoSolicitante: string, ticketId: string) {
     const { account } = useAuth();
-    const {Logs: LogSvc, Sociedades: SociedadesSvc, Proveedores: ProveedoresSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
+    const {Logs: LogSvc, Sociedades: SociedadesSvc, InternetTiendas: IntTiendasSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
         Logs: LogService;
         Sociedades: SociedadesService;
-        Proveedores: ProveedoresService
+        InternetTiendas: InternetTiendasService
     };
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -85,7 +85,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
 
         // buscar por correo del solicitante (usa CORREO si existe; si no, Title)
         const correoNorm = normLower(correoSolicitante);
-        const Tiendas = await ProveedoresSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
+        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
         const tiendaSel = Tiendas[0]
         setInfoInternet(tiendaSel)
 
@@ -127,7 +127,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setError(null);
         try {
              // Busca la tienda por CORREO (usa top:1 si esperas único resultado)
-            const tiendas = await ProveedoresSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' fields/IDENTIFICADOR eq '${term}')`, top: 1, });
+            const tiendas = await IntTiendasSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' fields/IDENTIFICADOR eq '${term}')`, top: 1, });
             const tiendaSel = tiendas?.[0] ?? null;
             setInfoInternet(tiendaSel);
 
@@ -168,7 +168,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(false);
         }
     },
-    [ProveedoresSvc, SociedadesSvc, correoSolicitante]
+    [IntTiendasSvc, SociedadesSvc, correoSolicitante]
     );
 
     const handleSubmit = React.useCallback(async () => {
@@ -213,7 +213,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(false);
         }
 },
-[ProveedoresSvc, SociedadesSvc, correoSolicitante]
+[IntTiendasSvc, SociedadesSvc, correoSolicitante]
 );
 
 

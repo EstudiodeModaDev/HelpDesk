@@ -2,7 +2,7 @@ import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts } from '../Models/Commons';
 import type { InternetTiendas } from '../Models/Internet';
 
-export class InternetService {
+export class InternetTiendasService {
   private graph!: GraphRest;
   private hostname!: string;
   private sitePath!: string;
