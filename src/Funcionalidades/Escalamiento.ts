@@ -136,11 +136,10 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
             if (tiendaSel) {
                 const compName = (tiendaSel as any).Compa_x00f1__x00ed_a ?? (tiendaSel as any).Compania ?? "";
                 console.log(compName)
-                const compEsc = String(compName).replace(/'/g, "''");
 
                 // Busca la sociedad por Título exacto
                 const sociedades = await SociedadesSvc.getAll({
-                filter: `fields/Title eq '${compEsc}'`,
+                filter: `fields/Title eq '${compName}'`,
                 top: 1,
                 });
 
