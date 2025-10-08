@@ -23,7 +23,6 @@
   background: var(--content-bg);
 }
 
-/* Grid de 2 columnas (sidebar + contenido) y 2 filas (header + main) */
 .layout.layout--withSidebar{
   display: grid;
   grid-template-columns: var(--sb-width) 1fr;
@@ -135,7 +134,6 @@
 .userName{ font-size: 13px; color: var(--header-text); font-weight: 600; }
 .userMail{ font-size: 12px; color: var(--header-sub); }
 
-
 .btn-logout{
   border: 1px solid #e1e7f0;
   background: #fff;
@@ -219,7 +217,6 @@
   background: var(--accent);
 }
 
-/* Caret */
 .caret{
   width: 14px;
   display:inline-block;

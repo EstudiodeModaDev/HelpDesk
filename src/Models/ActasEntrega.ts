@@ -9,3 +9,17 @@ export type ActasEntrega = {
     Estado: string;
     Cedula: string;
 };
+
+export type TipoUsuario = "Usuario administrativo" | "Usuario de diseño" | "Tienda";
+
+export type FormStateActa = {
+  numeroTicket: string;
+  persona: string;
+  sedeDestino: string;
+  correo: string;
+  cedula: string;
+  enviarEquipos: string;
+  tipoUsuario: TipoUsuario | "";
+  tipoComputador?: "Portátil" | "Escritorio" | "";
+  entregas: Record<string, boolean>;
+};

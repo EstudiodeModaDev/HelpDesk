@@ -12,6 +12,7 @@ import { usePlantillas } from "../../Funcionalidades/Plantillas";
 import type { PlantillasService } from "../../Services/Plantillas.service";
 import React from "react";
 import EscalamientoInternet from "./EscalamientoProveedor/Escalamiento";
+import InfoActaEntrega from "./ActaEntrega/InformacionCaso/InfoActa";
 
 export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; tipo: "solucion" | "seguimiento"; onDone?: () => void | Promise<void>}) {
   const { Tickets: TicketsSvc, Logs: LogsSvc, Plantillas: PlantillasSvc } =
@@ -31,6 +32,7 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
 
   const [plantillaId, setPlantillaId] = React.useState<string>("");
   const [showEscalar, setShowEscalar] = React.useState<boolean>(false)
+  const [showActaEntrega, setShowActaEntrega] = React.useState<boolean>(false)
 
   const onSelectPlantilla = (id: string) => {
     setPlantillaId(id);
@@ -47,7 +49,7 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
       </h2>
 
       {/* === SOLO DOCUMENTACIÓN CUANDO showEscalar = false === */}
-      {!showEscalar ? (
+      {!showEscalar && !showActaEntrega ? (
         <form
           onSubmit={(e) => { handleSubmit(e, tipo, ticket, account!);  if (onDone) onDone();}}
           noValidate
@@ -104,20 +106,21 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
               {submitting ? "Enviando..." : "Guardar documentación"}
             </button>
 
-            <button
-              type="button"
-              disabled={submitting}
-              className="tf-secondary btn-escalar"
-              onClick={() => setShowEscalar(true)}
-            >
-              Escalar a proveedor
+            <button type="button" disabled={submitting} className="tf-secondary btn-escalar" onClick={() => setShowEscalar(true)}>
+              Escalar a proveedor de internet
+            </button>
+
+            <button type="button" disabled={submitting} className="tf-secondary btn-escalar" onClick={() => setShowActaEntrega(true)}>
+              Generar Acta de Entrega
             </button>
           </div>
         </form>
       ) : (
         <>
           {/* === SOLO ESCALAMIENTO CUANDO showEscalar = true === */}
-          <EscalamientoInternet ticket={ticket} />
+
+          {showEscalar && <EscalamientoInternet ticket={ticket} />}
+          {showActaEntrega && <InfoActaEntrega ticket={ticket}/>}
 
           {/* Botón para volver a documentación, en la misma esquina izquierda */}
           <div className="tf-actions tf-col-2">
