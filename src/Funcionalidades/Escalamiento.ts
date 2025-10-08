@@ -138,12 +138,9 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
                 console.log(compName)
 
                 // Busca la sociedad por Título exacto
-                const sociedades = await SociedadesSvc.getAll({
-                filter: `ID eq ${compName}`,
-                top: 1,
-                });
+                const sociedades = await SociedadesSvc.get(compName)
 
-                setCompania(sociedades?.[0] ?? null);
+                setCompania(sociedades ?? null);
                 setState({
                     apellidos: account?.name!,
                     cedula: "",
