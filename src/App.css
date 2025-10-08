@@ -22,12 +22,22 @@
 .layout.layout--withSidebar{
   display: grid;
   grid-template-columns: var(--sb-width) 1fr;
+   grid-template-rows: auto 1fr;  
   min-height: 100vh;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar content";
+  min-height: 100vh;
+  background: var(--bg-app);
 }
 
 .content.content--withSidebar{
-  min-width: 0;             
-  overflow: hidden;
+  grid-area: content;
+  min-width: 0;                /* IMPORTANT: evita overflow horizontal */
+  background: var(--bg-content);
+  padding: 16px;
+  z-index: 1;
+  overflow: auto;              /* scroll normal del contenido */
 }
 
 .layout--withSidebar .sidebar{
@@ -42,30 +52,32 @@
 }
 
 .sidebar{
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  grid-area: sidebar;
   width: var(--sb-width);
   min-width: var(--sb-width);
-  background: #182330;        
-  color: #e5ecf6;
+  height: 100vh;               /* columna completa */
+  position: sticky;            /* se mantiene visible al hacer scroll */
+  top: 0;
+  z-index: 3;                  /* sobre el contenido si se solapan bordes */
   overflow-y: auto;
-  overflow-x: hidden;        
-  padding: 12px var(--sb-pad-x) 16px;
+  overflow-x: hidden;
+  background: #182330;
+  color: #e5ecf6;
+  padding: 12px 12px 16px;
   box-sizing: border-box;
 }
 
+
 /* ====== Header top bar ====== */
 .headerRow{
-  position: fixed;
-  top: 0; right: 0; left: 0;
-  height: var(--header-h);
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  border-bottom: 1px solid #e9edf3;
+  grid-area: header;
+  position: sticky;
+  top: 0;                      /* se pega al top del viewport */
+  z-index: 2;                  /* por encima del main si hay sombra */
+  background: #182330;         /* o el color que uses para la barra */
+  color: #fff;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
 }
 
 .layout--withSidebar .headerRow{
