@@ -5,7 +5,7 @@ import { useFacturas } from "../../Funcionalidades/Facturas";
 import NewItemModal from "./NewItemModal/NewItemModal";
 
 const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
-  const {state, submitting, proveedores, items, loadingData,  error, total,
+  const {state, submitting, proveedores, items, loadingData,  error, total, errors,
     setField, setState,  handleSubmit, setItems, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario} = useFacturas();
   const [showNewItem, setShowNewItem] = useState(false);
 
@@ -51,39 +51,25 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
         {/* Fila compacta */}
         <div className="field">
           <label className="label">Fecha</label>
-          <input
-            type="date"
-            value={state.FechaEmision || ""}
-            onChange={(e) => setField("FechaEmision", e.target.value)}
-            disabled={loadingData || submitting}
-            className="control"
-          />
+          <input type="date" value={state.FechaEmision || ""} onChange={(e) => setField("FechaEmision", e.target.value)} disabled={loadingData || submitting} className="control"/>
+          {errors.FechaEmision && <small className="error">{errors.FechaEmision}</small>}
         </div>
 
         <div className="field">
           <label className="label">No. Factura</label>
-          <input
-            value={state.NoFactura || ""}
-            onChange={(e) => setField("NoFactura", e.target.value)}
-            placeholder="Ej. F-2025-00123"
-            disabled={loadingData || submitting}
-            className="control"
-          />
+          <input value={state.NoFactura || ""} onChange={(e) => setField("NoFactura", e.target.value)}  placeholder="Ej. F-2025-00123" disabled={loadingData || submitting} className="control"/>
+          {errors.NoFactura && <small className="error">{errors.NoFactura}</small>}
         </div>
 
         <div className="field">
           <label className="label">Proveedor</label>
-          <select
-            value={state.IdProveedor || ""}
-            onChange={(e) => setField("IdProveedor", e.target.value)}
-            disabled={loadingData || submitting}
-            className="control"
-          >
+          <select value={state.IdProveedor || ""} onChange={(e) => setField("IdProveedor", e.target.value)} disabled={loadingData || submitting} className="control">
             <option value="">Seleccione proveedor</option>
             {proveedores.map((p) => (
               <option key={p.Id} value={p.Id}>{p.Title}</option>
             ))}
           </select>
+          {errors.IdProveedor && <small className="error">{errors.IdProveedor}</small>}
         </div>
 
         <div className="field">
@@ -93,25 +79,15 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
 
         <div className="field">
           <label className="label">CO (Centro de costos)</label>
-          <input
-            value={state.CO || ""}
-            onChange={(e) => {setField("CO", e.target.value);}}
-            placeholder="Ej. 1234"
-            disabled={loadingData || submitting}
-            className="control"
-          />
+          <input value={state.CO || ""} onChange={(e) => {setField("CO", e.target.value);}} placeholder="Ej. 1234" disabled={loadingData || submitting} className="control"/>
+          {errors.CO && <small className="error">{errors.CO}</small>}
         </div>
 
         {/* Ítems: ocupa todas las columnas */}
         <div className="col-span-full table-fluid">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-700">Ítems</span>
-            <button
-              type="button"
-              className="btn btn-sm"
-              onClick={addLinea}
-              disabled={submitting || loadingData}
-            >
+            <button type="button" className="btn btn-sm"  onClick={addLinea} disabled={submitting || loadingData}>
               + Agregar línea
             </button>
           </div>
@@ -141,12 +117,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                   <tr key={l.tempId}>
                     <td>
                       <div className="flex gap-2">
-                        <select
-                          value={l.Id}
-                          onChange={(e) => onChangeItem(l.tempId!, e.target.value)}
-                          disabled={submitting}
-                          className="select-compact bg-white"
-                        >
+                        <select value={l.Id} onChange={(e) => onChangeItem(l.tempId!, e.target.value)} disabled={submitting} className="select-compact bg-white">
                           <option value="">Seleccione</option>
                           {items.map((it) => (
                             <option key={it.Id} value={it.Title}>
@@ -154,12 +125,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                             </option>
                           ))}
                         </select>
-                        <button
-                          type="button"
-                          className="btn btn-sm whitespace-nowrap"
-                          onClick={() => setShowNewItem(true)}
-                          title="Registrar nuevo ítem"
-                        >
+                        <button type="button" className="btn btn-sm whitespace-nowrap" onClick={() => setShowNewItem(true)}  title="Registrar nuevo ítem">
                           Nuevo ítem
                         </button>
                       </div>
@@ -170,25 +136,11 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                     </td>
 
                     <td>
-                      <input
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={Number.isFinite(l.Valor) ? String(l.Valor) : "0"}
-                        onChange={(e) => onChangeValorUnitario(l.tempId!, Number(e.target.value))}
-                        className="input-compact"
-                      />
+                      <input type="number" min={0} step="0.01" value={Number.isFinite(l.Valor) ? String(l.Valor) : "0"} onChange={(e) => onChangeValorUnitario(l.tempId!, Number(e.target.value))} className="input-compact"/>
                     </td>
 
                     <td>
-                      <input
-                        type="number"
-                        min={1}
-                        step="1"
-                        value={Number.isFinite(l.cantidad) ? String(l.cantidad) : "1"}
-                        onChange={(e) => onChangeCantidad(l.tempId!, Math.max(1, Number(e.target.value)))}
-                        className="input-compact"
-                      />
+                      <input type="number" min={1} step="1" value={Number.isFinite(l.cantidad) ? String(l.cantidad) : "1"} onChange={(e) => onChangeCantidad(l.tempId!, Math.max(1, Number(e.target.value)))}className="input-compact"/>
                     </td>
 
                     <td>
@@ -196,16 +148,13 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                     </td>
 
                     <td>
-                      <button
-                        type="button"
-                        className="btn btn-sm"
-                        onClick={() => removeLinea(l.tempId!)}
-                      >
+                      <button type="button" className="btn btn-sm" onClick={() => removeLinea(l.tempId!)}>
                         Eliminar
                       </button>
                     </td>
                   </tr>
                 ))}
+                {errors.lineas && <small className="error">{errors.lineas}</small>}
               </tbody>
 
               <tfoot>
@@ -222,19 +171,10 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
 
         {/* Acciones: ocupa todas las columnas */}
         <div className="col-span-full flex items-center justify-end gap-2 pt-2">
-          <button
-            type="reset"
-            className="btn btn-sm"
-            disabled={submitting}
-            onClick={() => setState((s) => ({ ...s, lineas: [], total: 0 }))}
-          >
+          <button type="reset" className="btn btn-sm" disabled={submitting} onClick={() => setState((s) => ({ ...s, lineas: [], total: 0 }))}>
             Limpiar
           </button>
-          <button
-            type="submit"
-            className="btn btn-primary btn-sm"
-            disabled={submitting || loadingData}
-          >
+          <button type="submit" className="btn btn-primary btn-sm" disabled={submitting || loadingData}>
             {submitting ? "Guardando..." : "Guardar factura"}
           </button>
         </div>
@@ -251,5 +191,3 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
 };
 
 export default NuevaFactura;
-
-// Utils
