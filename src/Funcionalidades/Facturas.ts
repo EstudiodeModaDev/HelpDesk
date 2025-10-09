@@ -34,7 +34,7 @@ export function useFacturas() {
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const {Facturas: FacturasSvc, ItemFactura: ItemFacturaSvc, ProveedoresFactura: ProveedoresSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
+  const {Facturas: FacturasSvc, ItemFactura: ItemFacturaSvc, ProveedoresFactura: ProveedoresSvc, Item: ItemsSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
       Facturas: FacturasService;
       ItemFactura: ItemFacturaService;
       ProveedoresFactura: ProveedoresFacturaService;
@@ -48,7 +48,7 @@ export function useFacturas() {
       try {
           setLoadingData(true);
           const proveedores = await ProveedoresSvc.getAll()
-          const items = await ItemFacturaSvc.getAll()
+          const items = await ItemsSvc.getAll()
           setProveedores(proveedores);
           setItems(items);
       } catch (e: any) {
@@ -57,7 +57,7 @@ export function useFacturas() {
           setLoadingData(false);
       }
       })();
-  }, [ProveedoresSvc, ItemFacturaSvc]);
+  }, [ProveedoresSvc, ItemsSvc]);
 
 
   const validate = () => {
@@ -93,7 +93,7 @@ export function useFacturas() {
 
   //Funciones para cambios de desplegables
   const onChangeItem = (tempId: string, itemId: string) => {
-    const it = items.find((i) => i.Id === itemId);
+    const it = items.find((i) => i.Title === itemId);
     setField("lineas", (state.lineas ?? []).map((l) =>
         l.tempId === tempId
         ? {
@@ -133,8 +133,10 @@ export function useFacturas() {
   }
   
   //Funciones para incersiones en bases de datos
-  const handleSubmit = React.useCallback(async (e?: React.FormEvent) => {
+  const handleSubmit = React.useCallback<React.FormEventHandler<HTMLFormElement>>(async (e) => {
     e?.preventDefault?.();
+    setError(null);
+
     if (!validate()) return;
 
     setSubmitting(true);
@@ -145,25 +147,28 @@ export function useFacturas() {
         IdProveedor: state.IdProveedor!,
         NoFactura: String(state.NoFactura ?? "").trim(),
         Title: account?.name ?? "",
-        Total: (state.Total ?? 0), 
-        un: state.un ?? ""
+        Total: Number((state.Total ?? 0).toFixed(2)),
+        un: state.un ?? "",
       };
 
       const factura = await FacturasSvc.create(facturaPayload);
+      if (!factura?.Id) throw new Error("No se obtuvo Id de la factura guardada.");
 
-      await Promise.all((state.lineas ?? []).map(async (ln) => {
-        const itemLinea: ItemFactura = {
-          Cantidad: (ln.cantidad ?? 0),
-          Title: ln.Id?.trim() ?? "",
-          IdFactura: factura.Id ?? ""
-        };
-        return ItemFacturaSvc.create(itemLinea);
+      const detalle: ItemFactura[] = (state.lineas ?? []).map((ln) => ({
+        // En tu esquema ItemFactura.Title = IdItem (yo pasaré el código del ítem)
+        Title: ln.Title?.trim() ?? "",        // ⬅️ ANTES usabas ln.Id (vacío)
+        IdFactura: factura.Id!,
+        Cantidad: ln.cantidad ?? 0,
       }));
 
-      return factura;
-    } catch (err) {
+      await Promise.all(detalle.map((d) => ItemFacturaSvc.create(d)));
+
+      // opcional: limpiar/avisar
+      // setState(s => ({ ...s, lineas: [], Total: 0 }));
+      console.log("Factura guardada", factura);
+    } catch (err: any) {
       console.error(err);
-      throw err;
+      setError(err?.message ?? "Error al guardar.");
     } finally {
       setSubmitting(false);
     }
