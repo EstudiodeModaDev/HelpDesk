@@ -149,7 +149,7 @@ export function useFacturas() {
         IdProveedor: state.IdProveedor!,
         NoFactura: String(state.NoFactura ?? "").trim(),
         Title: account?.name ?? "",
-        Total: Number((state.Total ?? 0).toFixed(2)),
+        Total: String((state.Total ?? 0).toFixed(2)),
         un: state.un ?? "",
       };
 

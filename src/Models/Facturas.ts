@@ -5,7 +5,7 @@ export type Facturas = {
   NoFactura: string;
   IdProveedor: string;
   CO: string;
-  Total: number;
+  Total: number | string;
   un: string;
 }
 
