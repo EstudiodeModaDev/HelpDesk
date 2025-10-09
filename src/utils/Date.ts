@@ -123,3 +123,40 @@ export function toUtcIso(d?: Date | null): string | null {
   // toISOString() SIEMPRE retorna UTC con sufijo 'Z'
   return d.toISOString();
 }
+
+export function toGraphDateOnly(
+  v: Date | { toISOString: () => string } | string | null | undefined,
+  opts: { base?: "local" | "utc" } = { base: "local" }
+): string | undefined {
+  if (!v) return undefined;
+
+  if (typeof v === "string") {
+    // "YYYY-MM-DD" → déjalo igual
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+    // ISO con hora → devuelve solo la parte de fecha (UTC)
+    if (/^\d{4}-\d{2}-\d{2}T/.test(v)) return v.slice(0, 10);
+    // Cualquier otra cosa parseable
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return undefined;
+    // Decide si tomar local o UTC
+    return opts.base === "utc"
+      ? new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+          .toISOString()
+          .slice(0, 10)
+      : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+
+  // Objetos con toISOString() o Date
+  try {
+    const iso = (v as any).toISOString?.();
+    if (typeof iso === "string" && iso) return iso.slice(0, 10); // fecha desde UTC
+  } catch {}
+
+  const d = new Date(v as any);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return opts.base === "utc"
+    ? new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+        .toISOString()
+        .slice(0, 10)
+    : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}

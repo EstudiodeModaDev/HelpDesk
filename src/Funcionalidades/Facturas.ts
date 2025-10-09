@@ -7,6 +7,7 @@ import type { ProveedoresFacturaService } from "../Services/ProveedoresFacturas.
 import type { ItemService } from "../Services/Items.service";
 import type { FacturasService } from "../Services/Facturas.service";
 import type { ItemFacturaService } from "../Services/ItemsFacturas.service";
+import { toGraphDateOnly } from "../utils/Date";
 function cryptoRandomId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return (crypto as any).randomUUID();
@@ -144,7 +145,7 @@ export function useFacturas() {
     try {
       const facturaPayload: Facturas = {
         CO: state.CO?.trim() ?? "",
-        FechaEmision: state.FechaEmision,
+        FechaEmision: toGraphDateOnly(state.FechaEmision) ?? "",
         IdProveedor: state.IdProveedor!,
         NoFactura: String(state.NoFactura ?? "").trim(),
         Title: account?.name ?? "",
@@ -152,6 +153,7 @@ export function useFacturas() {
         un: state.un ?? "",
       };
 
+      console.log(facturaPayload)
       const factura = await FacturasSvc.create(facturaPayload);
       if (!factura?.Id) throw new Error("No se obtuvo Id de la factura guardada.");
 
