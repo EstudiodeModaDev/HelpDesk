@@ -47,7 +47,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
       {error && <div className="alert mb-3">{error}</div>}
 
       {/* Grid compacto: 5 columnas en desktop */}
-      <form onSubmit={handleSubmit} className="invoice-grid">
+      <form   onSubmit={(e) => {e.preventDefault(); handleSubmit()}} className="invoice-grid">
         {/* Fila compacta */}
         <div className="field">
           <label className="label">Fecha</label>

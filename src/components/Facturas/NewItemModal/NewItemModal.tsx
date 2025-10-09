@@ -1,4 +1,5 @@
 import * as React from "react";
+import "./NewItemModa.css"
 import type { ItemBd } from "../../../Models/Facturas";
 
 type Props = {

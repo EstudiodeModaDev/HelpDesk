@@ -1,0 +1,137 @@
+:root{
+  --modal-backdrop: rgba(0,0,0,.35);
+  --modal-surface: #ffffff;
+  --modal-text: #0f172a;          /* slate-900 */
+  --modal-muted: #475569;         /* slate-600 */
+  --modal-border: #e2e8f0;        /* slate-200 */
+  --modal-focus: #4f46e5;         /* indigo-600 */
+  --btn-primary: #4f46e5;
+  --btn-primary-pressed: #4338ca;
+  --btn-text-on-primary: #ffffff;
+  --shadow-lg: 0 10px 25px rgba(2,6,23,.15);
+  --radius-xl: 1rem;              /* 16px */
+  --radius-lg: .625rem;           /* 10px */
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+}
+
+/* Dark mode (opcional): activa con data-theme="dark" en <html> o cualquier contenedor */
+[data-theme="dark"] {
+  --modal-backdrop: rgba(0,0,0,.5);
+  --modal-surface: #0b1220;       /* casi slate-950 */
+  --modal-text: #e2e8f0;          /* slate-200 */
+  --modal-muted: #94a3b8;         /* slate-400 */
+  --modal-border: #1f2937;        /* slate-800 */
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.45);
+}
+
+/* ---------- Backdrop + layout ---------- */
+.modal-backdrop{
+  position: fixed; inset: 0;
+  background: var(--modal-backdrop);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  padding: var(--space-4); /* para respiración en pantallas pequeñas */
+  animation: modal-fade .18s ease-out;
+}
+
+/* ---------- Card ---------- */
+.modal-card{
+  background: var(--modal-surface);
+  color: var(--modal-text);
+  width: 100%;
+  max-width: 32rem;               /* ~max-w-md */
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--modal-border);
+  transform-origin: center;
+  animation: modal-pop .18s ease-out;
+}
+
+/* ---------- Título ---------- */
+.modal-title{
+  font-size: 1.125rem;            /* text-lg */
+  font-weight: 600;
+  margin: 0 0 var(--space-4);
+}
+
+/* ---------- Form ---------- */
+.modal-field{
+  display: flex; flex-direction: column; gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+.modal-label{
+  font-size: .875rem;             /* text-sm */
+  font-weight: 500;
+  color: var(--modal-muted);
+}
+.modal-input{
+  border: 1px solid var(--modal-border);
+  border-radius: var(--radius-lg);
+  padding: .5rem .75rem;          /* px-3 py-2 */
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  outline: none;
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.modal-input::placeholder{ color: #94a3b8; } /* slate-400 */
+.modal-input:focus{
+  border-color: var(--modal-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--modal-focus) 25%, transparent);
+}
+
+/* Quitar flechas del number en navegadores que las muestran */
+.modal-input[type="number"]::-webkit-outer-spin-button,
+.modal-input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+.modal-input[type="number"]{ -moz-appearance: textfield; }
+
+/* ---------- Actions ---------- */
+.modal-actions{
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: .25rem;
+}
+.btn{
+  font: inherit; cursor: pointer;
+  border-radius: var(--radius-lg);
+  padding: .5rem .75rem;
+  transition: transform .06s ease, opacity .12s ease, background .12s ease, border-color .12s ease;
+}
+.btn:disabled{ opacity: .55; cursor: not-allowed; }
+
+.btn-ghost{
+  background: transparent;
+  border: 1px solid var(--modal-border);
+  color: var(--modal-text);
+}
+.btn-ghost:hover{ transform: translateY(-1px); }
+.btn-ghost:active{ transform: translateY(0); }
+
+.btn-primary{
+  background: var(--btn-primary);
+  color: var(--btn-text-on-primary);
+  border: 1px solid transparent;
+}
+.btn-primary:hover{ transform: translateY(-1px); }
+.btn-primary:active{
+  transform: translateY(0);
+  background: var(--btn-primary-pressed);
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes modal-fade{
+  from{ opacity: 0; } to{ opacity: 1; }
+}
+@keyframes modal-pop{
+  from{ opacity: 0; transform: translateY(6px) scale(.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Respeta accesibilidad si el usuario prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce){
+  .modal-backdrop, .modal-card{ animation: none; }
+}
