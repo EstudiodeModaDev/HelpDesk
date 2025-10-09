@@ -354,7 +354,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = ({ onSaved })
         open={showNewItem}
         onClose={() => setShowNewItem(false)}
         onCreated={handleNewItemCreated}
-        onCreateRequest={crearItem}
+        onCreateRequest={crearItem} 
       />
     </div>
   );
