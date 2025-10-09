@@ -1,12 +1,7 @@
 import * as React from 'react';
 
-// Auth 
 import { useAuth } from '../auth/authContext'; // asegúrate del case correcto
-
-//  Cliente REST para Graph
 import { GraphRest } from './GraphRest';
-
-// 🧩 Servicios (versiones 100% Graph que ya creaste)
 import { SociedadesService } from '../Services/Sociedades.service';
 import { ProveedoresService } from '../Services/Proveedores.service';
 import { PlantillasService } from '../Services/Plantillas.service';
@@ -22,7 +17,10 @@ import { CategoriasService } from '../Services/Categorias.service';
 import { FranquiciasService } from '../Services/Franquicias.service';
 import { SubCategoriasService } from '../Services/SubCategorias.Service';
 import {InternetTiendasService } from '../Services/InternetTiendas.service'
-//import { SharedServices } from '../Services/Shared.service'; // <- singular
+import { FacturasService } from '../Services/Facturas.service';
+import { ItemFacturaService } from '../Services/ItemsFacturas.service';
+import { ProveedoresFacturaService } from '../Services/ProveedoresFacturas.service';
+import { ItemService } from '../Services/Items.service';
 
 // ================== Tipos ==================
 export type GraphSiteConfig = {
@@ -44,12 +42,15 @@ export type GraphSiteConfig = {
     Franquicias: string;
     SubCategorias: string;
     InternetTiendas: string
+    Facturas: string;
+    ItemFactura: string;
+    ProveedoresFactura: string;
+    Item: string
   };
 };
 
 export type GraphServices = {
   graph: GraphRest;
-  // SharePoint list services
   Sociedades: SociedadesService;
   Proveedores: ProveedoresService;
   Plantillas: PlantillasService;
@@ -65,7 +66,10 @@ export type GraphServices = {
   Franquicias: FranquiciasService;
   SubCategorias: SubCategoriasService;
   InternetTiendas: InternetTiendasService
-
+  Facturas: FacturasService
+  ItemFactura: ItemFacturaService
+  ProveedoresFactura: ProveedoresFacturaService;
+  Item: ItemService
 };
 
 // ================== Contexto ==================
@@ -95,7 +99,11 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     Categorias: 'Categorias',
     Franquicias: 'Franquicias',
     SubCategorias: 'SubCategorias',
-    InternetTiendas: 'Internet Tiendas'
+    InternetTiendas: 'Internet Tiendas',
+    Facturas: 'Facturas',
+    ItemFactura: "ItemsFactura",
+    ProveedoresFactura: "ProveedoresFactura",
+    Item: "ItemsDescripcion"
   },
 };
 
@@ -125,20 +133,22 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Franquicias:                    config?.lists?.Franquicias              ?? base.lists.Franquicias,
         SubCategorias:                  config?.lists?.SubCategorias            ?? base.lists.SubCategorias,
         InternetTiendas:                config?.lists?.InternetTiendas          ?? base.lists.InternetTiendas,
+        Facturas:                       config?.lists?.Facturas                 ?? base.lists.Facturas,
+        ItemFactura:                    config?.lists?.ItemFactura              ?? base.lists.ItemFactura,
+        ProveedoresFactura:             config?.lists?.ProveedoresFactura       ?? base.lists.ProveedoresFactura,
+        Item:                           config?.lists?.Item                     ?? base.lists.Item,
       },
     };
   }, [config]);
 
   // Cliente Graph REST (usa getToken del AuthContext/MSAL)
   const graph = React.useMemo(() => {
-    // tu GraphRest original sólo acepta getToken
     return new GraphRest(getToken);
   }, [getToken]);
 
   // Instancias de servicios (memo)
   const services = React.useMemo<GraphServices>(() => {
     const { hostname, sitePath, lists } = cfg;
-
     const Sociedades                = new SociedadesService(graph, hostname, sitePath, lists.Sociedades);
     const Proveedores               = new ProveedoresService(graph, hostname, sitePath, lists.Proveedores);
     const Plantillas                = new PlantillasService(graph, hostname, sitePath, lists.Plantillas);
@@ -153,30 +163,14 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Categorias                = new CategoriasService(graph, hostname, sitePath, lists.Categorias);
     const Franquicias               = new FranquiciasService(graph, hostname, sitePath, lists.Franquicias);
     const SubCategorias             = new SubCategoriasService(graph, hostname, sitePath, lists.SubCategorias);
-    const InternetTiendas            = new InternetTiendasService(graph, hostname, sitePath, lists.InternetTiendas)
+    const InternetTiendas           = new InternetTiendasService(graph, hostname, sitePath, lists.InternetTiendas);
+    const Facturas                  = new FacturasService(graph, hostname, sitePath, lists.Facturas);
+    const ItemFactura               = new ItemFacturaService(graph, hostname, sitePath, lists.ItemFactura);
+    const ProveedoresFactura        = new ProveedoresFacturaService(graph, hostname, sitePath, lists.ItemFactura);
+    const Item                      = new ItemService(graph, hostname, sitePath, lists.Item)
 
-
-    // SharedService depende de UsuariosParkingService
-    //const shared             = new SharedServices(usuariosParking);
-
-    return {
-        graph,
-        Sociedades,
-        Proveedores,
-        Plantillas,
-        Internet,
-        CasosHijosRequeridos,
-        ActasEntrega,
-        Anuncios,
-        Articulos,
-        Usuarios,
-        Logs,
-        Tickets,
-        Categorias,
-        Franquicias,
-        SubCategorias,
-        InternetTiendas
-    };
+    return {graph, Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
+        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item};
   }, [graph, cfg]);
 
   return (

@@ -6,10 +6,10 @@ type Props = {
   onClose: () => void;
   onCreated: (item: Item) => void;
   /** Creador inyectado (viene del hook/useFacturas o servicio real) */
-  onCreateRequest: (data: { descripcion: string; valor: number }) => Promise<Item>;
+ //onCreateRequest: (data: { descripcion: string; valor: number }) => Promise<Item>;
 };
 
-const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated, onCreateRequest }) => {
+const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated, /*onCreateRequest*/ }) => {
   const [descripcion, setDescripcion] = React.useState("");
   const [valor, setValor] = React.useState<string>("");
   const [saving, setSaving] = React.useState(false);
@@ -19,7 +19,7 @@ const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated, onCreateReque
   async function handleSave() {
     try {
       setSaving(true);
-      const item = await onCreateRequest({ descripcion: descripcion.trim(), valor: Number(valor) });
+      const item: Item = {descripcion: "", Identificador: "", valor: 0}//await onCreateRequest({ descripcion: descripcion.trim(), valor: Number(valor) });
       onCreated(item);            // notifica al padre
       setDescripcion("");
       setValor("");

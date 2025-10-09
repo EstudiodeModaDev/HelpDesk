@@ -1,40 +1,55 @@
+export type Facturas = {
+  Id?: string;
+  Title: string;
+  FechaEmision: string;
+  NoFactura: string;
+  IdProveedor: string;
+  CO: string;
+  Total: number;
+  un: string;
+}
+
 export type Proveedor = {
-  id: string;
-  nombre: string;
-  nit: string;
-};
+  Id?: string;
+  Title: string; // Nombre proveedor
+  Nit: string;
+}
 
-export type Item = {
-  Identificador: string;
-  descripcion: string;
-  valor: number;
-};
+export type ItemFactura = {
+  Id?: string;
+  Title: string; // IdItem
+  IdFactura: string;
+  Cantidad: number;
+}
 
-export type Provider = {
-  id: string;
-  nombre: string;
-  nit: string;
-};
+export type ItemUx = {
+  Id?: string;
+  tempId: string;
+  Title: string //Codigo Item
+  NombreItem: string;
+  Valor: number; 
+  cantidad: number,
+  subtotal: number,
+}
 
-export type InvoiceLine = {
-  tempId: string; // id temporal para key render
-  itemId: string;
-  descripcion?: string;
-  valorUnitario: number;
-  cantidad: number;
-  subtotal: number;
-};
+export type ItemBd = {
+  Id?: string;
+  Title: string //Codigo Item
+  NombreItem: string;
+  Valor: number; 
+}
 
-export type InvoicePayload = {
-  fecha: string; 
-  numero: string;
-  proveedorId: string;
-  nit: string;
-  co: string; 
-  centroCostos: string;
-  lineas: Array<InvoiceLine>;
-  total: number;
-};
+export type FacturasUx = {
+  Id?: string;
+  Title: string;
+  FechaEmision: string;
+  NoFactura: string;
+  IdProveedor: string;
+  CO: string;
+  Total: number;
+  un: string;
+  lineas: ItemUx[],
+  nit: string
+}
 
-
-export type FormErrors = Partial<Record<keyof InvoicePayload, string>>;
+export type FormErrors = Partial<Record<keyof FacturasUx, string>>;
