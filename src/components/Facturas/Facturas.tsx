@@ -1,132 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Facturas.css";
-import type { InvoiceLine, Item, Proveedor } from "../../Models/Facturas";
+import type { Item } from "../../Models/Facturas";
 import { useFacturas } from "../../Funcionalidades/Facturas";
-import NewItemModal from "./NewItemModal/NewItemModa";
+import NewItemModal from "./NewItemModal/NewItemModal";
 
-const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = ({ onSaved }) => {
-  const {state, setField, setState, submitting, cargarProveedores, cargarItems, crearItem, handleSubmit,} = useFacturas();
-
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
-
+const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
+  const {state, submitting, proveedores, items, loadingData,  error, total,
+    setField, setState,  handleSubmit, crearItem, setItems, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario} = useFacturas();
   const [showNewItem, setShowNewItem] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoadingData(true);
-        const [pv, it] = await Promise.all([cargarProveedores(), cargarItems()]);
-        setProveedores(pv);
-        setItems(it);
-      } catch (e: any) {
-        setError(e?.message ?? "Error cargando datos");
-      } finally {
-        setLoadingData(false);
-      }
-    })();
-  }, [cargarProveedores, cargarItems]);
+  const nit = useMemo(() => proveedores.find((p) => p.id === state.proveedorId)?.nit ?? "", [proveedores, state.proveedorId]);
 
-  // NIT derivado del proveedor
-  const nit = useMemo(
-    () => proveedores.find((p) => p.id === state.proveedorId)?.nit ?? "",
-    [proveedores, state.proveedorId]
-  );
+  //Cambio de nit
   useEffect(() => {
     if (nit !== state.nit) setField("nit", nit);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nit]);
 
-  // Total calculado
-  const total = useMemo(
-    () => (state.lineas ?? []).reduce((acc, l) => acc + l.subtotal, 0),
-    [state.lineas]
-  );
+  //Cambio de total
   useEffect(() => {
     if (total !== state.total) setField("total", Number(total.toFixed(2)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total]);
-
-  // ---- Líneas (con tempId consistente) ----
-  function addLinea() {
-    setField("lineas", [
-      ...(state.lineas ?? []),
-      {
-        tempId: cryptoRandomId(),
-        itemId: "",
-        descripcion: undefined,
-        valorUnitario: 0,
-        cantidad: 1,
-        subtotal: 0,
-      } as InvoiceLine,
-    ]);
-  }
-
-  function removeLinea(tempId: string) {
-    setField("lineas", (state.lineas ?? []).filter((l) => l.tempId !== tempId));
-  }
-
-  function onChangeItem(tempId: string, itemId: string) {
-    const it = items.find((i) => i.Identificador === itemId);
-    setField(
-      "lineas",
-      (state.lineas ?? []).map((l) =>
-        l.tempId === tempId
-          ? {
-              ...l,
-              itemId,
-              descripcion: it?.descripcion ?? "",
-              valorUnitario: it?.valor ?? 0,
-              subtotal: (it?.valor ?? 0) * (l.cantidad || 0),
-            }
-          : l
-      )
-    );
-  }
-
-  function onChangeCantidad(tempId: string, cantidad: number) {
-    setField(
-      "lineas",
-      (state.lineas ?? []).map((l) =>
-        l.tempId === tempId
-          ? { ...l, cantidad, subtotal: (l.valorUnitario || 0) * (cantidad || 0) }
-          : l
-      )
-    );
-  }
-
-  function onChangeValorUnitario(tempId: string, valorUnitario: number) {
-    setField(
-      "lineas",
-      (state.lineas ?? []).map((l) =>
-        l.tempId === tempId
-          ? { ...l, valorUnitario, subtotal: (valorUnitario || 0) * (l.cantidad || 0) }
-          : l
-      )
-    );
-  }
-
-  // ---- Submit
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    const res = await handleSubmit();
-    if (!res) return;
-    onSaved?.(res.id);
-    setState((s) => ({
-      ...s,
-      numero: "",
-      proveedorId: "",
-      nit: "",
-      co: "",
-      centroCostos: "",
-      lineas: [],
-      total: 0,
-    }));
-    alert(`Factura guardada: ${res.id}`);
-  }
 
   function handleNewItemCreated(item: Item) {
     setItems((prev) => [item, ...prev]);
@@ -154,7 +47,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = ({ onSaved })
       {error && <div className="alert mb-3">{error}</div>}
 
       {/* Grid compacto: 5 columnas en desktop */}
-      <form onSubmit={onSubmit} className="invoice-grid">
+      <form onSubmit={handleSubmit} className="invoice-grid">
         {/* Fila compacta */}
         <div className="field">
           <label className="label">Fecha</label>
@@ -363,9 +256,3 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = ({ onSaved })
 export default NuevaFactura;
 
 // Utils
-function cryptoRandomId() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return (crypto as any).randomUUID();
-  }
-  return Math.random().toString(36).slice(2);
-}
