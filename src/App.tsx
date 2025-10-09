@@ -48,7 +48,11 @@ const NAVS_ADMIN: MenuItem[] = [
           { id: 'cajpos', label: 'Cajeros POS', icon: '🧾' },
         ]
       },
-      // Otros grupos/acciones podrían ir aquí
+      {
+        id: 'cesar', label: 'Cesar', icon: '', children: [
+          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <NuevaFactura/>},
+        ]
+      },
     ]
   },
 ];
@@ -65,11 +69,7 @@ const NAVS_TECNICO: MenuItem[] = [
           { id: 'cajpos', label: 'Cajeros POS', icon: '🧾' },
         ]
       },
-       {
-        id: 'cesar', label: 'Cesar', icon: '', children: [
-          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <NuevaFactura/>},
-        ]
-      },
+
     ]
   },
 ];
