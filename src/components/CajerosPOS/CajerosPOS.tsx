@@ -51,7 +51,7 @@ export default function CajerosPOSForm({ services }: Props) {
             <input
               type="text"
               value={state.solicitante?.label ?? ""}
-              readOnly
+              
             />
           </div>
           <div className="campo">
@@ -59,7 +59,7 @@ export default function CajerosPOSForm({ services }: Props) {
             <input
               type="text"
               value={state.solicitante?.email ?? ""}
-              readOnly
+              
             />
           </div>
         </div>
