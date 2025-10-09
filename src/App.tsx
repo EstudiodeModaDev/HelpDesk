@@ -18,6 +18,7 @@ import CajerosPOSForm from './components/CajerosPOS/CajerosPOS';
 import type { TicketsService } from './Services/Tickets.service';
 import type { UsuariosSPService } from './Services/Usuarios.Service';
 import type { LogService } from './Services/Log.service';
+import NuevaFactura from './components/Facturas/Facturas';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -62,6 +63,11 @@ const NAVS_TECNICO: MenuItem[] = [
       {
         id: 'siesa', label: 'Siesa', icon: '📂', children: [
           { id: 'cajpos', label: 'Cajeros POS', icon: '🧾' },
+        ]
+      },
+       {
+        id: 'cesar', label: 'Cesar', icon: '', children: [
+          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <NuevaFactura/>},
         ]
       },
     ]
