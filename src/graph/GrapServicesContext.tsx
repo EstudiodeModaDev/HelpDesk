@@ -166,7 +166,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const InternetTiendas           = new InternetTiendasService(graph, hostname, sitePath, lists.InternetTiendas);
     const Facturas                  = new FacturasService(graph, hostname, sitePath, lists.Facturas);
     const ItemFactura               = new ItemFacturaService(graph, hostname, sitePath, lists.ItemFactura);
-    const ProveedoresFactura        = new ProveedoresFacturaService(graph, hostname, sitePath, lists.ItemFactura);
+    const ProveedoresFactura        = new ProveedoresFacturaService(graph, hostname, sitePath, lists.ProveedoresFactura);
     const Item                      = new ItemService(graph, hostname, sitePath, lists.Item)
 
     return {graph, Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
