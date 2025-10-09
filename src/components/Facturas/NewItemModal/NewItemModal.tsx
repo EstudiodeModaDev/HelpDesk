@@ -1,10 +1,10 @@
 import * as React from "react";
-import type { Item } from "../../../Models/Facturas";
+import type { ItemBd } from "../../../Models/Facturas";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  onCreated: (item: Item) => void;
+  onCreated: (item: ItemBd) => void;
   /** Creador inyectado (viene del hook/useFacturas o servicio real) */
  //onCreateRequest: (data: { descripcion: string; valor: number }) => Promise<Item>;
 };
@@ -19,7 +19,7 @@ const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated, /*onCreateReq
   async function handleSave() {
     try {
       setSaving(true);
-      const item: Item = {descripcion: "", Identificador: "", valor: 0}//await onCreateRequest({ descripcion: descripcion.trim(), valor: Number(valor) });
+      const item: ItemBd = {NombreItem: "", Title: "", Valor: 0}//await onCreateRequest({ descripcion: descripcion.trim(), valor: Number(valor) });
       onCreated(item);            // notifica al padre
       setDescripcion("");
       setValor("");
