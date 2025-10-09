@@ -50,7 +50,8 @@ export default function CajerosPOSForm({ services }: Props) {
             <label>Solicitante</label>
             <input
               type="text"
-              value={state.solicitante?.label ?? ""}
+              value={"LISTO"}
+              
               
             />
           </div>
@@ -58,7 +59,7 @@ export default function CajerosPOSForm({ services }: Props) {
             <label>Correo solicitante</label>
             <input
               type="text"
-              value={state.solicitante?.email ?? ""}
+              value={"listo@estudiodemoda.com.co"}
               
             />
           </div>
