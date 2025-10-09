@@ -153,7 +153,7 @@ export function useFacturas() {
         un: state.un ?? "",
       };
 
-      console.log(facturaPayload)
+      console.log("payload ", facturaPayload)
       const factura = await FacturasSvc.create(facturaPayload);
       if (!factura?.Id) throw new Error("No se obtuvo Id de la factura guardada.");
 
