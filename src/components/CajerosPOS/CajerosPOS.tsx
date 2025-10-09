@@ -43,7 +43,7 @@ export default function CajerosPOSForm({ services }: Props) {
     <div className="detalle-ticket">
       <h2>Creación de usuario POS</h2>
 
-      <form onSubmit={handleSubmit} noValidate>
+      <form   onSubmit={(e) => {handleSubmit(e);}} noValidate>
 
         <div className="fila">
           <div className="campo">
