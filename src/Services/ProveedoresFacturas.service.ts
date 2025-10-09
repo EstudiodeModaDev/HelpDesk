@@ -146,9 +146,9 @@ export class ProveedoresFacturaService {
 
     try {
       const res = await this.graph.get<any>(url);
-      console.log(res)
+      console.log("Respuesta ", res)
       const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
-      console.log(mapped)
+      console.log("Mappeado ",mapped)
       return mapped
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico

@@ -48,6 +48,7 @@ export function useFacturas() {
       try {
           setLoadingData(true);
           const proveedores = await ProveedoresSvc.getAll()
+          console.log("Proveedores que llegan: ", proveedores)
           const items = await ItemsSvc.getAll()
           setProveedores(proveedores);
           setItems(items);
