@@ -8,6 +8,7 @@ import { FlowClient } from "./FlowClient";
 import type { Log } from "../Models/Log";
 import type { LogService } from "../Services/Log.service";
 import { useAuth } from "../auth/authContext";
+import { norm } from "../utils/Commons";
 
 type Svc = {
   Tickets?: TicketsService;
@@ -99,7 +100,7 @@ export function useCajerosPOS(services: Svc) {
           Cedula: state.Cedula,
           Compañia: Number(state.Compañia),
           CorreoTercero: state.CorreoTercero,
-          Usuario: state.solicitante ,        
+          Usuario: norm(state.solicitante) ,        
           CO: state.CO,
         });
       } catch (err) {
