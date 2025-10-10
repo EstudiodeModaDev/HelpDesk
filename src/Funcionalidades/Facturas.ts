@@ -95,7 +95,7 @@ export function useFacturas() {
 
   //Funciones para cambios de desplegables
   const onChangeItem = (tempId: string, itemId: string) => {
-    const it = items.find((i) => i.Title === itemId);
+    const it = items.find((i) => i.Id === itemId);
     setField("lineas", (state.lineas ?? []).map((l) =>
         l.tempId === tempId
         ? {

@@ -132,7 +132,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                     </td>
 
                     <td>
-                      <input value={l.NombreItem ?? ""} readOnly className="input-compact bg-slate-100" />
+                      <input value={l.NombreItem ?? ""} className="input-compact bg-slate-100"/>
                     </td>
 
                     <td>
