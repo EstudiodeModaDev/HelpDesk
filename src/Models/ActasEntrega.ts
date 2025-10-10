@@ -44,6 +44,7 @@ export type CamposPayload = {
   CorreoRecibe: string;
   NombreEntrega: string;
   CorreoEntrega: string;
+  IdCaso: number
   SedeOrigen: "TI";
   ID: string;                   // ticket
   Enviar: string;               // "Sí" | "No"

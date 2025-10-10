@@ -66,7 +66,7 @@ function esPortatil(state: FormStateActa, selectedKeys: string[]) {
 }
 
 /** Construye Campos 1..12 con VACIO si falta */
-function buildCampos(state: FormStateActa, selectedKeys: string[], nombreEntrega: string, correoEntrega: string): CamposPayload {
+function buildCampos(state: FormStateActa, selectedKeys: string[], nombreEntrega: string, correoEntrega: string, idActa: number): CamposPayload {
   const items = selectedKeys.slice(0, 12).map((k, i) => ({ idx: i + 1, d: state.detalles[k] }));
 
   const base: Partial<CamposPayload> = {
@@ -80,6 +80,7 @@ function buildCampos(state: FormStateActa, selectedKeys: string[], nombreEntrega
     Enviar: state.enviarEquipos,
     Portatil: esPortatil(state, selectedKeys),
     Franquicia: sociedadFromEmail(state.correo),
+    IdCaso: idActa
   };
 
   for (let i = 1; i <= 12; i++) {
@@ -281,12 +282,13 @@ export function useActaEntrega(ticketId: string) {
       state,
       entregasSeleccionadas,
       account?.name ?? "",
-      account?.username ?? ""
+      account?.username ?? "",
+      Number(actaLista.Id)
     );
 
     const body = {
       Campos,                
-      UltimaActaId: actaLista.Id 
+
     };
 
     const resp = await notifyFlow.invoke<typeof body, any>(body);
