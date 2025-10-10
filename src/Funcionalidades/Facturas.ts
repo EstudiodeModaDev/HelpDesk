@@ -158,13 +158,12 @@ export function useFacturas() {
       if (!factura?.Id) throw new Error("No se obtuvo Id de la factura guardada.");
 
       const detalle: ItemFactura[] = (state.lineas ?? []).map((ln) => ({
-        // En tu esquema ItemFactura.Title = IdItem (yo pasaré el código del ítem)
-        Title: ln.Title?.trim() ?? "",        // ⬅️ ANTES usabas ln.Id (vacío)
+        Title: ln.Title?.trim() ?? "",       
         IdFactura: factura.Id!,
-        Cantidad: ln.cantidad ?? 0,
+        Cantidad: String(ln.cantidad ?? 0),
       }));
 
-      await Promise.all(detalle.map((d) => ItemFacturaSvc.create(d)));
+      await Promise.all(detalle.map((d) => {ItemFacturaSvc.create(d); console.log(d)}));
 
       // opcional: limpiar/avisar
       // setState(s => ({ ...s, lineas: [], Total: 0 }));

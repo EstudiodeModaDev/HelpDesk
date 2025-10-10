@@ -19,7 +19,7 @@ export type ItemFactura = {
   Id?: string;
   Title: string; // IdItem
   IdFactura: string;
-  Cantidad: number;
+  Cantidad: number | string;
 }
 
 export type ItemUx = {
