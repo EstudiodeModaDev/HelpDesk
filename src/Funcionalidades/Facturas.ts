@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useMemo } from "react";
-import type { Facturas, FormErrors, FacturasUx, ItemFactura, Proveedor, ItemBd, ItemUx } from "../Models/Facturas";
+import type { Facturas, FormErrors, FacturasUx, ItemFactura, Proveedor, ItemBd, ItemUx, ItemsErrors } from "../Models/Facturas";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import { useAuth } from "../auth/authContext";
 import type { ProveedoresFacturaService } from "../Services/ProveedoresFacturas.service";
@@ -28,6 +28,12 @@ export function useFacturas() {
       un: "",
       Title: account?.name!
   });
+  const [Itemsstate, setItemsState] = useState<ItemBd>({
+    NombreItem: "",
+    Title: "",
+    Valor: 0
+  });
+  const [Itemserrors, setItemsErrors] = useState<ItemsErrors>({});
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
@@ -43,13 +49,13 @@ export function useFacturas() {
   };
 
   const setField = <K extends keyof FacturasUx>(k: K, v: FacturasUx[K]) => setState(s => ({ ...s, [k]: v }));
+  const setItemsField = <K extends keyof ItemBd>(k: K, v: ItemBd[K]) => setItemsState(s => ({ ...s, [k]: v }));
 
   React.useEffect(() => {
       (async () => {
       try {
           setLoadingData(true);
           const proveedores = await ProveedoresSvc.getAll()
-          console.log("Proveedores que llegan: ", proveedores)
           const items = await ItemsSvc.getAll()
           setProveedores(proveedores);
           setItems(items);
@@ -73,7 +79,41 @@ export function useFacturas() {
       setErrors(e);
       return Object.keys(e).length === 0;
   };
-    
+
+  const validateItems = () => {
+    const e: ItemsErrors = {};
+    if (!Itemsstate.NombreItem) e.NombreItem = "Obligatorio";
+    if (!Itemsstate.Title)      e.Title      = "Obligatorio";
+    if (!Itemsstate.Valor)      e.Valor      = "Obligatorio";
+    setItemsErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmitItems = React.useCallback(async (): Promise<ItemBd> => {
+    // valida con tus Itemsstate / validateItems
+    if (!validateItems()) throw new Error("Item inválido");
+
+    const payload: ItemBd = {
+      Title: Itemsstate.Title.trim(),
+      NombreItem: Itemsstate.NombreItem.trim(),
+      Valor: Number(Itemsstate.Valor),
+    };
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const created = await ItemsSvc.create(payload);
+      // refrescar caches locales si quieres
+      setItems(prev => [created, ...prev]);
+      // limpiar formulario local del modal
+      setItemsState({ Title: "", NombreItem: "", Valor: 0 });
+      return created;
+    } finally {
+      setSubmitting(false);
+    }
+  }, [Itemsstate, ItemsSvc, validateItems, setItems, setItemsState, setSubmitting]);
+
+      
   const  addLinea = () => {setField("lineas", [...(state.lineas ?? []),
       {
         cantidad: 1,
@@ -153,7 +193,6 @@ export function useFacturas() {
         un: state.un ?? "",
       };
 
-      console.log("payload ", facturaPayload)
       const factura = await FacturasSvc.create(facturaPayload);
       if (!factura?.Id) throw new Error("No se obtuvo Id de la factura guardada.");
 
@@ -163,7 +202,7 @@ export function useFacturas() {
         Cantidad: String(ln.cantidad ?? 0),
       }));
 
-      await Promise.all(detalle.map((d) => {ItemFacturaSvc.create(d); console.log(d)}));
+      await Promise.all(detalle.map((d) => {ItemFacturaSvc.create(d)}));
 
       setState({ CO: "", FechaEmision: "", IdProveedor: "", nit: "", NoFactura: "", Title: "", un: "", lineas: [], Total: 0 });
       console.log("Factura guardada", factura);
@@ -176,7 +215,6 @@ export function useFacturas() {
   }, [state, account, validate, FacturasSvc, ItemFacturaSvc]);
 
 
-  return {state, errors, submitting, proveedores, items, loadingData, error, total,
-    setField, setState, setErrors, handleSubmit, setItems, setError, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario};
+  return {state, errors, submitting, proveedores, items, loadingData, error, total, Itemsstate, Itemserrors,
+    setField, setState, setErrors, handleSubmit, setItems, setError, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario, handleSubmitItems, setItemsField};
 }
-

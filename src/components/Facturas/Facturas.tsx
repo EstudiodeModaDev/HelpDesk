@@ -33,7 +33,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
               itemId: item.Id,
               descripcion: item.NombreItem,
               valorUnitario: item.Valor,
-              subtotal: item.Valor * (l.cantidad || 0),
+              subtotal: Number(item.Valor) * (l.cantidad || 0),
             }
           : l
       )
@@ -180,12 +180,14 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
         </div>
       </form>
 
-      <NewItemModal
-        open={showNewItem}
-        onClose={() => setShowNewItem(false)}
-        onCreated={handleNewItemCreated}
-      />
-
+    <NewItemModal
+      open={showNewItem}
+      onClose={() => setShowNewItem(false)}
+      onCreated={(item) => {
+        handleNewItemCreated(item);   // actualiza la última línea con el ítem creado
+        setShowNewItem(false);        // cierra el modal
+      }}
+    />
     </div>
   );
 };
