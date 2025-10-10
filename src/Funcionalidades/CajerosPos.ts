@@ -97,7 +97,7 @@ export function useCajerosPOS(services: Svc) {
       try {
         await flowCajerosPos.invoke<FlowToSP, any>({
           Cedula: state.Cedula,
-          Compañia: state.Compañia,
+          Compañia: Number(state.Compañia),
           CorreoTercero: state.CorreoTercero,
           Usuario: state.solicitante ,        
           CO: state.CO,

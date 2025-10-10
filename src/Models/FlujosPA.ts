@@ -46,7 +46,7 @@ export type FlowToSP = {
   Usuario: string;            
   Cedula: string;
   CorreoTercero: string;
-  Compañia: string;
+  Compañia: number;
   CO: string
 };
 
