@@ -19,7 +19,7 @@ const TIPO_COMPUTADOR_OPTIONS: Record<TipoUsuario, Array<string>> = {
 
 export default function InfoActaEntrega({ ticket }: Props) {
   const {state, items, ITEMS_CON_TIPO_COMPUTADOR, errors,  selectedKeys,
-    setField, toggleEntrega, handleSubmit, updateDetalle,} = useActaEntrega(ticket?.ID ?? "");
+    setField, toggleEntrega, handleSubmit, updateDetalle} = useActaEntrega(ticket?.ID ?? "");
 
   const tipoActual = state.tipoUsuario || "Usuario administrativo";
   const opcionesTipoPC = TIPO_COMPUTADOR_OPTIONS[tipoActual as TipoUsuario] ?? ["Portátil", "Escritorio"];
