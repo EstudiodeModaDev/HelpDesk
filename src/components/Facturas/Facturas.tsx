@@ -126,7 +126,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                           ))}
                         </select>
                         <button type="button" className="btn btn-sm whitespace-nowrap" onClick={() => setShowNewItem(true)}  title="Registrar nuevo ítem">
-                          Nuevo ítem
+                          Nuevo
                         </button>
                       </div>
                     </td>
