@@ -1,210 +1,210 @@
-/* ===========================
-   Facturas.css (scopeado)
-   =========================== */
+/* ===== Layout general ===== */
 .invoice-form {
-  --bd: #e2e8f0;           /* slate-200 */
-  --bd-strong: #cbd5e1;    /* slate-300 */
-  --fg: #0f172a;           /* slate-900 */
-  --muted: #475569;        /* slate-600 */
-  --bg: #ffffff;
-  --bg-soft: #f8fafc;      /* slate-50 */
-  --primary: #4f46e5;      /* indigo-600 */
-  --primary-700: #4338ca;  /* indigo-700 */
-  --ring: rgba(79,70,229,.25);
-  --radius: 12px;
-  --shadow: 0 2px 12px rgba(30,41,59,.08);
-  color: var(--fg);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
 }
 
-/* Título */
-.invoice-form h2 {
-  margin: 0 0 1rem 0;
-  font-weight: 800;
-}
-
-/* Alertas */
-.invoice-form .alert {
-  border: 1px solid #fecaca;
-  background: #fff1f2;
-  color: #b91c1c;
-  padding: 12px;
-  border-radius: var(--radius);
-}
-
-/* ====== Grid superior (campos) ====== */
-.invoice-form .invoice-grid {
+/* Grid: 1 col móvil, 3 col tablet, 5 col desktop */
+.invoice-grid {
   display: grid;
-  grid-template-columns: 1fr; /* móvil */
   gap: 12px;
-  align-items: end;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .invoice-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .invoice-grid { grid-template-columns: repeat(5, 1fr); }
 }
 
-@media (min-width: 1024px) { /* desktop */
-  .invoice-form .invoice-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    column-gap: 16px;
-    row-gap: 12px;
-  }
-}
+/* Helpers */
+.col-span-full { grid-column: 1 / -1; }
+.muted { color: #94a3b8; }
 
-/* Hace que un bloque abarque todas las columnas del grid */
-.invoice-form .col-span-full { grid-column: 1 / -1; }
-
-/* ====== Fields ====== */
-.invoice-form .field {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;              /* clave para que no se “corte” dentro del grid */
-}
-
-.invoice-form .label {
-  text-align: left;
-  font-size: 0.95rem;
-  font-weight: 600;
+/* ===== Campos ===== */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label {
+  font-size: 0.85rem;
   color: #334155;
-  margin: 0 0 8px;           /* espacio entre título y campo */
+  font-weight: 600;
 }
 
-/* Control base (input/select) */
-.invoice-form .control,
-.invoice-form .input-compact,
-.invoice-form .select-compact {
+/* Inputs base */
+.control,
+.input-compact,
+.select-compact {
   width: 100%;
-  min-width: 0;              /* permite encoger correctamente en grid/flex */
-  border: 1px solid var(--bd);
+  border: 1px solid #e5e7eb;
+  background: #fff;
   border-radius: 10px;
-  padding: 8px 12px;
-  background: var(--bg);
-  outline: none;
+  padding: 10px 12px;
   font-size: 0.95rem;
-  line-height: 1.35rem;
-  min-height: 38px;
-  box-sizing: border-box;
+  line-height: 1.2;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
-.invoice-form .control:focus,
-.invoice-form .input-compact:focus,
-.invoice-form .select-compact:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--ring);
+/* Compact variants (ya usadas en la tabla) */
+.input-compact,
+.select-compact {
+  padding: 8px 10px;
+  font-size: 0.9rem;
 }
 
-.invoice-form .control--readonly,
-.invoice-form .control[readonly],
-.invoice-form .control[disabled],
-.invoice-form .input-compact[readonly],
-.invoice-form .input-compact[disabled],
-.invoice-form .select-compact[disabled] {
-  background: #f1f5f9;
+/* Readonly / disabled */
+.control--readonly,
+.input-compact[readonly],
+input[disabled],
+select[disabled] {
+  background: #f8fafc !important;
   color: #64748b;
 }
 
-/* ====== Tabla full width ====== */
-.invoice-form .table-fluid {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
+.control:focus,
+.input-compact:focus,
+.select-compact:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148,163,184,.25);
 }
 
-.invoice-form .table-scroll {
-  width: 100%;
-  min-width: 0;
-  overflow-x: auto;          /* scroll si no cabe el min-width */
+.error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  margin-top: 2px;
 }
 
-.invoice-form .invoice-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
+/* ===== Alertas ===== */
+.alert {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+/* ===== Botones ===== */
+.btn {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn:hover { box-shadow: 0 4px 16px rgba(2, 6, 23, 0.08); }
+.btn:active { transform: translateY(1px); }
+
+.btn-sm { padding: 6px 10px; font-size: 0.85rem; }
+.btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.btn-primary:hover { background: #1e40af; border-color: #1e40af; }
+.btn[disabled] {
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===== Tabla ===== */
+.table-fluid {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: var(--shadow);
-  font-size: 0.875rem;
-  background: var(--bg);
-  table-layout: auto;        /* que crezcan las columnas */
-  min-width: 900px;          /* evita que colapsen en pantallas angostas */
 }
 
-.invoice-form .invoice-table thead {
-  background: var(--bg-soft);
+.table-scroll {
+  overflow: auto;
+  max-height: 420px;
 }
 
-.invoice-form .invoice-table th,
-.invoice-form .invoice-table td {
-  border: 1px solid var(--bd);
-  padding: 8px;
+/* Scrollbar sutil */
+.table-scroll::-webkit-scrollbar { height: 10px; width: 10px; }
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+.table-scroll::-webkit-scrollbar-track { background: #f8fafc; }
+
+.invoice-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px; /* para scroll horizontal ordenado en móviles */
+}
+
+.invoice-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.88rem;
   text-align: left;
-  vertical-align: middle;
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.invoice-form .invoice-table tfoot td {
+.invoice-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  background: #fff;
+}
+
+.invoice-table tfoot td {
+  padding: 12px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
   font-weight: 700;
 }
 
-/* Preferencia de anchos (opcional) */
-.invoice-form .invoice-table td:nth-child(2),
-.invoice-form .invoice-table th:nth-child(2) {
-  width: 28%;                /* Descripción un poco más ancha */
+/* Inputs dentro de celdas: ajustados y consistentes */
+.invoice-table .input-compact,
+.invoice-table .select-compact {
+  width: 100%;
+  min-width: 160px;
 }
 
-.invoice-form .invoice-table td:nth-child(3),
-.invoice-form .invoice-table th:nth-child(3),
-.invoice-form .invoice-table td:nth-child(4),
-.invoice-form .invoice-table th:nth-child(4),
-.invoice-form .invoice-table td:nth-child(5),
-.invoice-form .invoice-table th:nth-child(5) {
-  width: 12%;
-  white-space: nowrap;
+.invoice-table .bg-slate-100 {
+  background: #f1f5f9;
 }
 
-.invoice-form .invoice-table th.w-1,
-.invoice-form .invoice-table td.w-1 {
-  width: 1%;
-  white-space: nowrap;
-}
+/* Acciones columna estrecha */
+.invoice-table .w-1 { width: 1%; white-space: nowrap; }
 
-/* ====== Botones ====== */
-.invoice-form .btn {
-  border: 1px solid var(--bd);
-  background: #fff;
-  color: var(--fg);
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: border-color .15s, background .15s, transform .02s, opacity .15s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
+/* ===== Encabezado ===== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-semibold { font-weight: 600; }
+.text-sm { font-size: 0.9rem; }
+.text-slate-700 { color: #334155; }
 
-.invoice-form .btn:hover { border-color: var(--bd-strong); }
-.invoice-form .btn:active { transform: translateY(1px); }
-.invoice-form .btn:disabled { opacity: .6; cursor: not-allowed; }
+/* ===== Utilidades responsivas para spacing ===== */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.max-w-6xl { max-width: 72rem; margin: 0 auto; }
+.p-4 { padding: 1rem; }
+.mb-2 { margin-bottom: .5rem; }
+.mb-3 { margin-bottom: .75rem; }
+.pt-2 { padding-top: .5rem; }
 
-.invoice-form .btn-sm { padding: 6px 10px; font-size: 0.875rem; line-height: 1.25rem; }
-
-.invoice-form .btn-primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
-.invoice-form .btn-primary:hover {
-  background: var(--primary-700);
-  border-color: var(--primary-700);
-}
-
-/* ====== Utilidades ====== */
-.invoice-form .muted { color: var(--muted); font-size: 0.9rem; }
-.invoice-form .overflow-x-auto { overflow-x: auto; }
-
-/* Fix visual de selects en Safari/Firefox */
-.invoice-form select.select-compact,
-.invoice-form select.control {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-position: right .6rem center;
-  background-repeat: no-repeat;
+/* ===== Micro-animaciones ===== */
+.select-compact,
+.input-compact,
+.control,
+.btn,
+.invoice-form {
+  will-change: transform, box-shadow;
 }
