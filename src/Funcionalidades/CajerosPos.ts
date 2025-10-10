@@ -20,7 +20,7 @@ export const first = (...vals: any[]) =>
 export function useCajerosPOS(services: Svc) {
   const { Tickets, Logs } = services;
 
-  const [state, setState] = useState<FormStateCajeros>({Cedula: "", CO: "", Compañia: "", CorreoTercero: "", resolutor: null, solicitante: null, usuario: "",});
+  const [state, setState] = useState<FormStateCajeros>({Cedula: "", CO: "", Compañia: "", CorreoTercero: "", solicitante: "", usuario: "",});
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,7 +39,6 @@ export function useCajerosPOS(services: Svc) {
   const validate = () => {
     const e: FormErrorsCajeros = {};
     if (!state.solicitante) e.solicitante = "Requerido";
-    if (!state.resolutor) e.resolutor = "Requerido";
     if (!state.CO) e.CO = "Por favor digite un CO";
     if (!state.Cedula) e.Cedula = "Por favor una cédula";
     if (!state.Compañia.trim()) e.Compañia = "Por favor seleccione una compañía";
@@ -57,8 +56,8 @@ export function useCajerosPOS(services: Svc) {
 
       // 1) Crear ticket en la lista y log
       const payloadTicket = {
-        Title: `Creación de usuario POS para ${state.solicitante?.label ?? ""}`,
-        Descripcion: `Se ha creado un usuario POS para ${state.solicitante?.label ?? ""}, se enviarán las credenciales de forma interna`,
+        Title: `Creación de usuario POS para ${state.solicitante ?? ""}`,
+        Descripcion: `Se ha creado un usuario POS para ${state.solicitante ?? ""}, se enviarán las credenciales de forma interna`,
         FechaApertura: toGraphDateTime(new Date()),
         TiempoSolucion: toGraphDateTime(new Date()),
         Fuente: "Correo",
@@ -66,8 +65,8 @@ export function useCajerosPOS(services: Svc) {
         SubCategoria: "POS",
         SubSubCategoria: "Creacion de usuario nuevo",
         Nombreresolutor: "Automatizaciones",
-        Solicitante: state.solicitante?.label,
-        CorreoSolicitante: state.solicitante?.email,
+        Solicitante: state.solicitante,
+        CorreoSolicitante: state.CorreoTercero,
         Estadodesolicitud: "Cerrado",
         ANS: "ANS 3",
       };
@@ -80,9 +79,9 @@ export function useCajerosPOS(services: Svc) {
         createdId = created?.ID ?? "";
               
         const payloadLog: Log = {
-          Actor: state.solicitante?.label ?? "",
-          CorreoActor: state.solicitante?.email ?? "",
-          Descripcion: `Se ha creado un usuario POS para ${state.solicitante?.label ?? ""}, se enviarán las credenciales de forma interna`,
+          Actor: state.solicitante ?? "",
+          CorreoActor: state.CorreoTercero ?? "",
+          Descripcion: `Se ha creado un usuario POS para ${state.solicitante ?? ""}, se enviarán las credenciales de forma interna`,
           Tipo_de_accion: "Solucion",
           Title: createdId
         }
@@ -97,8 +96,8 @@ export function useCajerosPOS(services: Svc) {
         await flowCajerosPos.invoke<FlowToSP, any>({
           Cedula: state.Cedula,
           Compañia: state.Compañia,
-          CorreoTercero: state.solicitante?.email ?? "",
-          Usuario: state.solicitante?.label ?? "" ,        
+          CorreoTercero: state.solicitante,
+          Usuario: state.solicitante ,        
           CO: state.CO,
         });
       } catch (err) {
@@ -111,8 +110,7 @@ export function useCajerosPOS(services: Svc) {
         CO: "",
         Compañia: "",
         CorreoTercero: "",
-        resolutor: null,
-        solicitante: null,
+        solicitante: "",
         usuario: "",
       });
       setErrors({});

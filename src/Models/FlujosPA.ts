@@ -1,8 +1,5 @@
-import type { UserOption } from "./Commons";
-
 export type FormStateCajeros = {
-    solicitante: UserOption | null;
-    resolutor: UserOption | null;
+    solicitante: string;
     usuario: string;
     Cedula: string;
     CO: string;

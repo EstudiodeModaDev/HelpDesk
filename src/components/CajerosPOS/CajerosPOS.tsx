@@ -34,7 +34,7 @@ export default function CajerosPOSForm({ services }: Props) {
     const name  = (account as any).name ?? email; // usa name si existe, si no el email
 
     if (email) {
-      setField("solicitante", { value: email, label: name, email });
+      setField("solicitante", name);
     }
   }, [account, setField]);
 
@@ -48,20 +48,11 @@ export default function CajerosPOSForm({ services }: Props) {
         <div className="fila">
           <div className="campo">
             <label>Solicitante</label>
-            <input
-              type="text"
-              value={"LISTO"}
-              
-              
-            />
+            <input type="text" value={state.solicitante!} onChange={(e) => setField("solicitante", e.target.value)}/>
           </div>
           <div className="campo">
             <label>Correo solicitante</label>
-            <input
-              type="text"
-              value={"listo@estudiodemoda.com.co"}
-              
-            />
+            <input type="text" value={state.CorreoTercero} onChange={(e) => setField("CorreoTercero", e.target.value)}/>
           </div>
         </div>
 
@@ -69,12 +60,7 @@ export default function CajerosPOSForm({ services }: Props) {
         <div className="fila">
           <div className="campo">
             <label>Cédula</label>
-            <input
-              type="text"
-              value={state.Cedula}
-              onChange={(e) => setField("Cedula", e.target.value)}
-              placeholder="Documento del usuario"
-            />
+            <input type="text" value={state.Cedula} onChange={(e) => setField("Cedula", e.target.value)} placeholder="Documento del usuario"/>
             { (errors as any).Cedula && (
               <small style={{ color: "#b91c1c" }}>{(errors as any).Cedula}</small>
             )}
@@ -135,4 +121,5 @@ export default function CajerosPOSForm({ services }: Props) {
 }
 
 
-//TODO: Aplicar un paso mas, recibe en el correo de listo x correo, eso lo mueve a una carpeta ultimos 2 digitos de la cedula de la persoan fue como se creo el usuario (Primera inicial nombre 1 y2, apellido 2 ultimos digitos de la cedula) y envia correo con los datos a la persona
+//TODO: Aplicar un paso mas, recibe en el correo de listo x correo, eso lo mueve a una carpeta ultimos 2 digitos de la cedula de la persoan fue como se creo el usuario 
+// (Primera inicial nombre 1 y2, apellido 2 ultimos digitos de la cedula) y envia correo con los datos a la persona
