@@ -12,32 +12,18 @@ type Props = {
 };
 
 const TIPO_COMPUTADOR_OPTIONS: Record<TipoUsuario, Array<string>> = {
-  "Usuario administrativo": ["Portátil Apple", "Escritorio Apple"],
-  "Usuario de diseño": ["Portátil Apple", "Escritorio Apple", "Portátil Windows", "Escritorio Windows"],
+  "Usuario administrativo": ["Portátil Apple", "Escritorio Apple", "Portátil Windows", "Escritorio Windows"],
+  "Usuario de diseño": ["Portátil Apple", "Escritorio Apple"],
   "Tienda": ["Portátil Windows", "Escritorio Windows"],
 };
 
-/* ===== Componente principal ===== */
 export default function InfoActaEntrega({ ticket }: Props) {
-  const {
-    state,
-    setField,
-    items,
-    toggleEntrega,
-    handleSubmit,
-    ITEMS_CON_TIPO_COMPUTADOR,
-    errors,
-    updateDetalle,
-    selectedKeys,
-  } = useActaEntrega(ticket?.ID ?? "");
+  const {state, items, ITEMS_CON_TIPO_COMPUTADOR, errors,  selectedKeys,
+    setField, toggleEntrega, handleSubmit, updateDetalle,} = useActaEntrega(ticket?.ID ?? "");
 
   const tipoActual = state.tipoUsuario || "Usuario administrativo";
-  const opcionesTipoPC =
-    TIPO_COMPUTADOR_OPTIONS[tipoActual as TipoUsuario] ?? ["Portátil", "Escritorio"];
-
-  const mostrarTipoPC =
-    items.some((i) => ITEMS_CON_TIPO_COMPUTADOR.has(i) && state.entregas[i]) &&
-    !!state.tipoUsuario;
+  const opcionesTipoPC = TIPO_COMPUTADOR_OPTIONS[tipoActual as TipoUsuario] ?? ["Portátil", "Escritorio"];
+  const mostrarTipoPC = items.some((i) => ITEMS_CON_TIPO_COMPUTADOR.has(i) && state.entregas[i]) &&!!state.tipoUsuario;
 
   return (
     <form className="acta-form" onSubmit={handleSubmit}>
@@ -47,62 +33,36 @@ export default function InfoActaEntrega({ ticket }: Props) {
       <div className="acta-grid">
         <div className="acta-field">
           <label>Número de ticket</label>
-          <input
-            className="acta-input"
-            value={state.numeroTicket}
-            onChange={(e) => setField("numeroTicket", e.target.value)}
-            placeholder=""
-          />
+          <input className="acta-input" value={state.numeroTicket} type="number" onChange={(e) => setField("numeroTicket", e.target.value)} placeholder=""/>
         </div>
 
         <div className="acta-field">
           <label>*Sede de destino</label>
-          <input
-            className="acta-input"
-            value={state.sedeDestino}
-            onChange={(e) => setField("sedeDestino", e.target.value)}
-          />
+          <input className="acta-input" value={state.sedeDestino} onChange={(e) => setField("sedeDestino", e.target.value)}/>
           {errors.sedeDestino && <small className="error">{errors.sedeDestino}</small>}
         </div>
 
         <div className="acta-field">
           <label>*Persona (Quien recibe)</label>
-          <input
-            className="acta-input"
-            value={state.persona}
-            onChange={(e) => setField("persona", e.target.value)}
-          />
+          <input className="acta-input" value={state.persona} onChange={(e) => setField("persona", e.target.value)}/>
           {errors.persona && <small className="error">{errors.persona}</small>}
         </div>
 
         <div className="acta-field">
           <label>*Correo (Quien Recibe)</label>
-          <input
-            className="acta-input"
-            type="email"
-            value={state.correo}
-            onChange={(e) => setField("correo", e.target.value)}
-          />
+          <input className="acta-input" type="email" value={state.correo} onChange={(e) => setField("correo", e.target.value)}/>
           {errors.correo && <small className="error">{errors.correo}</small>}
         </div>
 
         <div className="acta-field">
           <label>*Número de cédula (Quien recibe)</label>
-          <input
-            className="acta-input"
-            value={state.cedula}
-            onChange={(e) => setField("cedula", e.target.value)}
-          />
+          <input className="acta-input" value={state.cedula} onChange={(e) => setField("cedula", e.target.value)} type="number"/>
           {errors.cedula && <small className="error">{errors.cedula}</small>}
         </div>
 
         <div className="acta-field">
           <label>*Tipo de usuario</label>
-          <select
-            className="acta-input"
-            value={state.tipoUsuario}
-            onChange={(e) => setField("tipoUsuario", e.target.value as TipoUsuario)}
-          >
+          <select className="acta-input" value={state.tipoUsuario} onChange={(e) => setField("tipoUsuario", e.target.value as TipoUsuario)}>
             <option value="">Seleccione…</option>
             <option>Usuario administrativo</option>
             <option>Usuario de diseño</option>
@@ -113,10 +73,7 @@ export default function InfoActaEntrega({ ticket }: Props) {
 
         <div className="acta-field">
           <label>*¿Estos equipos se enviarán?</label>
-          <select
-            className="acta-input"
-            value={state.enviarEquipos}
-            onChange={(e) => setField("enviarEquipos", e.target.value as string)}
+          <select className="acta-input" value={state.enviarEquipos} onChange={(e) => setField("enviarEquipos", e.target.value as string)}
           >
             <option value="">Seleccione…</option>
             <option value="No">No</option>
@@ -132,11 +89,7 @@ export default function InfoActaEntrega({ ticket }: Props) {
       <div className="entregas-grid">
         {items.map((it) => (
           <div key={it} className="entrega-item">
-            <Toggle
-              checked={!!state.entregas[it]}
-              onChange={(v) => toggleEntrega(it, v)}
-              label={it}
-            />
+            <Toggle checked={!!state.entregas[it]} onChange={(v) => toggleEntrega(it, v)} label={it}/>
           </div>
         ))}
         {errors.entregas && <small className="error">{errors.entregas}</small>}
@@ -145,13 +98,7 @@ export default function InfoActaEntrega({ ticket }: Props) {
         {mostrarTipoPC && (
           <div className="entrega-item entrega-item--span2">
             <label className="acta-label-strong">Tipo de computador</label>
-            <select
-              className="acta-input"
-              value={state.tipoComputador ?? ""}
-              onChange={(e) =>
-                setField("tipoComputador", e.target.value as "Portátil" | "Escritorio" | "")
-              }
-            >
+            <select className="acta-input" value={state.tipoComputador ?? ""} onChange={(e) => setField("tipoComputador", e.target.value as "Portátil" | "Escritorio" | "")}>
               <option value="">Seleccione…</option>
               {opcionesTipoPC.map((opt) => (
                 <option key={opt} value={opt}>
@@ -181,38 +128,22 @@ export default function InfoActaEntrega({ ticket }: Props) {
 
                   <div className="galeria-row">
                     <label>Marca</label>
-                    <input
-                      className="acta-input"
-                      value={det?.Marca ?? ""}
-                      onChange={(e) => updateDetalle(key, { Marca: e.target.value })}
-                    />
+                    <input className="acta-input" value={det?.Marca ?? ""} onChange={(e) => updateDetalle(key, { Marca: e.target.value })} />
                   </div>
 
                   <div className="galeria-row">
                     <label>Referencia</label>
-                    <input
-                      className="acta-input"
-                      value={det?.Referencia ?? ""}
-                      onChange={(e) => updateDetalle(key, { Referencia: e.target.value })}
-                    />
+                    <input className="acta-input" value={det?.Referencia ?? ""} onChange={(e) => updateDetalle(key, { Referencia: e.target.value })}/>
                   </div>
 
                   <div className="galeria-row">
                     <label>Serial</label>
-                    <input
-                      className="acta-input"
-                      value={det?.Serial ?? ""}
-                      onChange={(e) => updateDetalle(key, { Serial: e.target.value })}
-                    />
+                    <input className="acta-input" value={det?.Serial ?? ""} onChange={(e) => updateDetalle(key, { Serial: e.target.value })}/>
                   </div>
 
                   <div className="galeria-row">
                     <label>Propiedad</label>
-                    <select
-                      className="acta-input"
-                      value={det?.Propiedad ?? ""}
-                      onChange={(e) => updateDetalle(key, { Propiedad: e.target.value as any })}
-                    >
+                    <select className="acta-input" value={det?.Propiedad ?? ""} onChange={(e) => updateDetalle(key, { Propiedad: e.target.value as any })}>
                       <option value="">Seleccione…</option>
                       <option value="Alquilado">Alquilado</option>
                       <option value="Propio">Propio</option>
@@ -223,30 +154,17 @@ export default function InfoActaEntrega({ ticket }: Props) {
 
                   <div className="galeria-row">
                     <label>Proveedor</label>
-                    <input
-                      className="acta-input"
-                      value={proveedorDisabled ? "-" : (det?.Proveedor ?? "")}
-                      disabled={proveedorDisabled}
-                      onChange={(e) => updateDetalle(key, { Proveedor: e.target.value })}
-                    />
+                    <input className="acta-input" value={proveedorDisabled ? "-" : (det?.Proveedor ?? "")} disabled={proveedorDisabled} onChange={(e) => updateDetalle(key, { Proveedor: e.target.value })}/>
                   </div>
 
                   <div className="galeria-row">
                     <label>Descripción</label>
-                    <input
-                      className="acta-input"
-                      value={det?.Detalle ?? ""}
-                      onChange={(e) => updateDetalle(key, { Detalle: e.target.value })}
-                    />
+                    <input className="acta-input" value={det?.Detalle ?? ""} onChange={(e) => updateDetalle(key, { Detalle: e.target.value })}/>
                   </div>
 
                   <div className="galeria-row">
                     <label>Prueba de funcionamiento</label>
-                    <input
-                      className="acta-input"
-                      value={det?.Prueba ?? ""}
-                      onChange={(e) => updateDetalle(key, { Prueba: e.target.value })}
-                    />
+                    <input className="acta-input" value={det?.Prueba ?? ""} onChange={(e) => updateDetalle(key, { Prueba: e.target.value })}/>
                   </div>
                 </div>
               );

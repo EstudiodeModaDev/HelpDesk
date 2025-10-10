@@ -1,124 +1,198 @@
-/* ====== Contenedor y títulos ====== */
-.acta-form{
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 8px 8px 24px;
-}
-.acta-title{
-  margin: 0 0 12px;
-  font-size: 32px;
-  font-weight: 800;
-  color: #0b2b3a;
-  letter-spacing: .2px;
-}
-.acta-subtitle{
-  margin: 24px 0 12px;
-  font-size: 22px;
-  font-weight: 800;
-  color: #0b2b3a;
+/* ====== Tokens (ajusta a tu paleta) ====== */
+:root{
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --text: #0f172a;          /* slate-900 */
+  --muted: #475569;         /* slate-600 */
+  --border: #e5e7eb;        /* gray-200 */
+  --ring: #2563eb;          /* blue-600 */
+  --error: #b91c1c;         /* red-700 */
+  --shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
+
+  --radius: 12px;
+  --radius-sm: 10px;
+
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+
+  --font-title: clamp(22px, 2.6vw, 34px);
+  --font-sub: clamp(16px, 1.6vw, 20px);
 }
 
-/* ====== Grid cabecera (2 columnas) ====== */
+/* ====== Layout base ====== */
+.acta-form{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.acta-title{
+  font-size: var(--font-title);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 6px 0 var(--space-4);
+}
+
+/* ====== Grid cabecera ====== */
 .acta-grid{
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
 }
 
-/* ====== Campos ====== */
-.acta-field{ display: flex; flex-direction: column; gap: 6px; }
+.acta-field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .acta-field > label{
-  font-size: .94rem;
-  font-weight: 700;
-  color: #1f2a37;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
 }
 
-/* Inputs/selects */
 .acta-input{
-  border: 1px solid #e5e7eb;
-  background: #f8fafc;
-  color: #0f172a;
-  border-radius: 10px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 10px 12px;
   font: inherit;
+  color: inherit;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  width: 100%;
-  min-height: 38px;
-  box-sizing: border-box;
 }
-.acta-input::placeholder{ color: #94a3b8; }
+
 .acta-input:focus{
-  background: #fff;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 18%, transparent);
 }
-.acta-input[disabled]{
-  background: #f1f5f9;
-  color: #94a3b8;
+
+/* Disabled-friendly */
+.acta-input:disabled{
+  background: #f8fafc;       /* slate-50 */
+  color: #64748b;            /* slate-500 */
   cursor: not-allowed;
 }
 
-/* ====== Entregas (toggles) ====== */
-.entregas-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 24px;
+/* Mensajes de error */
+.error{
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 4px;
 }
-.entrega-item{ display:flex; align-items:center; }
-.entrega-item--span2{ grid-column: 1 / -1; }
+
+/* ====== Secciones ====== */
+.acta-subtitle{
+  font-size: var(--font-sub);
+  font-weight: 700;
+  margin: var(--space-5) 0 var(--space-3);
+}
 
 .acta-label-strong{
-  display:block;
-  font-weight: 800;
-  color: #0b2b3a;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
-/* ====== Botonera ====== */
-.acta-actions{
+/* ====== Toggles / items a entregar ====== */
+.entregas-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.entrega-item{
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 24px 0 8px;
-}
-.acta-primary{
-  --btn-bg: #2563eb;
-  --btn-bg-hover: #1e55c7;
-  --btn-text: #ffffff;
-
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: none;
-  background: var(--btn-bg);
-  color: var(--btn-text);
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(37,99,235,.18);
-  transition: filter .15s ease, transform .02s ease, background .15s ease;
-}
-.acta-primary:hover{ background: var(--btn-bg-hover); }
-.acta-primary:active{ transform: translateY(1px); }
-.acta-primary:disabled{
-  background: #cbd5e1;
-  box-shadow: none;
-  cursor: not-allowed;
+  gap: 10px;
 }
 
-/* ====== Errores (si los usas) ====== */
-.acta-error{
-  margin-top: 4px;
-  color: #b91c1c;
-  font-size: .85rem;
+.entrega-item--span2{
+  grid-column: 1 / -1;
+}
+
+/* ====== Galería (tarjetas) ====== */
+.galeria-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.galeria-card{
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: var(--space-4);
+}
+
+.galeria-header{
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.galeria-row{
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.galeria-row > label{
+  font-size: 13px;
+  color: var(--muted);
   font-weight: 600;
 }
 
-/* ====== Responsive ====== */
-@media (max-width: 960px){
-  .acta-grid{ grid-template-columns: 1fr; }
-  .entregas-grid{ grid-template-columns: 1fr; }
-  .acta-title{ font-size: 28px; }
+/* ====== Footer acciones ====== */
+.acta-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.acta-primary{
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  background: var(--ring);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .15s ease, background .2s ease;
+  box-shadow: 0 2px 6px rgba(37,99,235,.25);
+}
+
+.acta-primary:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37,99,235,.25);
+}
+
+.acta-primary:active{
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(37,99,235,.25);
+}
+
+/* ====== Responsivo ====== */
+@media (max-width: 1024px){
+  .acta-grid,
+  .entregas-grid,
+  .galeria-grid{
+    grid-template-columns: 1fr;
+  }
+  .galeria-row{
+    grid-template-columns: 1fr;
+  }
 }
