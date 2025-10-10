@@ -22,6 +22,20 @@ export type FormStateActa = {
   tipoUsuario: TipoUsuario | "";
   tipoComputador?: "Portátil" | "Escritorio" | "";
   entregas: Record<string, boolean>;
+  detalles: Record<string, DetalleEntrega>
+};
+
+export type Propiedad = "Alquilado" | "Propio" 
+
+export type DetalleEntrega = {
+  Elemento: string;        
+  Detalle: string;
+  Marca: string;
+  Referencia: string;
+  Serial: string;
+  Propiedad: Propiedad | "";
+  Proveedor: string;       
+  Prueba: string;          
 };
 
 export type FormActaStateErrors = Partial<Record<keyof FormStateActa, string>>;
