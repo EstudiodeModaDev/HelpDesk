@@ -287,7 +287,7 @@ export function useActaEntrega(ticketId: string) {
     );
 
     const body = {
-      Campos,                
+      ...Campos,                
 
     };
 
