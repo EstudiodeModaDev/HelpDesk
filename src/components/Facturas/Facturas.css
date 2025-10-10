@@ -96,11 +96,12 @@ select[disabled] {
   font-size: 0.9rem;
   cursor: pointer;
   transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
+  margin: 15px;
 }
 .btn:hover { box-shadow: 0 4px 16px rgba(2, 6, 23, 0.08); }
 .btn:active { transform: translateY(1px); }
 
-.btn-sm { padding: 6px 10px; font-size: 0.85rem; }
+.btn-sm { padding: 6px 10px; font-size: 0.85rem;}
 .btn-primary {
   background: #2563eb;
   border-color: #2563eb;

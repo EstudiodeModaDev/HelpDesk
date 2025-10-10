@@ -1,27 +1,46 @@
 import * as React from "react";
-import "./NewItemModa.css"
+import { createPortal } from "react-dom";
+import "./NewItemModa.css";
 import type { ItemBd } from "../../../Models/Facturas";
 
 type Props = {
   open: boolean;
   onClose: () => void;
   onCreated: (item: ItemBd) => void;
-  /** Creador inyectado (viene del hook/useFacturas o servicio real) */
- //onCreateRequest: (data: { descripcion: string; valor: number }) => Promise<Item>;
 };
 
-const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated, /*onCreateRequest*/ }) => {
+const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated }) => {
   const [descripcion, setDescripcion] = React.useState("");
   const [valor, setValor] = React.useState<string>("");
   const [saving, setSaving] = React.useState(false);
+  const titleRef = React.useRef<HTMLHeadingElement | null>(null);
 
-  const disabled = !descripcion.trim() || !Number(valor) || Number(valor) <= 0;
+  const disabled = !descripcion.trim() || Number.isNaN(Number(valor)) || Number(valor) <= 0;
+
+  React.useEffect(() => {
+    if (!open) return;
+    // Bloquear scroll del body
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    // Focus al título (o al primer input)
+    setTimeout(() => titleRef.current?.focus(), 0);
+    // Escape para cerrar
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = prev; window.removeEventListener("keydown", onKey); };
+  }, [open, onClose]);
 
   async function handleSave() {
     try {
       setSaving(true);
-      const item: ItemBd = {NombreItem: "", Title: "", Valor: 0}//await onCreateRequest({ descripcion: descripcion.trim(), valor: Number(valor) });
-      onCreated(item);            // notifica al padre
+      // Construir el ítem con tus datos reales
+      const item: ItemBd = {
+        Id: cryptoRandomId(),                 // opcional/temporal
+        Title: descripcion.trim(),           // código si no tienes, usa la desc temporalmente
+        NombreItem: descripcion.trim(),
+        Valor: Number(valor)
+      };
+      onCreated(item);
       setDescripcion("");
       setValor("");
       onClose();
@@ -34,59 +53,58 @@ const NewItemModal: React.FC<Props> = ({ open, onClose, onCreated, /*onCreateReq
 
   if (!open) return null;
 
-  return (
-    <div
-      className="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="new-item-title"
-    >
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
-        <h3 id="new-item-title" className="text-lg font-semibold mb-4">
+  const content = (
+    <div className="newitem-overlay" role="dialog" aria-modal="true" aria-labelledby="new-item-title">
+      {/* capa para click-outside */}
+      <div className="newitem-clickguard" onClick={onClose} />
+      <div className="newitem-card" onClick={(e) => e.stopPropagation()}>
+        <h3 id="new-item-title" className="newitem-title" tabIndex={-1} ref={titleRef}>
           Nuevo ítem
         </h3>
 
-        <div className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-slate-700">Descripción</span>
-            <input
-              className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="Ej. Empaque burbuja"
-              autoFocus
-            />
-          </label>
+        <div className="newitem-field">
+          <label className="newitem-label">Descripción</label>
+          <input
+            className="newitem-input"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            placeholder="Ej. Empaque burbuja"
+            autoFocus
+            onKeyDown={(e) => e.key === "Enter" && !disabled && handleSave()}
+          />
+        </div>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-slate-700">Valor unitario</span>
-            <input
-              className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
-              type="number"
-              min={0}
-              step="0.01"
-              value={valor}
-              onChange={(e) => setValor(e.target.value)}
-              placeholder="0"
-            />
-          </label>
+        <div className="newitem-field">
+          <label className="newitem-label">Valor unitario</label>
+          <input
+            className="newitem-input"
+            type="number"
+            min={0}
+            step="0.01"
+            value={valor}
+            onChange={(e) => setValor(e.target.value)}
+            placeholder="0"
+            onKeyDown={(e) => e.key === "Enter" && !disabled && handleSave()}
+          />
+        </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <button className="px-3 py-2 rounded-lg border" onClick={onClose} disabled={saving}>
-              Cancelar
-            </button>
-            <button
-              className="px-4 py-2 rounded-lg bg-indigo-600 text-white disabled:opacity-50"
-              onClick={handleSave}
-              disabled={saving || disabled}
-            >
-              {saving ? "Guardando..." : "Guardar ítem"}
-            </button>
-          </div>
+        <div className="newitem-footer">
+          <button className="btn" onClick={onClose} disabled={saving}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleSave} disabled={saving || disabled}>
+            {saving ? "Guardando..." : "Guardar ítem"}
+          </button>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(content, document.body);
 };
 
 export default NewItemModal;
+
+// Utilidad local si la necesitas:
+function cryptoRandomId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return (crypto as any).randomUUID();
+  return Math.random().toString(36).slice(2);
+}
