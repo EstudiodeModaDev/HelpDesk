@@ -1,8 +1,6 @@
-import * as React from "react";
 import "./CajerosPOS.css"; // importa el css que nos diste
 import { useCajerosPOS } from "../../Funcionalidades/CajerosPos";
 import type { TicketsService } from "../../Services/Tickets.service";
-import { useAuth } from "../../auth/authContext";
 import Select, { type SingleValue } from "react-select";
 import type { LogService } from "../../Services/Log.service";
 
@@ -23,21 +21,6 @@ const companiaOptions: Option[] = [
 
 export default function CajerosPOSForm({ services }: Props) {
   const { state, setField, errors, submitting, handleSubmit } = useCajerosPOS(services);
-
-  // Helpers controlados para solicitante 
-  const {account } = useAuth();
-
-  // Sincroniza con el hook cuando cambian los inputs
-  React.useEffect(() => {
-    if (!account) return;
-    const email = account.username ?? "";
-    const name  = (account as any).name ?? email; // usa name si existe, si no el email
-
-    if (email) {
-      setField("solicitante", name);
-    }
-  }, [account, setField]);
-
 
   return (
     <div className="detalle-ticket">

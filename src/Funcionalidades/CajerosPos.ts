@@ -7,6 +7,7 @@ import type { FlowToSP, FormErrorsCajeros, FormStateCajeros } from "../Models/Fl
 import { FlowClient } from "./FlowClient";
 import type { Log } from "../Models/Log";
 import type { LogService } from "../Services/Log.service";
+import { useAuth } from "../auth/authContext";
 
 type Svc = {
   Tickets?: TicketsService;
@@ -18,9 +19,10 @@ export const first = (...vals: any[]) =>
   vals.find((v) => v !== undefined && v !== null && v !== "");
 
 export function useCajerosPOS(services: Svc) {
-  const { Tickets, Logs } = services;
+  const { Tickets, Logs } = services; 
+  const { account } = useAuth();
 
-  const [state, setState] = useState<FormStateCajeros>({Cedula: "", CO: "", Compañia: "", CorreoTercero: "", solicitante: "", usuario: "",});
+  const [state, setState] = useState<FormStateCajeros>({Cedula: "", CO: "", Compañia: "", CorreoTercero: account?.username!, solicitante: account?.name!, usuario: "",});
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
 
