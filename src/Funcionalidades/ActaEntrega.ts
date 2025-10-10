@@ -4,12 +4,16 @@ import { useGraphServices } from "../graph/GrapServicesContext";
 import { useAuth } from "../auth/authContext";
 import type { LogService } from "../Services/Log.service";
 import type {
+  ActasEntrega,
+  CamposPayload,
   DetalleEntrega,
   FormActaStateErrors,
   FormStateActa,
   TipoUsuario,
 } from "../Models/ActasEntrega";
 import type { ActasdeentregaService } from "../Services/Actasdeentrega.service";
+import { FlowClient } from "./FlowClient";
+import { toGraphDateOnly } from "../utils/Date";
 
 /* ===== Config ===== */
 const ENTREGAS_BY_TIPO: Record<TipoUsuario, string[]> = {
@@ -18,12 +22,13 @@ const ENTREGAS_BY_TIPO: Record<TipoUsuario, string[]> = {
   "Tienda": ["CPU", "Monitor", "Teclado", "Mouse", "Lector CB", "Cajón Monedero", "Cámara", "Teléfono", "Multipuertos"],
 };
 const ITEMS_CON_TIPO_COMPUTADOR = new Set(["Computador", "CPU"]);
+const VACIO = "-------";
 
+/* ===== Helpers ===== */
 function crearDetalleDefault(nombre: string, tipoComputador?: string): DetalleEntrega {
   const esPC = ITEMS_CON_TIPO_COMPUTADOR.has(nombre);
   const elemento = esPC && tipoComputador ? `Computador ${tipoComputador}` : nombre;
-  const descripcion =
-    esPC ? `Computador ${tipoComputador ?? ""}`.trim() : nombre;
+  const descripcion = esPC ? `Computador ${tipoComputador ?? ""}`.trim() : nombre;
 
   return {
     Elemento: elemento,
@@ -37,17 +42,69 @@ function crearDetalleDefault(nombre: string, tipoComputador?: string): DetalleEn
   };
 }
 
+function sociedadFromEmail(email: string): CamposPayload["Franquicia"] {
+  const dom = email.split("@")[1]?.toLowerCase() ?? "";
+  if (dom === "movivisual.com") return "MV";
+  if (dom === "replaycol.com")  return "DH";
+  if (dom === "mtagraphics.com")return "MG";
+  // default
+  return "EDM";
+}
+
+function hayDatosMinimos(detalles: Record<string, DetalleEntrega>): boolean {
+  return Object.values(detalles).some((d) => d?.Referencia?.trim() || d?.Serial?.trim() || d?.Marca?.trim());
+}
+
+const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
+
+function esPortatil(state: FormStateActa, selectedKeys: string[]) {
+  const textos = [
+    state.tipoComputador ?? "",
+    ...selectedKeys.map((k) => state.detalles[k]?.Elemento ?? ""),
+  ].join(" ");
+  return /port[aá]til/i.test(textos);
+}
+
+/** Construye Campos 1..12 con VACIO si falta */
+function buildCampos(state: FormStateActa, selectedKeys: string[], nombreEntrega: string, correoEntrega: string): CamposPayload {
+  const items = selectedKeys.slice(0, 12).map((k, i) => ({ idx: i + 1, d: state.detalles[k] }));
+
+  const base: Partial<CamposPayload> = {
+    SedeDestino: state.sedeDestino,
+    NombreRecibe: state.persona,
+    CorreoRecibe: state.correo,
+    NombreEntrega: nombreEntrega,
+    CorreoEntrega: correoEntrega,
+    SedeOrigen: "TI",
+    ID: state.numeroTicket,
+    Enviar: state.enviarEquipos,
+    Portatil: esPortatil(state, selectedKeys),
+    Franquicia: sociedadFromEmail(state.correo),
+  };
+
+  for (let i = 1; i <= 12; i++) {
+    const found = items.find((x) => x.idx === i)?.d;
+    (base as any)[`Marca_${i}`]       = found?.Marca?.trim()        || VACIO;
+    (base as any)[`Referencia_${i}`]  = found?.Referencia?.trim()   || VACIO;
+    (base as any)[`Serial_${i}`]      = found?.Serial?.trim()       || VACIO;
+    (base as any)[`Descripcion_${i}`] = found?.Elemento?.trim()     || VACIO;
+    (base as any)[`Proveedor_${i}`]   = (found?.Proveedor ?? VACIO).trim() || VACIO;
+    (base as any)[`Prueba_${i}`]      = (found?.Prueba?.trim() || found?.Detalle?.trim()) || VACIO;
+  }
+
+  return base as CamposPayload;
+}
+
+/* ===== Hook ===== */
 export function useActaEntrega(ticketId: string) {
   const { account } = useAuth();
-  const { Logs: LogSvc } = useGraphServices() as ReturnType<typeof useGraphServices> & {
+  const { Logs: LogSvc, ActasEntrega: EntregaSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
     Logs: LogService;
     ActasEntrega: ActasdeentregaService;
   };
-
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<FormActaStateErrors>({});
-
   const [state, setState] = React.useState<FormStateActa>({
     numeroTicket: ticketId,
     persona: "",
@@ -73,26 +130,21 @@ export function useActaEntrega(ticketId: string) {
   React.useEffect(() => {
     if (!state.tipoUsuario) return;
 
-    // recalcula qué está disponible
     const nextEntregas: Record<string, boolean> = {};
     const nextDetalles: Record<string, DetalleEntrega> = {};
 
     for (const k of items) {
       const activo = !!state.entregas[k];
       nextEntregas[k] = activo;
-      if (activo) {
-        nextDetalles[k] = state.detalles[k] ?? crearDetalleDefault(k, state.tipoComputador);
-      }
+      if (activo) nextDetalles[k] = state.detalles[k] ?? crearDetalleDefault(k, state.tipoComputador);
     }
 
-    const algunComputadorActivo = items.some(
-      (k) => ITEMS_CON_TIPO_COMPUTADOR.has(k) && !!nextEntregas[k]
-    );
+    const algunComputadorActivo = items.some((k) => ITEMS_CON_TIPO_COMPUTADOR.has(k) && !!nextEntregas[k]);
 
     setState((s) => ({
       ...s,
       entregas: nextEntregas,
-      detalles: nextDetalles, // <<< sincroniza colección
+      detalles: nextDetalles,
       tipoComputador: algunComputadorActivo ? (s.tipoComputador ?? "") : "",
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,7 +169,6 @@ export function useActaEntrega(ticketId: string) {
     });
   }, [state.tipoComputador]);
 
-  /** Toggle + crear/eliminar detalle */
   const toggleEntrega = (key: string, v: boolean) =>
     setState((s) => {
       const entregas = { ...s.entregas, [key]: v };
@@ -130,7 +181,6 @@ export function useActaEntrega(ticketId: string) {
       return { ...s, entregas, detalles };
     });
 
-  /** Edición de una tarjeta */
   const updateDetalle = (key: string, patch: Partial<DetalleEntrega>) =>
     setState((s) => {
       const prev = s.detalles[key] ?? crearDetalleDefault(key, s.tipoComputador);
@@ -162,16 +212,21 @@ export function useActaEntrega(ticketId: string) {
     return Object.keys(e).length === 0;
   };
 
-  /** Submit */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    // Validación mínima estilo Power Apps (txtReferencia_1 / txtSerial / txtMarca)
+    if (!hayDatosMinimos(state.detalles)) {
+      alert("Por favor llene todos los campos requeridos");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      // Ejemplo: log
+      // Log (opcional)
       await LogSvc.create({
         Actor: account?.name ?? "",
         CorreoActor: account?.username ?? "",
@@ -180,24 +235,65 @@ export function useActaEntrega(ticketId: string) {
         Title: state.numeroTicket,
       });
 
+      // (Opcional) solo para inspección en consola
       const entregasSeleccionadas = Object.keys(state.entregas).filter((k) => state.entregas[k]);
-      const coleccion = entregasSeleccionadas.map((k, i) => ({ ID: i, ...state.detalles[k] }));
+      const coleccion = entregasSeleccionadas.map((k, i) => ({ ID: i + 1, ...state.detalles[k] }));
+      console.log("[ACTA] Colección (debug):", coleccion);
 
-      const payload = { ...state, entregasSeleccionadas, coleccion };
-      console.log("[ACTA] Payload:", payload);
-      alert("Acta lista (ver consola).");
+      // === Invoca el flujo y crea el acta en SharePoint desde emitirActa ===
+      const flowResp = await emitirActa();
+
+      alert("Se ha generado el acta con éxito. Ingrese a su correo y fírmela.");
+      console.log("[Flow] Respuesta:", flowResp);
+      // navigate("/seguimiento"); // si aplica
+
     } catch (e: any) {
       console.error(e);
-      setError(e?.message ?? "Error guardando el acta");
+      setError(e?.message ?? "Error generando el acta");
     } finally {
       setLoading(false);
     }
   };
 
+
   const selectedKeys = React.useMemo(
     () => Object.keys(state.entregas).filter((k) => state.entregas[k]),
     [state.entregas]
   );
+
+  // ...dentro del hook useActaEntrega
+
+  const emitirActa = async () => {
+    const entregasSeleccionadas = Object.keys(state.entregas).filter((k) => state.entregas[k]);
+    const actaPayload: ActasEntrega = {
+      Cedula: state.cedula,
+      Correo_x0028_QuienRecibe_x0029_: state.correo,
+      Estado: "Enviado",
+      Id_caso: state.numeroTicket,
+      Tecnico_x0028_Queentrega_x0029_: account?.username ?? "",
+      Title: account?.name ?? "",
+      Fecha: toGraphDateOnly(new Date()),
+      Persona_x0028_Quienrecibe_x0029_: state.persona
+    }
+    const actaLista = await EntregaSvc.create(actaPayload)
+
+    const Campos = buildCampos(
+      state,
+      entregasSeleccionadas,
+      account?.name ?? "",
+      account?.username ?? ""
+    );
+
+    const body = {
+      Campos,                
+      UltimaActaId: actaLista.Id 
+    };
+
+    const resp = await notifyFlow.invoke<typeof body, any>(body);
+    return resp;
+  };
+
+  
 
   return {
     loading,
@@ -211,6 +307,7 @@ export function useActaEntrega(ticketId: string) {
     toggleEntrega,
     ITEMS_CON_TIPO_COMPUTADOR,
     updateDetalle,
-    selectedKeys, // útil para la galería
+    selectedKeys,
+    emitirActa
   };
 }

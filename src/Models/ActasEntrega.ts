@@ -1,5 +1,5 @@
 export type ActasEntrega = {
-    Id: string;
+    Id?: string;
     Title: string; //Correo (usuario que entrega)
     Id_caso: string;
     Tecnico_x0028_Queentrega_x0029_: string; //Tecnico (usuario que entrega)
@@ -36,6 +36,26 @@ export type DetalleEntrega = {
   Propiedad: Propiedad | "";
   Proveedor: string;       
   Prueba: string;          
+};
+
+export type CamposPayload = {
+  SedeDestino: string;
+  NombreRecibe: string;
+  CorreoRecibe: string;
+  NombreEntrega: string;
+  CorreoEntrega: string;
+  SedeOrigen: "TI";
+  ID: string;                   // ticket
+  Enviar: string;               // "Sí" | "No"
+  Portatil: boolean;
+  Franquicia: "EDM" | "MV" | "DH" | "MG" | "EDM"; // default EDM
+  // Slots 1..12
+  [k: `Marca_${number}`]: string;
+  [k: `Referencia_${number}`]: string;
+  [k: `Serial_${number}`]: string;
+  [k: `Descripcion_${number}`]: string;
+  [k: `Proveedor_${number}`]: string;
+  [k: `Prueba_${number}`]: string;
 };
 
 export type FormActaStateErrors = Partial<Record<keyof FormStateActa, string>>;
