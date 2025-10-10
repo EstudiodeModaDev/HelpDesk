@@ -120,7 +120,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                         <select value={l.Id} onChange={(e) => onChangeItem(l.tempId!, e.target.value)} disabled={submitting} className="select-compact bg-white">
                           <option value="">Seleccione</option>
                           {items.map((it) => (
-                            <option key={it.Id} value={it.Title}>
+                            <option key={it.Id} value={it.Id}>
                               {it.NombreItem}
                             </option>
                           ))}
@@ -132,7 +132,7 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                     </td>
 
                     <td>
-                      <input value={l.NombreItem ?? ""} className="input-compact bg-slate-100"/>
+                      <input value={l.NombreItem ?? ""} className="input-compact bg-slate-100"   onChange={(e) => setField("lineas", state.lineas.map(ln => ln.tempId === l.tempId ? { ...ln, NombreItem: e.target.value } : ln))}/>
                     </td>
 
                     <td>

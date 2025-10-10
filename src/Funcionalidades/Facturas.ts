@@ -100,11 +100,11 @@ export function useFacturas() {
         l.tempId === tempId
         ? {
             ...l,
-            itemId,
-            descripcion: it?.NombreItem ?? "",
-            valorUnitario: it?.Valor ?? 0,
-            subtotal: (Number(it?.Valor ?? 0) * (l.cantidad || 0)),
-
+            itemId,                          
+            Title: it?.Title ?? "",          
+            NombreItem: it?.NombreItem ?? "",
+            Valor: Number(it?.Valor ?? 0),  
+            subtotal: Number(it?.Valor ?? 0) * (l.cantidad || 0),
             }
         : l
     )
