@@ -1,7 +1,12 @@
 import * as React from "react";
+import Select, { components, type GroupBase } from "react-select";
 import type { CargarA, CO, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
-import "./Compras.css"; // <-- importa el CSS de abajo
+import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm"; // si no lo tienes, puedes usar { value:string; label:string }
+import { useFranquicias } from "../../Funcionalidades/Franquicias";
+import { useWorkers } from "../../Funcionalidades/Workers";
+import "./Compras.css";
 
+/** --- Datos de selects básicos --- */
 const CO_OPTS: CO[] = [
   { value: "Operaciones", code: "1001" },
   { value: "Logística",  code: "1002" },
@@ -25,13 +30,46 @@ type Marca = typeof MARCAS[number];
 const zeroMarcas = (): Record<Marca, number> =>
   MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
-type Props = { onSubmit?: (payload: comprasState) => void; initial?: Partial<comprasState>; };
+/** --- Props: agrego opcionales para que no reviente lo externo --- */
+type Props = {
+  onSubmit?: (payload: comprasState) => void;
+  initial?: Partial<comprasState>;
+  FranquiciasSvc?: unknown;      // se pasa a useFranquicias si tu hook lo requiere
+  submitting?: boolean;          // si quieres deshabilitar mientras guardas
+};
 
-export default function CompraFormulario({ onSubmit, initial }: Props) {
+/** --- Filtro simple para react-select --- */
+function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
+  const q = rawInput.trim().toLowerCase();
+  if (!q) return true;
+  return option.label.toLowerCase().includes(q) || (option.value ?? "").toLowerCase().includes(q);
+}
+
+/** --- Opción custom (puedes decorarla más si quieres) --- */
+const Option = (props: any) => (
+  <components.Option {...props}>
+    <span>{props.data.label}</span>
+  </components.Option>
+);
+
+export default function CompraFormulario({
+  onSubmit,
+  initial,
+  FranquiciasSvc,
+  submitting = false,
+}: Props) {
+  /** Datos externos */
+  const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc as any);
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
+    onlyEnabled: true,
+    domainFilter: "estudiodemoda.com.co",
+  });
+
+  /** Estado del formulario */
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
     productoServicio: "",
-    solicitadoPor: "",
+    solicitadoPor: "",         // lo guardamos como string (label seleccionado)
     fechaSolicitud: "",
     dispositivo: "",
     co: "",
@@ -45,6 +83,23 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
   });
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
+  /** Merge de opciones de solicitantes (workers + franquicias) sin duplicados */
+  const combinedOptions: UserOptionEx[] = React.useMemo(() => {
+    const map = new Map<string, UserOptionEx>();
+    for (const o of [...workersOptions, ...franqOptions]) {
+      const key = (o.value || "").toLowerCase();
+      if (!map.has(key)) map.set(key, o);
+    }
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [workersOptions, franqOptions]);
+
+  /** Valor seleccionado para react-select (necesita el objeto, no el string) */
+  const selectedSolicitante = React.useMemo<UserOptionEx | null>(() => {
+    if (!state.solicitadoPor) return null;
+    return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
+  }, [combinedOptions, state.solicitadoPor]);
+
+  /** Helpers */
   const totalPct = React.useMemo(
     () => state.cargarA === "Marca"
       ? (Object.values(state.marcasPct).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) || 0)
@@ -58,27 +113,34 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
   function setMarcaPct(m: Marca, v: number) {
     setState((s) => ({ ...s, marcasPct: { ...s.marcasPct, [m]: v } }));
   }
+
+  /** Validaciones */
   function validate(): boolean {
     const e: Record<string, string> = {};
     if (!state.productoServicio.trim()) e.productoServicio = "Requerido.";
-    if (!state.solicitadoPor.trim()) e.solicitadoPor = "Requerido.";
-    if (!state.fechaSolicitud) e.fechaSolicitud = "Requerido.";
-    if (!state.co) e.co = "Seleccione CO.";
-    if (!state.un) e.un = "Seleccione UN.";
-    if (!state.ccosto) e.ccosto = "Seleccione C. Costo.";
+    if (!state.solicitadoPor.trim())   e.solicitadoPor   = "Requerido.";
+    if (!state.fechaSolicitud)          e.fechaSolicitud  = "Requerido.";
+    if (!state.co)                      e.co              = "Seleccione CO.";
+    if (!state.un)                      e.un              = "Seleccione UN.";
+    if (!state.ccosto)                  e.ccosto          = "Seleccione C. Costo.";
     if (state.cargarA === "Marca" && totalPct !== 100) e.marcasPct = "El total de porcentajes debe ser 100%.";
+
     setErrors(e);
     return Object.keys(e).length === 0;
   }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
     onSubmit?.(state);
   }
+
+  /** Si vuelve a CO, resetea % */
   React.useEffect(() => {
     if (state.cargarA === "CO") setState((s) => ({ ...s, marcasPct: { ...zeroMarcas() } }));
   }, [state.cargarA]);
 
+  /** Mostrar label del CO cuando Cargar a = CO */
   const valorCargarACo = React.useMemo(
     () => CO_OPTS.find((o) => o.value === state.co)?.value ?? "",
     [state.co]
@@ -87,91 +149,154 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
   return (
     <div className="compra-form white-silo compra-wrap" data-darkreader-ignore>
       <form className="form-grid" onSubmit={handleSubmit}>
-        {/* Fila 1 */}
+        {/* Tipo */}
         <div className="field">
           <label className="label">Tipo</label>
-          <select className="control" value={state.tipoCompra}
-                  onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}>
+          <select
+            className="control"
+            value={state.tipoCompra}
+            onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}
+          >
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
           </select>
         </div>
 
+        {/* Producto/Servicio/Alquiler */}
         <div className="field">
           <label className="label">
-            {state.tipoCompra === "Producto" ? "Producto" :
-             state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
+            {state.tipoCompra === "Producto" ? "Producto"
+             : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
           </label>
-          <input className="control" value={state.productoServicio}
-                 onChange={(e) => setField("productoServicio", e.target.value)}
-                 placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`} />
+          <input
+            className="control"
+            value={state.productoServicio}
+            onChange={(e) => setField("productoServicio", e.target.value)}
+            placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}
+          />
           {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
         </div>
 
+        {/* Solicitado por (texto simple) */}
         <div className="field">
           <label className="label">Solicitado por</label>
-          <input className="control" value={state.solicitadoPor}
-                 onChange={(e) => setField("solicitadoPor", e.target.value)}
-                 placeholder="Nombre completo" />
+          <input
+            className="control"
+            value={state.solicitadoPor}
+            onChange={(e) => setField("solicitadoPor", e.target.value)}
+            placeholder="Nombre completo"
+          />
           {errors.solicitadoPor && <small className="error">{errors.solicitadoPor}</small>}
         </div>
 
+        {/* Solicitante (react-select) */}
+        <div className="field">
+          <label className="label">Solicitante</label>
+          <Select<UserOptionEx, false, GroupBase<UserOptionEx>>
+            classNamePrefix="rs"
+            className="rs-override"
+            options={combinedOptions}
+            placeholder={
+              (loadingWorkers || loadingFranq) ? "Cargando opciones…" :
+              (usersError || franqError) ? "Error cargando opciones" :
+              "Buscar solicitante…"
+            }
+            isDisabled={submitting || loadingWorkers || loadingFranq}
+            isLoading={loadingWorkers || loadingFranq}
+            value={selectedSolicitante}
+            onChange={(opt) => setField("solicitadoPor", opt?.label ?? "")}
+            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
+            components={{ Option }}
+            isClearable
+          />
+        </div>
+
+        {/* Fecha */}
         <div className="field">
           <label className="label">Fecha de solicitud</label>
-          <input type="date" className="control" value={state.fechaSolicitud}
-                 onChange={(e) => setField("fechaSolicitud", e.target.value)} />
+          <input
+            type="date"
+            className="control"
+            value={state.fechaSolicitud}
+            onChange={(e) => setField("fechaSolicitud", e.target.value)}
+          />
           {errors.fechaSolicitud && <small className="error">{errors.fechaSolicitud}</small>}
         </div>
 
-        {/* Fila 2 */}
+        {/* Dispositivo */}
         <div className="field">
           <label className="label">Dispositivo</label>
-          <input className="control" value={state.dispositivo}
-                 onChange={(e) => setField("dispositivo", e.target.value)}
-                 placeholder="(Opcional)" />
+          <input
+            className="control"
+            value={state.dispositivo}
+            onChange={(e) => setField("dispositivo", e.target.value)}
+            placeholder="(Opcional)"
+          />
         </div>
 
+        {/* CO */}
         <div className="field">
           <label className="label">CO</label>
-          <select className="control" value={state.co}
-                  onChange={(e) => setField("co", e.target.value)}>
+          <select
+            className="control"
+            value={state.co}
+            onChange={(e) => setField("co", e.target.value)}
+          >
             <option value="">Seleccione CO</option>
-            {CO_OPTS.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+            {CO_OPTS.map((o) => (
+              <option key={o.value} value={o.value}>{o.value}</option>
+            ))}
           </select>
           {errors.co && <small className="error">{errors.co}</small>}
         </div>
 
+        {/* UN */}
         <div className="field">
           <label className="label">UN</label>
-          <select className="control" value={state.un}
-                  onChange={(e) => setField("un", e.target.value)}>
+          <select
+            className="control"
+            value={state.un}
+            onChange={(e) => setField("un", e.target.value)}
+          >
             <option value="">Seleccione UN</option>
-            {UN_OPTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {UN_OPTS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
           </select>
           {errors.un && <small className="error">{errors.un}</small>}
         </div>
 
+        {/* C. Costo */}
         <div className="field">
           <label className="label">C. Costo</label>
-          <select className="control" value={state.ccosto}
-                  onChange={(e) => setField("ccosto", e.target.value)}>
+          <select
+            className="control"
+            value={state.ccosto}
+            onChange={(e) => setField("ccosto", e.target.value)}
+          >
             <option value="">Seleccione C. Costo</option>
-            {CCOSTO_OPTS.map((o) => <option key={o.value} value={o.value}>{o.value}</option>)}
+            {CCOSTO_OPTS.map((o) => (
+              <option key={o.value} value={o.value}>{o.value}</option>
+            ))}
           </select>
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}
         </div>
 
-        {/* Fila 3: Cargar a */}
+        {/* Cargar a */}
         <div className="field">
           <label className="label">Cargar a</label>
-          <select className="control" value={state.cargarA}
-                  onChange={(e) => setField("cargarA", e.target.value as CargarA)}>
+          <select
+            className="control"
+            value={state.cargarA}
+            onChange={(e) => setField("cargarA", e.target.value as CargarA)}
+          >
             <option value="CO">CO</option>
             <option value="Marca">Marca</option>
           </select>
         </div>
 
+        {/* Valor a cargar / Distribución marcas */}
         {state.cargarA === "CO" ? (
           <div className="field">
             <label className="label">Valor a cargar (CO)</label>
@@ -188,10 +313,14 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
                 {MARCAS.map((m) => (
                   <div key={m} className="field">
                     <label className="label">{m}</label>
-                    <input type="number" min={0} max={100} step="1" className="control"
-                           value={state.marcasPct[m]}
-                           onChange={(e) =>
-                             setMarcaPct(m, Math.max(0, Math.min(100, Number(e.target.value))))} />
+                    <input
+                      type="number" min={0} max={100} step="1"
+                      className="control"
+                      value={state.marcasPct[m]}
+                      onChange={(e) =>
+                        setMarcaPct(m, Math.max(0, Math.min(100, Number(e.target.value))))
+                      }
+                    />
                   </div>
                 ))}
               </div>
@@ -200,41 +329,54 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
           </div>
         )}
 
-        {/* Fila 4 */}
+        {/* No. CO */}
         <div className="field">
           <label className="label">No. CO</label>
-          <input className="control" value={state.noCO}
-                 onChange={(e) => setField("noCO", e.target.value)}
-                 placeholder="Ej. 12345" />
+          <input
+            className="control"
+            value={state.noCO}
+            onChange={(e) => setField("noCO", e.target.value)}
+            placeholder="Ej. 12345"
+          />
         </div>
 
+        {/* Peso */}
         <div className="field">
           <label className="label">Peso (opcional)</label>
-          <input type="number" step="0.01" className="control"
-                 value={state.pesoTotal ?? ""}
-                 onChange={(e) => {
-                   const v = e.target.value;
-                   setField("pesoTotal", v === "" ? undefined : Number(v));
-                 }}
-                 placeholder="Kg" />
+          <input
+            type="number"
+            step="0.01"
+            className="control"
+            value={state.pesoTotal ?? ""}
+            onChange={(e) => {
+              const v = e.target.value;
+              setField("pesoTotal", v === "" ? undefined : Number(v));
+            }}
+            placeholder="Kg"
+          />
         </div>
 
         {/* Acciones */}
         <div className="col-span-full flex items-center justify-end gap-2 pt-2">
-          <button type="reset" className="btn btn-sm"
-                  onClick={() => setState((s) => ({
-                    ...s,
-                    productoServicio: "",
-                    solicitadoPor: "",
-                    fechaSolicitud: "",
-                    dispositivo: "",
-                    noCO: "",
-                    pesoTotal: undefined,
-                    marcasPct: { ...zeroMarcas() },
-                  }))}>
+          <button
+            type="reset"
+            className="btn btn-sm"
+            onClick={() => setState((s) => ({
+              ...s,
+              productoServicio: "",
+              solicitadoPor: "",
+              fechaSolicitud: "",
+              dispositivo: "",
+              noCO: "",
+              pesoTotal: undefined,
+              marcasPct: { ...zeroMarcas() },
+            }))}
+          >
             Limpiar
           </button>
-          <button type="submit" className="btn btn-primary btn-sm">Guardar</button>
+          <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
+            Guardar
+          </button>
         </div>
       </form>
     </div>

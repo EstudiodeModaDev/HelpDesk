@@ -16,7 +16,7 @@ import type { LogService } from "../../Services/Log.service";
 const norm = (s: string) =>
   (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 
-type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
+export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 type CategoriaItem = { ID: string | number; Title: string };
 
 export default function NuevoTicketForm() {

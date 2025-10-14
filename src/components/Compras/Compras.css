@@ -1,4 +1,4 @@
-/* --- Silo blanco: anti modo oscuro/extensiones --- */
+/* --- Silo blanco: anti modo-oscuro/extensiones --- */
 .white-silo {
   background: #ffffff !important;
   color: #0f172a !important;
@@ -24,7 +24,7 @@
 }
 .compra-form, .compra-form * { -webkit-text-size-adjust: 100%; }
 
-/* --- GRID fluido: auto-fit columnas --- */
+/* --- GRID fluido: columnas automáticas --- */
 .compra-form .form-grid {
   display: grid;
   gap: 12px;
@@ -36,7 +36,7 @@
 .compra-form .field { display: flex; flex-direction: column; gap: 6px; }
 .compra-form .label { font-size: .85rem; color: #334155; font-weight: 600; }
 
-/* Controles */
+/* Controles base */
 .compra-form input,
 .compra-form select,
 .compra-form textarea,
@@ -66,7 +66,7 @@
   box-shadow: 0 0 0 3px rgba(148,163,184,.25) !important;
 }
 
-/* Readonly/disabled */
+/* Readonly / disabled */
 .compra-form .control.control--readonly,
 .compra-form input[readonly],
 .compra-form input[disabled],
@@ -75,7 +75,7 @@
   color: #475569 !important;
 }
 
-/* Placeholders y autofill */
+/* Placeholders & autofill */
 .compra-form ::placeholder { color: #94a3b8; opacity: 1; }
 .compra-form input:-webkit-autofill {
   -webkit-text-fill-color: #0f172a !important;
@@ -128,18 +128,66 @@
 .compra-form .mb-2 { margin-bottom: .5rem; }
 .compra-form .mb-3 { margin-bottom: .75rem; }
 
-/* Errores y accesibilidad */
+/* Errores & accesibilidad */
 .compra-form .error { color: #b91c1c; font-size: .8rem; margin-top: 2px; }
 .compra-form :focus-visible { outline: 2px solid #94a3b8; outline-offset: 2px; }
 .compra-form ::selection { background: #dbeafe; color: #0f172a; }
 
-/* Preferencia SO: oscuro (mantenemos blanco y subimos contraste de bordes) */
+/* Preferencia SO: oscuro (seguimos blancos, subimos contraste de bordes) */
 @media (prefers-color-scheme: dark) {
   .compra-form input, .compra-form select, .compra-form textarea { border-color: #d1d5db !important; }
   .compra-form .btn, .compra-form .box { border-color: #d1d5db !important; }
 }
 
-/* Alto contraste: permitir colores del sistema */
+/* Alto contraste */
 @media (forced-colors: active) {
   .compra-form { forced-color-adjust: auto; }
+}
+
+/* =========================
+   REACT-SELECT (classNamePrefix="rs")
+   ========================= */
+.rs-override .rs__control {
+  min-height: var(--control-h);
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+  border-radius: 10px;
+}
+.rs-override .rs__value-container { padding: 2px 8px; }
+.rs-override .rs__single-value { color: #0f172a !important; }
+.rs-override .rs__placeholder   { color: #94a3b8 !important; }
+
+.rs-override .rs__menu {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 24px rgba(2,6,23,.08);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 40;
+}
+.rs-override .rs__menu-list { padding: 6px 0; }
+.rs-override .rs__option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+.rs-override .rs__option--is-focused {
+  background: #eef2ff !important;
+}
+.rs-override .rs__option--is-selected {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+.rs-override .rs__indicator,
+.rs-override .rs__dropdown-indicator,
+.rs-override .rs__clear-indicator {
+  color: #475569 !important;
+}
+.rs-override .rs__indicator-separator { display: none; }
+
+/* Deshabilitado */
+.rs-override .rs__control--is-disabled {
+  background: #f8fafc !important;
+  border-color: #e5e7eb !important;
+  opacity: .9;
 }
