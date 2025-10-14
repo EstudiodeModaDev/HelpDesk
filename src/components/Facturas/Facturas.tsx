@@ -58,102 +58,50 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
 
       {error && <div className="alert mb-3">{error}</div>}
 
-      {/* Grid compacto: 5 columnas en desktop */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit(e);
-        }}
-        className="invoice-grid"
-      >
-        {/* Fecha */}
+      <form onSubmit={(e) => {e.preventDefault(); handleSubmit(e);}} className="invoice-grid">
+
         <div className="field">
           <label className="label">Fecha</label>
-          <input
-            type="date"
-            value={state.FechaEmision || ""}
-            onChange={(e) => setField("FechaEmision", e.target.value)}
-            disabled={loadingData || submitting}
-            className="control"
-          />
+          <input type="date" value={state.FechaEmision || ""} onChange={(e) => setField("FechaEmision", e.target.value)} disabled={loadingData || submitting} className="control"/>
           {errors.FechaEmision && <small className="error">{errors.FechaEmision}</small>}
         </div>
 
-        {/* No. Factura */}
         <div className="field">
           <label className="label">No. Factura</label>
-          <input
-            value={state.NoFactura || ""}
-            onChange={(e) => setField("NoFactura", e.target.value)}
-            placeholder="Ej. F-2025-00123"
-            disabled={loadingData || submitting}
-            className="control"
-          />
+          <input value={state.NoFactura || ""} onChange={(e) => setField("NoFactura", e.target.value)} placeholder="Ej. F-2025-00123" disabled={loadingData || submitting} className="control"/>
           {errors.NoFactura && <small className="error">{errors.NoFactura}</small>}
         </div>
 
-        {/* Proveedor + Añadir */}
         <div className="field">
           <label className="label">Proveedor</label>
 
           <div className="input-row"> {/* <- NUEVO */}
-            <select
-              value={state.IdProveedor || ""}
-              onChange={(e) => setField("IdProveedor", e.target.value)}
-              disabled={loadingData || submitting}
-              className="control"
-              aria-label="Proveedor"
-            >
+            <select value={state.IdProveedor || ""} onChange={(e) => setField("IdProveedor", e.target.value)} disabled={loadingData || submitting} className="control" aria-label="Proveedor">
               <option value="">Seleccione proveedor</option>
               {proveedoresList.map((p) => (
                 <option key={p.Id} value={p.Id}>{p.Title}</option>
               ))}
             </select>
-
-            <button
-              type="button"
-              className="btn btn-inline"   // <- NUEVO
-              onClick={() => setShowNewProveedor(true)}
-              disabled={submitting || loadingData}
-              title="Registrar nuevo proveedor"
-            >
-              Añadir
-            </button>
           </div>
 
           {errors.IdProveedor && <small className="error">{errors.IdProveedor}</small>}
         </div>
-        {/* NIT */}
+
         <div className="field">
           <label className="label">NIT</label>
           <input value={nit} readOnly disabled className="control control--readonly" />
         </div>
 
-        {/* CO */}
         <div className="field">
           <label className="label">CO (Centro de costos)</label>
-          <input
-            value={state.CO || ""}
-            onChange={(e) => {
-              setField("CO", e.target.value);
-            }}
-            placeholder="Ej. 1234"
-            disabled={loadingData || submitting}
-            className="control"
-          />
+          <input value={state.CO || ""} onChange={(e) => {setField("CO", e.target.value);}} placeholder="Ej. 1234" disabled={loadingData || submitting} className="control"/>
           {errors.CO && <small className="error">{errors.CO}</small>}
         </div>
 
-        {/* Ítems */}
         <div className="col-span-full table-fluid">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-700">Ítems</span>
-            <button
-              type="button"
-              className="btn btn-sm"
-              onClick={addLinea}
-              disabled={submitting || loadingData}
-            >
+            <button type="button" className="btn btn-sm" onClick={addLinea} disabled={submitting || loadingData}>
               + Agregar línea
             </button>
           </div>
@@ -286,44 +234,24 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
           </div>
         </div>
 
-        {/* Acciones */}
         <div className="col-span-full flex items-center justify-end gap-2 pt-2">
-          <button
-            type="reset"
-            className="btn btn-sm"
-            disabled={submitting}
-            onClick={() => setState((s) => ({ ...s, lineas: [], total: 0 }))}
-          >
+          <button type="reset" className="btn btn-sm" disabled={submitting} onClick={() => setState((s) => ({ ...s, lineas: [], total: 0 }))}>
             Limpiar
           </button>
           <button type="submit" className="btn btn-primary btn-sm" disabled={submitting || loadingData}>
             {submitting ? "Guardando..." : "Guardar factura"}
           </button>
+          <button type="button" className="btn btn-inline" onClick={() => setShowNewProveedor(true)} disabled={submitting || loadingData} title="Registrar nuevo proveedor">
+            Añadir Proveedor
+          </button>
         </div>
       </form>
 
       {/* Modal: Nuevo Ítem */}
-      <NewItemModal
-        open={showNewItem}
-        onClose={() => setShowNewItem(false)}
-        onCreated={(item) => {
-          handleNewItemCreated(item); // actualiza la última línea con el ítem creado
-          setShowNewItem(false); // cierra el modal
-        }}
-      />
+      <NewItemModal open={showNewItem} onClose={() => setShowNewItem(false)} onCreated={(item) => {handleNewItemCreated(item); setShowNewItem(false);}}/>
 
       {/* Modal: Nuevo Proveedor */}
-      <NewProveedorModal
-        open={showNewProveedor}
-        onClose={() => setShowNewProveedor(false)}
-        onCreated={(prov: Proveedor) => {
-          // Añade a la lista local para que aparezca en el select
-          setProveedoresList((prev) => [prov, ...prev]);
-          // Selecciona automáticamente el proveedor recién creado
-          setField("IdProveedor", prov.Id ?? "");
-          setShowNewProveedor(false);
-        }}
-      />
+      <NewProveedorModal open={showNewProveedor} onClose={() => setShowNewProveedor(false)} onCreated={(prov: Proveedor) => {setProveedoresList((prev) => [prov, ...prev]); setField("IdProveedor", prov.Id ?? ""); setShowNewProveedor(false);}}/>
     </div>
   );
 };
