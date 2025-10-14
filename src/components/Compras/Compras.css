@@ -1,65 +1,30 @@
-/* === Contenedor: fuerza tema claro y evita inversiones automáticas === */
+/* === SILO BLANCO: no permitir inversiones ni mezclas en modo oscuro o extensiones === */
+.white-silo {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  position: relative;
+  isolation: isolate; /* corta filtros heredados del <html> */
+}
+.white-silo, .white-silo * {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  background-image: none !important;
+}
+
+/* === Contenedor del formulario === */
 .compra-form {
   background: #ffffff;
   color: #0f172a;
-  color-scheme: light;        /* dice al navegador: este bloque es claro */
-  forced-color-adjust: none;  /* evita que OS/extensiones “oscurezcan” este bloque */
+  color-scheme: light;        /* este bloque es claro */
+  forced-color-adjust: none;  /* no oscurezcas este bloque */
   --control-h: 42px;          /* altura estándar para inputs y botones */
 }
 
-/* Texto/inputs legibles en ambos modos */
-.compra-form, 
-.compra-form * {
-  -webkit-text-size-adjust: 100%;
-}
+/* Tipografía / ajustes generales */
+.compra-form,
+.compra-form * { -webkit-text-size-adjust: 100%; }
 
-.compra-form input,
-.compra-form select,
-.compra-form textarea {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  caret-color: #0f172a;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  min-height: var(--control-h);
-  padding: 10px 12px;
-  line-height: 1.2;
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-}
-
-/* Opciones del select (el popup también queda blanco) */
-.compra-form select option {
-  background: #ffffff;
-  color: #0f172a;
-}
-
-/* Placeholders y autofill (Chrome) */
-.compra-form ::placeholder { color: #94a3b8; opacity: 1; }
-.compra-form input:-webkit-autofill {
-  -webkit-text-fill-color: #0f172a;
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
-  caret-color: #0f172a;
-}
-
-/* Estados */
-.compra-form .control:focus,
-.compra-form input:focus,
-.compra-form select:focus,
-.compra-form textarea:focus {
-  border-color: #94a3b8;
-  box-shadow: 0 0 0 3px rgba(148,163,184,.25);
-}
-
-.compra-form .control.control--readonly,
-.compra-form input[readonly],
-.compra-form input[disabled],
-.compra-form select[disabled] {
-  background: #f8fafc !important;
-  color: #475569 !important;
-}
-
-/* Grid responsivo (ajústalo a tu layout si ya tienes uno) */
+/* Grid responsivo */
 .compra-form .form-grid {
   display: grid;
   gap: 12px;
@@ -73,19 +38,60 @@
 .compra-form .field { display: flex; flex-direction: column; gap: 6px; }
 .compra-form .label { font-size: .85rem; color: #334155; font-weight: 600; }
 
-/* Fila input + botón (si usas botón “Añadir” junto a un select) */
-.compra-form .input-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  align-items: center;
+/* Controles: forzar blanco y esquema claro en CADA control */
+.compra-form input,
+.compra-form select,
+.compra-form textarea,
+.compra-form button {
+  color-scheme: light !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px;
+  min-height: var(--control-h);
+  padding: 10px 12px;
+  line-height: 1.2;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
-/* Botones: blancos y visibles en ambos modos */
+/* Opciones del select (popup) */
+.compra-form select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Focus */
+.compra-form .control:focus,
+.compra-form input:focus,
+.compra-form select:focus,
+.compra-form textarea:focus {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 0 3px rgba(148,163,184,.25) !important;
+}
+
+/* Readonly / disabled */
+.compra-form .control.control--readonly,
+.compra-form input[readonly],
+.compra-form input[disabled],
+.compra-form select[disabled] {
+  background: #f8fafc !important;
+  color: #475569 !important;
+}
+
+/* Placeholders y autofill (Chrome) */
+.compra-form ::placeholder { color: #94a3b8; opacity: 1; }
+.compra-form input:-webkit-autofill {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  caret-color: #0f172a !important;
+}
+
+/* Botones */
 .compra-form .btn {
-  background: #ffffff;
-  color: #0f172a;
-  border: 1px solid #e5e7eb;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e5e7eb !important;
   border-radius: 10px;
   padding: 10px 14px;
   font-weight: 600;
@@ -93,20 +99,19 @@
   cursor: pointer;
   transition: transform .06s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
 }
-.compra-form .btn:hover { box-shadow: 0 4px 16px rgba(2, 6, 23, .08); }
+.compra-form .btn:hover { box-shadow: 0 4px 16px rgba(2,6,23,.08); }
 .compra-form .btn:active { transform: translateY(1px); }
 .compra-form .btn[disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }
 .compra-form .btn-sm { padding: 6px 10px; font-size: .85rem; min-height: var(--control-h); }
-.compra-form .btn-inline { margin: 0; height: var(--control-h); display: inline-flex; align-items: center; }
 
-/* Botón primario (azul) sigue viéndose bien en modo oscuro del SO */
-.compra-form .btn-primary { background: #2563eb; border-color: #2563eb; color: #ffffff; }
-.compra-form .btn-primary:hover { background: #1e40af; border-color: #1e40af; }
+/* Primario */
+.compra-form .btn-primary { background: #2563eb !important; border-color: #2563eb !important; color: #ffffff !important; }
+.compra-form .btn-primary:hover { background: #1e40af !important; border-color: #1e40af !important; }
 
-/* Caja blanca (para la tabla de marcas/porcentajes, etc.) */
+/* Caja blanca para distribución marcas */
 .compra-form .box {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
   border-radius: 14px;
   padding: 12px;
 }
@@ -134,23 +139,15 @@
 .compra-form :focus-visible { outline: 2px solid #94a3b8; outline-offset: 2px; }
 .compra-form ::selection { background: #dbeafe; color: #0f172a; }
 
-/* === Ajustes específicos cuando el SO está en modo oscuro ===
-   Mantenemos blancos, pero subimos contraste de bordes/sombras. */
+/* Ajustes en pantallas con prefers-color-scheme: dark (seguimos blancos) */
 @media (prefers-color-scheme: dark) {
-  .compra-form {
-    background: #ffffff;  /* seguimos blanco */
-  }
   .compra-form input,
   .compra-form select,
-  .compra-form textarea {
-    border-color: #d1d5db; /* un poco más marcado en pantallas oscuras */
-  }
-  .compra-form .btn { border-color: #d1d5db; }
-  .compra-form .box { border-color: #d1d5db; }
+  .compra-form textarea { border-color: #d1d5db !important; }
+  .compra-form .btn, .compra-form .box { border-color: #d1d5db !important; }
 }
 
-/* === Modo Alto Contraste del SO ===
-   Permitimos que el sistema gestione colores para legibilidad. */
+/* Alto contraste del SO: permite colores del sistema */
 @media (forced-colors: active) {
   .compra-form { forced-color-adjust: auto; }
 }

@@ -16,3 +16,20 @@ export type comprasState = {
   pesoTotal?: number;           
   marcasPct: Record<string, number>;
 };
+export type Compra = {
+  Title: string;
+  SolicitadoPor: string;
+  FechaSolicitud: string;
+  Dispositivo: string;
+  CO: string;
+  UN: string;
+  CCosto: string;
+  CargarA: string;
+  PorcentajeMFG: string;
+  PorcentajeDiesel: string;
+  PorcentajePilatos: string;
+  PorcentajeSuperdry: string;
+  PorcentajeKipling: string;
+  PorcentajeBroken: string;
+  Id?: string
+}
