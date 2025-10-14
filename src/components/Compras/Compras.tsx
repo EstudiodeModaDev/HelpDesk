@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { CargarA, CO, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
-import "./CompraFormulario.css"; // <-- importa el CSS de abajo
+import "./Compras.css"; // <-- importa el CSS de abajo
 
 const CO_OPTS: CO[] = [
   { value: "Operaciones", code: "1001" },
