@@ -22,12 +22,13 @@ export default function TicketsAsociados({
 }: Props) {
   const { Tickets } = useGraphServices();
   // ⬇️ ahora esperamos { padre, hijos, loading, error }
-  const { padre, hijos, loading, error } = useTicketsRelacionados(Tickets, ticket);
+  const { padre, hijos, loading, error, loadRelateds} = useTicketsRelacionados(Tickets, ticket);
 
   function handleClick(e: React.MouseEvent, t: Ticket) {
     if (onSelect) {
       e.preventDefault();
       onSelect(t);
+      loadRelateds()
     }
   }
 

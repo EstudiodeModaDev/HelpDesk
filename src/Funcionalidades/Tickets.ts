@@ -287,5 +287,6 @@ const loadRelateds = React.useCallback(async () => {
     padre, hijos,
     loading,
     error,
+    loadRelateds
   };
 }
