@@ -238,14 +238,14 @@ export function useTickets(
 }
 
 export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticket) {
-  const [padres, setPadres] = React.useState<Ticket[]>([]);
+  const [padre, setPadre] = React.useState<Ticket | null>(null);
   const [hijos, setHijos] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
 const loadRelateds = React.useCallback(async () => {
   if (!ticket?.ID) {
-    setPadres([]);
+    setPadre(null);
     setHijos([]);
     return;
   }
@@ -257,15 +257,10 @@ const loadRelateds = React.useCallback(async () => {
     // --- Padre (si aplica) ---
     const idPadre = ticket.IdCasoPadre;
     if (idPadre != null && idPadre !== "") {
-      const padreRes = await TicketsSvc.getAll({
-        // ID del item está en la raíz (ajusta si tu backend lo expone distinto)
-        filter: `(id eq ${Number(idPadre)} or ID eq ${Number(idPadre)})`,
-        top: 1,
-      });
-      setPadres(padreRes?.items ?? []);
+      const padreRes = await TicketsSvc.get(ticket.ID);
+      setPadre(padreRes ?? null);
     } else {
-      // Limpia si este ticket no tiene padre
-      setPadres([]);
+      setPadre(null);
     }
 
     // --- Hijos ---
@@ -275,7 +270,7 @@ const loadRelateds = React.useCallback(async () => {
     setHijos(hijosRes?.items ?? []);
   } catch (e: any) {
     setError(e?.message ?? "Error cargando tickets");
-    setPadres([]);
+    setPadre(null);
     setHijos([]);
   } finally {
     setLoading(false);
@@ -289,8 +284,7 @@ const loadRelateds = React.useCallback(async () => {
 
 
   return {
-    // datos visibles (solo la página actual)
-    padres, hijos,
+    padre, hijos,
     loading,
     error,
   };

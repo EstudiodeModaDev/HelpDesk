@@ -9,7 +9,7 @@ type Props = {
   title?: string;
   ticket: Ticket;                         // ticket actualmente seleccionado
   emptyChildrenText?: string;
-  onSelect?: (t: Ticket) => void;         // ✅ nuevo: callback al seleccionar
+  onSelect?: (t: Ticket) => void;         // callback al seleccionar
   buildHref?: (id: number | string) => string; // opcional: si también quieres navegar
 };
 
@@ -21,15 +21,14 @@ export default function TicketsAsociados({
   buildHref, // opcional
 }: Props) {
   const { Tickets } = useGraphServices();
-  const { padres, hijos, loading, error } = useTicketsRelacionados(Tickets, ticket);
+  // ⬇️ ahora esperamos { padre, hijos, loading, error }
+  const { padre, hijos, loading, error } = useTicketsRelacionados(Tickets, ticket);
 
-  // helper para click: prioriza onSelect; si no existe, usa href si lo pasaron
   function handleClick(e: React.MouseEvent, t: Ticket) {
     if (onSelect) {
       e.preventDefault();
       onSelect(t);
     }
-    // si no hay onSelect pero sí buildHref, dejamos que el <a> navegue
   }
 
   const href = (id: number | string) => (buildHref ? buildHref(id) : "#");
@@ -52,33 +51,31 @@ export default function TicketsAsociados({
       {error && <p className="ta-error">Error cargando tickets</p>}
 
       <div className="ta-body">
-        {/* Padres */}
+        {/* Padre */}
         <section className="ta-column">
-          <p className="ta-label">Padre de {padres.length}:</p>
+          <p className="ta-label">Ticket padre:</p>
           <ul className="ta-list">
-            {padres.length === 0 ? (
+            {!padre ? (
               <li className="ta-empty">No tiene ticket padre</li>
-            ) : padres.map((t) => (
-              <li key={t.ID} className="ta-list__item">
+            ) : (
+              <li className="ta-list__item">
                 <span className="ta-list__dash" aria-hidden>-</span>
 
                 {onSelect ? (
-                  // ✅ Botón con apariencia de link (no navega, llama onSelect)
                   <button
                     type="button"
                     className="ta-link ta-link--button"
-                    onClick={(e) => handleClick(e, t)}
+                    onClick={(e) => handleClick(e, padre)}
                   >
-                    {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
+                    {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
                   </button>
                 ) : (
-                  // Opción: link real si no pasas onSelect
-                  <a className="ta-link" href={href(t.ID ?? "")}>
-                    {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
+                  <a className="ta-link" href={href(padre.ID ?? "")}>
+                    {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
                   </a>
                 )}
               </li>
-            ))}
+            )}
           </ul>
         </section>
 
