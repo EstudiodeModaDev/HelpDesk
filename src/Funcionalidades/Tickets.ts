@@ -243,14 +243,17 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-
-  // cargar primera página (o recargar)
   const loadRelateds = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const padres = await TicketsSvc.getAll({filter: `fields/ID eq ${ticket.IdCasoPadre}`})
+      if (ticket.IdCasoPadre !== null && ticket.IdCasoPadre !== undefined && ticket.IdCasoPadre !== "") {
+        const padreRes = await TicketsSvc.getAll({
+          filter: `(Id eq ${Number(ticket.IdCasoPadre)} or ID eq ${Number(ticket.IdCasoPadre)})`,
+          top: 1,
+        });
+        setPadres(padreRes.items)
+    }
       const hijos = await TicketsSvc.getAll({filter: `fields/IdCasoPadre eq ${ticket.ID}`})
-      setPadres(padres.items);
       setHijos(hijos.items);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tickets");
