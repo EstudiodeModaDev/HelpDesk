@@ -1,31 +1,19 @@
+import { useTicketsRelacionados } from "../../../Funcionalidades/Tickets";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { Ticket } from "../../../Models/Tickets";
 import "./TicketsAsociados.css";
-
-type TicketLink = {
-  id: number | string;
-  title: string;
-  href?: string;
-};
 
 type Props = {
   title?: string;
-  parentsLabel?: string;   // Ej: "Padre de 2/10:"
-  childrenLabel?: string;  // Ej: "Hijo de: 0/0"
-  parents?: TicketLink[];
-  children?: TicketLink[];
+  ticket: Ticket;
   emptyChildrenText?: string;
 };
 
-export default function TicketsAsociados({
-  title = "Tickets Asociados",
-  parentsLabel = "Padre de 2/10:",
-  childrenLabel = "Hijo de: 0/0",
-  parents = [
-    { id: 288, title: "Problemas con usuario POS - Hacer pruebas", href: "#" },
-    { id: 417, title: "Problemas con usuarios POS", href: "#" },
-  ],
-  children = [],
-  emptyChildrenText = "No es hijo de ningun caso",
-}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso"}: Props) {
+
+  const { Tickets } = useGraphServices(); 
+  const {padres, hijos} = useTicketsRelacionados(Tickets, ticket);
+
   return (
     <section className="ta-panel" aria-label={title}>
       {/* Header */}
@@ -48,13 +36,13 @@ export default function TicketsAsociados({
       <div className="ta-body">
         {/* Columna izquierda: Padres */}
         <section className="ta-column">
-          <p className="ta-label">{parentsLabel}</p>
+          <p className="ta-label">Padre de {padres.length}</p>
           <ul className="ta-list">
-            {parents.map((t) => (
-              <li key={t.id} className="ta-list__item">
+            {padres.map((t) => (
+              <li key={t.ID} className="ta-list__item">
                 <span className="ta-list__dash" aria-hidden>-</span>
-                <a className="ta-link" href={t.href || "#"}>
-                  {t.title} <span className="ta-link__muted">- ID: {t.id}</span>
+                <a className="ta-link" href={t.ID || "#"}>
+                  {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
                 </a>
               </li>
             ))}
@@ -63,17 +51,17 @@ export default function TicketsAsociados({
 
         {/* Columna derecha: Hijos */}
         <section className="ta-column">
-          <p className="ta-label">{childrenLabel}</p>
+          <p className="ta-label">Hijo de {hijos.length}</p>
 
-          {children.length === 0 ? (
+          {hijos.length === 0 ? (
             <p className="ta-empty">{emptyChildrenText}</p>
           ) : (
             <ul className="ta-list">
-              {children.map((t) => (
-                <li key={t.id} className="ta-list__item">
+              {hijos.map((t) => (
+                <li key={t.ID} className="ta-list__item">
                   <span className="ta-list__dash" aria-hidden>-</span>
-                  <a className="ta-link" href={t.href || "#"}>
-                    {t.title} <span className="ta-link__muted">- ID: {t.id}</span>
+                  <a className="ta-link" href={t.ID || "#"}>
+                    {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
                   </a>
                 </li>
               ))}

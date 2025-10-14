@@ -25,30 +25,8 @@ export default function TablaTickets() {
 
   const { Tickets } = useGraphServices();
 
-  const {
-    // datos/página actual (server-side)
-    rows,
-    loading,
-    error,
-
-    // filtros (server)
-    filterMode,
-    setFilterMode,
-    range,
-    setRange,
-    applyRange,     // recarga primera página con el rango
-
-    // paginación (server)
-    pageSize,
-    setPageSize,    // cambia $top -> recarga primera página
-    pageIndex,      // 1-based
-    hasNext,        // !!nextLink
-    nextPage,       // sigue @odata.nextLink
-    reloadAll, 
-    toggleSort,
-    sorts     // recarga primera página (para “Anterior”)
-
-  } = useTickets(Tickets, userMail, isAdmin.isAdmin);
+  const {rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts,
+    setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
   const [search, setSearch] = React.useState("");

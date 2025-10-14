@@ -133,7 +133,7 @@ export default function DetalleTicket({
         </div>
       </div>
 
-      <TicketsAsociados/>
+      <TicketsAsociados ticket={ticket}/>
 
       {/* Botón Seguimiento (toggle) */}
       <div>

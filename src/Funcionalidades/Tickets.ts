@@ -236,3 +236,40 @@ export function useTickets(
     sorts,
   };
 }
+
+export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticket) {
+  const [padres, setPadres] = React.useState<Ticket[]>([]);
+  const [hijos, setHijos] = React.useState<Ticket[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+
+  // cargar primera página (o recargar)
+  const loadRelateds = React.useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const padres = await TicketsSvc.getAll({filter: `fields/IdCasoPadre eq ${ticket.IdCasoPadre}`})
+      const hijos = await TicketsSvc.getAll({filter: `fields/IdCasoPadre eq ${ticket.ID}`})
+      setPadres(padres.items);
+      setHijos(hijos.items);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando tickets");
+      setPadres([]);
+      setHijos([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [TicketsSvc]);
+
+  React.useEffect(() => {
+    loadRelateds();
+  }, [loadRelateds])
+
+
+  return {
+    // datos visibles (solo la página actual)
+    padres, hijos,
+    loading,
+    error,
+  };
+}
