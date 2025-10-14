@@ -114,54 +114,25 @@ export default function TablaTickets() {
           <table>
             <thead>
               <tr>
-                <th
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => toggleSort('ID', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('ID', e.shiftKey); }}
-                  aria-label="Ordenar por ID"
-                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >
-                  ID {renderSortIndicator('ID', sorts)}
+                <th role="button" tabIndex={0} onClick={(e) => toggleSort('id', e.shiftKey)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('id', e.shiftKey); }} aria-label="Ordenar por ID" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  ID {renderSortIndicator('id', sorts)}
                 </th>
 
-                <th
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => toggleSort('resolutor', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('resolutor', e.shiftKey); }}
-                  aria-label="Ordenar por Resolutor"
-                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >
+                <th role="button" tabIndex={0} onClick={(e) => toggleSort('resolutor', e.shiftKey)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('resolutor', e.shiftKey); }} aria-label="Ordenar por Resolutor" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   Resolutor {renderSortIndicator('resolutor', sorts)}
                 </th>
 
-                <th>Solicitante</th> {/* si quieres ordenar por Solicitante, avísame y lo añadimos al mapping */}
+                <th>Solicitante</th> 
 
-                <th
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => toggleSort('Title', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('Title', e.shiftKey); }}
-                  aria-label="Ordenar por Asunto"
-                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >
+                <th role="button" tabIndex={0} onClick={(e) => toggleSort('Title', e.shiftKey)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('Title', e.shiftKey); }} aria-label="Ordenar por Asunto" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   Asunto {renderSortIndicator('Title', sorts)}
                 </th>
 
-                <th
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => toggleSort('FechaApertura', e.shiftKey)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('FechaApertura', e.shiftKey); }}
-                  aria-label="Ordenar por Fecha de apertura"
-                  style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
-                >
+                <th role="button" tabIndex={0} onClick={(e) => toggleSort('FechaApertura', e.shiftKey)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('FechaApertura', e.shiftKey); }} aria-label="Ordenar por Fecha de apertura" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   Fecha de apertura {renderSortIndicator('FechaApertura', sorts)}
                 </th>
 
-                <th
-                  role="button"
+                <th role="button"
                   tabIndex={0}
                   onClick={(e) => toggleSort('TiempoSolucion', e.shiftKey)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSort('TiempoSolucion', e.shiftKey); }}

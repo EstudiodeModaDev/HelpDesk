@@ -1,5 +1,5 @@
 import { GraphRest } from '../graph/GraphRest';
-import type { GetAllOpts } from '../Models/Commons';
+import type { GetAllOpts, PageResult } from '../Models/Commons';
 import type { Facturas } from '../Models/Facturas';
 
 export class FacturasService {
@@ -116,46 +116,31 @@ export class FacturasService {
     return this.toModel(res);
   }
 
-  async getAll(opts?: GetAllOpts) {
-    await this.ensureIds()
-
-    const normalizeFieldTokens = (s: string) => s.replace(/\bID\b/g, 'id').replace(/(^|[^/])\bTitle\b/g, '$1fields/Title');
-    const escapeODataLiteral = (v: string) => v.replace(/'/g, "''");
-    const normalizeFilter = (raw: string) => {
-        let out = normalizeFieldTokens(raw.trim());
-        // escapa todo literal '...'
-        out = out.replace(/'(.*?)'/g, (_m, p1) => `'${escapeODataLiteral(p1)}'`);
-        return out;
-    };
-    const normalizeOrderby = (raw: string) => normalizeFieldTokens(raw.trim());
-
-    const qs = new URLSearchParams();
-    qs.set('$expand', 'fields');        // necesario si filtras por fields/*
-    qs.set('$select', 'id,webUrl');     // opcional; añade fields(...) si quieres
-    if (opts?.orderby) qs.set('$orderby', normalizeOrderby(opts.orderby));
+  async getAll(opts?: GetAllOpts): Promise<PageResult<Facturas>> {
+    await this.ensureIds();
+    const qs = new URLSearchParams({ $expand: 'fields' });
+    if (opts?.filter)  qs.set('$filter', opts.filter);
+    if (opts?.orderby) qs.set('$orderby', opts.orderby);
     if (opts?.top != null) qs.set('$top', String(opts.top));
-    if (opts?.filter) qs.set('$filter', normalizeFilter(String(opts.filter)));
+    const url = `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`;
+    const res = await this.fetchPage(url);
+    return res
+  }
 
-    // Evita '+' por espacios (algunos proxies se quejan)
-    const query = qs.toString().replace(/\+/g, '%20');
+  // Seguir el @odata.nextLink tal cual lo entrega Graph
+  async getByNextLink(nextLink: string): Promise<PageResult<Facturas>> {
+    return this.fetchPage(nextLink, /*isAbsolute*/ true);
+  }
 
-    const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${query}`;
+  private async fetchPage(url: string, isAbsolute = false): Promise<PageResult<Facturas>> {
+    const res = isAbsolute
+      ? await this.graph.getAbsolute<any>(url)  // 👈 URL absoluta (nextLink)
+      : await this.graph.get<any>(url);         // 👈 path relativo
 
-    try {
-      const res = await this.graph.get<any>(url);
-      return (res.value ?? []).map((x: any) => this.toModel(x));
-    } catch (e: any) {
-      // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
-      const code = e?.error?.code ?? e?.code;
-      if (code === 'itemNotFound' && opts?.filter) {
-        const qs2 = new URLSearchParams(qs);
-        qs2.delete('$filter');
-        const url2 = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${qs2.toString()}`;
-        const res2 = await this.graph.get<any>(url2);
-        return (res2.value ?? []).map((x: any) => this.toModel(x));
-      }
-      throw e;
-    }
+    const raw = Array.isArray(res?.value) ? res.value : [];
+    const items = raw.map((x: any) => this.toModel(x));
+    const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
+    return { items, nextLink };
   }
 
 }

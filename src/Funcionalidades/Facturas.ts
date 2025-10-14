@@ -7,7 +7,8 @@ import type { ProveedoresFacturaService } from "../Services/ProveedoresFacturas.
 import type { ItemService } from "../Services/Items.service";
 import type { FacturasService } from "../Services/Facturas.service";
 import type { ItemFacturaService } from "../Services/ItemsFacturas.service";
-import { toGraphDateOnly } from "../utils/Date";
+import { toGraphDateOnly, toISODateFlex } from "../utils/Date";
+import type { GetAllOpts } from "../Models/Commons";
 function cryptoRandomId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return (crypto as any).randomUUID();
@@ -251,4 +252,159 @@ export function useFacturas() {
   return {state, errors, submitting, proveedores, items, loadingData, error, total, Itemsstate, Itemserrors, ProveedorError, ProveedorState,
     setField, setState, setErrors, handleSubmit, setItems, setError, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario, handleSubmitItems, setItemsField, 
     handleSubmitProveedor, setProveedorState, setProveedoresField};
+}
+
+export function useVerFacturas(FacturasSvc: FacturasService) {
+  const [rows, setRows] = React.useState<Facturas[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // fecha “YYYY-MM-DD”
+  const today = React.useMemo(() => toISODateFlex(new Date()), []);
+
+  // Si DateRange son strings ISO “YYYY-MM-DD”
+  type DateRange = { from?: string; to?: string };
+
+  const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
+
+  // paginación servidor
+  const [pageSize, setPageSize] = React.useState<number>(10); // $top
+  const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
+  const [nextLink, setNextLink] = React.useState<string | null>(null);
+
+  // ordenamiento
+  type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';
+  type SortDir = 'asc' | 'desc';
+
+  const [sorts, setSorts] = React.useState<Array<{ field: SortField; dir: SortDir }>>([
+    { field: 'id', dir: 'desc' },
+  ]);
+
+  // Mueve el mapa ARRIBA (o métele useMemo) para evitar TDZ
+  const sortFieldToOData = React.useMemo<Record<SortField, string>>(
+    () => ({
+      id: 'id', // o 'fields/Created' si realmente quieres ordenar por created
+      FechaApertura: 'fields/FechaApertura',
+      TiempoSolucion: 'fields/TiempoSolucion',
+      Title: 'fields/Title',
+      resolutor: 'fields/Nombreresolutor',
+    }),
+    []
+  );
+
+  const buildFilter = React.useCallback((): GetAllOpts => {
+    const filters: string[] = [];
+
+    // Permite solo-from, solo-to o ambos
+    if (range.from) filters.push(`fields/FechaApertura ge '${range.from}T00:00:00Z'`);
+    if (range.to)   filters.push(`fields/FechaApertura le '${range.to}T23:59:59Z'`);
+
+    const orderParts: string[] = sorts
+      .map((s) => {
+        const col = sortFieldToOData[s.field];
+        return col ? `${col} ${s.dir}` : '';
+      })
+      .filter(Boolean);
+
+    // asegúrate de tener siempre un tie-breaker
+    if (!sorts.some((s) => s.field === 'id')) {
+      orderParts.push('id desc');
+    }
+
+    return {
+      filter: filters.join(' and '),
+      orderby: orderParts.join(','),
+      top: pageSize,
+    };
+  }, [range.from, range.to, pageSize, sorts, sortFieldToOData]);
+
+  const loadFirstPage = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { items, nextLink: n1 } = await FacturasSvc.getAll(buildFilter());
+      setRows(items);
+      setNextLink(n1 ?? null);
+      setPageIndex(1);
+    } catch (e: any) {
+      setError(e?.message ?? 'Error cargando facturas');
+      setRows([]);
+      setNextLink(null);
+      setPageIndex(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [FacturasSvc, buildFilter]);
+
+  React.useEffect(() => {
+    loadFirstPage();
+  }, [loadFirstPage]);
+
+  const hasNext = !!nextLink;
+
+  const nextPage = React.useCallback(async () => {
+    if (!nextLink) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { items, nextLink: n2 } = await FacturasSvc.getByNextLink(nextLink);
+      setRows(items);            // solo página actual (no acumulativo)
+      setNextLink(n2 ?? null);
+      setPageIndex((i) => i + 1);
+    } catch (e: any) {
+      setError(e?.message ?? 'Error cargando más facturas');
+    } finally {
+      setLoading(false);
+    }
+  }, [nextLink, FacturasSvc]);
+
+  const applyRange = React.useCallback(() => {
+    loadFirstPage(); // ya resetea pageIndex y nextLink
+  }, [loadFirstPage]);
+
+  const reloadAll = React.useCallback(() => {
+    loadFirstPage();
+  }, [loadFirstPage]);
+
+  const toggleSort = React.useCallback((field: SortField, additive = false) => {
+    setSorts((prev) => {
+      const idx = prev.findIndex((s) => s.field === field);
+      if (!additive) {
+        if (idx >= 0) {
+          const dir: SortDir = prev[idx].dir === 'desc' ? 'asc' : 'desc';
+          return [{ field, dir }];
+        }
+        return [{ field, dir: 'asc' }];
+      }
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = { field, dir: copy[idx].dir === 'desc' ? 'asc' : 'desc' };
+        return copy;
+      }
+      return [...prev, { field, dir: 'asc' }];
+    });
+  }, []);
+
+  return {
+    rows,
+    loading,
+    error,
+
+    // paginación
+    pageSize,
+    setPageSize, // al cambiar, buildFilter cambia y se recarga por el efecto
+    pageIndex,
+    hasNext,
+    nextPage,
+
+    // filtros
+    range,
+    setRange,
+    applyRange,
+
+    // acciones
+    reloadAll,
+    toggleSort,
+    sorts,
+  };
 }
