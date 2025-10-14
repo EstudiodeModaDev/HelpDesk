@@ -53,5 +53,5 @@ export type FacturasUx = {
 }
 
 export type FormErrors = Partial<Record<keyof FacturasUx, string>>;
-
 export type ItemsErrors = Partial<Record<keyof ItemBd, string>>;
+export type ProveedorError = Partial<Record<keyof Proveedor, string>>;

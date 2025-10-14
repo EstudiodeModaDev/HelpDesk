@@ -1,22 +1,34 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Facturas.css";
-import type { ItemBd } from "../../Models/Facturas";
+import type { ItemBd, Proveedor } from "../../Models/Facturas";
 import { useFacturas } from "../../Funcionalidades/Facturas";
 import NewItemModal from "./NewItemModal/NewItemModal";
+import NewProveedorModal from "./NewProveedor/NewProveedor";
 
 const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
-  const {state, submitting, proveedores, items, loadingData,  error, total, errors,
-    setField, setState,  handleSubmit, setItems, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario} = useFacturas();
+  const {state, submitting, proveedores, items, loadingData, error, total, errors,
+    setField, setState, handleSubmit, setItems, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario,} = useFacturas();
+
   const [showNewItem, setShowNewItem] = useState(false);
+  const [showNewProveedor, setShowNewProveedor] = useState(false);
 
-  const nit = useMemo(() => proveedores.find((p) => p.Id === state.IdProveedor)?.Nit ?? "", [proveedores, state.IdProveedor]);
+  // Lista local de proveedores para pintar el <select> y hacer append optimista
+  const [proveedoresList, setProveedoresList] = useState<Proveedor[]>([]);
+  useEffect(() => {
+    setProveedoresList(proveedores as unknown as Proveedor[]);
+  }, [proveedores]);
 
-  //Cambio de nit
+  const nit = useMemo(
+    () => proveedoresList.find((p) => p.Id === state.IdProveedor)?.Nit ?? "",
+    [proveedoresList, state.IdProveedor]
+  );
+
+  // Actualiza NIT al cambiar IdProveedor
   useEffect(() => {
     if (nit !== state.nit) setField("nit", nit);
   }, [nit]);
 
-  //Cambio de total
+  // Actualiza Total
   useEffect(() => {
     if (total !== state.Total) setField("Total", Number(total.toFixed(2)));
   }, [total]);
@@ -47,47 +59,102 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
       {error && <div className="alert mb-3">{error}</div>}
 
       {/* Grid compacto: 5 columnas en desktop */}
-      <form   onSubmit={(e) => {e.preventDefault(); handleSubmit(e)}} className="invoice-grid">
-        {/* Fila compacta */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(e);
+        }}
+        className="invoice-grid"
+      >
+        {/* Fecha */}
         <div className="field">
           <label className="label">Fecha</label>
-          <input type="date" value={state.FechaEmision || ""} onChange={(e) => setField("FechaEmision", e.target.value)} disabled={loadingData || submitting} className="control"/>
+          <input
+            type="date"
+            value={state.FechaEmision || ""}
+            onChange={(e) => setField("FechaEmision", e.target.value)}
+            disabled={loadingData || submitting}
+            className="control"
+          />
           {errors.FechaEmision && <small className="error">{errors.FechaEmision}</small>}
         </div>
 
+        {/* No. Factura */}
         <div className="field">
           <label className="label">No. Factura</label>
-          <input value={state.NoFactura || ""} onChange={(e) => setField("NoFactura", e.target.value)}  placeholder="Ej. F-2025-00123" disabled={loadingData || submitting} className="control"/>
+          <input
+            value={state.NoFactura || ""}
+            onChange={(e) => setField("NoFactura", e.target.value)}
+            placeholder="Ej. F-2025-00123"
+            disabled={loadingData || submitting}
+            className="control"
+          />
           {errors.NoFactura && <small className="error">{errors.NoFactura}</small>}
         </div>
 
+        {/* Proveedor + Añadir */}
         <div className="field">
           <label className="label">Proveedor</label>
-          <select value={state.IdProveedor || ""} onChange={(e) => setField("IdProveedor", e.target.value)} disabled={loadingData || submitting} className="control">
-            <option value="">Seleccione proveedor</option>
-            {proveedores.map((p) => (
-              <option key={p.Id} value={p.Id}>{p.Title}</option>
-            ))}
-          </select>
+          <div className="flex gap-2">
+            <select
+              value={state.IdProveedor || ""}
+              onChange={(e) => setField("IdProveedor", e.target.value)}
+              disabled={loadingData || submitting}
+              className="control"
+              aria-label="Proveedor"
+            >
+              <option value="">Seleccione proveedor</option>
+              {proveedoresList.map((p) => (
+                <option key={p.Id} value={p.Id}>
+                  {p.Title}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => setShowNewProveedor(true)}
+              disabled={submitting || loadingData}
+              title="Registrar nuevo proveedor"
+            >
+              Añadir
+            </button>
+          </div>
           {errors.IdProveedor && <small className="error">{errors.IdProveedor}</small>}
         </div>
 
+        {/* NIT */}
         <div className="field">
           <label className="label">NIT</label>
           <input value={nit} readOnly disabled className="control control--readonly" />
         </div>
 
+        {/* CO */}
         <div className="field">
           <label className="label">CO (Centro de costos)</label>
-          <input value={state.CO || ""} onChange={(e) => {setField("CO", e.target.value);}} placeholder="Ej. 1234" disabled={loadingData || submitting} className="control"/>
+          <input
+            value={state.CO || ""}
+            onChange={(e) => {
+              setField("CO", e.target.value);
+            }}
+            placeholder="Ej. 1234"
+            disabled={loadingData || submitting}
+            className="control"
+          />
           {errors.CO && <small className="error">{errors.CO}</small>}
         </div>
 
-        {/* Ítems: ocupa todas las columnas */}
+        {/* Ítems */}
         <div className="col-span-full table-fluid">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-700">Ítems</span>
-            <button type="button" className="btn btn-sm"  onClick={addLinea} disabled={submitting || loadingData}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={addLinea}
+              disabled={submitting || loadingData}
+            >
               + Agregar línea
             </button>
           </div>
@@ -117,7 +184,12 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                   <tr key={l.tempId}>
                     <td>
                       <div className="flex gap-2">
-                        <select value={l.Id} onChange={(e) => onChangeItem(l.tempId!, e.target.value)} disabled={submitting} className="select-compact bg-white">
+                        <select
+                          value={l.Id}
+                          onChange={(e) => onChangeItem(l.tempId!, e.target.value)}
+                          disabled={submitting}
+                          className="select-compact bg-white"
+                        >
                           <option value="">Seleccione</option>
                           {items.map((it) => (
                             <option key={it.Id} value={it.Id}>
@@ -125,30 +197,70 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
                             </option>
                           ))}
                         </select>
-                        <button type="button" className="btn btn-sm whitespace-nowrap" onClick={() => setShowNewItem(true)}  title="Registrar nuevo ítem">
+                        <button
+                          type="button"
+                          className="btn btn-sm whitespace-nowrap"
+                          onClick={() => setShowNewItem(true)}
+                          title="Registrar nuevo ítem"
+                        >
                           Nuevo
                         </button>
                       </div>
                     </td>
 
                     <td>
-                      <input value={l.NombreItem ?? ""} className="input-compact bg-slate-100"   onChange={(e) => setField("lineas", state.lineas.map(ln => ln.tempId === l.tempId ? { ...ln, NombreItem: e.target.value } : ln))}/>
+                      <input
+                        value={l.NombreItem ?? ""}
+                        className="input-compact bg-slate-100"
+                        onChange={(e) =>
+                          setField(
+                            "lineas",
+                            state.lineas.map((ln) =>
+                              ln.tempId === l.tempId ? { ...ln, NombreItem: e.target.value } : ln
+                            )
+                          )
+                        }
+                      />
                     </td>
 
                     <td>
-                      <input type="number" min={0} step="0.01" value={Number.isFinite(l.Valor) ? String(l.Valor) : "0"} onChange={(e) => onChangeValorUnitario(l.tempId!, Number(e.target.value))} className="input-compact"/>
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={Number.isFinite(l.Valor) ? String(l.Valor) : "0"}
+                        onChange={(e) => onChangeValorUnitario(l.tempId!, Number(e.target.value))}
+                        className="input-compact"
+                      />
                     </td>
 
                     <td>
-                      <input type="number" min={1} step="1" value={Number.isFinite(l.cantidad) ? String(l.cantidad) : "1"} onChange={(e) => onChangeCantidad(l.tempId!, Math.max(1, Number(e.target.value)))}className="input-compact"/>
+                      <input
+                        type="number"
+                        min={1}
+                        step="1"
+                        value={Number.isFinite(l.cantidad) ? String(l.cantidad) : "1"}
+                        onChange={(e) =>
+                          onChangeCantidad(l.tempId!, Math.max(1, Number(e.target.value)))
+                        }
+                        className="input-compact"
+                      />
                     </td>
 
                     <td>
-                      <input value={l.subtotal!.toFixed(2)} readOnly className="input-compact bg-slate-100" />
+                      <input
+                        value={l.subtotal!.toFixed(2)}
+                        readOnly
+                        className="input-compact bg-slate-100"
+                      />
                     </td>
 
                     <td>
-                      <button type="button" className="btn btn-sm" onClick={() => removeLinea(l.tempId!)}>
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        onClick={() => removeLinea(l.tempId!)}
+                      >
                         Eliminar
                       </button>
                     </td>
@@ -159,9 +271,15 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
 
               <tfoot>
                 <tr>
-                  <td className="text-right font-semibold" colSpan={4}>Total</td>
+                  <td className="text-right font-semibold" colSpan={4}>
+                    Total
+                  </td>
                   <td colSpan={2}>
-                    <input value={state.Total.toFixed(2)} readOnly className="input-compact bg-slate-100" />
+                    <input
+                      value={state.Total.toFixed(2)}
+                      readOnly
+                      className="input-compact bg-slate-100"
+                    />
                   </td>
                 </tr>
               </tfoot>
@@ -169,9 +287,14 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
           </div>
         </div>
 
-        {/* Acciones: ocupa todas las columnas */}
+        {/* Acciones */}
         <div className="col-span-full flex items-center justify-end gap-2 pt-2">
-          <button type="reset" className="btn btn-sm" disabled={submitting} onClick={() => setState((s) => ({ ...s, lineas: [], total: 0 }))}>
+          <button
+            type="reset"
+            className="btn btn-sm"
+            disabled={submitting}
+            onClick={() => setState((s) => ({ ...s, lineas: [], total: 0 }))}
+          >
             Limpiar
           </button>
           <button type="submit" className="btn btn-primary btn-sm" disabled={submitting || loadingData}>
@@ -180,14 +303,28 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
         </div>
       </form>
 
-    <NewItemModal
-      open={showNewItem}
-      onClose={() => setShowNewItem(false)}
-      onCreated={(item) => {
-        handleNewItemCreated(item);   // actualiza la última línea con el ítem creado
-        setShowNewItem(false);        // cierra el modal
-      }}
-    />
+      {/* Modal: Nuevo Ítem */}
+      <NewItemModal
+        open={showNewItem}
+        onClose={() => setShowNewItem(false)}
+        onCreated={(item) => {
+          handleNewItemCreated(item); // actualiza la última línea con el ítem creado
+          setShowNewItem(false); // cierra el modal
+        }}
+      />
+
+      {/* Modal: Nuevo Proveedor */}
+      <NewProveedorModal
+        open={showNewProveedor}
+        onClose={() => setShowNewProveedor(false)}
+        onCreated={(prov: Proveedor) => {
+          // Añade a la lista local para que aparezca en el select
+          setProveedoresList((prev) => [prov, ...prev]);
+          // Selecciona automáticamente el proveedor recién creado
+          setField("IdProveedor", prov.Id ?? "");
+          setShowNewProveedor(false);
+        }}
+      />
     </div>
   );
 };

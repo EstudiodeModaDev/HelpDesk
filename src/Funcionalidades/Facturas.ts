@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useMemo } from "react";
-import type { Facturas, FormErrors, FacturasUx, ItemFactura, Proveedor, ItemBd, ItemUx, ItemsErrors } from "../Models/Facturas";
+import type { Facturas, FormErrors, FacturasUx, ItemFactura, Proveedor, ItemBd, ItemUx, ItemsErrors, ProveedorError } from "../Models/Facturas";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import { useAuth } from "../auth/authContext";
 import type { ProveedoresFacturaService } from "../Services/ProveedoresFacturas.service";
@@ -33,6 +33,11 @@ export function useFacturas() {
     Title: "",
     Valor: 0
   });
+  const [ProveedorState, setProveedorState] = useState<Proveedor>({
+    Nit: "",
+    Title: ""
+  });
+  const [ProveedorError, setProveedorErrors] = useState<ProveedorError>({});
   const [Itemserrors, setItemsErrors] = useState<ItemsErrors>({});
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -50,6 +55,7 @@ export function useFacturas() {
 
   const setField = <K extends keyof FacturasUx>(k: K, v: FacturasUx[K]) => setState(s => ({ ...s, [k]: v }));
   const setItemsField = <K extends keyof ItemBd>(k: K, v: ItemBd[K]) => setItemsState(s => ({ ...s, [k]: v }));
+  const setProveedoresField = <K extends keyof Proveedor>(k: K, v: Proveedor[K]) => setProveedorState(s => ({ ...s, [k]: v }));
 
   React.useEffect(() => {
       (async () => {
@@ -89,6 +95,14 @@ export function useFacturas() {
     return Object.keys(e).length === 0;
   };
 
+  const validateProveedores = () => {
+    const e: ProveedorError = {};
+    if (!ProveedorState.Title) e.Title = "Obligatorio";
+    if (!ProveedorState.Nit)   e.Nit   = "Obligatorio";
+    setProveedorErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmitItems = React.useCallback(async (): Promise<ItemBd> => {
     // valida con tus Itemsstate / validateItems
     if (!validateItems()) throw new Error("Item inválido");
@@ -112,6 +126,25 @@ export function useFacturas() {
       setSubmitting(false);
     }
   }, [Itemsstate, ItemsSvc, validateItems, setItems, setItemsState, setSubmitting]);
+
+  const handleSubmitProveedor = React.useCallback(async (): Promise<Proveedor> => {
+    if (!validateProveedores()) throw new Error("Item inválido");
+
+    const payload: Proveedor = {
+      Title: ProveedorState.Title.trim(),
+      Nit: ProveedorState.Nit.trim(),
+    };
+
+    setSubmitting(true); setError(null);
+    try {
+      const created = await ProveedoresSvc.create(payload);
+      setProveedores(prev => [created, ...prev]);
+      setProveedorState({ Title: "", Nit: "" });
+      return created;
+    } finally {
+      setSubmitting(false);
+    }
+  }, [ProveedorState, ProveedoresSvc, validateProveedores, setProveedores, setProveedorState, setSubmitting]);
 
       
   const  addLinea = () => {setField("lineas", [...(state.lineas ?? []),
@@ -215,6 +248,7 @@ export function useFacturas() {
   }, [state, account, validate, FacturasSvc, ItemFacturaSvc]);
 
 
-  return {state, errors, submitting, proveedores, items, loadingData, error, total, Itemsstate, Itemserrors,
-    setField, setState, setErrors, handleSubmit, setItems, setError, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario, handleSubmitItems, setItemsField};
+  return {state, errors, submitting, proveedores, items, loadingData, error, total, Itemsstate, Itemserrors, ProveedorError, ProveedorState,
+    setField, setState, setErrors, handleSubmit, setItems, setError, addLinea, removeLinea, onChangeItem, onChangeCantidad, onChangeValorUnitario, handleSubmitItems, setItemsField, 
+    handleSubmitProveedor, setProveedorState, setProveedoresField};
 }
