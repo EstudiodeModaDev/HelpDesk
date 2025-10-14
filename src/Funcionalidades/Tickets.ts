@@ -243,26 +243,45 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const loadRelateds = React.useCallback(async () => {
-    setLoading(true); setError(null);
-    try {
-      if (ticket.IdCasoPadre !== null && ticket.IdCasoPadre !== undefined && ticket.IdCasoPadre !== "") {
-        const padreRes = await TicketsSvc.getAll({
-          filter: `(Id eq ${Number(ticket.IdCasoPadre)} or ID eq ${Number(ticket.IdCasoPadre)})`,
-          top: 1,
-        });
-        setPadres(padreRes.items)
-    }
-      const hijos = await TicketsSvc.getAll({filter: `fields/IdCasoPadre eq ${ticket.ID}`})
-      setHijos(hijos.items);
-    } catch (e: any) {
-      setError(e?.message ?? "Error cargando tickets");
+const loadRelateds = React.useCallback(async () => {
+  if (!ticket?.ID) {
+    setPadres([]);
+    setHijos([]);
+    return;
+  }
+
+  setLoading(true);
+  setError(null);
+
+  try {
+    // --- Padre (si aplica) ---
+    const idPadre = ticket.IdCasoPadre;
+    if (idPadre != null && idPadre !== "") {
+      const padreRes = await TicketsSvc.getAll({
+        // ID del item está en la raíz (ajusta si tu backend lo expone distinto)
+        filter: `(Id eq ${Number(idPadre)} or ID eq ${Number(idPadre)})`,
+        top: 1,
+      });
+      setPadres(padreRes?.items ?? []);
+    } else {
+      // Limpia si este ticket no tiene padre
       setPadres([]);
-      setHijos([]);
-    } finally {
-      setLoading(false);
     }
-  }, [TicketsSvc, ticket]);
+
+    // --- Hijos ---
+    const hijosRes = await TicketsSvc.getAll({
+      filter: `fields/IdCasoPadre eq ${Number(ticket.ID)}`,
+    });
+    setHijos(hijosRes?.items ?? []);
+  } catch (e: any) {
+    setError(e?.message ?? "Error cargando tickets");
+    setPadres([]);
+    setHijos([]);
+  } finally {
+    setLoading(false);
+  }
+}, [TicketsSvc, ticket?.ID, ticket?.IdCasoPadre]);
+
 
   React.useEffect(() => {
     loadRelateds();
