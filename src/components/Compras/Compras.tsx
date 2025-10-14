@@ -4,14 +4,10 @@ import type { CargarA, CO, comprasState, Opcion, TipoCompra } from "../../Models
 import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm"; // si no lo tienes, puedes usar { value:string; label:string }
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../Funcionalidades/Workers";
+import { useCentroCostos } from "../../Funcionalidades/Compras";
 import "./Compras.css";
-
-/** --- Datos de selects básicos --- */
-const CO_OPTS: CO[] = [
-  { value: "Operaciones", code: "1001" },
-  { value: "Logística",  code: "1002" },
-  { value: "TI",         code: "1003" },
-];
+import type { FranquiciasService } from "../../Services/Franquicias.service";
+import type { CentroCostosService } from "../../Services/CentroCostos.service";
 
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
@@ -19,7 +15,7 @@ const UN_OPTS: Opcion[] = [
   { value: "CJ",  label: "CJ"  },
 ];
 
-const CCOSTO_OPTS: CO[] = [
+const CO_OPTS: CO[] = [
   { value: "C001", code: "C001 - Comercial" },
   { value: "C002", code: "C002 - Operativo" },
   { value: "C003", code: "C003 - Administrativo" },
@@ -31,12 +27,7 @@ const zeroMarcas = (): Record<Marca, number> =>
   MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
 /** --- Props: agrego opcionales para que no reviente lo externo --- */
-type Props = {
-  onSubmit?: (payload: comprasState) => void;
-  initial?: Partial<comprasState>;
-  FranquiciasSvc?: unknown;      // se pasa a useFranquicias si tu hook lo requiere
-  submitting?: boolean;          // si quieres deshabilitar mientras guardas
-};
+type Props = {onSubmit?: (payload: comprasState) => void; initial?: Partial<comprasState>; FranquiciasSvc?: FranquiciasService; CentroCostosSvc?: CentroCostosService; submitting?: boolean;};
 
 /** --- Filtro simple para react-select --- */
 function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
@@ -56,16 +47,14 @@ export default function CompraFormulario({
   onSubmit,
   initial,
   FranquiciasSvc,
+  CentroCostosSvc,
   submitting = false,
 }: Props) {
   /** Datos externos */
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc as any);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
-    onlyEnabled: true,
-    domainFilter: "estudiodemoda.com.co",
-  });
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, domainFilter: "estudiodemoda.com.co",});
+  const {CC} = useCentroCostos(CentroCostosSvc as any)
 
-  /** Estado del formulario */
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
     productoServicio: "",
@@ -276,8 +265,8 @@ export default function CompraFormulario({
             onChange={(e) => setField("ccosto", e.target.value)}
           >
             <option value="">Seleccione C. Costo</option>
-            {CCOSTO_OPTS.map((o) => (
-              <option key={o.value} value={o.value}>{o.value}</option>
+            {CC.map((o) => (
+              <option key={o.Codigo} value={o.Codigo}>{o.Title}</option>
             ))}
           </select>
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}
