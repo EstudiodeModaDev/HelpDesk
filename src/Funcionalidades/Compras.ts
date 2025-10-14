@@ -99,12 +99,13 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
   const [error, setError] = React.useState<string | null>(null);
 
   const loadCC = React.useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const items = await CCSvc.getAll(); // debe devolver {items,nextLink}
-      setCC(items);
+      const items: CentroCostos[] = await CCSvc.getAll();
+      setCC(Array.isArray(items) ? items : []);
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando tickets");
+      setError(e?.message ?? "Error cargando centros de costo");
       setCC([]);
     } finally {
       setLoading(false);
@@ -115,10 +116,14 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
     loadCC();
   }, [loadCC]);
 
+  const ccOptions = React.useMemo(
+    () => CC.map(c => ({ value: c.Codigo, label: c.Title })),
+    [CC]
+  );
+
   return {
-    CC,
-    loading,
-    error,
+    CC, ccOptions, loading, error,
+    reload: loadCC,
   };
 }
 

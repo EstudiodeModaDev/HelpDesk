@@ -53,7 +53,7 @@ export default function CompraFormulario({
   /** Datos externos */
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc as any);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, domainFilter: "estudiodemoda.com.co",});
-  const {CC} = useCentroCostos(CentroCostosSvc as any)
+  const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostosSvc as any);
 
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
@@ -141,11 +141,7 @@ export default function CompraFormulario({
         {/* Tipo */}
         <div className="field">
           <label className="label">Tipo</label>
-          <select
-            className="control"
-            value={state.tipoCompra}
-            onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}
-          >
+          <select className="control" value={state.tipoCompra} onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}>
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
@@ -259,17 +255,12 @@ export default function CompraFormulario({
         {/* C. Costo */}
         <div className="field">
           <label className="label">C. Costo</label>
-          <select
-            className="control"
-            value={state.ccosto}
-            onChange={(e) => setField("ccosto", e.target.value)}
-          >
-            <option value="">Seleccione C. Costo</option>
-            {CC.map((o) => (
-              <option key={o.Codigo} value={o.Codigo}>{o.Title}</option>
-            ))}
+          <select className="control" value={state.ccosto} onChange={(e) => setField("ccosto", e.target.value)} disabled={loadingCC || submitting}>
+            <option value="">{loadingCC ? "Cargando C. Costo…" : "Seleccione C. Costo"}</option>
+            {ccOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
           </select>
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}
+          {ccError && <small className="error">{ccError}</small>}
         </div>
 
         {/* Cargar a */}
