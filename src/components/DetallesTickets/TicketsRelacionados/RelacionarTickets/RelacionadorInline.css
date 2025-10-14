@@ -1,0 +1,202 @@
+:root {
+  --relc-blue: #183884;        /* borde/acentos del mock */
+  --relc-blue-2: #2850b8;
+  --relc-bg: #ffffff;
+  --relc-border: #183884;
+  --relc-text: #0b152e;
+  --relc-muted: #6b7a99;
+  --relc-ok: #2f80ed;
+  --relc-ok-dark: #1f64be;
+  --relc-danger: #2f80ed;      /* mismo azul para consistencia con el mock */
+  --relc-shadow: 0 8px 24px rgba(0,0,0,.08);
+  --relc-radius: 4px;
+}
+
+/* Lienzo */
+.relc {
+  display: grid;
+  gap: 18px;
+}
+
+/* Fila con los dos controles */
+.relc-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+/* ===== Select de modo ===== */
+.relc-select {
+  position: relative;
+}
+.relc-select__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid var(--relc-border);
+  background: linear-gradient(90deg, #fff 0 78%, var(--relc-blue) 78% 100%);
+  color: var(--relc-text);
+  height: 40px;
+  padding: 0 42px 0 14px;
+  border-radius: var(--relc-radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: default; /* es solo indicador; el menu vive debajo */
+}
+.relc-caret {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* menú de modo (si lo quieres clicable, se ve inmediatamente debajo) */
+.relc-select__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--relc-bg);
+  border: 1px solid #dbe2f2;
+  border-radius: 6px;
+  box-shadow: var(--relc-shadow);
+  overflow: hidden;
+  z-index: 3;
+}
+.relc-option {
+  display: block;
+  padding: 10px 14px;
+  width: 180px;
+  text-align: left;
+  background: #fff;
+  border: 0;
+  color: var(--relc-text);
+  cursor: pointer;
+}
+.relc-option:hover { background: #f3f6fc; }
+.relc-option.is-active { font-weight: 700; color: var(--relc-blue-2); }
+
+/* ===== Combo buscador/selector ===== */
+.relc-combo {
+  position: relative;
+  width: 360px;
+}
+.relc-input {
+  width: 100%;
+  height: 40px;
+  border: 2px solid var(--relc-border);
+  border-radius: var(--relc-radius);
+  padding: 0 44px 0 12px;
+  font-size: 16px;
+  outline: none;
+}
+.relc-combo__caret {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 40px;
+  width: 44px;
+  border: 0;
+  background: var(--relc-blue);
+  color: #fff;
+  font-weight: 700;
+  border-top-right-radius: var(--relc-radius);
+  border-bottom-right-radius: var(--relc-radius);
+  cursor: pointer;
+}
+
+/* Lista desplegable */
+.relc-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #dbe2f2;
+  border-radius: 6px;
+  box-shadow: var(--relc-shadow);
+  z-index: 4;
+}
+.relc-empty {
+  padding: 12px;
+  color: var(--relc-muted);
+  font-size: 14px;
+}
+.relc-item {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #fff;
+  border: 0;
+  cursor: pointer;
+}
+.relc-item:hover { background: #f6f8fe; }
+.relc-item.is-selected { background: #eef3ff; }
+.relc-item--check {
+  cursor: default;
+}
+.relc-item--check input {
+  margin-right: 10px;
+  accent-color: var(--relc-blue-2);
+}
+.relc-title { color: var(--relc-text); }
+.relc-id { color: var(--relc-muted); font-size: 13px; }
+
+/* Chips (masiva) */
+.relc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.relc-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  background: #f1f5ff;
+  border: 1px solid #d9e3ff;
+  border-radius: 999px;
+  font-size: 13px; color: #183884;
+}
+.relc-chip__id { color: var(--relc-muted); }
+.relc-chip__x {
+  background: transparent; border: 0; cursor: pointer;
+  font-weight: 700; color: #183884; padding: 0 4px;
+}
+
+/* Acciones */
+.relc-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 10px;
+}
+.relc-btn {
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  transition: transform .05s ease-in-out, filter .2s;
+}
+.relc-btn--circle {
+  width: 44px; height: 44px; border-radius: 999px;
+  display: inline-grid; place-items: center;
+  font-size: 20px; font-weight: 800;
+  background: var(--relc-ok);
+}
+.relc-btn--ok { background: var(--relc-ok); }
+.relc-btn--ok:hover { filter: brightness(0.95); }
+.relc-btn--danger { background: var(--relc-ok); } /* mismo color del mock */
+.relc-btn--danger:hover { filter: brightness(0.92); }
+
+/* Accesibilidad focus */
+.relc-select__btn:focus-visible,
+.relc-input:focus-visible,
+.relc-combo__caret:focus-visible,
+.relc-item:focus-visible,
+.relc-option:focus-visible,
+.relc-btn:focus-visible,
+.relc-chip__x:focus-visible {
+  outline: 3px solid #bcd1ff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}

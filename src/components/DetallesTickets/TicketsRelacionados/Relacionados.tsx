@@ -4,6 +4,8 @@ import { useTicketsRelacionados } from "../../../Funcionalidades/Tickets";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { Ticket } from "../../../Models/Tickets";
 import "./TicketsAsociados.css";
+import type { TicketLite } from "./RelacionarTickets/Relacionador";
+import RelacionadorInline from "./RelacionarTickets/Relacionador";
 
 type Props = {
   title?: string;
@@ -11,6 +13,8 @@ type Props = {
   emptyChildrenText?: string;
   onSelect?: (t: Ticket) => void;         // callback al seleccionar
   buildHref?: (id: number | string) => string; // opcional: si también quieres navegar
+  // opcional: callback para guardar relación en backend
+  onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
 export default function TicketsAsociados({
@@ -19,16 +23,52 @@ export default function TicketsAsociados({
   emptyChildrenText = "No es hijo de ningun caso",
   onSelect,
   buildHref, // opcional
+  onRelateConfirm,
 }: Props) {
   const { Tickets } = useGraphServices();
-  // ⬇️ ahora esperamos { padre, hijos, loading, error }
-  const { padre, hijos, loading, error, loadRelateds} = useTicketsRelacionados(Tickets, ticket);
 
+  // Hook de relacionados
+  const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
+
+  // ====== Relacionador (UI) ======
+  const [showRel, setShowRel] = React.useState(false);
+  const [options, setOptions] = React.useState<TicketLite[]>([]);
+  const [loadingOpts, setLoadingOpts] = React.useState(false);
+
+  // Cargar opciones cuando abrimos el relacionador
+  async function openRelacionador() {
+    try {
+      setShowRel(true);
+      setLoadingOpts(true);
+      const res = await Tickets.getAll({ top: 400, orderby: "created asc"});
+      const items = (res?.items ?? [])
+        .filter((t: any) => String(t.ID) !== String(ticket.ID))
+        .map((t: any) => ({ ID: t.ID, Title: t.Title } as TicketLite));
+      setOptions(items);
+    } finally {
+      setLoadingOpts(false);
+    }
+  }
+
+  function closeRelacionador() {
+    setShowRel(false);
+  }
+
+  async function handleRelacionConfirm(payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) {
+
+    if (onRelateConfirm) {
+      await onRelateConfirm(payload);
+    }
+
+    setShowRel(false);
+    loadRelateds();
+  }
+
+  // ====== Navegación por click en padre/hijo ======
   function handleClick(e: React.MouseEvent, t: Ticket) {
     if (onSelect) {
       e.preventDefault();
-      onSelect(t);
-      loadRelateds()
+      onSelect(t);   // ✅ no recargamos aquí; el padre cambia el ticket y el hook se dispara solo
     }
   }
 
@@ -39,77 +79,99 @@ export default function TicketsAsociados({
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
-          <button type="button" className="ta-iconbtn" aria-label="Agregar ticket asociado" title="Agregar">
+          <button
+            type="button"
+            className="ta-iconbtn"
+            aria-label="Relacionar tickets"
+            title="Relacionar"
+            onClick={openRelacionador}
+          >
             <svg className="ta-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
         </div>
         <a className="ta-seeall" href="#" aria-label="Ver todos los tickets asociados">Ver todos</a>
       </header>
 
-      {loading && <div className="ta-skeleton" aria-hidden />}
-      {error && <p className="ta-error">Error cargando tickets</p>}
-
-      <div className="ta-body">
-        {/* Padre */}
-        <section className="ta-column">
-          <p className="ta-label">Ticket padre:</p>
-          <ul className="ta-list">
-            {!padre ? (
-              <li className="ta-empty">No tiene ticket padre</li>
-            ) : (
-              <li className="ta-list__item">
-                <span className="ta-list__dash" aria-hidden>-</span>
-
-                {onSelect ? (
-                  <button
-                    type="button"
-                    className="ta-link ta-link--button"
-                    onClick={(e) => handleClick(e, padre)}
-                  >
-                    {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
-                  </button>
-                ) : (
-                  <a className="ta-link" href={href(padre.ID ?? "")}>
-                    {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
-                  </a>
-                )}
-              </li>
-            )}
-          </ul>
-        </section>
-
-        {/* Hijos */}
-        <section className="ta-column">
-          <p className="ta-label">Hijo de {hijos.length}:</p>
-          {hijos.length === 0 ? (
-            <p className="ta-empty">{emptyChildrenText}</p>
+      {/* ===== Relacionador (se muestra al pulsar +) ===== */}
+      {showRel ? (
+        <div className="ta-relacionador-wrap">
+          {loadingOpts ? (
+            <div className="ta-skeleton" style={{ height: 40 }} aria-hidden />
           ) : (
-            <ul className="ta-list">
-              {hijos.map((t) => (
-                <li key={t.ID} className="ta-list__item">
-                  <span className="ta-list__dash" aria-hidden>-</span>
-
-                  {onSelect ? (
-                    <button
-                      type="button"
-                      className="ta-link ta-link--button"
-                      onClick={(e) => handleClick(e, t)}
-                    >
-                      {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
-                    </button>
-                  ) : (
-                    <a className="ta-link" href={href(t.ID ?? "")}>
-                      {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <RelacionadorInline
+              currentId={Number(ticket.ID)}
+              tickets={options}
+              onCancel={closeRelacionador}
+              onConfirm={handleRelacionConfirm}
+            />
           )}
-        </section>
-      </div>
+        </div>
+      ) : (
+        <>
+          {loading && <div className="ta-skeleton" aria-hidden />}
+          {error && <p className="ta-error">Error cargando tickets</p>}
+
+          <div className="ta-body">
+            {/* Padre */}
+            <section className="ta-column">
+              <p className="ta-label">Ticket padre:</p>
+              <ul className="ta-list">
+                {!padre ? (
+                  <li className="ta-empty">No tiene ticket padre</li>
+                ) : (
+                  <li className="ta-list__item">
+                    <span className="ta-list__dash" aria-hidden>-</span>
+                    {onSelect ? (
+                      <button
+                        type="button"
+                        className="ta-link ta-link--button"
+                        onClick={(e) => handleClick(e, padre)}
+                      >
+                        {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
+                      </button>
+                    ) : (
+                      <a className="ta-link" href={href(padre.ID ?? "")}>
+                        {padre.Title} <span className="ta-link__muted">- ID: {padre.ID}</span>
+                      </a>
+                    )}
+                  </li>
+                )}
+              </ul>
+            </section>
+
+            {/* Hijos */}
+            <section className="ta-column">
+              <p className="ta-label">Hijo de {hijos.length}:</p>
+              {hijos.length === 0 ? (
+                <p className="ta-empty">{emptyChildrenText}</p>
+              ) : (
+                <ul className="ta-list">
+                  {hijos.map((t) => (
+                    <li key={t.ID} className="ta-list__item">
+                      <span className="ta-list__dash" aria-hidden>-</span>
+                      {onSelect ? (
+                        <button
+                          type="button"
+                          className="ta-link ta-link--button"
+                          onClick={(e) => handleClick(e, t)}
+                        >
+                          {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
+                        </button>
+                      ) : (
+                        <a className="ta-link" href={href(t.ID ?? "")}>
+                          {t.Title} <span className="ta-link__muted">- ID: {t.ID}</span>
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        </>
+      )}
     </section>
   );
 }
