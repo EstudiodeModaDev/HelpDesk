@@ -248,7 +248,7 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
   const loadRelateds = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const padres = await TicketsSvc.getAll({filter: `fields/IdCasoPadre eq ${ticket.IdCasoPadre}`})
+      const padres = await TicketsSvc.getAll({filter: `fields/ID eq ${ticket.IdCasoPadre}`})
       const hijos = await TicketsSvc.getAll({filter: `fields/IdCasoPadre eq ${ticket.ID}`})
       setPadres(padres.items);
       setHijos(hijos.items);
@@ -259,7 +259,7 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc]);
+  }, [TicketsSvc, ticket]);
 
   React.useEffect(() => {
     loadRelateds();
