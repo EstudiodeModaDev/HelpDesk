@@ -79,14 +79,8 @@ export default function TicketsAsociados({
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
-          <button
-            type="button"
-            className="ta-iconbtn"
-            aria-label={showRel ? "Cancelar relación" : "Relacionar tickets"}
-            title={showRel ? "Cancelar" : "Relacionar"}
-            onClick={showRel ? closeRelacionador : openRelacionador}
-          >
-            {showRel ? "Cancelar" : "Relacionar nuevo ticket"}
+          <button type="button" className="ta-iconbtn" aria-label={showRel ? "cancelar" : "nuevo"} title={showRel ? "Cancelar" : "Relacionar"} onClick={showRel ? closeRelacionador : openRelacionador}>
+            {showRel ? "Cancelar" : "Nuevo"}
           </button>
         </div>
 
