@@ -6,16 +6,15 @@ export type TicketLite = { ID: number | string; Title: string };
 type Mode = "padre" | "hijo" | "masiva";
 
 type Props = {
-  /** Ticket actualmente abierto/seleccionado (para excluirlo de las opciones) */
+  /** ID del ticket actual (se excluye de la lista) */
   currentId: number | string;
-  /** Lista de tickets disponibles (puedes paginar/inyectar desde fuera) */
+  /** Opciones disponibles para relacionar */
   tickets: TicketLite[];
-
-  /** Opcional: modo inicial (por defecto 'padre') */
+  /** Modo inicial del relacionador */
   defaultMode?: Mode;
-
-  /** Callbacks */
+  /** Cerrar sin cambios */
   onCancel: () => void;
+  /** Confirmar relación */
   onConfirm: (payload: { mode: Mode; selected: TicketLite[] }) => void;
 };
 
@@ -29,18 +28,19 @@ export default function RelacionadorInline({
   const [mode, setMode] = React.useState<Mode>(defaultMode);
   const [query, setQuery] = React.useState("");
   const [openList, setOpenList] = React.useState(false);
+  const [openMode, setOpenMode] = React.useState(false);
 
-  // selección interna
+  // selección
   const [selectedOne, setSelectedOne] = React.useState<TicketLite | null>(null);
   const [selectedMany, setSelectedMany] = React.useState<TicketLite[]>([]);
 
-  // tickets disponibles (excluye el actual)
+  // opciones base (excluye el actual)
   const baseOptions = React.useMemo(
     () => tickets.filter((t) => String(t.ID) !== String(currentId)),
     [tickets, currentId]
   );
 
-  // filtrar por query
+  // filtrado por texto
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return baseOptions;
@@ -51,13 +51,15 @@ export default function RelacionadorInline({
     );
   }, [baseOptions, query]);
 
-  // reset de selección cuando cambia modo
+  // reset de selección al cambiar modo
   React.useEffect(() => {
     setSelectedOne(null);
     setSelectedMany([]);
     setQuery("");
     setOpenList(false);
   }, [mode]);
+
+  const isSingle = mode === "padre" || mode === "hijo";
 
   function toggleMany(ticket: TicketLite) {
     const exists = selectedMany.some((x) => String(x.ID) === String(ticket.ID));
@@ -67,68 +69,88 @@ export default function RelacionadorInline({
   }
 
   function handleConfirm() {
-    const selected =
-      mode === "masiva" ? selectedMany : selectedOne ? [selectedOne] : [];
+    const selected = isSingle ? (selectedOne ? [selectedOne] : []) : selectedMany;
     onConfirm({ mode, selected });
   }
 
-  const isSingle = mode === "padre" || mode === "hijo";
-
   return (
     <div className="relc">
-      {/* Barra de controles */}
+      {/* Fila superior */}
       <div className="relc-row">
         {/* Select de modo */}
         <div className="relc-select">
           <button
             type="button"
             className="relc-select__btn"
-            onClick={() => setOpenList(false)}
+            onClick={() => {
+              setOpenMode((v) => !v);
+              setOpenList(false);
+            }}
+            aria-haspopup="listbox"
+            aria-expanded={openMode}
           >
             <span className="relc-select__label">
               {mode === "padre" ? "Padre de" : mode === "hijo" ? "Hijo de" : "Masiva"}
             </span>
             <span className="relc-caret">▾</span>
           </button>
-          <div className="relc-select__menu">
-            <button
-              className={`relc-option ${mode === "padre" ? "is-active" : ""}`}
-              onClick={() => setMode("padre")}
-              type="button"
-            >
-              Padre de
-            </button>
-            <button
-              className={`relc-option ${mode === "hijo" ? "is-active" : ""}`}
-              onClick={() => setMode("hijo")}
-              type="button"
-            >
-              Hijo de
-            </button>
-            <button
-              className={`relc-option ${mode === "masiva" ? "is-active" : ""}`}
-              onClick={() => setMode("masiva")}
-              type="button"
-            >
-              Masiva
-            </button>
-          </div>
+
+          {openMode && (
+            <div className="relc-select__menu" role="listbox">
+              <button
+                className={`relc-option ${mode === "padre" ? "is-active" : ""}`}
+                onClick={() => {
+                  setMode("padre");
+                  setOpenMode(false);
+                }}
+                type="button"
+              >
+                Padre de
+              </button>
+              <button
+                className={`relc-option ${mode === "hijo" ? "is-active" : ""}`}
+                onClick={() => {
+                  setMode("hijo");
+                  setOpenMode(false);
+                }}
+                type="button"
+              >
+                Hijo de
+              </button>
+              <button
+                className={`relc-option ${mode === "masiva" ? "is-active" : ""}`}
+                onClick={() => {
+                  setMode("masiva");
+                  setOpenMode(false);
+                }}
+                type="button"
+              >
+                Masiva
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Combo buscador/selector */}
+        {/* Combo buscador / selector */}
         <div className="relc-combo">
           <input
             className="relc-input"
             placeholder="Buscar elementos"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setOpenList(true)}
+            onFocus={() => {
+              setOpenList(true);
+              setOpenMode(false);
+            }}
           />
           <button
             className="relc-combo__caret"
             type="button"
             aria-label="Abrir lista"
-            onClick={() => setOpenList((v) => !v)}
+            onClick={() => {
+              setOpenList((v) => !v);
+              setOpenMode(false);
+            }}
           >
             ▾
           </button>
@@ -157,10 +179,9 @@ export default function RelacionadorInline({
                     </button>
                   );
                 }
-                // Masiva
-                const inSel = selectedMany.some(
-                  (x) => String(x.ID) === String(t.ID)
-                );
+
+                // masiva
+                const inSel = selectedMany.some((x) => String(x.ID) === String(t.ID));
                 return (
                   <label
                     key={t.ID}
@@ -181,7 +202,7 @@ export default function RelacionadorInline({
         </div>
       </div>
 
-      {/* Chips de multi-selección */}
+      {/* Chips (solo masiva) */}
       {mode === "masiva" && selectedMany.length > 0 && (
         <div className="relc-chips">
           {selectedMany.map((s) => (
