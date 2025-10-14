@@ -259,7 +259,7 @@ const loadRelateds = React.useCallback(async () => {
     if (idPadre != null && idPadre !== "") {
       const padreRes = await TicketsSvc.getAll({
         // ID del item está en la raíz (ajusta si tu backend lo expone distinto)
-        filter: `(Id eq ${Number(idPadre)} or ID eq ${Number(idPadre)})`,
+        filter: `(id eq ${Number(idPadre)} or ID eq ${Number(idPadre)})`,
         top: 1,
       });
       setPadres(padreRes?.items ?? []);
