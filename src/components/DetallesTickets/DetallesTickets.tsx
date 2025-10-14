@@ -7,6 +7,7 @@ import { toISODateTimeFlex } from '../../utils/Date';
 import Recategorizar from './ModalRecategorizar/Recategorizar';
 import Reasignar from './Reasignar/Reasignar';
 import AsignarObservador from './Observador/Observador';
+import TicketsAsociados from './TicketsRelacionados/Relacionados';
 
 // Helper: ¿tiene permiso para recategorizar?
 const hasRecatRole = (r?: string) => {
@@ -131,6 +132,8 @@ export default function DetalleTicket({
           )}
         </div>
       </div>
+
+      <TicketsAsociados/>
 
       {/* Botón Seguimiento (toggle) */}
       <div>
