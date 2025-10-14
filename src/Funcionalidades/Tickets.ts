@@ -257,7 +257,7 @@ const loadRelateds = React.useCallback(async () => {
     // --- Padre (si aplica) ---
     const idPadre = ticket.IdCasoPadre;
     if (idPadre != null && idPadre !== "") {
-      const padreRes = await TicketsSvc.get(ticket.ID);
+      const padreRes = await TicketsSvc.get(String(ticket.IdCasoPadre));
       setPadre(padreRes ?? null);
     } else {
       setPadre(null);
