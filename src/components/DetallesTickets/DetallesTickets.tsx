@@ -164,10 +164,11 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
       <TicketsAsociados
+        key={selected.ID}              
         ticket={selected}
         onSelect={(t) => {
-          setSelected(t);
-          setShowSeg(false);
+          setSelected(t);              
+          setShowSeg(false);           // opcional: cierra seguimiento
         }}
       />
 
