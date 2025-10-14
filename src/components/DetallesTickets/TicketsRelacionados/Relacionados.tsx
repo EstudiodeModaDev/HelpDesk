@@ -35,7 +35,6 @@ export default function TicketsAsociados({
   const [options, setOptions] = React.useState<TicketLite[]>([]);
   const [loadingOpts, setLoadingOpts] = React.useState(false);
 
-  // Cargar opciones cuando abrimos el relacionador
   async function openRelacionador() {
     try {
       setShowRel(true);
@@ -79,16 +78,8 @@ export default function TicketsAsociados({
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
-          <button
-            type="button"
-            className="ta-iconbtn"
-            aria-label="Relacionar tickets"
-            title="Relacionar"
-            onClick={openRelacionador}
-          >
-            <svg className="ta-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+          <button type="button" className="ta-iconbtn" aria-label="Relacionar tickets" title="Relacionar" onClick={() => openRelacionador()}>
+            Relacionar nuevo ticket
           </button>
         </div>
         <a className="ta-seeall" href="#" aria-label="Ver todos los tickets asociados">Ver todos</a>
