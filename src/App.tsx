@@ -19,6 +19,7 @@ import type { TicketsService } from './Services/Tickets.service';
 import type { UsuariosSPService } from './Services/Usuarios.Service';
 import type { LogService } from './Services/Log.service';
 import NuevaFactura from './components/Facturas/Facturas';
+import CompraFormulario from './components/Compras/Compras';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -51,6 +52,7 @@ const NAVS_ADMIN: MenuItem[] = [
       {
         id: 'cesar', label: 'Cesar', icon: '', children: [
           { id: 'facturas', label: 'Facturas', icon: '🧾', to: <NuevaFactura/>},
+          { id: 'compras', label: 'Compras', icon: '🧾', to: <CompraFormulario/>},
         ]
       },
     ]
