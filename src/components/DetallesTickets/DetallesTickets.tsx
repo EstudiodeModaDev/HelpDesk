@@ -166,9 +166,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
       <TicketsAsociados
         ticket={selected}
         onSelect={(t) => {
-          // cambia el ticket seleccionado al hacer clic en padre/hijo
           setSelected(t);
-          // opcional: cerrar seguimiento al cambiar de ticket
           setShowSeg(false);
         }}
       />
