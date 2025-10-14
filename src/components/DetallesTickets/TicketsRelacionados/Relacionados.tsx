@@ -75,17 +75,30 @@ export default function TicketsAsociados({
 
   return (
     <section className="ta-panel" aria-label={title}>
+      {/* Header SIEMPRE visible */}
       <header className="ta-header">
         <div className="ta-header__left">
           <h2 className="ta-title">{title}</h2>
-          <button type="button" className="ta-iconbtn" aria-label="Relacionar tickets" title="Relacionar" onClick={() => openRelacionador()}>
-            Relacionar nuevo ticket
+          <button
+            type="button"
+            className="ta-iconbtn"
+            aria-label={showRel ? "Cancelar relación" : "Relacionar tickets"}
+            title={showRel ? "Cancelar" : "Relacionar"}
+            onClick={showRel ? closeRelacionador : openRelacionador}
+          >
+            {showRel ? "Cancelar" : "Relacionar nuevo ticket"}
           </button>
         </div>
-        <a className="ta-seeall" href="#" aria-label="Ver todos los tickets asociados">Ver todos</a>
+
+        {/* Oculta el link cuando estás relacionando */}
+        {!showRel && (
+          <a className="ta-seeall" href="#" aria-label="Ver todos los tickets asociados">
+            Ver todos
+          </a>
+        )}
       </header>
 
-      {/* ===== Relacionador (se muestra al pulsar +) ===== */}
+      {/* ===== Contenido ===== */}
       {showRel ? (
         <div className="ta-relacionador-wrap">
           {loadingOpts ? (
@@ -165,4 +178,5 @@ export default function TicketsAsociados({
       )}
     </section>
   );
+
 }
