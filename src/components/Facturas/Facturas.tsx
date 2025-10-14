@@ -95,7 +95,8 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
         {/* Proveedor + Añadir */}
         <div className="field">
           <label className="label">Proveedor</label>
-          <div className="flex gap-2">
+
+          <div className="input-row"> {/* <- NUEVO */}
             <select
               value={state.IdProveedor || ""}
               onChange={(e) => setField("IdProveedor", e.target.value)}
@@ -105,15 +106,13 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
             >
               <option value="">Seleccione proveedor</option>
               {proveedoresList.map((p) => (
-                <option key={p.Id} value={p.Id}>
-                  {p.Title}
-                </option>
+                <option key={p.Id} value={p.Id}>{p.Title}</option>
               ))}
             </select>
 
             <button
               type="button"
-              className="btn btn-sm"
+              className="btn btn-inline"   // <- NUEVO
               onClick={() => setShowNewProveedor(true)}
               disabled={submitting || loadingData}
               title="Registrar nuevo proveedor"
@@ -121,9 +120,9 @@ const NuevaFactura: React.FC<{ onSaved?: (id: string) => void }> = () => {
               Añadir
             </button>
           </div>
+
           {errors.IdProveedor && <small className="error">{errors.IdProveedor}</small>}
         </div>
-
         {/* NIT */}
         <div className="field">
           <label className="label">NIT</label>
