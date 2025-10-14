@@ -12,8 +12,7 @@ export type comprasState = {
   un: string;                 
   ccosto: string;                
   cargarA: CargarA;
-  noCO: string;
-  pesoTotal?: number;           
+  noCO: string;         
   marcasPct: Record<string, number>;
 };
 export type Compra = {

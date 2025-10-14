@@ -6,8 +6,7 @@ import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../Funcionalidades/Workers";
 import { useCentroCostos } from "../../Funcionalidades/Compras";
 import "./Compras.css";
-import type { FranquiciasService } from "../../Services/Franquicias.service";
-import type { CentroCostosService } from "../../Services/CentroCostos.service";
+import { useGraphServices } from "../../graph/GrapServicesContext";
 
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
@@ -27,7 +26,7 @@ const zeroMarcas = (): Record<Marca, number> =>
   MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
 /** --- Props: agrego opcionales para que no reviente lo externo --- */
-type Props = {onSubmit?: (payload: comprasState) => void; initial?: Partial<comprasState>; FranquiciasSvc?: FranquiciasService; CentroCostosSvc?: CentroCostosService; submitting?: boolean;};
+type Props = {onSubmit?: (payload: comprasState) => void; initial?: Partial<comprasState>; submitting?: boolean;};
 
 /** --- Filtro simple para react-select --- */
 function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
@@ -43,17 +42,12 @@ const Option = (props: any) => (
   </components.Option>
 );
 
-export default function CompraFormulario({
-  onSubmit,
-  initial,
-  FranquiciasSvc,
-  CentroCostosSvc,
-  submitting = false,
-}: Props) {
-  /** Datos externos */
-  const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc as any);
+export default function CompraFormulario({onSubmit, initial, submitting = false,}: Props) {
+  
+  const { Franquicias, CentroCostos } = useGraphServices();
+  const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, domainFilter: "estudiodemoda.com.co",});
-  const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostosSvc as any);
+  const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
 
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
@@ -66,7 +60,6 @@ export default function CompraFormulario({
     ccosto: "",
     cargarA: "CO",
     noCO: "",
-    pesoTotal: undefined,
     marcasPct: { ...zeroMarcas() },
     ...initial,
   });
@@ -317,22 +310,6 @@ export default function CompraFormulario({
             value={state.noCO}
             onChange={(e) => setField("noCO", e.target.value)}
             placeholder="Ej. 12345"
-          />
-        </div>
-
-        {/* Peso */}
-        <div className="field">
-          <label className="label">Peso (opcional)</label>
-          <input
-            type="number"
-            step="0.01"
-            className="control"
-            value={state.pesoTotal ?? ""}
-            onChange={(e) => {
-              const v = e.target.value;
-              setField("pesoTotal", v === "" ? undefined : Number(v));
-            }}
-            placeholder="Kg"
           />
         </div>
 
