@@ -21,6 +21,7 @@ import { FacturasService } from '../Services/Facturas.service';
 import { ItemFacturaService } from '../Services/ItemsFacturas.service';
 import { ProveedoresFacturaService } from '../Services/ProveedoresFacturas.service';
 import { ItemService } from '../Services/Items.service';
+import { CentroCostosService } from '../Services/CentroCostos.service';
 
 // ================== Tipos ==================
 export type GraphSiteConfig = {
@@ -46,6 +47,7 @@ export type GraphSiteConfig = {
     ItemFactura: string;
     ProveedoresFactura: string;
     Item: string
+    CentroCostos: string;
   };
 };
 
@@ -69,7 +71,8 @@ export type GraphServices = {
   Facturas: FacturasService
   ItemFactura: ItemFacturaService
   ProveedoresFactura: ProveedoresFacturaService;
-  Item: ItemService
+  Item: ItemService;
+  CentroCostos: CentroCostosService
 };
 
 // ================== Contexto ==================
@@ -103,7 +106,8 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     Facturas: 'Facturas',
     ItemFactura: "ItemsFactura",
     ProveedoresFactura: "ProveedoresFactura",
-    Item: "ItemsDescripcion"
+    Item: "ItemsDescripcion",
+    CentroCostos: "CentroCostos"
   },
 };
 
@@ -137,6 +141,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         ItemFactura:                    config?.lists?.ItemFactura              ?? base.lists.ItemFactura,
         ProveedoresFactura:             config?.lists?.ProveedoresFactura       ?? base.lists.ProveedoresFactura,
         Item:                           config?.lists?.Item                     ?? base.lists.Item,
+        CentroCostos:                   config?.lists?.CentroCostos             ?? base.lists.CentroCostos
       },
     };
   }, [config]);
@@ -168,9 +173,10 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const ItemFactura               = new ItemFacturaService(graph, hostname, sitePath, lists.ItemFactura);
     const ProveedoresFactura        = new ProveedoresFacturaService(graph, hostname, sitePath, lists.ProveedoresFactura);
     const Item                      = new ItemService(graph, hostname, sitePath, lists.Item)
+    const CentroCostos              = new CentroCostosService(graph, hostname, sitePath, lists.Item)
 
     return {graph, Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
-        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item};
+        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos};
   }, [graph, cfg]);
 
   return (
