@@ -1,10 +1,17 @@
 /* ===== Layout general ===== */
 .invoice-form {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+  color-scheme: light;           /* dile al UA: este bloque es claro */
+  forced-color-adjust: none;     /* evita reajustes de contraste del SO */
+  background: #fff;
+  color: #0f172a;
+}
+
+.invoice-form input,
+.invoice-form select,
+.invoice-form textarea {
+  background: #fff !important;
+  color: #0f172a !important;
+  caret-color: #0f172a;
 }
 
 /* Grid: 1 col móvil, 3 col tablet, 5 col desktop */
