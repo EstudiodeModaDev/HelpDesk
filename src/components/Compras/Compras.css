@@ -1,9 +1,9 @@
-/* === SILO BLANCO: no permitir inversiones ni mezclas en modo oscuro o extensiones === */
+/* --- Silo blanco: anti modo oscuro/extensiones --- */
 .white-silo {
   background: #ffffff !important;
   color: #0f172a !important;
   position: relative;
-  isolation: isolate; /* corta filtros heredados del <html> */
+  isolation: isolate;
 }
 .white-silo, .white-silo * {
   filter: none !important;
@@ -11,34 +11,32 @@
   background-image: none !important;
 }
 
-/* === Contenedor del formulario === */
+/* --- Contenedor & ancho --- */
+.compra-wrap { max-width: 1280px; margin: 0 auto; padding: 16px; }
+
+/* --- Controles blancos, legibles en dark mode --- */
 .compra-form {
   background: #ffffff;
   color: #0f172a;
-  color-scheme: light;        /* este bloque es claro */
-  forced-color-adjust: none;  /* no oscurezcas este bloque */
-  --control-h: 42px;          /* altura estándar para inputs y botones */
+  color-scheme: light;
+  forced-color-adjust: none;
+  --control-h: 42px;
 }
+.compra-form, .compra-form * { -webkit-text-size-adjust: 100%; }
 
-/* Tipografía / ajustes generales */
-.compra-form,
-.compra-form * { -webkit-text-size-adjust: 100%; }
-
-/* Grid responsivo */
+/* --- GRID fluido: auto-fit columnas --- */
 .compra-form .form-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
-@media (min-width: 640px) { .compra-form .form-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1024px){ .compra-form .form-grid { grid-template-columns: repeat(5, 1fr); } }
 .compra-form .col-span-full { grid-column: 1 / -1; }
 
 /* Campos & labels */
 .compra-form .field { display: flex; flex-direction: column; gap: 6px; }
 .compra-form .label { font-size: .85rem; color: #334155; font-weight: 600; }
 
-/* Controles: forzar blanco y esquema claro en CADA control */
+/* Controles */
 .compra-form input,
 .compra-form select,
 .compra-form textarea,
@@ -54,8 +52,6 @@
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
-
-/* Opciones del select (popup) */
 .compra-form select option {
   background: #ffffff !important;
   color: #0f172a !important;
@@ -70,7 +66,7 @@
   box-shadow: 0 0 0 3px rgba(148,163,184,.25) !important;
 }
 
-/* Readonly / disabled */
+/* Readonly/disabled */
 .compra-form .control.control--readonly,
 .compra-form input[readonly],
 .compra-form input[disabled],
@@ -79,7 +75,7 @@
   color: #475569 !important;
 }
 
-/* Placeholders y autofill (Chrome) */
+/* Placeholders y autofill */
 .compra-form ::placeholder { color: #94a3b8; opacity: 1; }
 .compra-form input:-webkit-autofill {
   -webkit-text-fill-color: #0f172a !important;
@@ -103,12 +99,10 @@
 .compra-form .btn:active { transform: translateY(1px); }
 .compra-form .btn[disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }
 .compra-form .btn-sm { padding: 6px 10px; font-size: .85rem; min-height: var(--control-h); }
-
-/* Primario */
-.compra-form .btn-primary { background: #2563eb !important; border-color: #2563eb !important; color: #ffffff !important; }
+.compra-form .btn-primary { background: #2563eb !important; border-color: #2563eb !important; color: #fff !important; }
 .compra-form .btn-primary:hover { background: #1e40af !important; border-color: #1e40af !important; }
 
-/* Caja blanca para distribución marcas */
+/* Caja marcas */
 .compra-form .box {
   background: #ffffff !important;
   border: 1px solid #e5e7eb !important;
@@ -120,7 +114,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
 }
-@media (max-width: 768px) { .compra-form .brands-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .compra-form .brands-grid { grid-template-columns: repeat(2, 1fr); } }
 
 /* Utilidades */
 .compra-form .muted { color: #94a3b8; }
@@ -139,15 +133,13 @@
 .compra-form :focus-visible { outline: 2px solid #94a3b8; outline-offset: 2px; }
 .compra-form ::selection { background: #dbeafe; color: #0f172a; }
 
-/* Ajustes en pantallas con prefers-color-scheme: dark (seguimos blancos) */
+/* Preferencia SO: oscuro (mantenemos blanco y subimos contraste de bordes) */
 @media (prefers-color-scheme: dark) {
-  .compra-form input,
-  .compra-form select,
-  .compra-form textarea { border-color: #d1d5db !important; }
+  .compra-form input, .compra-form select, .compra-form textarea { border-color: #d1d5db !important; }
   .compra-form .btn, .compra-form .box { border-color: #d1d5db !important; }
 }
 
-/* Alto contraste del SO: permite colores del sistema */
+/* Alto contraste: permitir colores del sistema */
 @media (forced-colors: active) {
   .compra-form { forced-color-adjust: auto; }
 }
