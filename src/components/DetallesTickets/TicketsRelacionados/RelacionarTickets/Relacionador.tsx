@@ -2,7 +2,7 @@ import * as React from "react";
 import "./RelacionadorInline.css";
 
 export type TicketLite = { ID: number | string; Title: string };
-type Mode = "padre" | "hijo" | "masiva";
+type Mode = "padre" | "hijo";
 
 type Props = {
   currentId: number | string;
@@ -21,6 +21,9 @@ export default function RelacionadorInline({
 }: Props) {
   const [mode, setMode] = React.useState<Mode>(defaultMode);
   const [query, setQuery] = React.useState("");
+  const [open, setOpen] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1); // item resaltado en la lista
+  const [selectedOne, setSelectedOne] = React.useState<TicketLite | null>(null);
 
   // Excluir el ticket actual
   const baseOptions = React.useMemo(
@@ -28,7 +31,7 @@ export default function RelacionadorInline({
     [tickets, currentId]
   );
 
-  // Filtrar por texto
+  // Filtrado (si query vacío => todos)
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return baseOptions;
@@ -39,27 +42,72 @@ export default function RelacionadorInline({
     );
   }, [baseOptions, query]);
 
-  // Estado de selección
-  const [selectedOne, setSelectedOne] = React.useState<string>("");
-  const [selectedMany, setSelectedMany] = React.useState<string[]>([]);
-
-  // Reset cuando cambia el modo
+  // Reset selección al cambiar modo
   React.useEffect(() => {
-    setSelectedOne("");
-    setSelectedMany([]);
+    setSelectedOne(null);
+    setQuery("");
+    setActiveIndex(-1);
   }, [mode]);
 
+  // Si cambia el filtro, reajustar el índice activo
+  React.useEffect(() => {
+    if (filtered.length === 0) setActiveIndex(-1);
+    else if (activeIndex >= filtered.length) setActiveIndex(0);
+  }, [filtered.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Abrir/cerrar control con click fuera
+  const wrapRef = React.useRef<HTMLDivElement | null>(null);
+  React.useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (!wrapRef.current) return;
+      if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  function chooseItem(item: TicketLite) {
+    setSelectedOne(item);
+    setQuery(`${item.Title} — ID: ${item.ID}`);
+    setOpen(false);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      setOpen(true);
+      setActiveIndex(0);
+      e.preventDefault();
+      return;
+    }
+    if (!open) return;
+
+    if (e.key === "ArrowDown") {
+      setActiveIndex((i) => (filtered.length ? (i + 1) % filtered.length : -1));
+      e.preventDefault();
+    } else if (e.key === "ArrowUp") {
+      setActiveIndex((i) =>
+        filtered.length ? (i <= 0 ? filtered.length - 1 : i - 1) : -1
+      );
+      e.preventDefault();
+    } else if (e.key === "Enter") {
+      if (activeIndex >= 0 && filtered[activeIndex]) {
+        chooseItem(filtered[activeIndex]);
+      }
+      e.preventDefault();
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }
+
   function handleConfirm() {
-    const selectedIds = mode === "masiva" ? selectedMany : selectedOne ? [selectedOne] : [];
-    const map = new Map(filtered.map((t) => [String(t.ID), t]));
-    const selected = selectedIds.map((id) => map.get(id)!).filter(Boolean);
-    onConfirm({ mode, selected });
+    if (!selectedOne) return;
+    onConfirm({ mode, selected: [selectedOne] });
   }
 
   return (
     <div className="relc relc--native">
       <div className="relc-row">
-        {/* Select modo */}
+        {/* Select modo (nativo) */}
         <label className="relc-field">
           <span className="relc-field__label">Relación</span>
           <select
@@ -69,58 +117,78 @@ export default function RelacionadorInline({
           >
             <option value="padre">Padre de</option>
             <option value="hijo">Hijo de</option>
-            <option value="masiva">Masiva</option>
           </select>
         </label>
 
-        {/* Buscar */}
-        <label className="relc-field relc-field--grow">
-          <span className="relc-field__label">Buscar</span>
-          <input
-            className="relc-input"
-            placeholder="Buscar elementos"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </label>
+        {/* Combobox de tickets (input + lista) */}
+        <div className="relc-field relc-field--grow" ref={wrapRef}>
+          <span className="relc-field__label">Ticket</span>
 
-        {/* Select tickets */}
-        <label className="relc-field relc-field--grow">
-          <span className="relc-field__label">Tickets</span>
-          {mode === "masiva" ? (
-            <select
-              className="relc-native"
-              multiple
-              size={Math.min(8, Math.max(3, filtered.length))}
-              value={selectedMany}
+          <div
+            className="relc-combobox"
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            aria-owns="relc-listbox"
+          >
+            <input
+              className="relc-input"
+              placeholder="Buscar o seleccionar"
+              value={query}
               onChange={(e) => {
-                const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
-                setSelectedMany(vals);
+                setQuery(e.target.value);
+                setOpen(true);
+                setActiveIndex(0);
+                // si el usuario empieza a escribir, des-seleccionamos
+                setSelectedOne(null);
               }}
+              onFocus={() => setOpen(true)}
+              onKeyDown={handleKeyDown}
+              aria-autocomplete="list"
+              aria-controls="relc-listbox"
+            />
+
+            <button
+              type="button"
+              className="relc-combo__caret"
+              aria-label={open ? "Cerrar" : "Abrir"}
+              onClick={() => setOpen((v) => !v)}
             >
-              {filtered.map((t) => (
-                <option key={String(t.ID)} value={String(t.ID)}>
-                  {t.Title} — ID: {t.ID}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <select
-              className="relc-native"
-              value={selectedOne}
-              onChange={(e) => setSelectedOne(e.target.value)}
-            >
-              <option value="" disabled>
-                {filtered.length ? "Selecciona un ticket" : "Sin resultados"}
-              </option>
-              {filtered.map((t) => (
-                <option key={String(t.ID)} value={String(t.ID)}>
-                  {t.Title} — ID: {t.ID}
-                </option>
-              ))}
-            </select>
+              ▾
+            </button>
+          </div>
+
+          {open && (
+            <ul id="relc-listbox" role="listbox" className="relc-list">
+              {filtered.length === 0 ? (
+                <li className="relc-empty" aria-disabled="true">
+                  Sin resultados
+                </li>
+              ) : (
+                filtered.map((t, idx) => {
+                  const isActive = idx === activeIndex;
+                  return (
+                    <li
+                      key={String(t.ID)}
+                      role="option"
+                      aria-selected={isActive}
+                      className={`relc-item ${isActive ? "is-selected" : ""}`}
+                      onMouseDown={(e) => {
+                        // mousedown para no perder el foco del input antes del click
+                        e.preventDefault();
+                        chooseItem(t);
+                      }}
+                      onMouseEnter={() => setActiveIndex(idx)}
+                    >
+                      <span className="relc-title">{t.Title}</span>
+                      <span className="relc-id">ID: {t.ID}</span>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
           )}
-        </label>
+        </div>
       </div>
 
       {/* Acciones */}
@@ -140,10 +208,7 @@ export default function RelacionadorInline({
           onClick={handleConfirm}
           title="Confirmar"
           aria-label="Confirmar"
-          disabled={
-            (mode !== "masiva" && !selectedOne) ||
-            (mode === "masiva" && selectedMany.length === 0)
-          }
+          disabled={!selectedOne}
         >
           ✓
         </button>
