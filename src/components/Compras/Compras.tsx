@@ -1,14 +1,10 @@
 import * as React from "react";
+import type { CargarA, CO, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
 
-type TipoCompra = "Producto" | "Servicio" | "Alquiler";
-type CargarA = "CO" | "Marca";
-
-type Opcion = { value: string; label: string };
-
-const CO_OPTS: Opcion[] = [
-  { value: "1001", label: "1001 - Operaciones" },
-  { value: "1002", label: "1002 - Logística" },
-  { value: "1003", label: "1003 - TI" },
+const CO_OPTS: CO[] = [
+  { value: "Operaciones", code:"1001"},
+  { value: "Logística", code: "1002"},
+  { value: "TI", code: "1003" },
 ];
 
 const UN_OPTS: Opcion[] = [
@@ -17,39 +13,21 @@ const UN_OPTS: Opcion[] = [
   { value: "CJ", label: "CJ" },
 ];
 
-const CCOSTO_OPTS: Opcion[] = [
-  { value: "C001", label: "C001 - Comercial" },
-  { value: "C002", label: "C002 - Operativo" },
-  { value: "C003", label: "C003 - Administrativo" },
+const CCOSTO_OPTS: CO[] = [
+  { value: "C001", code: "C001 - Comercial" },
+  { value: "C002", code: "C002 - Operativo" },
+  { value: "C003", code: "C003 - Administrativo" },
 ];
-
-const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY"] as const;
+const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"];
 type Marca = typeof MARCAS[number];
 
-type FormState = {
-  tipoCompra: TipoCompra;
-  productoServicio: string;      // nombre del producto/servicio/alquiler
-  solicitadoPor: string;
-  fechaSolicitud: string;        // YYYY-MM-DD
-  dispositivo: string;
-  co: string;                    // dropdown
-  un: string;                    // dropdown
-  ccosto: string;                // dropdown
-  cargarA: CargarA;
-  noCO: string;
-  pesoTotal?: number;            // opcional
-
-  // si cargarA = "Marca"
-  marcasPct: Record<Marca, number>;
-};
-
 type Props = {
-  onSubmit?: (payload: FormState) => void;
-  initial?: Partial<FormState>;
+  onSubmit?: (payload: comprasState) => void;
+  initial?: Partial<comprasState>;
 };
 
 export default function CompraFormulario({ onSubmit, initial }: Props) {
-  const [state, setState] = React.useState<FormState>({
+  const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
     productoServicio: "",
     solicitadoPor: "",
@@ -61,10 +39,9 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
     cargarA: "CO",
     noCO: "",
     pesoTotal: undefined,
-    marcasPct: { MFG: 0, DIESL: 0, PILATOS: 0, SUPERDRY: 0 },
+    marcasPct: { MFG: 0, DIESL: 0, PILATOS: 0, SUPERDRY: 0, KIPLING: 0, 'BROKEN CHAINS': 0},
     ...initial,
   });
-
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   const totalPct = React.useMemo(
@@ -75,7 +52,7 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
     [state.cargarA, state.marcasPct]
   );
 
-  function setField<K extends keyof FormState>(k: K, v: FormState[K]) {
+  function setField<K extends keyof comprasState>(k: K, v: comprasState[K]) {
     setState((s) => ({ ...s, [k]: v }));
   }
 
@@ -121,7 +98,7 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
 
   // valor a mostrar cuando Cargar a = CO (mismo valor del CO)
   const valorCargarACo = React.useMemo(
-    () => CO_OPTS.find((o) => o.value === state.co)?.label ?? "",
+    () => CO_OPTS.find((o) => o.value === state.co)?.value ?? "",
     [state.co]
   );
 
@@ -200,7 +177,7 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
         >
           <option value="">Seleccione CO</option>
           {CO_OPTS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value}>{o.value}</option>
           ))}
         </select>
         {errors.co && <small className="error">{errors.co}</small>}
@@ -230,7 +207,7 @@ export default function CompraFormulario({ onSubmit, initial }: Props) {
         >
           <option value="">Seleccione C. Costo</option>
           {CCOSTO_OPTS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value}>{o.value}</option>
           ))}
         </select>
         {errors.ccosto && <small className="error">{errors.ccosto}</small>}
