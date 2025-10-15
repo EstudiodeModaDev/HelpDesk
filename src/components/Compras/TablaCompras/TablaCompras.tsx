@@ -58,8 +58,8 @@ export default function TablaCompras() {
                 <th>UN</th>
                 <th>Centro de costos</th>
                 <th>Cargar A</th>
-                <th>Acciones</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
