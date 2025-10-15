@@ -209,14 +209,14 @@ export default function CompraFormulario({
 
         {/* CO (Centros Operativos) - react-select */}
         <div className="field">
-          <label className="label">C. Costo</label>
+          <label className="label">CO</label>
           <Select classNamePrefix="rs" 
             className="rs-override" 
             options={COOptions}
-            placeholder={loadingCC ? "Cargando C. Costo…" : coError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
+            placeholder={loadingCO ? "Cargando C. Costo…" : coError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
             isDisabled={submitting || loadingCO}
             isLoading={loadingCO}                                      
-            onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} 
+            onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} 
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
           />
