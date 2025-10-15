@@ -75,12 +75,10 @@ export function useCompras(ComprasSvc: ComprasService) {
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   return {
-    // datos visibles (solo la página actual)
     compras,
     loading,
     error,
 
-    // paginación (servidor)
     pageSize, setPageSize, 
     pageIndex,
     hasNext,
@@ -102,7 +100,8 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
     setLoading(true);
     setError(null);
     try {
-      const items: CentroCostos[] = await CCSvc.getAll();
+      const items = await CCSvc.getAll();
+
       setCC(Array.isArray(items) ? items : []);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando centros de costo");

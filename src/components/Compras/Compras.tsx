@@ -53,7 +53,7 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
     tipoCompra: "Producto",
     productoServicio: "",
     solicitadoPor: "",     
-    fechaSolicitud: "",
+    fechaSolicitud: new Date().toISOString().slice(0, 10),
     dispositivo: "",
     co: "",
     un: "",
@@ -141,21 +141,6 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
           </select>
         </div>
 
-        {/* Producto/Servicio/Alquiler */}
-        <div className="field">
-          <label className="label">
-            {state.tipoCompra === "Producto" ? "Producto"
-             : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
-          </label>
-          <input
-            className="control"
-            value={state.productoServicio}
-            onChange={(e) => setField("productoServicio", e.target.value)}
-            placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}
-          />
-          {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
-        </div>
-
         {/* Solicitante (react-select) */}
         <div className="field">
           <label className="label">Solicitante</label>
@@ -190,15 +175,19 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
           {errors.fechaSolicitud && <small className="error">{errors.fechaSolicitud}</small>}
         </div>
 
-        {/* Dispositivo */}
+        {/* Producto/Servicio/Alquiler */}
         <div className="field">
-          <label className="label">Dispositivo</label>
+          <label className="label">
+            {state.tipoCompra === "Producto" ? "Producto"
+             : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
+          </label>
           <input
             className="control"
-            value={state.dispositivo}
-            onChange={(e) => setField("dispositivo", e.target.value)}
-            placeholder="(Opcional)"
+            value={state.productoServicio}
+            onChange={(e) => setField("productoServicio", e.target.value)}
+            placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}
           />
+          {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
         </div>
 
         {/* CO */}
@@ -237,7 +226,7 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
         <div className="field">
           <label className="label">C. Costo</label>
           <select className="control" value={state.ccosto} onChange={(e) => setField("ccosto", e.target.value)} disabled={loadingCC || submitting}>
-            <option value="">{loadingCC ? "Cargando C. Costo…" : "Seleccione C. Costo"}</option>
+            <option value={state.ccosto}>{loadingCC ? "Cargando C. Costo…" : "Seleccione C. Costo"}</option>
             {ccOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
           </select>
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}

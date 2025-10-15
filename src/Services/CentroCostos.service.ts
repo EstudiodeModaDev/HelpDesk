@@ -145,7 +145,10 @@ export class CentroCostosService {
 
     try {
       const res = await this.graph.get<any>(url);
-      return (res.value ?? []).map((x: any) => this.toModel(x));
+      console.log("Respuesta get all ", res)
+      const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
+      console.log("Mapped", console.table(mapped))
+      return mapped
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico
       const code = e?.error?.code ?? e?.code;
