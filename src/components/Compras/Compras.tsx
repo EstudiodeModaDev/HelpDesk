@@ -1,7 +1,7 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
 import type { CargarA, CO, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
-import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm"; // si no lo tienes, puedes usar { value:string; label:string }
+import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm";
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../Funcionalidades/Workers";
 import { useCentroCostos } from "../../Funcionalidades/Compras";
@@ -19,13 +19,13 @@ const CO_OPTS: CO[] = [
   { value: "C002", code: "C002 - Operativo" },
   { value: "C003", code: "C003 - Administrativo" },
 ];
-
+type CcOption = { value: string; label: string };
 const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
 type Marca = typeof MARCAS[number];
 const zeroMarcas = (): Record<Marca, number> =>
   MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
-/** --- Props: agrego opcionales para que no reviente lo externo --- */
+/** --- Props --- */
 type Props = {onSubmit?: (payload: comprasState) => void; initial?: Partial<comprasState>; submitting?: boolean;};
 
 /** --- Filtro simple para react-select --- */
@@ -35,7 +35,7 @@ function userFilter(option: { label: string; value: string }, rawInput: string):
   return option.label.toLowerCase().includes(q) || (option.value ?? "").toLowerCase().includes(q);
 }
 
-/** --- Opción custom (puedes decorarla más si quieres) --- */
+/** --- Opción custom para react-select --- */
 const Option = (props: any) => (
   <components.Option {...props}>
     <span>{props.data.label}</span>
@@ -43,16 +43,16 @@ const Option = (props: any) => (
 );
 
 export default function CompraFormulario({onSubmit, initial, submitting = false,}: Props) {
-  
+
   const { Franquicias, CentroCostos } = useGraphServices();
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({onlyEnabled: true, domainFilter: "estudiodemoda.com.co",});
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
   const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
 
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
     productoServicio: "",
-    solicitadoPor: "",     
+    solicitadoPor: "",
     fechaSolicitud: new Date().toISOString().slice(0, 10),
     dispositivo: "",
     co: "",
@@ -65,7 +65,6 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
   });
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
-  /** Merge de opciones de solicitantes (workers + franquicias) sin duplicados */
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
     for (const o of [...workersOptions, ...franqOptions]) {
@@ -75,28 +74,35 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, [workersOptions, franqOptions]);
 
-  /** Valor seleccionado para react-select (necesita el objeto, no el string) */
   const selectedSolicitante = React.useMemo<UserOptionEx | null>(() => {
     if (!state.solicitadoPor) return null;
     return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
   }, [combinedOptions, state.solicitadoPor]);
 
+  const selectedCc = React.useMemo<CcOption | null>(() => {
+    if (!state.ccosto) return null;
+    return (ccOptions).find(
+      o => String(o.value) === String(state.ccosto)
+    ) ?? null;
+  }, [ccOptions, state.ccosto]);
+
   /** Helpers */
   const totalPct = React.useMemo(
-    () => state.cargarA === "Marca"
-      ? (Object.values(state.marcasPct).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) || 0)
-      : 0,
+    () =>
+      state.cargarA === "Marca"
+        ? (Object.values(state.marcasPct).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) || 0)
+        : 0,
     [state.cargarA, state.marcasPct]
   );
 
   function setField<K extends keyof comprasState>(k: K, v: comprasState[K]) {
     setState((s) => ({ ...s, [k]: v }));
   }
+
   function setMarcaPct(m: Marca, v: number) {
     setState((s) => ({ ...s, marcasPct: { ...s.marcasPct, [m]: v } }));
   }
 
-  /** Validaciones */
   function validate(): boolean {
     const e: Record<string, string> = {};
     if (!state.productoServicio.trim()) e.productoServicio = "Requerido.";
@@ -105,7 +111,8 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
     if (!state.co)                      e.co              = "Seleccione CO.";
     if (!state.un)                      e.un              = "Seleccione UN.";
     if (!state.ccosto)                  e.ccosto          = "Seleccione C. Costo.";
-    if (state.cargarA === "Marca" && totalPct !== 100) e.marcasPct = "El total de porcentajes debe ser 100%.";
+    if (state.cargarA === "Marca" && totalPct !== 100)
+      e.marcasPct = "El total de porcentajes debe ser 100%.";
 
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -119,7 +126,8 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
 
   /** Si vuelve a CO, resetea % */
   React.useEffect(() => {
-    if (state.cargarA === "CO") setState((s) => ({ ...s, marcasPct: { ...zeroMarcas() } }));
+    if (state.cargarA === "CO")
+      setState((s) => ({ ...s, marcasPct: { ...zeroMarcas() } }));
   }, [state.cargarA]);
 
   /** Mostrar label del CO cuando Cargar a = CO */
@@ -134,7 +142,11 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
         {/* Tipo */}
         <div className="field">
           <label className="label">Tipo</label>
-          <select className="control" value={state.tipoCompra} onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}>
+          <select
+            className="control"
+            value={state.tipoCompra}
+            onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}
+          >
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
@@ -157,7 +169,9 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
             isLoading={loadingWorkers || loadingFranq}
             value={selectedSolicitante}
             onChange={(opt) => setField("solicitadoPor", opt?.label ?? "")}
-            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
+            filterOption={(o, input) =>
+              userFilter({ label: o.label, value: String(o.value ?? "") }, input)
+            }
             components={{ Option }}
             isClearable
           />
@@ -179,7 +193,7 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
         <div className="field">
           <label className="label">
             {state.tipoCompra === "Producto" ? "Producto"
-             : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
+              : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
           </label>
           <input
             className="control"
@@ -222,13 +236,22 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
           {errors.un && <small className="error">{errors.un}</small>}
         </div>
 
-        {/* C. Costo */}
+        {/* C. Costo (react-select) */}
         <div className="field">
           <label className="label">C. Costo</label>
-          <select className="control" value={state.ccosto} onChange={(e) => setField("ccosto", e.target.value)} disabled={loadingCC || submitting}>
-            <option value={state.ccosto}>{loadingCC ? "Cargando C. Costo…" : "Seleccione C. Costo"}</option>
-            {ccOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
-          </select>
+          <Select<CcOption, false, GroupBase<CcOption>>
+            classNamePrefix="rs"
+            className="rs-override"
+            options={ccOptions}
+            placeholder={loadingCC ? "Cargando C. Costo…" : ccError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
+            isDisabled={submitting || loadingCC}
+            isLoading={loadingCC}
+            value={selectedCc}                                  
+            onChange={(opt) => setField("ccosto", opt?.value ?? "")} 
+            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
+            components={{ Option }}
+            isClearable
+          />
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}
           {ccError && <small className="error">{ccError}</small>}
         </div>
