@@ -40,8 +40,6 @@ export default function CompraFormulario({submitting = false,}: Props) {
   const { COOptions, loading: loadingCO, error: coError } = useCO(CentroOperativo as any);
   const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras as any);
 
-
-
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
     for (const o of [...workersOptions, ...franqOptions]) {
@@ -138,14 +136,15 @@ export default function CompraFormulario({submitting = false,}: Props) {
         {/* CO (Centros Operativos) - react-select */}
         <div className="field">
           <label className="label">CO</label>
-          <Select classNamePrefix="rs" 
-            className="rs-override" 
+          <Select
+            classNamePrefix="rs"
+            className="rs-override"
             options={COOptions}
-            placeholder={loadingCO ? "Cargando C. Costo…" : coError ? "Error cargando CO" : "Buscar co…"}
+            placeholder={loadingCO ? "Cargando CO…" : coError ? "Error cargando CO" : "Buscar CO…"}
             isDisabled={submitting || loadingCO}
             isLoading={loadingCO}
             value={selectedCO}
-            onChange={(opt) => {setField("co", opt ? String(opt.value).trim() : "");}}                                     
+            onChange={(opt) => setField("co", opt?.value ?? "")}
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
           />
