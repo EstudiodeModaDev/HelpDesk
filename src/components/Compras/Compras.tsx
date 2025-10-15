@@ -75,7 +75,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           </select>
         </div>
 
-        {/* Solicitante (react-select) */}
+        {/* Solicitante */}
         <div className="field">
           <label className="label">Solicitante</label>
           <Select<UserOptionEx, false, GroupBase<UserOptionEx>>
@@ -205,10 +205,11 @@ export default function CompraFormulario({submitting = false,}: Props) {
         ): <div></div>}
 
         {/* No. CO */}
-        <div className="field">
-          <label className="label">No. CO</label>
-          <input className="control" value={state.co?.value} placeholder="Ej. 12345"/>
-        </div>
+        {state.cargarA === "CO" ? (
+          <div className="field">
+            <label className="label">No. CO</label>
+            <input className="control" value={state.co?.value} placeholder="Ej. 12345"/>
+          </div>) : <div></div>}
 
         {/* Acciones */}
         <div className="col-span-full flex items-center justify-end gap-2 pt-2">
@@ -222,6 +223,9 @@ export default function CompraFormulario({submitting = false,}: Props) {
               noCO: "",
               pesoTotal: undefined,
               marcasPct: { ...zeroMarcas() },
+              co: null,
+              ccosto: null,
+              un: ""
             }))}
           >
             Limpiar
