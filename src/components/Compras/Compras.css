@@ -1,3 +1,10 @@
+/* ==========================  COMPRAS (Light-only)  ==========================
+   Este CSS fuerza apariencia CLARA para el formulario de Compras, incluso
+   cuando el navegador/SO esté en modo oscuro.
+   - Usa el scope .force-light para no afectar el resto de la app.
+   - Si quieres que TODO el sitio sea claro, ver bloque opcional al final.
+============================================================================ */
+
 /* ===============  Variables & Reset  =============== */
 :root{
   --bg: #ffffff;
@@ -11,21 +18,6 @@
   --ring: #93c5fd;
   --radius: 14px;
   --shadow: 0 8px 24px rgba(2,6,23,0.08);
-}
-
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg: #0b1020;
-    --card: #0f172a;
-    --text: #e5e7eb;
-    --muted: #9ca3af;
-    --border: #1f2937;
-    --primary: #3b82f6;
-    --primary-700:#2563eb;
-    --error: #f87171;
-    --ring: #60a5fa;
-    --shadow: 0 10px 30px rgba(0,0,0,0.35);
-  }
 }
 
 *{ box-sizing: border-box; }
@@ -212,12 +204,80 @@ input[type="number"]{ -moz-appearance: textfield; }
 }
 
 /* ===============  Micro-detalles  =============== */
-.white-silo{ /* puedes usarlo como “theme token” si ya existe */
-  border-radius: var(--radius);
-}
+.white-silo{ border-radius: var(--radius); }
 
 /* Ayuda visual para inputs con error */
 .field:has(.error) .control,
 .field:has(.error) .rs__control{
   border-color: var(--error);
 }
+
+/* ============================================================================
+   ============================  LIGHT-ONLY SCOPE  ============================
+   Aplica .force-light en el wrapper del formulario para forzar tema claro:
+   <div class="compra-wrap force-light" data-darkreader-ignore>...</div>
+============================================================================ */
+.force-light{
+  /* tokens claros fijos */
+  --bg: #ffffff !important;
+  --card: #f8fafc !important;
+  --text: #0f172a !important;
+  --muted: #6b7280 !important;
+  --border: #e5e7eb !important;
+  --primary: #2563eb !important;
+  --primary-700:#1d4ed8 !important;
+  --error: #ef4444 !important;
+  --ring: #93c5fd !important;
+  --shadow: 0 8px 24px rgba(2,6,23,0.08) !important;
+
+  /* Controles nativos (inputs, selects, date) siempre en claro */
+  color-scheme: only light;
+  background: var(--bg) !important;
+}
+
+.force-light .rs-override .rs__menu,
+.force-light .rs-override .rs__control,
+.force-light .rs-override .rs__option,
+.force-light .rs-override .rs__placeholder,
+.force-light .rs-override .rs__single-value{
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+/* Si usas menuPortalTarget={document.body} en react-select y quieres
+   forzar claro también en el portal, puedes añadir dinámicamente la clase
+   'force-light-portal' al <body>. Estas reglas preparan ese escenario. */
+:root.force-light-portal,
+html.force-light-portal,
+body.force-light-portal{
+  color-scheme: only light;
+  --bg: #ffffff;
+  --text: #0f172a;
+  --border: #e5e7eb;
+}
+
+/* ============================================================================
+   =====================  OPCIONAL: GLOBAL LIGHT-ONLY  =======================
+   Si prefieres que TODO EL SITIO sea claro SIEMPRE, descomenta esto:
+============================================================================ */
+/*
+:root, html, body {
+  color-scheme: only light !important;
+  background: #ffffff !important;
+}
+@media (prefers-color-scheme: dark){
+  :root {
+    --bg: #ffffff !important;
+    --card: #f8fafc !important;
+    --text: #0f172a !important;
+    --muted: #6b7280 !important;
+    --border: #e5e7eb !important;
+    --primary: #2563eb !important;
+    --primary-700:#1d4ed8 !important;
+    --error: #ef4444 !important;
+    --ring: #93c5fd !important;
+    --shadow: 0 8px 24px rgba(2,6,23,0.08) !important;
+  }
+}
+*/
