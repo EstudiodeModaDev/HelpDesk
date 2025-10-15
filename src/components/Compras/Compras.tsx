@@ -110,12 +110,9 @@ export default function CompraFormulario({
 
   /** Opción seleccionada (C. Costo) */
   const selectedCc = React.useMemo<CcOption | null>(() => {
-    const current = String(state.ccosto ?? "").trim();
-    if (!current) return null;
-    return (ccOptions as CcOption[]).find(
-      o => String(o.value ?? "").trim() === current
-    ) ?? null;
-  }, [ccOptions, state.ccosto]);
+    if (!state.ccosto) return null;
+    return ccOptions.find(o => o.label === state.ccosto) ?? null;
+  }, [CentroCostos, state.ccosto]);
 
   /** Helpers */
   const totalPct = React.useMemo(
