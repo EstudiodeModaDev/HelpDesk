@@ -213,24 +213,21 @@ export default function CompraFormulario({
           <Select classNamePrefix="rs" 
             className="rs-override" 
             options={COOptions}
-            placeholder={loadingCO ? "Cargando C. Costo…" : coError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
+            placeholder={loadingCO ? "Cargando C. Costo…" : coError ? "Error cargando CO" : "Buscar co…"}
             isDisabled={submitting || loadingCO}
             isLoading={loadingCO}                                      
             onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} 
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
           />
-          {errors.ccosto && <small className="error">{errors.ccosto}</small>}
-          {ccError && <small className="error">{ccError}</small>}
+          {errors.co && <small className="error">{errors.co}</small>}
+          {coError && <small className="error">{coError}</small>}
         </div>
 
         {/* UN */}
         <div className="field">
           <label className="label">UN</label>
-          <select className="control"
-            value={state.un}
-            onChange={(e) => setField("un", e.target.value)}
-          >
+          <select className="control" value={state.un} onChange={(e) => setField("un", e.target.value)}>
             <option value="">Seleccione UN</option>
             {UN_OPTS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -247,8 +244,7 @@ export default function CompraFormulario({
             options={ccOptions}
             placeholder={loadingCC ? "Cargando C. Costo…" : ccError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
             isDisabled={submitting || loadingCC}
-            isLoading={loadingCC}
-           // value={selectedCc}                                        
+            isLoading={loadingCC}                                 
             onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} 
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
@@ -260,11 +256,7 @@ export default function CompraFormulario({
         {/* Cargar a */}
         <div className="field">
           <label className="label">Cargar a</label>
-          <select
-            className="control"
-            value={state.cargarA}
-            onChange={(e) => setField("cargarA", e.target.value as CargarA)}
-          >
+          <select className="control" value={state.cargarA} onChange={(e) => setField("cargarA", e.target.value as CargarA)}>
             <option value="CO">CO</option>
             <option value="Marca">Marca</option>
           </select>
@@ -274,7 +266,6 @@ export default function CompraFormulario({
         {state.cargarA === "CO" ? (
           <div className="field">
             <label className="label">Valor a cargar (CO)</label>
-            {/* Si quieres mostrar label del CO, podrías mostrar selectedCo?.label */}
             <input className="control control--readonly" readOnly value={state.co ?? ""} />
           </div>
         ) : (
