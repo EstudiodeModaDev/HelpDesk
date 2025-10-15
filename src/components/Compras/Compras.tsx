@@ -7,6 +7,7 @@ import { useWorkers } from "../../Funcionalidades/Workers";
 import { useCentroCostos, useCO, useCompras } from "../../Funcionalidades/Compras";
 import "./Compras.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
+import type { COOption } from "../../Models/CO";
 
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
@@ -54,10 +55,10 @@ export default function CompraFormulario({submitting = false,}: Props) {
     return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
   }, [combinedOptions, state.solicitadoPor]);
 
-  const selectedCO = React.useMemo(
-    () => COOptions.find(o => String(o.value) === String(state.co)) ?? null,
-    [COOptions, state.co]
-  );
+  const selectedCO = React.useMemo<COOption | null>(() => {
+    if (!state.co) return null;
+    return COOptions.find(o => String(o.value) === state.co) ?? null;
+  }, [COOptions, state.co]);
 
   /** Si vuelve a CO, resetea % */
   React.useEffect(() => {
@@ -135,21 +136,20 @@ export default function CompraFormulario({submitting = false,}: Props) {
 
         {/* CO (Centros Operativos) - react-select */}
         <div className="field">
-          <label className="label">CO</label>
-          <Select
-            classNamePrefix="rs"
-            className="rs-override"
+          <label className="label">Solicitante</label>
+          <Select<COOption, false>
             options={COOptions}
-            placeholder={loadingCO ? "Cargando CO…" : coError ? "Error cargando CO" : "Buscar CO…"}
-            isDisabled={submitting || loadingCO}
-            isLoading={loadingCO}
+            placeholder={loadingCO ? "Cargando CO…" : "Buscar CO"}
             value={selectedCO}
             onChange={(opt) => setField("co", opt?.value ?? "")}
+            classNamePrefix="rs"
+            isDisabled={submitting || loadingCO}
+            isLoading={loadingCO}
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
+            components={{ Option: Option as any }}
+            noOptionsMessage={() => (coError ? "Error cargando usuarios" : "Sin coincidencias")}
             isClearable
           />
-          {errors.co && <small className="error">{errors.co}</small>}
-          {coError && <small className="error">{coError}</small>}
         </div>
 
         {/* UN */}
