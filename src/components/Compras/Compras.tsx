@@ -1,10 +1,10 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
-import type { CargarA, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
+import type { CargarA, Opcion, TipoCompra } from "../../Models/Compras";
 import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm";
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../Funcionalidades/Workers";
-import { useCentroCostos, useCO } from "../../Funcionalidades/Compras";
+import { useCentroCostos, useCO, useCompras } from "../../Funcionalidades/Compras";
 import "./Compras.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 
@@ -14,17 +14,8 @@ const UN_OPTS: Opcion[] = [
   { value: "CJ",  label: "CJ"  },
 ];
 
-const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
-type Marca = typeof MARCAS[number];
-const zeroMarcas = (): Record<Marca, number> =>
-  MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
-
 /** --- Props --- */
-type Props = {
-  onSubmit?: (payload: comprasState) => void;
-  initial?: Partial<comprasState>;
-  submitting?: boolean;
-};
+type Props = {submitting?: boolean;};
 
 /** --- Filtro simple para react-select --- */
 function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
@@ -40,46 +31,17 @@ const Option = (props: any) => (
   </components.Option>
 );
 
-export default function CompraFormulario({
-  onSubmit,
-  initial,
-  submitting = false,
-}: Props) {
+export default function CompraFormulario({submitting = false,}: Props) {
 
-  const { Franquicias, CentroCostos, CentroOperativo } = useGraphServices();
+  const { Franquicias, CentroCostos, CentroOperativo, Compras } = useGraphServices();
+  const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+  const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
+  const { COOptions, loading: loadingCO, error: coError } = useCO(CentroOperativo as any);
+  const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras as any);
 
-  // Datos externos
-  const { franqOptions, loading: loadingFranq, error: franqError } =
-    useFranquicias(Franquicias as any);
 
-  const { workersOptions, loadingWorkers, error: usersError } =
-    useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
 
-  const { ccOptions, loading: loadingCC, error: ccError } =
-    useCentroCostos(CentroCostos as any);
-
-  const { COOptions, loading: loadingCO, error: coError } =
-    useCO(CentroOperativo as any);
-
-  // Estado del form
-  const [state, setState] = React.useState<comprasState>({
-    tipoCompra: "Producto",
-    productoServicio: "",
-    solicitadoPor: "",
-    fechaSolicitud: new Date().toISOString().slice(0, 10),
-    dispositivo: "",
-    co: "",         // <- guardamos el value del CO (string)
-    un: "",
-    ccosto: "",     // <- guardamos el value del C. Costo (string)
-    cargarA: "CO",
-    noCO: "",
-    marcasPct: { ...zeroMarcas() },
-    ...initial,
-  });
-
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
-
-  /** Merge solicitantes (workers + franquicias) */
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
     for (const o of [...workersOptions, ...franqOptions]) {
@@ -89,49 +51,10 @@ export default function CompraFormulario({
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, [workersOptions, franqOptions]);
 
-  /** Opción seleccionada (Solicitante) */
   const selectedSolicitante = React.useMemo<UserOptionEx | null>(() => {
     if (!state.solicitadoPor) return null;
     return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
   }, [combinedOptions, state.solicitadoPor]);
-
-  /** Helpers */
-  const totalPct = React.useMemo(
-    () =>
-      state.cargarA === "Marca"
-        ? (Object.values(state.marcasPct).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) || 0)
-        : 0,
-    [state.cargarA, state.marcasPct]
-  );
-
-  function setField<K extends keyof comprasState>(k: K, v: comprasState[K]) {
-    setState((s) => ({ ...s, [k]: v }));
-  }
-
-  function setMarcaPct(m: Marca, v: number) {
-    setState((s) => ({ ...s, marcasPct: { ...s.marcasPct, [m]: v } }));
-  }
-
-  function validate(): boolean {
-    const e: Record<string, string> = {};
-    if (!state.productoServicio.trim()) e.productoServicio = "Requerido.";
-    if (!state.solicitadoPor.trim())   e.solicitadoPor   = "Requerido.";
-    if (!state.fechaSolicitud)          e.fechaSolicitud  = "Requerido.";
-    if (!state.co)                      e.co              = "Seleccione CO.";
-    if (!state.un)                      e.un              = "Seleccione UN.";
-    if (!state.ccosto)                  e.ccosto          = "Seleccione C. Costo.";
-    if (state.cargarA === "Marca" && totalPct !== 100)
-      e.marcasPct = "El total de porcentajes debe ser 100%.";
-
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validate()) return;
-    onSubmit?.(state);
-  }
 
   /** Si vuelve a CO, resetea % */
   React.useEffect(() => {
@@ -262,13 +185,8 @@ export default function CompraFormulario({
           </select>
         </div>
 
-        {/* Distribución marcas / Valor CO */}
-        {state.cargarA === "CO" ? (
-          <div className="field">
-            <label className="label">Valor a cargar (CO)</label>
-            <input className="control control--readonly" readOnly value={state.co ?? ""} />
-          </div>
-        ) : (
+        {/* Distribución marcas*/}
+        {state.cargarA !== "CO" ? (
           <div className="col-span-full">
             <div className="box">
               <div className="flex items-center justify-between mb-2">
@@ -293,24 +211,17 @@ export default function CompraFormulario({
               {errors.marcasPct && <small className="error">{errors.marcasPct}</small>}
             </div>
           </div>
-        )}
+        ): <div></div>}
 
         {/* No. CO */}
         <div className="field">
           <label className="label">No. CO</label>
-          <input
-            className="control"
-            value={state.noCO}
-            onChange={(e) => setField("noCO", e.target.value)}
-            placeholder="Ej. 12345"
-          />
+          <input className="control" value={state.noCO} onChange={(e) => setField("noCO", e.target.value)} placeholder="Ej. 12345"/>
         </div>
 
         {/* Acciones */}
         <div className="col-span-full flex items-center justify-end gap-2 pt-2">
-          <button
-            type="reset"
-            className="btn btn-sm"
+          <button type="reset" className="btn btn-sm"
             onClick={() => setState((s) => ({
               ...s,
               productoServicio: "",

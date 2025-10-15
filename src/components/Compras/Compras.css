@@ -1,193 +1,223 @@
-/* --- Silo blanco: anti modo-oscuro/extensiones --- */
-.white-silo {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  position: relative;
-  isolation: isolate;
-}
-.white-silo, .white-silo * {
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  background-image: none !important;
+/* ===============  Variables & Reset  =============== */
+:root{
+  --bg: #ffffff;
+  --card: #f8fafc;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #2563eb;
+  --primary-700:#1d4ed8;
+  --error: #ef4444;
+  --ring: #93c5fd;
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(2,6,23,0.08);
 }
 
-/* --- Contenedor & ancho --- */
-.compra-wrap { max-width: 1280px; margin: 0 auto; padding: 16px; }
-
-/* --- Controles blancos, legibles en dark mode --- */
-.compra-form {
-  background: #ffffff;
-  color: #0f172a;
-  color-scheme: light;
-  forced-color-adjust: none;
-  --control-h: 42px;
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0b1020;
+    --card: #0f172a;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --border: #1f2937;
+    --primary: #3b82f6;
+    --primary-700:#2563eb;
+    --error: #f87171;
+    --ring: #60a5fa;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
 }
-.compra-form, .compra-form * { -webkit-text-size-adjust: 100%; }
 
-/* --- GRID fluido: columnas automáticas --- */
-.compra-form .form-grid {
+*{ box-sizing: border-box; }
+
+/* ===============  Contenedor / Tarjeta  =============== */
+.compra-wrap{
+  background: var(--bg);
+  padding: 24px;
+}
+.compra-form{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+/* ===============  Grid del formulario  =============== */
+.form-grid{
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-.compra-form .col-span-full { grid-column: 1 / -1; }
-
-/* Campos & labels */
-.compra-form .field { display: flex; flex-direction: column; gap: 6px; }
-.compra-form .label { font-size: .85rem; color: #334155; font-weight: 600; }
-
-/* Controles base */
-.compra-form input,
-.compra-form select,
-.compra-form textarea,
-.compra-form button {
-  color-scheme: light !important;
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 10px;
-  min-height: var(--control-h);
-  padding: 10px 12px;
-  line-height: 1.2;
-  outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
-}
-.compra-form select option {
-  background: #ffffff !important;
-  color: #0f172a !important;
+  grid-template-columns: 1fr;
+  gap: 16px;
 }
 
-/* Focus */
-.compra-form .control:focus,
-.compra-form input:focus,
-.compra-form select:focus,
-.compra-form textarea:focus {
-  border-color: #94a3b8 !important;
-  box-shadow: 0 0 0 3px rgba(148,163,184,.25) !important;
+@media (min-width: 640px){
+  .form-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px){
+  .form-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* Readonly / disabled */
-.compra-form .control.control--readonly,
-.compra-form input[readonly],
-.compra-form input[disabled],
-.compra-form select[disabled] {
-  background: #f8fafc !important;
-  color: #475569 !important;
+.col-span-full{ grid-column: 1 / -1; }
+
+/* ===============  Field / Label / Control  =============== */
+.field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-/* Placeholders & autofill */
-.compra-form ::placeholder { color: #94a3b8; opacity: 1; }
-.compra-form input:-webkit-autofill {
-  -webkit-text-fill-color: #0f172a !important;
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-  caret-color: #0f172a !important;
-}
-
-/* Botones */
-.compra-form .btn {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 10px;
-  padding: 10px 14px;
+.label{
+  font-size: 0.875rem;
   font-weight: 600;
-  font-size: .9rem;
-  cursor: pointer;
-  transition: transform .06s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+  color: var(--text);
+  opacity: 0.9;
 }
-.compra-form .btn:hover { box-shadow: 0 4px 16px rgba(2,6,23,.08); }
-.compra-form .btn:active { transform: translateY(1px); }
-.compra-form .btn[disabled] { opacity: .6; cursor: not-allowed; box-shadow: none; }
-.compra-form .btn-sm { padding: 6px 10px; font-size: .85rem; min-height: var(--control-h); }
-.compra-form .btn-primary { background: #2563eb !important; border-color: #2563eb !important; color: #fff !important; }
-.compra-form .btn-primary:hover { background: #1e40af !important; border-color: #1e40af !important; }
 
-/* Caja marcas */
-.compra-form .box {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 14px;
-  padding: 12px;
+.control{
+  appearance: none;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.4;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .2s ease;
 }
-.compra-form .brands-grid {
+
+.control:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 35%, transparent);
+}
+
+.control::placeholder{ color: var(--muted); }
+
+.control--readonly{
+  background: color-mix(in srgb, var(--bg) 85%, #888 15%);
+  color: var(--muted);
+}
+
+/* Tipo number limpio */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+input[type="number"]{ -moz-appearance: textfield; }
+
+/* Mensajes de error */
+.error{
+  color: var(--error);
+  font-size: 0.78rem;
+}
+
+/* ===============  React-Select overrides (classNamePrefix="rs") =============== */
+.rs-override .rs__control{
+  min-height: 40px;
+  border-radius: 10px;
+  border-color: var(--border);
+  background: var(--bg);
+  box-shadow: none;
+}
+.rs-override .rs__control--is-focused{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 35%, transparent);
+}
+.rs-override .rs__placeholder{ color: var(--muted); }
+.rs-override .rs__single-value{ color: var(--text); }
+.rs-override .rs__menu{
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.rs-override .rs__option{
+  background: transparent;
+  color: var(--text);
+  padding: 8px 12px;
+}
+.rs-override .rs__option--is-focused{
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+}
+.rs-override .rs__option--is-selected{
+  background: var(--primary);
+  color: white;
+}
+.rs-override .rs__indicator-separator{ display:none; }
+.rs-override .rs__input-container input{ color: var(--text); }
+
+/* ===============  Caja y sección Marcas  =============== */
+.box{
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.brands-grid{
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0,1fr));
   gap: 12px;
 }
-@media (max-width: 900px) { .compra-form .brands-grid { grid-template-columns: repeat(2, 1fr); } }
-
-/* Utilidades */
-.compra-form .muted { color: #94a3b8; }
-.compra-form .text-sm { font-size: .9rem; }
-.compra-form .font-semibold { font-weight: 600; }
-.compra-form .flex { display: flex; }
-.compra-form .items-center { align-items: center; }
-.compra-form .justify-between { justify-content: space-between; }
-.compra-form .gap-2 { gap: 8px; }
-.compra-form .pt-2 { padding-top: .5rem; }
-.compra-form .mb-2 { margin-bottom: .5rem; }
-.compra-form .mb-3 { margin-bottom: .75rem; }
-
-/* Errores & accesibilidad */
-.compra-form .error { color: #b91c1c; font-size: .8rem; margin-top: 2px; }
-.compra-form :focus-visible { outline: 2px solid #94a3b8; outline-offset: 2px; }
-.compra-form ::selection { background: #dbeafe; color: #0f172a; }
-
-/* Preferencia SO: oscuro (seguimos blancos, subimos contraste de bordes) */
-@media (prefers-color-scheme: dark) {
-  .compra-form input, .compra-form select, .compra-form textarea { border-color: #d1d5db !important; }
-  .compra-form .btn, .compra-form .box { border-color: #d1d5db !important; }
+@media (min-width: 640px){
+  .brands-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (min-width: 1024px){
+  .brands-grid{ grid-template-columns: repeat(5, minmax(0,1fr)); }
 }
 
-/* Alto contraste */
-@media (forced-colors: active) {
-  .compra-form { forced-color-adjust: auto; }
-}
-
-/* =========================
-   REACT-SELECT (classNamePrefix="rs")
-   ========================= */
-.rs-override .rs__control {
-  min-height: var(--control-h);
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: none !important;
+/* ===============  Botones  =============== */
+.btn{
+  --btn-bg: transparent;
+  --btn-text: var(--text);
+  --btn-brd: var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--btn-brd);
   border-radius: 10px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .06s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
 }
-.rs-override .rs__value-container { padding: 2px 8px; }
-.rs-override .rs__single-value { color: #0f172a !important; }
-.rs-override .rs__placeholder   { color: #94a3b8 !important; }
+.btn:hover{ background: color-mix(in oklab, var(--card) 50%, transparent); }
+.btn:active{ transform: translateY(1px); }
+.btn[disabled]{ opacity: .6; cursor: not-allowed; }
 
-.rs-override .rs__menu {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 8px 24px rgba(2,6,23,.08);
-  border-radius: 10px;
-  overflow: hidden;
-  z-index: 40;
-}
-.rs-override .rs__menu-list { padding: 6px 0; }
-.rs-override .rs__option {
-  background: #ffffff !important;
-  color: #0f172a !important;
-}
-.rs-override .rs__option--is-focused {
-  background: #eef2ff !important;
-}
-.rs-override .rs__option--is-selected {
-  background: #2563eb !important;
-  color: #ffffff !important;
-}
-.rs-override .rs__indicator,
-.rs-override .rs__dropdown-indicator,
-.rs-override .rs__clear-indicator {
-  color: #475569 !important;
-}
-.rs-override .rs__indicator-separator { display: none; }
+.btn-sm{ height: 32px; padding: 0 10px; font-size: 0.9rem; }
 
-/* Deshabilitado */
-.rs-override .rs__control--is-disabled {
-  background: #f8fafc !important;
-  border-color: #e5e7eb !important;
-  opacity: .9;
+.btn-primary{
+  --btn-bg: var(--primary);
+  --btn-text: #fff;
+  --btn-brd: var(--primary);
+}
+.btn-primary:hover{ background: var(--primary-700); border-color: var(--primary-700); }
+
+/* ===============  Utilidades mínimas  =============== */
+.flex{ display: flex; }
+.items-center{ align-items: center; }
+.justify-between{ justify-content: space-between; }
+.justify-end{ justify-content: flex-end; }
+.gap-2{ gap: 8px; }
+.pt-2{ padding-top: 8px; }
+
+/* ===============  Accesibilidad (focus visible)  =============== */
+:where(button, .control, .rs-override .rs__control):focus-visible{
+  outline: 0;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 35%, transparent);
+}
+
+/* ===============  Micro-detalles  =============== */
+.white-silo{ /* puedes usarlo como “theme token” si ya existe */
+  border-radius: var(--radius);
+}
+
+/* Ayuda visual para inputs con error */
+.field:has(.error) .control,
+.field:has(.error) .rs__control{
+  border-color: var(--error);
 }

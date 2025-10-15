@@ -4,13 +4,19 @@ import type { DateRange } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { ComprasService } from "../Services/Compras.service";
-import type { Compra } from "../Models/Compras";
+import type { Compra, comprasState } from "../Models/Compras";
 import type { CentroCostos } from "../Models/CentroCostos";
 import type { CentroCostosService } from "../Services/CentroCostos.service";
 import type { COService } from "../Services/COCostos.service";
 
 export function useCompras(ComprasSvc: ComprasService) {
-  const [compras, setCompras] = React.useState<Compra[]>([]);
+
+  const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
+  type Marca = typeof MARCAS[number];
+  const zeroMarcas = (): Record<Marca, number> => MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
+
+  const [rows, setRows] = React.useState<Compra[]>([]);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
@@ -18,6 +24,50 @@ export function useCompras(ComprasSvc: ComprasService) {
   const [pageSize, setPageSize] = React.useState<number>(10); // = $top
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
+  const [state, setState] = React.useState<comprasState>({
+    tipoCompra: "Producto",
+    productoServicio: "",
+    solicitadoPor: "",
+    fechaSolicitud: new Date().toISOString().slice(0, 10),
+    dispositivo: "",
+    co: "",         // <- guardamos el value del CO (string)
+    un: "",
+    ccosto: "",     // <- guardamos el value del C. Costo (string)
+    cargarA: "CO",
+    noCO: "",
+    marcasPct: { ...zeroMarcas() },
+  });
+
+  //HELPERS
+  const totalPct = React.useMemo( () => state.cargarA === "Marca" ? 
+    (Object.values(state.marcasPct).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) || 0)
+    : 0, [state.cargarA, state.marcasPct]);
+
+  function setField<K extends keyof comprasState>(k: K, v: comprasState[K]) {setState((s) => ({ ...s, [k]: v }));}
+
+  function setMarcaPct(m: Marca, v: number) {setState((s) => ({ ...s, marcasPct: { ...s.marcasPct, [m]: v } }))}
+
+  function validate(): boolean {
+    const e: Record<string, string> = {};
+    if (!state.productoServicio.trim()) e.productoServicio = "Requerido.";
+    if (!state.solicitadoPor.trim())   e.solicitadoPor   = "Requerido.";
+    if (!state.fechaSolicitud)          e.fechaSolicitud  = "Requerido.";
+    if (!state.co)                      e.co              = "Seleccione CO.";
+    if (!state.un)                      e.un              = "Seleccione UN.";
+    if (!state.ccosto)                  e.ccosto          = "Seleccione C. Costo.";
+    if (state.cargarA === "Marca" && totalPct !== 100)
+      e.marcasPct = "El total de porcentajes debe ser 100%.";
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }
+  
+  const handleSubmit = React.useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+        if (!validate()) return;
+    console.log(state)
+  }, [state ]); 
+  
 
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
@@ -36,12 +86,12 @@ export function useCompras(ComprasSvc: ComprasService) {
     setLoading(true); setError(null);
     try {
       const { items, nextLink } = await ComprasSvc.getAll(buildFilter()); // debe devolver {items,nextLink}
-      setCompras(items);
+      setRows(items);
       setNextLink(nextLink ?? null);
       setPageIndex(1);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tickets");
-      setCompras([]);
+      setRows([]);
       setNextLink(null);
       setPageIndex(1);
     } finally {
@@ -61,7 +111,7 @@ export function useCompras(ComprasSvc: ComprasService) {
     setLoading(true); setError(null);
     try {
       const { items, nextLink: n2 } = await ComprasSvc.getByNextLink(nextLink);
-      setCompras(items);              // 👈 reemplaza la página visible
+      setRows(items);              // 👈 reemplaza la página visible
       setNextLink(n2 ?? null);     // null si no hay más
       setPageIndex(i => i + 1);
     } catch (e: any) {
@@ -76,19 +126,8 @@ export function useCompras(ComprasSvc: ComprasService) {
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   return {
-    compras,
-    loading,
-    error,
-
-    pageSize, setPageSize, 
-    pageIndex,
-    hasNext,
-    nextPage,
-
-    range, setRange,
-    applyRange,
-
-    reloadAll,
+    rows, loading, error, MARCAS, pageSize,  pageIndex, hasNext, errors, state, range, totalPct,
+    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit
   };
 }
 

@@ -23,6 +23,7 @@ import { ProveedoresFacturaService } from '../Services/ProveedoresFacturas.servi
 import { ItemService } from '../Services/Items.service';
 import { CentroCostosService } from '../Services/CentroCostos.service';
 import { COService } from '../Services/COCostos.service';
+import { ComprasService } from '../Services/Compras.service';
 
 // ================== Tipos ==================
 export type GraphSiteConfig = {
@@ -50,6 +51,7 @@ export type GraphSiteConfig = {
     Item: string
     CentroCostos: string;
     CentroOperativo: string;
+    Compras: string;
   };
 };
 
@@ -75,7 +77,8 @@ export type GraphServices = {
   ProveedoresFactura: ProveedoresFacturaService;
   Item: ItemService;
   CentroCostos: CentroCostosService;
-  CentroOperativo: COService
+  CentroOperativo: COService;
+  Compras: ComprasService
 };
 
 // ================== Contexto ==================
@@ -111,7 +114,8 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     ProveedoresFactura: "ProveedoresFactura",
     Item: "ItemsDescripcion",
     CentroCostos: "CentroCostos",
-    CentroOperativo: "CentrosOperativos"
+    CentroOperativo: "CentrosOperativos",
+    Compras: "Compras"
   },
 };
 
@@ -146,7 +150,8 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         ProveedoresFactura:             config?.lists?.ProveedoresFactura       ?? base.lists.ProveedoresFactura,
         Item:                           config?.lists?.Item                     ?? base.lists.Item,
         CentroCostos:                   config?.lists?.CentroCostos             ?? base.lists.CentroCostos,
-        CentroOperativo:                config?.lists?.CentroOperativo             ?? base.lists.CentroOperativo
+        CentroOperativo:                config?.lists?.CentroOperativo          ?? base.lists.CentroOperativo,
+        Compras:                        config?.lists?.Compras                  ?? base.lists.Compras,
       },
     };
   }, [config]);
@@ -180,9 +185,10 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Item                      = new ItemService(graph, hostname, sitePath, lists.Item)
     const CentroCostos              = new CentroCostosService(graph, hostname, sitePath, lists.CentroCostos)
     const CentroOperativo           = new COService(graph, hostname, sitePath, lists.CentroOperativo)
+    const Compras                   = new ComprasService(graph, hostname, sitePath, lists.Compras)
 
     return {graph, Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
-        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos, CentroOperativo};
+        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos, CentroOperativo, Compras};
   }, [graph, cfg]);
 
   return (
