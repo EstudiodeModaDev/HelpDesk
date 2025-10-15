@@ -1,190 +1,195 @@
-/* ===========================
-   Tickets.css (Tabla Tickets)
-   =========================== */
-
-:root{
-  /* Paleta (ajústala a tu branding) */
-  --bg:#fff;
-  --fg:#0b2b6a;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --surface:#f9fafb;
-  --surface-2:#f3f4f6;
-  --accent:#2563eb;
-
-  --radius:12px;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
-  --shadow-md:0 8px 20px rgba(0,0,0,.08);
-
-  /* Tipografías y espacios responsivos */
-  --fs-12:clamp(11px,.75vw,12px);
-  --fs-14:clamp(12px,.9vw,14px);
-  --fs-16:clamp(13px,1.05vw,16px);
-  --pad-y:clamp(10px,1.2vw,12px);
-  --pad-x:clamp(10px,1.6vw,14px);
-}
+/* =====================  TABLA COMPRAS (LISTADO)  ===================== */
+/* Siempre claro dentro de .force-light si tu wrapper lo usa */
 
 .tabla-tickets{
-  color:var(--fg);
-  background:var(--bg);
-  position: relative;
-  z-index: 0;
+  display: grid;
+  gap: 10px;
+  color-scheme: only light;               /* evita controles oscuros del UA */
 }
 
-.tabla-tickets > h2{
-  margin:0 0 12px;
-  font-size:var(--fs-16);
-  font-weight:700;
+/* ---------- Barra de filtros ---------- */
+.tabla-tickets .filtros{
+  background: var(--bg, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: var(--shadow, 0 8px 24px rgba(2,6,23,.08));
+
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto auto auto;
+  gap: 8px;
 }
 
-/* ========= Filtros ========= */
-.filtros{
-  display:flex;
-  flex-wrap: wrap;
-  grid-template-columns: 1fr auto auto auto auto;
-  gap:10px;
-  align-items:center;
-  background:var(--surface);
-  padding:12px;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow-sm);
-  margin-bottom:14px;
+.tabla-tickets .filtros input[type="text"],
+.tabla-tickets .filtros input[type="date"],
+.tabla-tickets .filtros button,
+.tabla-tickets .filtros select{
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--bg, #fff);
+  color: var(--text, #0f172a);
+  padding: 0 12px;
+  outline: none;
 }
 
-.filtros input[type="text"],
-.filtros input[type="date"]{
-  appearance:none; outline:none;
-  border:1px solid var(--border);
-  background:#fff;
-  padding:8px 10px;
-  border-radius:10px;
-  min-width:clamp(140px,24vw,280px);
-  font-size:var(--fs-14);
-  transition:border-color .2s, box-shadow .2s, transform .06s;
-}
-.filtros input[type="text"]:focus,
-.filtros input[type="date"]:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+.tabla-tickets .filtros input[type="text"]::placeholder{
+  color: var(--muted, #6b7280);
 }
 
-.filtros input[type="text"]{
-  flex: 1 1 260px;          /* crece/encoge y ocupa buen espacio */
-  min-width: 180px;
-}
-.filtros input[type="date"]{
-  flex: 0 1 180px;          /* compactos para que quepan en la fila */
-  min-width: 140px;
+.tabla-tickets .filtros input[type="text"]:focus,
+.tabla-tickets .filtros input[type="date"]:focus,
+.tabla-tickets .filtros select:focus{
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring, #93c5fd) 35%, transparent);
 }
 
-
-.filtros span{ color:var(--muted); user-select:none; padding:0 6px; }
-.filtros button{
-  border:1px solid var(--border);
-  background:#fff; 
-  color:var(--fg);
-  border-radius:10px; 
-  padding:8px 12px;
-  font-size:var(--fs-14); 
-  cursor:pointer;
-  transition:transform .06s, box-shadow .2s, border-color .2s;
-  flex: 0 0 auto;
-  margin-left: auto;
+.tabla-tickets .filtros button{
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--card, #f8fafc);
+  color: var(--text, #0f172a);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, transform .06s ease;
 }
-.filtros button:hover{
-  border-color:var(--accent);
-  box-shadow:0 6px 14px rgba(37,99,235,.10);
-  transform:translateY(-1px);
+.tabla-tickets .filtros button:hover{
+  background: color-mix(in oklab, var(--card, #f8fafc) 60%, transparent);
+}
+.tabla-tickets .filtros button:active{
+  transform: translateY(1px);
 }
 
-/* === Contenedor de tabla con scroll horizontal === */
+.tabla-tickets .filtros > span{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted, #6b7280);
+  padding: 0 4px;
+}
+
+/* ---------- Contenedor de tabla ---------- */
 .table-wrap{
-  width:100%;
-  overflow-x:auto;             
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow-md);
-  background:#fff;
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  background: var(--bg, #fff);
+  box-shadow: var(--shadow, 0 8px 24px rgba(2,6,23,.08));
 }
 
-/* Mantén table con su layout nativo */
 .table-wrap table{
-  width:100%;
-  min-width: 920px;                /* evita aplastarse en móviles */
-  border-collapse:separate;
-  border-spacing:0;
-  table-layout:auto;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: var(--text, #0f172a);
 }
 
-/* Thead sticky dentro del MISMO contenedor scroll */
+/* Header pegajoso */
 .table-wrap thead th{
-  position:sticky; top:0;
-  background:var(--surface-2);
-  z-index:1;
-  text-align:left;
-  font-weight:700;
-  font-size:var(--fs-12);
-  color:var(--muted);
-  border-bottom:1px solid var(--border);
-  padding:var(--pad-y) var(--pad-x);
-  white-space:nowrap;
+  position: sticky;
+  top: 0;
+  background: color-mix(in oklab, var(--card, #f8fafc) 92%, white);
+  color: var(--text, #0f172a);
+  text-align: left;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  z-index: 1;
 }
 
-/* Celdas */
 .table-wrap tbody td{
-  padding:var(--pad-y) var(--pad-x);
-  border-bottom:1px solid var(--border);
-  font-size:var(--fs-14);
-  color:#111827;
-  vertical-align:middle;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border, #e5e7eb);
+  white-space: nowrap;
 }
 
-/* Zebra + hover + click */
-.table-wrap tbody tr:nth-child(even){ background:var(--surface); }
-.table-wrap tbody tr{ cursor:pointer; transition:background-color .15s; }
-.table-wrap tbody tr:hover{ background:#eef2ff; }
-
-/* Columnas compactas (ID y Estado) */
-.table-wrap thead th:first-child,
-.table-wrap tbody td:first-child{ width:84px; white-space:nowrap; }
-.table-wrap thead th:last-child,
-.table-wrap tbody td:last-child{ width:72px; text-align:left; }
-
-/* Circulito de estado (color se pasa inline) */
-.estado-circulo{
-  display:inline-block;
-  width:12px; height:12px; min-width:12px; min-height:12px;
-  border-radius:50%;
-  border:2px solid #fff;
-  box-shadow:0 0 0 2px rgba(0,0,0,.06);
+/* Zebra + hover */
+.table-wrap tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--bg, #fff) 95%, #f2f6ff 5%);
+}
+.table-wrap tbody tr:hover{
+  background: color-mix(in oklab, var(--primary, #2563eb) 12%, transparent);
+  cursor: pointer;
 }
 
-/* ========= Responsive ========= */
-@media (max-width:1024px){
-  .filtros{ gap:8px; padding:10px; }
-  .table-wrap table{ min-width: 780px; }
+/* Navegación por teclado en filas clicables */
+.table-wrap tbody tr{
+  outline: none;
 }
-
-@media (max-width:640px){
-  .filtros{
-    grid-template-columns:1fr 1fr;
-  }
-  .filtros input[type="text"]{ grid-column:1 / -1; }
-  .filtros span{ display:none; }
-  .filtros button{ justify-self:end; }
-
-  .table-wrap table{ min-width:640px; }
-
-  /* (Opcional) Oculta columnas menos críticas en móvil:
-  .table-wrap thead th:nth-child(2),
-  .table-wrap tbody td:nth-child(2){ display:none; }  
-  */
-}
-
-/* Accesibilidad (focus visible en filas) */
-.table-wrap tbody tr:focus-within,
 .table-wrap tbody tr:focus{
-  outline:2px solid rgba(37,99,235,.35);
-  outline-offset:-2px;
+  box-shadow: inset 0 0 0 2px var(--primary, #2563eb);
+}
+
+/* Padding lateral agradable */
+th:first-child, td:first-child{ padding-left: 16px; }
+th:last-child,  td:last-child{  padding-right: 16px; }
+
+/* ---------- Paginación ---------- */
+/* Si puedes, añade className="pager" al contenedor de paginación en JSX.
+   Aun así, cubrimos el caso actual con el selector adyacente. */
+.pager,
+.table-wrap + div{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.pager button,
+.table-wrap + div > button{
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--card, #f8fafc);
+  color: var(--text, #0f172a);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, transform .06s ease;
+}
+.pager button:hover,
+.table-wrap + div > button:hover{
+  background: color-mix(in oklab, var(--card, #f8fafc) 60%, transparent);
+}
+.pager button:active,
+.table-wrap + div > button:active{
+  transform: translateY(1px);
+}
+
+.pager button[disabled],
+.table-wrap + div > button[disabled]{
+  background: var(--card, #f8fafc) !important;
+  border-color: var(--border, #e5e7eb) !important;
+  color: var(--muted, #6b7280) !important;
+  cursor: not-allowed;
+}
+
+.pager select,
+.table-wrap + div > select{
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--bg, #fff);
+  color: var(--text, #0f172a);
+  padding: 0 8px;
+}
+
+/* Texto “Página X” */
+.pager span,
+.table-wrap + div > span{
+  color: var(--text, #0f172a);
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 920px){
+  .tabla-tickets .filtros{
+    grid-template-columns: 1fr;
+  }
+  .tabla-tickets .filtros > span{ display: none; }
+
+  .pager,
+  .table-wrap + div{
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
 }
