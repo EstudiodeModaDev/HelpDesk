@@ -8,6 +8,7 @@ import { useCentroCostos, useCO, useCompras } from "../../Funcionalidades/Compra
 import "./Compras.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { COOption } from "../../Models/CO";
+import type { CCOption } from "../../Models/CentroCostos";
 
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
@@ -133,11 +134,12 @@ export default function CompraFormulario({submitting = false,}: Props) {
         <div className="field">
           <label className="label">CO</label>
           <Select<COOption, false>
+            classNamePrefix="rs"
+            className="rs-override"
             options={COOptions}
             placeholder={loadingCO ? "Cargando CO..." : "Buscar CO..."}
             value={state.co}
             onChange={(opt) => setField("co", opt ?? null)}
-            classNamePrefix="rs"
             isDisabled={submitting || loadingCO}
             isLoading={loadingCO}
             filterOption={userFilter as any}
@@ -163,14 +165,18 @@ export default function CompraFormulario({submitting = false,}: Props) {
         {/* C. Costo (react-select) */}
         <div className="field">
           <label className="label">C. Costo</label>
-          <Select classNamePrefix="rs" 
-            className="rs-override" 
+          <Select<CCOption, false>
+            classNamePrefix="rs"
+            className="rs-override"
             options={ccOptions}
-            placeholder={loadingCC ? "Cargando C. Costo…" : ccError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
+            placeholder={loadingCC ? "Cargando Centros de costos..." : "Buscar Centro de costos..."}
+            value={state.co}
+            onChange={(opt) => setField("ccosto", opt ?? null)}
             isDisabled={submitting || loadingCC}
-            isLoading={loadingCC}                                 
-            onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} 
-            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
+            isLoading={loadingCC}
+            filterOption={userFilter as any}
+            components={{ Option: Option as any }}
+            noOptionsMessage={() => (loadingCC ? "Error cargando Centros de costos" : "Sin coincidencias")}
             isClearable
           />
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}

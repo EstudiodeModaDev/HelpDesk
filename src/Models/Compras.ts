@@ -1,3 +1,4 @@
+import type { CCOption } from "./CentroCostos";
 import type { COOption } from "./CO";
 
 export type TipoCompra = "Producto" | "Servicio" | "Alquiler";
@@ -12,7 +13,7 @@ export type comprasState = {
   dispositivo: string;
   co: COOption | null;                   
   un: string;                 
-  ccosto: string;                
+  ccosto: CCOption | null;                
   cargarA: CargarA;
   noCO: string;         
   marcasPct: Record<string, number>;
