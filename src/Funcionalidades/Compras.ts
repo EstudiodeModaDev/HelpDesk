@@ -11,7 +11,7 @@ import type { COService } from "../Services/COCostos.service";
 
 export function useCompras(ComprasSvc: ComprasService) {
 
-  const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
+  const MARCAS = ["MFG", "DIESEL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
   type Marca = typeof MARCAS[number];
   const zeroMarcas = (): Record<Marca, number> => MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
@@ -64,11 +64,26 @@ export function useCompras(ComprasSvc: ComprasService) {
   
   const handleSubmit = React.useCallback((e: React.FormEvent) => {
     e.preventDefault();
-        if (!validate()) return;
-    console.log(state)
-  }, [state ]); 
+    if (!validate()) return;
+    const compra = ComprasSvc.create({
+      CargarA: state.cargarA, 
+      CCosto: state.ccosto?.value ?? "", 
+      CO: state.co?.value ?? "", 
+      Dispositivo: state.productoServicio, 
+      FechaSolicitud: state.fechaSolicitud,
+      PorcentajeBroken: String(state.marcasPct["BROKEN CHAINS"]) ?? "0",
+      PorcentajeDiesel: String(state.marcasPct["DIESEL"]) ?? "0",
+      PorcentajeKipling: String(state.marcasPct["KIPLING"]) ?? "0",
+      PorcentajeMFG: String(state.marcasPct["MFG"] ?? "0"),
+      PorcentajePilatos: String(state.marcasPct["PILATOS"] ?? "0"),
+      PorcentajeSuperdry: String(state.marcasPct["SUPERDRY"] ?? "0"),
+      SolicitadoPor: state.solicitadoPor,
+      Title: state.tipoCompra,
+      UN: state.un})
+    alert("Se ha creado la solicitud de compra con éxito")
+    console.log(compra)
+  }, [state, ComprasSvc]); 
   
-
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
 
@@ -103,7 +118,6 @@ export function useCompras(ComprasSvc: ComprasService) {
     loadFirstPage();
   }, [loadFirstPage]);
 
-  // siguiente página: seguir el nextLink tal cual
   const hasNext = !!nextLink;
 
   const nextPage = React.useCallback(async () => {
@@ -121,7 +135,6 @@ export function useCompras(ComprasSvc: ComprasService) {
     }
   }, [nextLink, ComprasSvc]);
 
-  // recargas por cambios externos
   const applyRange = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
