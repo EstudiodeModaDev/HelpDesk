@@ -52,7 +52,7 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
     productoServicio: "",
-    solicitadoPor: "",         // lo guardamos como string (label seleccionado)
+    solicitadoPor: "",     
     fechaSolicitud: "",
     dispositivo: "",
     co: "",
@@ -154,18 +154,6 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
             placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}
           />
           {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
-        </div>
-
-        {/* Solicitado por (texto simple) */}
-        <div className="field">
-          <label className="label">Solicitado por</label>
-          <input
-            className="control"
-            value={state.solicitadoPor}
-            onChange={(e) => setField("solicitadoPor", e.target.value)}
-            placeholder="Nombre completo"
-          />
-          {errors.solicitadoPor && <small className="error">{errors.solicitadoPor}</small>}
         </div>
 
         {/* Solicitante (react-select) */}
