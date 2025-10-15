@@ -17,6 +17,7 @@ export type comprasState = {
   cargarA: CargarA;
   noCO: string;         
   marcasPct: Record<string, number>;
+  motivo: string
 };
 export type Compra = {
   Title: string;

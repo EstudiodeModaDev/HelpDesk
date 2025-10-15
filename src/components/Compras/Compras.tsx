@@ -15,6 +15,7 @@ const UN_OPTS: Opcion[] = [
   { value: "PAR", label: "PAR" },
   { value: "CJ",  label: "CJ"  },
 ];
+const Motivos = ["Cambio por daño", "Renovación de equipo", "Renovación de licencia"] as const;
 
 /** --- Props --- */
 type Props = {submitting?: boolean;};
@@ -165,6 +166,18 @@ export default function CompraFormulario({submitting = false,}: Props) {
           />
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}
           {ccError && <small className="error">{ccError}</small>}
+        </div>
+
+        {/* UN */}
+        <div className="field">
+          <label className="label">Motivo</label>
+          <select className="control" value={state.un} onChange={(e) => setField("motivo", e.target.value)}>
+            <option value="">Seleccione motivo</option>
+            {Motivos.map((o) => (
+              <option key={o} value={o}>{o}</option>
+            ))}
+          </select>
+          {errors.un && <small className="error">{errors.un}</small>}
         </div>
 
         {/* Cargar a */}

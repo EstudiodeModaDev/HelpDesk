@@ -36,6 +36,7 @@ export function useCompras(ComprasSvc: ComprasService) {
     cargarA: "CO",
     noCO: "",
     marcasPct: { ...zeroMarcas() },
+    motivo: ""
   });
 
   //HELPERS
