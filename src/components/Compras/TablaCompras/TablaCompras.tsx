@@ -3,7 +3,6 @@ import * as React from "react";
 import "./TablaCompras.css"
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import { useCompras } from "../../../Funcionalidades/Compras";
-import type { Compra } from "../../../Models/Compras";
 import { toISODateTimeFlex } from "../../../utils/Date";
 
 export default function TablaCompras() {
@@ -11,7 +10,6 @@ export default function TablaCompras() {
     const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext} = useCompras(Compras)
 
   const [search, setSearch] = React.useState("");
-  const [CompraSeleccionada, setCompraSeleccionada] = React.useState<Compra | null>(null);
 
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -61,11 +59,12 @@ export default function TablaCompras() {
                 <th>Centro de costos</th>
                 <th>Cargar A</th>
                 <th>Acciones</th>
+                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((compra) => (
-                <tr key={compra.Id} onKeyDown={(e) => (e.key === "Enter" || e.key === " ")}>
+                <tr key={compra.Id}>
                   <td>{compra.Id}</td>
                   <td>{compra.SolicitadoPor}</td>
                   <td>{toISODateTimeFlex(compra.FechaSolicitud)}</td>
@@ -74,8 +73,11 @@ export default function TablaCompras() {
                   <td>{compra.UN}</td>
                   <td>{compra.CCosto}</td>
                   <td>{compra.CargarA}</td>
+                  <td>{compra.Estado}</td>
                   <td>
-                    <button onClick={() => {setCompraSeleccionada(compra); handleNext(CompraSeleccionada?.Id ?? "")}}>Siguiente paso</button>
+                    <button type="button" onClick={(e) => {e.stopPropagation(); handleNext(compra.Id ?? "");}} aria-label={`Siguiente paso para compra ${compra.Id}`} className="btn btn-sm btn-primary">
+                      Siguiente paso
+                    </button>
                   </td>
                 </tr>
               ))}
