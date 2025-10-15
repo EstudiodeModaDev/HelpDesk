@@ -170,7 +170,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
             className="rs-override"
             options={ccOptions}
             placeholder={loadingCC ? "Cargando Centros de costos..." : "Buscar Centro de costos..."}
-            value={state.co}
+            value={state.ccosto}
             onChange={(opt) => setField("ccosto", opt ?? null)}
             isDisabled={submitting || loadingCC}
             isLoading={loadingCC}
