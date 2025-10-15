@@ -139,7 +139,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
             options={COOptions}
             placeholder={loadingCO ? "Cargando CO..." : "Buscar CO..."}
             value={state.co}
-            onChange={(opt) => setField("co", opt ?? null)}
+            onChange={(opt) => {setField("co", opt ?? null); setField("noCO", opt?.value!)}}
             isDisabled={submitting || loadingCO}
             isLoading={loadingCO}
             filterOption={userFilter as any}
