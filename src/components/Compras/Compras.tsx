@@ -56,6 +56,11 @@ export default function CompraFormulario({submitting = false,}: Props) {
     return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
   }, [combinedOptions, state.solicitadoPor]);
 
+  const selectedCO = React.useMemo(
+    () => COOptions.find(o => String(o.value) === String(state.co)) ?? null,
+    [COOptions, state.co]
+  );
+
   /** Si vuelve a CO, resetea % */
   React.useEffect(() => {
     if (state.cargarA === "CO")
@@ -138,8 +143,9 @@ export default function CompraFormulario({submitting = false,}: Props) {
             options={COOptions}
             placeholder={loadingCO ? "Cargando C. Costo…" : coError ? "Error cargando CO" : "Buscar co…"}
             isDisabled={submitting || loadingCO}
-            isLoading={loadingCO}                                      
-            onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} 
+            isLoading={loadingCO}
+            value={selectedCO}
+            onChange={(opt) => {setField("co", opt ? String(opt.value).trim() : "");}}                                     
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
           />
