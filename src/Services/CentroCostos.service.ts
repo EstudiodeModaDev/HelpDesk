@@ -27,7 +27,7 @@ export class CentroCostosService {
   private toModel(item: any): CentroCostos {
     const f = item?.fields ?? {};
     return {
-        Codigo: String(item?.Codigo ?? ''),
+        Codigo: String(f.Codigo ?? ''),
         Title: f.Title, 
     };
   }

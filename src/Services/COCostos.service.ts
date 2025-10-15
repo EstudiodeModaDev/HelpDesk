@@ -27,7 +27,7 @@ export class COService {
   private toModel(item: any): CentroOperativo {
     const f = item?.fields ?? {};
     return {
-        Codigo: String(item?.Codigo ?? ''),
+        Codigo: String(f.Codigo ?? ''),
         Title: f.Title, 
     };
   }
