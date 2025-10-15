@@ -276,25 +276,15 @@ export default function CompraFormulario({
         {/* C. Costo (react-select) */}
         <div className="field">
           <label className="label">C. Costo</label>
-          <Select<CcOption, false, GroupBase<CcOption>>
-            classNamePrefix="rs"
-            className="rs-override"
-            options={ccOptions as CcOption[]}
-            placeholder={
-              loadingCC ? "Cargando C. Costo…" :
-              ccError ? "Error cargando C. Costo" :
-              "Buscar centro de costo…"
-            }
+          <Select classNamePrefix="rs" 
+            className="rs-override" 
+            options={ccOptions}
+            placeholder={loadingCC ? "Cargando C. Costo…" : ccError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
             isDisabled={submitting || loadingCC}
             isLoading={loadingCC}
-            value={selectedCc}                                        // objeto opción
-            onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} // guarda value
-            getOptionValue={(o) => String(o.value)}
-            getOptionLabel={(o) => o.label}
-            filterOption={(o, input) =>
-              userFilter({ label: o.label, value: String(o.value ?? "") }, input)
-            }
-            components={{ Option }}
+            value={selectedCc}                                        
+            onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} 
+            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
           />
           {errors.ccosto && <small className="error">{errors.ccosto}</small>}
