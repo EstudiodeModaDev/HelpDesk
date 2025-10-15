@@ -9,7 +9,6 @@ import "./Compras.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 
 // ---- Tipos opción para react-select
-type CcOption = { value: string; label: string };
 type CoOption = { value: string; label: string };
 
 const UN_OPTS: Opcion[] = [
@@ -107,12 +106,6 @@ export default function CompraFormulario({
       o => String(o.value ?? "").trim() === current
     ) ?? null;
   }, [COOptions, state.co]);
-
-  /** Opción seleccionada (C. Costo) */
-  const selectedCc = React.useMemo<CcOption | null>(() => {
-    if (!state.ccosto) return null;
-    return ccOptions.find(o => o.label === state.ccosto) ?? null;
-  }, [CentroCostos, state.ccosto]);
 
   /** Helpers */
   const totalPct = React.useMemo(
@@ -240,8 +233,8 @@ export default function CompraFormulario({
             }
             isDisabled={submitting || loadingCO}
             isLoading={loadingCO}
-            value={selectedCo}                                        // objeto opción
-            onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} // guarda value
+            value={selectedCo}                                     
+            onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} 
             getOptionValue={(o) => String(o.value)}
             getOptionLabel={(o) => o.label}
             filterOption={(o, input) =>
@@ -257,8 +250,7 @@ export default function CompraFormulario({
         {/* UN */}
         <div className="field">
           <label className="label">UN</label>
-          <select
-            className="control"
+          <select className="control"
             value={state.un}
             onChange={(e) => setField("un", e.target.value)}
           >
@@ -279,7 +271,7 @@ export default function CompraFormulario({
             placeholder={loadingCC ? "Cargando C. Costo…" : ccError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
             isDisabled={submitting || loadingCC}
             isLoading={loadingCC}
-            value={selectedCc}                                        
+           // value={selectedCc}                                        
             onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} 
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
