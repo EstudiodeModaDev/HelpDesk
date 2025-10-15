@@ -107,10 +107,6 @@
 .table-wrap tbody tr:nth-child(odd){
   background: color-mix(in oklab, var(--bg, #fff) 95%, #f2f6ff 5%);
 }
-.table-wrap tbody tr:hover{
-  background: color-mix(in oklab, var(--primary, #2563eb) 12%, transparent);
-  cursor: pointer;
-}
 
 /* Navegación por teclado en filas clicables */
 .table-wrap tbody tr{

@@ -65,7 +65,7 @@ export default function TablaCompras() {
             </thead>
             <tbody>
               {filtered.map((compra) => (
-                <tr key={compra.Id} onKeyDown={(e) => (e.key === "Enter" || e.key === " ")} onClick={() => setCompraSeleccionada(compra)}>
+                <tr key={compra.Id} onKeyDown={(e) => (e.key === "Enter" || e.key === " ")}>
                   <td>{compra.Id}</td>
                   <td>{compra.SolicitadoPor}</td>
                   <td>{toISODateTimeFlex(compra.FechaSolicitud)}</td>
@@ -75,7 +75,7 @@ export default function TablaCompras() {
                   <td>{compra.CCosto}</td>
                   <td>{compra.CargarA}</td>
                   <td>
-                    <button onClick={() => handleNext(CompraSeleccionada?.Id ?? "")}>Siguiente paso</button>
+                    <button onClick={() => {setCompraSeleccionada(compra); handleNext(CompraSeleccionada?.Id ?? "")}}>Siguiente paso</button>
                   </td>
                 </tr>
               ))}
