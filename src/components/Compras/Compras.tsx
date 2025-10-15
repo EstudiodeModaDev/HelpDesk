@@ -20,6 +20,7 @@ const CO_OPTS: CO[] = [
   { value: "C003", code: "C003 - Administrativo" },
 ];
 type CcOption = { value: string; label: string };
+
 const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
 type Marca = typeof MARCAS[number];
 const zeroMarcas = (): Record<Marca, number> =>
@@ -80,9 +81,10 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
   }, [combinedOptions, state.solicitadoPor]);
 
   const selectedCc = React.useMemo<CcOption | null>(() => {
-    if (!state.ccosto) return null;
-    return (ccOptions).find(
-      o => String(o.value) === String(state.ccosto)
+    const current = String(state.ccosto ?? "").trim();
+    if (!current) return null;
+    return (ccOptions as CcOption[]).find(
+      o => String(o.value ?? "").trim() === current
     ) ?? null;
   }, [ccOptions, state.ccosto]);
 
@@ -238,22 +240,12 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
 
         {/* C. Costo (react-select) */}
         <div className="field">
-          <label className="label">C. Costo</label>
+          <label className="label">C. Costos</label>
           <Select<CcOption, false, GroupBase<CcOption>>
-            classNamePrefix="rs"
-            className="rs-override"
-            options={ccOptions}
-            placeholder={loadingCC ? "Cargando C. Costo…" : ccError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
-            isDisabled={submitting || loadingCC}
-            isLoading={loadingCC}
-            value={selectedCc}                                  
-            onChange={(opt) => setField("ccosto", opt?.value ?? "")} 
-            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
-            components={{ Option }}
-            isClearable
-          />
-          {errors.ccosto && <small className="error">{errors.ccosto}</small>}
-          {ccError && <small className="error">{ccError}</small>}
+            classNamePrefix="rs" className="rs-override" options={ccOptions}
+            placeholder={ (loadingCC) ? "Cargando opciones…" : (ccError) ? "Error cargando opciones" : "Buscar solicitante…"}
+            isDisabled={submitting || loadingCC}  isLoading={loadingCC} value={selectedCc} onChange={(opt) => setField("ccosto", opt?.label ?? "")}
+            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)} components={{ Option }} isClearable/>
         </div>
 
         {/* Cargar a */}

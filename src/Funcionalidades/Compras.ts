@@ -7,6 +7,7 @@ import type { ComprasService } from "../Services/Compras.service";
 import type { Compra } from "../Models/Compras";
 import type { CentroCostos } from "../Models/CentroCostos";
 import type { CentroCostosService } from "../Services/CentroCostos.service";
+import type { COService } from "../Services/COCostos.service";
 
 export function useCompras(ComprasSvc: ComprasService) {
   const [compras, setCompras] = React.useState<Compra[]>([]);
@@ -123,6 +124,41 @@ export function useCentroCostos(CCSvc: CentroCostosService) {
   return {
     CC, ccOptions, loading, error,
     reload: loadCC,
+  };
+}
+
+export function useCO(COSvc: COService) {
+  const [CentrosOperativos, setCO] = React.useState<CentroCostos[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const LoadCentroOperativos = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const items = await COSvc.getAll();
+
+      setCO(Array.isArray(items) ? items : []);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando centros de costo");
+      setCO([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [COSvc]);
+
+  React.useEffect(() => {
+    LoadCentroOperativos();
+  }, [LoadCentroOperativos]);
+
+  const COOptions = React.useMemo(
+    () => CentrosOperativos.map(c => ({ value: c.Codigo, label: c.Title })),
+    [CentrosOperativos]
+  );
+
+  return {
+    CentrosOperativos, COOptions, loading, error,
+    reload: LoadCentroOperativos,
   };
 }
 
