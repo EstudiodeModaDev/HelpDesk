@@ -7,19 +7,16 @@ import NuevoTicketForm from './components/NuevoTicket/NuevoTicketForm';
 import TablaTickets from './components/Tickets/Tickets';
 import TareasPage from './components/Tareas/Tareas';
 import Formatos from './components/Formatos/Formatos';
-
 import type { User } from './Models/User';
 import { GraphServicesProvider, useGraphServices } from './graph/GrapServicesContext';
-
 import { AuthProvider, useAuth } from './auth/authContext';
 import { useUserRoleFromSP } from './Funcionalidades/Usuarios';
 import CajerosPOSForm from './components/CajerosPOS/CajerosPOS';
-
 import type { TicketsService } from './Services/Tickets.service';
 import type { UsuariosSPService } from './Services/Usuarios.Service';
 import type { LogService } from './Services/Log.service';
 import NuevaFactura from './components/Facturas/Facturas';
-import CompraFormulario from './components/Compras/Compras';
+import ComprasPage from './components/Compras/ComprasPage';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -52,7 +49,7 @@ const NAVS_ADMIN: MenuItem[] = [
       {
         id: 'cesar', label: 'Cesar', icon: '', children: [
           { id: 'facturas', label: 'Facturas', icon: '🧾', to: <NuevaFactura/>},
-          { id: 'compras', label: 'Compras', icon: '🧾', to: <CompraFormulario/>},
+          { id: 'compras', label: 'Compras', icon: '💰', to: <ComprasPage/>},
         ]
       },
     ]

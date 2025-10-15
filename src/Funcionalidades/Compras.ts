@@ -101,7 +101,7 @@ export function useCompras(ComprasSvc: ComprasService) {
   const loadFirstPage = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const { items, nextLink } = await ComprasSvc.getAll(buildFilter()); // debe devolver {items,nextLink}
+      const { items, nextLink } = await ComprasSvc.getAll(buildFilter()); 
       setRows(items);
       setNextLink(nextLink ?? null);
       setPageIndex(1);

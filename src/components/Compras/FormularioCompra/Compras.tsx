@@ -1,14 +1,14 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
-import type { CargarA, Opcion, TipoCompra } from "../../Models/Compras";
-import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm";
-import { useFranquicias } from "../../Funcionalidades/Franquicias";
-import { useWorkers } from "../../Funcionalidades/Workers";
-import { useCentroCostos, useCO, useCompras } from "../../Funcionalidades/Compras";
+import type { CargarA, Opcion, TipoCompra } from "../../../Models/Compras";
+import type { UserOptionEx } from "../../NuevoTicket/NuevoTicketForm";
+import { useFranquicias } from "../../../Funcionalidades/Franquicias";
+import { useWorkers } from "../../../Funcionalidades/Workers";
+import { useCentroCostos, useCO, useCompras } from "../../../Funcionalidades/Compras";
 import "./Compras.css";
-import { useGraphServices } from "../../graph/GrapServicesContext";
-import type { COOption } from "../../Models/CO";
-import type { CCOption } from "../../Models/CentroCostos";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { COOption } from "../../../Models/CO";
+import type { CCOption } from "../../../Models/CentroCostos";
 
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
