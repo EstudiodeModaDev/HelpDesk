@@ -64,15 +64,11 @@ export default function CompraFormulario({submitting = false,}: Props) {
 
   return (
     <div className="compra-form white-silo compra-wrap" data-darkreader-ignore>
-      <form className="form-grid" onSubmit={handleSubmit}>
+      <form className="form-grid" onSubmit={(e) => { handleSubmit(e)}}>
         {/* Tipo */}
         <div className="field">
           <label className="label">Tipo</label>
-          <select
-            className="control"
-            value={state.tipoCompra}
-            onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}
-          >
+          <select className="control" value={state.tipoCompra} onChange={(e) => setField("tipoCompra", e.target.value as TipoCompra)}>
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
@@ -86,18 +82,12 @@ export default function CompraFormulario({submitting = false,}: Props) {
             classNamePrefix="rs"
             className="rs-override"
             options={combinedOptions}
-            placeholder={
-              (loadingWorkers || loadingFranq) ? "Cargando opciones…" :
-              (usersError || franqError) ? "Error cargando opciones" :
-              "Buscar solicitante…"
-            }
+            placeholder={(loadingWorkers || loadingFranq) ? "Cargando opciones…" : (usersError || franqError) ? "Error cargando opciones" : "Buscar solicitante…"}
             isDisabled={submitting || loadingWorkers || loadingFranq}
             isLoading={loadingWorkers || loadingFranq}
             value={selectedSolicitante}
             onChange={(opt) => setField("solicitadoPor", opt?.label ?? "")}
-            filterOption={(o, input) =>
-              userFilter({ label: o.label, value: String(o.value ?? "") }, input)
-            }
+            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             components={{ Option }}
             isClearable
           />
@@ -118,15 +108,9 @@ export default function CompraFormulario({submitting = false,}: Props) {
         {/* Producto/Servicio/Alquiler */}
         <div className="field">
           <label className="label">
-            {state.tipoCompra === "Producto" ? "Producto"
-              : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
+            {state.tipoCompra === "Producto" ? "Producto" : state.tipoCompra === "Servicio" ? "Servicio" : "Alquiler"}
           </label>
-          <input
-            className="control"
-            value={state.productoServicio}
-            onChange={(e) => setField("productoServicio", e.target.value)}
-            placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}
-          />
+          <input className="control" value={state.productoServicio} onChange={(e) => setField("productoServicio", e.target.value)} placeholder={`Nombre de ${state.tipoCompra.toLowerCase()}`}/>
           {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
         </div>
 
@@ -223,7 +207,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
         {/* No. CO */}
         <div className="field">
           <label className="label">No. CO</label>
-          <input className="control" value={state.noCO} onChange={(e) => setField("noCO", e.target.value)} placeholder="Ej. 12345"/>
+          <input className="control" value={state.co?.value} placeholder="Ej. 12345"/>
         </div>
 
         {/* Acciones */}
