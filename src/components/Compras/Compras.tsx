@@ -8,9 +8,6 @@ import { useCentroCostos, useCO } from "../../Funcionalidades/Compras";
 import "./Compras.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 
-// ---- Tipos opción para react-select
-type CoOption = { value: string; label: string };
-
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
   { value: "PAR", label: "PAR" },
@@ -97,15 +94,6 @@ export default function CompraFormulario({
     if (!state.solicitadoPor) return null;
     return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
   }, [combinedOptions, state.solicitadoPor]);
-
-  /** Opción seleccionada (CO - Centros Operativos) */
-  const selectedCo = React.useMemo<CoOption | null>(() => {
-    const current = String(state.co ?? "").trim();
-    if (!current) return null;
-    return (COOptions as CoOption[]).find(
-      o => String(o.value ?? "").trim() === current
-    ) ?? null;
-  }, [COOptions, state.co]);
 
   /** Helpers */
   const totalPct = React.useMemo(
@@ -221,30 +209,19 @@ export default function CompraFormulario({
 
         {/* CO (Centros Operativos) - react-select */}
         <div className="field">
-          <label className="label">CO (Centro Operativo)</label>
-          <Select<CoOption, false, GroupBase<CoOption>>
-            classNamePrefix="rs"
-            className="rs-override"
-            options={COOptions as CoOption[]}
-            placeholder={
-              loadingCO ? "Cargando CO…" :
-              coError ? "Error cargando CO" :
-              "Buscar centro operativo…"
-            }
+          <label className="label">C. Costo</label>
+          <Select classNamePrefix="rs" 
+            className="rs-override" 
+            options={COOptions}
+            placeholder={loadingCC ? "Cargando C. Costo…" : coError ? "Error cargando C. Costo" : "Buscar centro de costo…"}
             isDisabled={submitting || loadingCO}
-            isLoading={loadingCO}
-            value={selectedCo}                                     
-            onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} 
-            getOptionValue={(o) => String(o.value)}
-            getOptionLabel={(o) => o.label}
-            filterOption={(o, input) =>
-              userFilter({ label: o.label, value: String(o.value ?? "") }, input)
-            }
-            components={{ Option }}
+            isLoading={loadingCO}                                      
+            onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} 
+            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             isClearable
           />
-          {errors.co && <small className="error">{errors.co}</small>}
-          {coError && <small className="error">{coError}</small>}
+          {errors.ccosto && <small className="error">{errors.ccosto}</small>}
+          {ccError && <small className="error">{ccError}</small>}
         </div>
 
         {/* UN */}
@@ -298,7 +275,7 @@ export default function CompraFormulario({
           <div className="field">
             <label className="label">Valor a cargar (CO)</label>
             {/* Si quieres mostrar label del CO, podrías mostrar selectedCo?.label */}
-            <input className="control control--readonly" readOnly value={selectedCo?.label ?? ""} />
+            <input className="control control--readonly" readOnly value={state.co ?? ""} />
           </div>
         ) : (
           <div className="col-span-full">
