@@ -1,12 +1,16 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
-import type { CargarA, CO, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
+import type { CargarA, comprasState, Opcion, TipoCompra } from "../../Models/Compras";
 import type { UserOptionEx } from "../NuevoTicket/NuevoTicketForm";
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../Funcionalidades/Workers";
-import { useCentroCostos } from "../../Funcionalidades/Compras";
+import { useCentroCostos, useCO } from "../../Funcionalidades/Compras";
 import "./Compras.css";
 import { useGraphServices } from "../../graph/GrapServicesContext";
+
+// ---- Tipos opción para react-select
+type CcOption = { value: string; label: string };
+type CoOption = { value: string; label: string };
 
 const UN_OPTS: Opcion[] = [
   { value: "UND", label: "UND" },
@@ -14,20 +18,17 @@ const UN_OPTS: Opcion[] = [
   { value: "CJ",  label: "CJ"  },
 ];
 
-const CO_OPTS: CO[] = [
-  { value: "C001", code: "C001 - Comercial" },
-  { value: "C002", code: "C002 - Operativo" },
-  { value: "C003", code: "C003 - Administrativo" },
-];
-type CcOption = { value: string; label: string };
-
 const MARCAS = ["MFG", "DIESL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
 type Marca = typeof MARCAS[number];
 const zeroMarcas = (): Record<Marca, number> =>
   MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
 /** --- Props --- */
-type Props = {onSubmit?: (payload: comprasState) => void; initial?: Partial<comprasState>; submitting?: boolean;};
+type Props = {
+  onSubmit?: (payload: comprasState) => void;
+  initial?: Partial<comprasState>;
+  submitting?: boolean;
+};
 
 /** --- Filtro simple para react-select --- */
 function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
@@ -36,36 +37,53 @@ function userFilter(option: { label: string; value: string }, rawInput: string):
   return option.label.toLowerCase().includes(q) || (option.value ?? "").toLowerCase().includes(q);
 }
 
-/** --- Opción custom para react-select --- */
+/** --- Opción custom para react-select (puedes decorarla más si quieres) --- */
 const Option = (props: any) => (
   <components.Option {...props}>
     <span>{props.data.label}</span>
   </components.Option>
 );
 
-export default function CompraFormulario({onSubmit, initial, submitting = false,}: Props) {
+export default function CompraFormulario({
+  onSubmit,
+  initial,
+  submitting = false,
+}: Props) {
 
-  const { Franquicias, CentroCostos } = useGraphServices();
-  const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
-  const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
+  const { Franquicias, CentroCostos, CentroOperativo } = useGraphServices();
 
+  // Datos externos
+  const { franqOptions, loading: loadingFranq, error: franqError } =
+    useFranquicias(Franquicias as any);
+
+  const { workersOptions, loadingWorkers, error: usersError } =
+    useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+
+  const { ccOptions, loading: loadingCC, error: ccError } =
+    useCentroCostos(CentroCostos as any);
+
+  const { COOptions, loading: loadingCO, error: coError } =
+    useCO(CentroOperativo as any);
+
+  // Estado del form
   const [state, setState] = React.useState<comprasState>({
     tipoCompra: "Producto",
     productoServicio: "",
     solicitadoPor: "",
     fechaSolicitud: new Date().toISOString().slice(0, 10),
     dispositivo: "",
-    co: "",
+    co: "",         // <- guardamos el value del CO (string)
     un: "",
-    ccosto: "",
+    ccosto: "",     // <- guardamos el value del C. Costo (string)
     cargarA: "CO",
     noCO: "",
     marcasPct: { ...zeroMarcas() },
     ...initial,
   });
+
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
+  /** Merge solicitantes (workers + franquicias) */
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
     for (const o of [...workersOptions, ...franqOptions]) {
@@ -75,11 +93,22 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, [workersOptions, franqOptions]);
 
+  /** Opción seleccionada (Solicitante) */
   const selectedSolicitante = React.useMemo<UserOptionEx | null>(() => {
     if (!state.solicitadoPor) return null;
     return combinedOptions.find(o => o.label === state.solicitadoPor) ?? null;
   }, [combinedOptions, state.solicitadoPor]);
 
+  /** Opción seleccionada (CO - Centros Operativos) */
+  const selectedCo = React.useMemo<CoOption | null>(() => {
+    const current = String(state.co ?? "").trim();
+    if (!current) return null;
+    return (COOptions as CoOption[]).find(
+      o => String(o.value ?? "").trim() === current
+    ) ?? null;
+  }, [COOptions, state.co]);
+
+  /** Opción seleccionada (C. Costo) */
   const selectedCc = React.useMemo<CcOption | null>(() => {
     const current = String(state.ccosto ?? "").trim();
     if (!current) return null;
@@ -131,12 +160,6 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
     if (state.cargarA === "CO")
       setState((s) => ({ ...s, marcasPct: { ...zeroMarcas() } }));
   }, [state.cargarA]);
-
-  /** Mostrar label del CO cuando Cargar a = CO */
-  const valorCargarACo = React.useMemo(
-    () => CO_OPTS.find((o) => o.value === state.co)?.value ?? "",
-    [state.co]
-  );
 
   return (
     <div className="compra-form white-silo compra-wrap" data-darkreader-ignore>
@@ -206,20 +229,32 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
           {errors.productoServicio && <small className="error">{errors.productoServicio}</small>}
         </div>
 
-        {/* CO */}
+        {/* CO (Centros Operativos) - react-select */}
         <div className="field">
-          <label className="label">CO</label>
-          <select
-            className="control"
-            value={state.co}
-            onChange={(e) => setField("co", e.target.value)}
-          >
-            <option value="">Seleccione CO</option>
-            {CO_OPTS.map((o) => (
-              <option key={o.value} value={o.value}>{o.value}</option>
-            ))}
-          </select>
+          <label className="label">CO (Centro Operativo)</label>
+          <Select<CoOption, false, GroupBase<CoOption>>
+            classNamePrefix="rs"
+            className="rs-override"
+            options={COOptions as CoOption[]}
+            placeholder={
+              loadingCO ? "Cargando CO…" :
+              coError ? "Error cargando CO" :
+              "Buscar centro operativo…"
+            }
+            isDisabled={submitting || loadingCO}
+            isLoading={loadingCO}
+            value={selectedCo}                                        // objeto opción
+            onChange={(opt) => setField("co", String(opt?.value ?? "").trim())} // guarda value
+            getOptionValue={(o) => String(o.value)}
+            getOptionLabel={(o) => o.label}
+            filterOption={(o, input) =>
+              userFilter({ label: o.label, value: String(o.value ?? "") }, input)
+            }
+            components={{ Option }}
+            isClearable
+          />
           {errors.co && <small className="error">{errors.co}</small>}
+          {coError && <small className="error">{coError}</small>}
         </div>
 
         {/* UN */}
@@ -240,12 +275,30 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
 
         {/* C. Costo (react-select) */}
         <div className="field">
-          <label className="label">C. Costos</label>
+          <label className="label">C. Costo</label>
           <Select<CcOption, false, GroupBase<CcOption>>
-            classNamePrefix="rs" className="rs-override" options={ccOptions}
-            placeholder={ (loadingCC) ? "Cargando opciones…" : (ccError) ? "Error cargando opciones" : "Buscar solicitante…"}
-            isDisabled={submitting || loadingCC}  isLoading={loadingCC} value={selectedCc} onChange={(opt) => setField("ccosto", opt?.label ?? "")}
-            filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)} components={{ Option }} isClearable/>
+            classNamePrefix="rs"
+            className="rs-override"
+            options={ccOptions as CcOption[]}
+            placeholder={
+              loadingCC ? "Cargando C. Costo…" :
+              ccError ? "Error cargando C. Costo" :
+              "Buscar centro de costo…"
+            }
+            isDisabled={submitting || loadingCC}
+            isLoading={loadingCC}
+            value={selectedCc}                                        // objeto opción
+            onChange={(opt) => setField("ccosto", String(opt?.value ?? "").trim())} // guarda value
+            getOptionValue={(o) => String(o.value)}
+            getOptionLabel={(o) => o.label}
+            filterOption={(o, input) =>
+              userFilter({ label: o.label, value: String(o.value ?? "") }, input)
+            }
+            components={{ Option }}
+            isClearable
+          />
+          {errors.ccosto && <small className="error">{errors.ccosto}</small>}
+          {ccError && <small className="error">{ccError}</small>}
         </div>
 
         {/* Cargar a */}
@@ -261,11 +314,12 @@ export default function CompraFormulario({onSubmit, initial, submitting = false,
           </select>
         </div>
 
-        {/* Valor a cargar / Distribución marcas */}
+        {/* Distribución marcas / Valor CO */}
         {state.cargarA === "CO" ? (
           <div className="field">
             <label className="label">Valor a cargar (CO)</label>
-            <input className="control control--readonly" readOnly value={valorCargarACo} />
+            {/* Si quieres mostrar label del CO, podrías mostrar selectedCo?.label */}
+            <input className="control control--readonly" readOnly value={selectedCo?.label ?? ""} />
           </div>
         ) : (
           <div className="col-span-full">
