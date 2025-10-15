@@ -12,6 +12,13 @@ import type { COService } from "../Services/COCostos.service";
 export function useCompras(ComprasSvc: ComprasService) {
 
   const MARCAS = ["MFG", "DIESEL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
+  const NEXT: Record<string, string> = {
+    "Pendiente por orden de compra": "Pendiente por entrega de proveedor",
+    "Pendiente por entrega de proveedor": "Pendiente por registro de inventario",
+    "Pendiente por registro de inventario": "Pendiente por entrega al usuario",
+    "Pendiente por entrega al usuario": "Pendiente por registro de factura",
+    "Pendiente por registro de factura": "Completado"
+  };
   type Marca = typeof MARCAS[number];
   const zeroMarcas = (): Record<Marca, number> => MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);
 
@@ -38,6 +45,7 @@ export function useCompras(ComprasSvc: ComprasService) {
     marcasPct: { ...zeroMarcas() },
     motivo: ""
   });
+  const [saving, setSaving] = React.useState(false)
 
   //HELPERS
   const totalPct = React.useMemo( () => state.cargarA === "Marca" ? 
@@ -115,6 +123,59 @@ export function useCompras(ComprasSvc: ComprasService) {
     }
   }, [ComprasSvc, buildFilter]);
 
+  const handleNext = React.useCallback(async (idItem: string) => {
+    if (saving) return;
+    setSaving(true);
+    setError(null);
+
+    try {
+     
+      const current = await ComprasSvc.get(idItem); 
+      const prev = (current.Estado) ?? "";
+      const next = NEXT[prev];
+
+      // 2) Si ya está en terminal, no hay nada que hacer
+      if (prev === next) {
+        setSaving(false);
+        return;
+      }
+
+      try {
+        const updated = await ComprasSvc.update(idItem, { Estado: next },        );
+        alert(`Se ha actualizado el registro con el siguiente estado: ${updated?.Estado ?? "—"}`)
+        reloadAll()
+
+      } catch (e: any) {
+        const code = e?.status ?? e?.code ?? e?.response?.status;
+        if (code === 409 || code === 412) {
+          const fresh = await ComprasSvc.get(idItem);
+          const freshPrev = (fresh.Estado ) ?? "";
+          const freshNext = NEXT[freshPrev];
+
+          if (freshPrev === freshNext) {
+            setField?.("estado", freshPrev);
+            setSaving(false);
+            return;
+          }
+
+          // Segundo intento con el ETag más reciente
+          await ComprasSvc.update(
+            idItem,
+            { Estado: freshNext },
+          );
+          setField?.("estado", freshNext);
+        } else {
+          throw e;
+        }
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "No se pudo avanzar el estado");
+    } finally {
+      setSaving(false);
+    }
+  }, [ComprasSvc, setField, saving]);
+
+
   React.useEffect(() => {
     loadFirstPage();
   }, [loadFirstPage]);
@@ -141,7 +202,7 @@ export function useCompras(ComprasSvc: ComprasService) {
 
   return {
     rows, loading, error, MARCAS, pageSize,  pageIndex, hasNext, errors, state, range, totalPct,
-    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit
+    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit, handleNext
   };
 }
 

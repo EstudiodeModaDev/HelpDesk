@@ -8,7 +8,7 @@ import { toISODateTimeFlex } from "../../../utils/Date";
 
 export default function TablaCompras() {
     const { Compras } = useGraphServices();
-    const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize} = useCompras(Compras)
+    const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext} = useCompras(Compras)
 
   const [search, setSearch] = React.useState("");
   const [CompraSeleccionada, setCompraSeleccionada] = React.useState<Compra | null>(null);
@@ -26,7 +26,6 @@ export default function TablaCompras() {
 
   return (
     <div className="tabla-tickets">
-      {!CompraSeleccionada && (
         <div className="filtros" style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}>
 
           <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
@@ -43,17 +42,12 @@ export default function TablaCompras() {
             Limpiar
           </button>
         </div>
-      )}
-
       {/* Estados */}
       {loading && <p>Cargando solicitudes de compra...</p>}
       {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
       {!loading && !error && filtered.length === 0 && <p>No hay solicitudes de compra para los filtros seleccionados.</p>}
 
       {/* Tabla o Detalle */}
-      {CompraSeleccionada ? (
-        <div></div>
-      ) : (
         <div className="table-wrap">
           <table>
             <thead>
@@ -66,11 +60,12 @@ export default function TablaCompras() {
                 <th>UN</th>
                 <th>Centro de costos</th>
                 <th>Cargar A</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((compra) => (
-                <tr key={compra.Id} onClick={() => setCompraSeleccionada(compra)} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setCompraSeleccionada(compra)}>
+                <tr key={compra.Id} onKeyDown={(e) => (e.key === "Enter" || e.key === " ")} onClick={() => setCompraSeleccionada(compra)}>
                   <td>{compra.Id}</td>
                   <td>{compra.SolicitadoPor}</td>
                   <td>{toISODateTimeFlex(compra.FechaSolicitud)}</td>
@@ -79,6 +74,9 @@ export default function TablaCompras() {
                   <td>{compra.UN}</td>
                   <td>{compra.CCosto}</td>
                   <td>{compra.CargarA}</td>
+                  <td>
+                    <button onClick={() => handleNext(CompraSeleccionada?.Id ?? "")}>Siguiente paso</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -110,7 +108,6 @@ export default function TablaCompras() {
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }
