@@ -30,7 +30,7 @@ export function useCompras(ComprasSvc: ComprasService) {
     solicitadoPor: "",
     fechaSolicitud: new Date().toISOString().slice(0, 10),
     dispositivo: "",
-    co: "",         // <- guardamos el value del CO (string)
+    co: null,         // <- guardamos el value del CO (string)
     un: "",
     ccosto: "",     // <- guardamos el value del C. Costo (string)
     cargarA: "CO",

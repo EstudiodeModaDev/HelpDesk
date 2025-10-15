@@ -1,3 +1,5 @@
+import type { COOption } from "./CO";
+
 export type TipoCompra = "Producto" | "Servicio" | "Alquiler";
 export type CargarA = "CO" | "Marca";
 export type Opcion = { value: string; label: string };
@@ -8,7 +10,7 @@ export type comprasState = {
   solicitadoPor: string;
   fechaSolicitud: string;       
   dispositivo: string;
-  co: string;                   
+  co: COOption | null;                   
   un: string;                 
   ccosto: string;                
   cargarA: CargarA;
