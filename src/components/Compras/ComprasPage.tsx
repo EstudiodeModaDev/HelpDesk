@@ -1,6 +1,7 @@
 import * as React from "react";
 import CompraFormulario from "./FormularioCompra/Compras";
 import TablaCompras from "./TablaCompras/TablaCompras";
+import "./Compras.css"
 
 type View = "form" | "tabla";
 

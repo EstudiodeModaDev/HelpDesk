@@ -1,0 +1,220 @@
+/* ==================== COMPRAS PAGE (Tabs + Tabla) ==================== */
+/* Reutiliza variables ya definidas y fuerza claro con .force-light      */
+
+/* --------- Accesibilidad --------- */
+.sr-only{
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* --------- Header / Tabs --------- */
+.compra-wrap .compras-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.compra-wrap .segmented{
+  display: flex;
+  gap: 8px;
+}
+
+.btn.btn-primary[aria-pressed="true"]{
+  /* refuerza estado activo cuando uses aria-pressed */
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* disabled consistente (evita fondo negro del UA) */
+.btn[disabled]{
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--muted) !important;
+  opacity: 1;         /* legible */
+  cursor: not-allowed;
+}
+
+/* --------- Barra de filtros (TablaCompras) --------- */
+.filtros{
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto auto auto;
+  gap: 8px;
+}
+
+.filtros input[type="text"],
+.filtros input[type="date"],
+.filtros button,
+.filtros select{
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0 12px;
+  outline: none;
+}
+
+.filtros input[type="text"]::placeholder{ color: var(--muted); }
+
+.filtros input[type="text"]:focus,
+.filtros input[type="date"]:focus,
+.filtros select:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 35%, transparent);
+}
+
+.filtros button{
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.filtros button:hover{
+  background: color-mix(in oklab, var(--card) 60%, transparent);
+}
+.filtros button:active{ transform: translateY(1px); }
+
+/* Flecha entre fechas (el “→”) */
+.filtros > span{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+/* --------- Tabla --------- */
+.table-wrap{
+  width: 100%;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+.table-wrap table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table-wrap thead th{
+  position: sticky;
+  top: 0;
+  background: color-mix(in oklab, var(--card) 92%, white);
+  color: var(--text);
+  text-align: left;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+
+.table-wrap tbody td{
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;          /* evita saltos feos en datos cortos */
+}
+
+.table-wrap tbody tr:nth-child(odd){
+  background: color-mix(in oklab, var(--bg) 95%, #f2f6ff 5%);
+}
+
+.table-wrap tbody tr:hover{
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  cursor: pointer;
+}
+
+/* accesible con teclado en filas clicables */
+.table-wrap tbody tr:focus{
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+/* --------- Paginación --------- */
+.pager{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+}
+
+.pager .btn,
+.pager button{
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pager .btn:hover,
+.pager button:hover{
+  background: color-mix(in oklab, var(--card) 60%, transparent);
+}
+
+.pager .btn[disabled],
+.pager button[disabled]{
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--muted) !important;
+  cursor: not-allowed;
+}
+
+.pager select{
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0 8px;
+}
+
+/* --------- Ajustes responsivos --------- */
+@media (max-width: 920px){
+  .filtros{
+    grid-template-columns: 1fr;
+  }
+  .filtros > span{ display: none; }
+  .pager{ flex-wrap: wrap; }
+}
+
+/* --------- Forzar claro dentro del scope (portal-safe) --------- */
+.force-light{
+  color-scheme: only light;
+}
+
+/* Por si el navegador insiste con botones oscuros */
+.force-light button{
+  background: var(--card);
+  color: var(--text);
+}
+
+/* --------- Microdetalles visuales --------- */
+th:first-child, td:first-child{ padding-left: 16px; }
+th:last-child,  td:last-child{  padding-right: 16px; }
+
+/* Texto secundario (puedes usar en celdas menos importantes) */
+.text-muted{ color: var(--muted); }
