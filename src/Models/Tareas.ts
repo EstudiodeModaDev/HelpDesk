@@ -19,4 +19,4 @@ export type Tarea = {
   Cantidaddediasalarma: string;
 };
 
-export type FilterMode = 'Pendientes' | 'Inciadas' | 'Finalizadas';
+export type FilterMode = 'Pendientes' | 'Iniciadas' | 'Finalizadas';
