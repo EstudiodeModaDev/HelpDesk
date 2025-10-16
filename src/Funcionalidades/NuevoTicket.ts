@@ -344,7 +344,7 @@ export function useNuevoTicketForm(services: Svc) {
 }
 
 export function useNuevoUsuarioTicketForm(services: Svc) {
-  const { Usuarios, Tickets} = services;
+  const { Usuarios, Tickets, Logs} = services;
   const { account, } = useAuth();
   const [state, setState] = useState<UserFormState>({
     archivo: null,
@@ -357,9 +357,8 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
   const [submitting, setSubmitting] = useState(false);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null);
-  //const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
-  // Carga de festivos inicial
   useEffect(() => {
     let cancel = false;
     (async () => {
@@ -448,11 +447,60 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
       if (resolutor) {
         const casosActuales = Number(resolutor.Numerodecasos ?? 0); // ← default 0 ANTES de Number()
         const nuevoTotal = casosActuales + 1;
-
         await Usuarios.update(String(resolutor.Id), {Numerodecasos: nuevoTotal,});
       }
 
-      alert("caso creado con ID" + ticketCreated?.ID)
+      alert("caso creado con ID " + ticketCreated?.ID)
+      Logs.create({
+        Actor: "Sitema", 
+        Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated!.ID ?? ""}`, 
+        CorreoActor: "", 
+        Tipo_de_accion: 
+        "Creacion", 
+        Title: ticketCreated?.ID ?? ""
+      })
+
+      if (ticketCreated?.CorreoSolicitante) {
+        const title = `Asignación de Caso - ${ticketCreated.ID}`;
+        const message = `
+          <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
+          Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
+          <strong>ID del Caso:</strong> ${ticketCreated.ID}<br>
+          <strong>Asunto del caso:</strong> ${payload.Title}<br>
+          <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
+          El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
+          Si hay algun cambio con su ticket sera notificado.
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
+
+          try {
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated?.CorreoSolicitante, title, message, mail: true, });
+          } catch (err) {
+            console.error("[Flow] Error enviando a solicitante:", err);
+          }
+        }
+
+        // Notificar resolutor    
+        if (ticketCreated?.CorreoResolutor) {
+          const title = `Nuevo caso asignado - ${ticketCreated.ID}`;
+          const message = `
+          <p>¡Hola!<br><br>
+          Tienes un nuevo caso asignado con estos detalles:<br><br>
+          <strong>ID del Caso:</strong> ${ticketCreated}<br>
+          <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
+          <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
+          <strong>Asunto:</strong> ${payload.Title}<br>
+          <strong>Fecha máxima para categorización:</strong> ${ticketCreated.FechaApertura}<br><br>
+          En caso de no categorizar el ticket este se vencera y sera irreversible.<br><br>
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
+
+          try {
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated.CorreoResolutor, title, message, mail: true,});
+          } catch (err) {
+            console.error("[Flow] Error enviando a resolutor:", err);
+          }
+        }
  
     } catch (err) {
       console.error("Error en handleSubmit:", err);
