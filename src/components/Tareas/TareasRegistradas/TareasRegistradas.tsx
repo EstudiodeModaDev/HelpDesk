@@ -1,8 +1,6 @@
 import type { Tarea } from "../../../Models/Tareas";
 import "./TareasRegistradas.css";
 
-
-
 export default function ListaTareas(props: { tareas: Tarea[] }) {
   const { tareas } = props;
 

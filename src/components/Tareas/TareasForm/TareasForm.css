@@ -1,4 +1,3 @@
-/* src/components/Tareas/FormTarea.css */
 :root{
   --card-bg:#fff; --card-bd:#e5e7eb; --text:#0f172a; --muted:#6b7280;
   --radius:14px; --shadow:0 10px 28px rgba(2,6,23,.08);
@@ -50,4 +49,59 @@
 .ft-btn-ghost{
   background:var(--ghost); color:var(--text); border:1px solid var(--card-bd);
   border-radius:10px; padding:8px 12px; cursor:pointer;
+}
+
+/* === Forzar tema CLARO para el formulario de turnos === */
+.ft-scope {
+  /* evita inversiones automáticas del navegador */
+  color-scheme: light;
+  isolation: isolate;
+
+  /* tokens fijos en claro (sobrescriben los :root) */
+  --card-bg:#ffffff;
+  --card-bd:#e5e7eb;
+  --text:#0f172a;
+  --muted:#6b7280;
+  --radius:14px;
+  --shadow:0 10px 28px rgba(2,6,23,.08);
+  --primary:#2563eb;
+  --primary-ink:#ffffff;
+  --ghost:#f3f4f6;
+}
+
+/* Mantén los mismos valores en dark-mode del SO */
+@media (prefers-color-scheme: dark){
+  .ft-scope{
+    --card-bg:#ffffff !important;
+    --card-bd:#e5e7eb !important;
+    --text:#0f172a !important;
+    --muted:#6b7280 !important;
+    --shadow:0 10px 28px rgba(2,6,23,.08) !important;
+    --primary:#2563eb !important;
+    --primary-ink:#ffffff !important;
+    --ghost:#f3f4f6 !important;
+  }
+}
+
+/* Ajustes para inputs: evita transparencia en dark global */
+.ft-scope .ft-field input,
+.ft-scope .ft-field select{
+  background:#fff !important;        /* en claro siempre */
+  color:var(--text) !important;
+  border:1px solid var(--card-bd) !important;
+}
+
+.ft-scope .ft-field input::placeholder{
+  color:var(--muted) !important;
+}
+
+/* Botones coherentes en claro */
+.ft-scope .ft-btn-primary{
+  background:var(--primary) !important;
+  color:var(--primary-ink) !important;
+}
+.ft-scope .ft-btn-ghost{
+  background:var(--ghost) !important;
+  color:var(--text) !important;
+  border:1px solid var(--card-bd) !important;
 }
