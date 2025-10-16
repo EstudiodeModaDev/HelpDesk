@@ -91,7 +91,9 @@ export function useCompras(ComprasSvc: ComprasService) {
       UN: state.un})
     alert("Se ha creado la solicitud de compra con éxito")
     console.log(compra)
-  }, [state, ComprasSvc]); 
+    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: ""})  }, 
+    [state, ComprasSvc]
+  ); 
   
   const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
