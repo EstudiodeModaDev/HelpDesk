@@ -14,6 +14,31 @@
 }
 
 /* ========= Card ========= */
+
+/* ========= Scope: forzar tema CLARO solo en PN ========= */
+.pn-scope{
+  /* bloquea modo oscuro automático dentro del scope */
+  color-scheme: light;
+  isolation: isolate;
+
+  /* tokens fijos (tema claro) */
+  --card-bg:#ffffff; --card-bd:#e5e7eb;
+  --ink:#0f172a; --muted:#6b7280;
+  --primary:#22b08f; --primary-ink:#ffffff; --ring:rgba(34,176,143,.35);
+  --shadow:0 12px 28px rgba(2,6,23,.08);
+}
+
+/* Opcional: si hay estilos “oscuros” más específicos,
+   re-afirma los tokens también dentro del media query */
+@media (prefers-color-scheme: dark){
+  .pn-scope{
+    --card-bg:#ffffff; --card-bd:#e5e7eb;
+    --ink:#0f172a; --muted:#6b7280;
+    --primary:#22b08f; --primary-ink:#ffffff; --ring:rgba(34,176,143,.35);
+    --shadow:0 12px 28px rgba(2,6,23,.08);
+  }
+}
+
 .pn-card{
   background:var(--card-bg);
   border:1px solid var(--card-bd);
