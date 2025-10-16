@@ -7,7 +7,7 @@ import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 import type {  GetAllOpts, } from "../Models/Commons";
 import type { FlowToUser } from "../Models/FlujosPA";
 import type { TZDate } from "@date-fns/tz";
-import type { TicketsService } from "../Services/Tickets.service";
+import { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
@@ -344,8 +344,8 @@ export function useNuevoTicketForm(services: Svc) {
 }
 
 export function useNuevoUsuarioTicketForm(services: Svc) {
-  const { Usuarios,} = services;
-  const { account,  } = useAuth();
+  const { Usuarios, Tickets} = services;
+  const { account, } = useAuth();
   const [state, setState] = useState<UserFormState>({
     archivo: null,
     Correosolicitante: account?.username ?? "",
@@ -425,14 +425,35 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
       const solucion = calcularFechaSolucion(apertura, 2.5, holidays);
       setFechaSolucion(solucion);
 
-      //const aperturaISO  = toGraphDateTime(apertura);
-      //const tiempoSolISO = toGraphDateTime(solucion as any);
+      const aperturaISO  = toGraphDateTime(apertura);
+      const tiempoSolISO = toGraphDateTime(solucion as any);
 
-      // 1) Elegir resolutor
       const resolutor = await pickTecnicoConMenosCasos();
-      console.log(resolutor)
+      console.log(resolutor);
 
-    
+      const payload = {
+        Title: state.motivo,
+        Descripcion: state.descripcion,
+        FechaApertura: aperturaISO,
+        TiempoSolucion: tiempoSolISO,
+        Nombreresolutor: resolutor?.Title,
+        Correoresolutor: resolutor?.Correo,
+        Solicitante: account?.name,
+        CorreoSolicitante: account?.username,
+        Estadodesolicitud: "En Atención",
+      };
+
+      const ticketCreated = await Tickets?.create(payload);
+      console.log(ticketCreated);
+      if (resolutor) {
+        const casosActuales = Number(resolutor.Numerodecasos ?? 0); // ← default 0 ANTES de Number()
+        const nuevoTotal = casosActuales + 1;
+
+        await Usuarios.update(String(resolutor.Id), {Numerodecasos: nuevoTotal,});
+      }
+
+      alert("caso creado con ID" + ticketCreated?.ID)
+ 
     } catch (err) {
       console.error("Error en handleSubmit:", err);
     } finally {
