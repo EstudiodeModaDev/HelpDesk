@@ -5,16 +5,16 @@ import "./TareasRegistradas.css";
 
 export default function ListaTareas() {
   const {Tareas} = useGraphServices() as ReturnType<typeof useGraphServices> & {Tareas: TareasService;};
-  const {rows, setFilterMode} = useTareas(Tareas);
+  const {rows, setFilterMode, reloadAll} = useTareas(Tareas);
   
   return (
     <div className="lt-scope">
       <section className="lt-card">
         <header className="lt-header">
           <nav className="lt-tabs" aria-label="Filtros de tareas">
-            <button className="lt-tab is-active" onClick={() => setFilterMode("Pendientes")}>Pendientes</button>
-            <button className="lt-tab" onClick={() => setFilterMode("Iniciadas")}>Iniciadas</button>
-            <button className="lt-tab" onClick={() => setFilterMode("Finalizadas")}>Finalizadas</button>
+            <button className="lt-tab is-active" onClick={() => {setFilterMode("Pendientes"); reloadAll()}}>Pendientes</button>
+            <button className="lt-tab" onClick={() => {setFilterMode("Iniciadas"); reloadAll()}}>Iniciadas</button>
+            <button className="lt-tab" onClick={() => {setFilterMode("Finalizadas"); reloadAll()}}>Finalizadas</button>
           </nav>
           <h2 className="lt-title">Mis Tareas</h2>
         </header>
