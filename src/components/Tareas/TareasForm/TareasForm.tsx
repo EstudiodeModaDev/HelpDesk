@@ -66,16 +66,7 @@ export default function FormTarea({ onAgregar }: FormTareaProps) {
       <form className="ft-form" onSubmit={submit} onReset={limpiar} noValidate>
         <label className="ft-field" htmlFor={ids.titulo}>
           <span>Asunto *</span>
-          <input
-            id={ids.titulo}
-            name="titulo"
-            value={form.titulo}
-            onChange={onChange("titulo")}
-            placeholder="Asunto de la tarea"
-            autoComplete="off"
-            required
-            aria-required="true"
-          />
+          <input id={ids.titulo}  name="titulo" value={form.titulo} onChange={onChange("titulo")} placeholder="Asunto de la tarea" autoComplete="off" required aria-required="true"/>
         </label>
 
         <label className="ft-field" htmlFor={ids.solicitante}>

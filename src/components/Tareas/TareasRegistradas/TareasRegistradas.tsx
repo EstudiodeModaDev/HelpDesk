@@ -1,6 +1,5 @@
 import type { Tarea } from "../../../Models/Tareas";
 import "./TareasRegistradas.css";          // base
-import "./ListaTareas.force-light.css";    // (si lo separaste) IMPORTA DESPUÉS
 
 export default function ListaTareas({ tareas }: { tareas: Tarea[] }) {
   return (
