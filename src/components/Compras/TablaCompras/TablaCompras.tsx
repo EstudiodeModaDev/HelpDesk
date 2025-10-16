@@ -75,10 +75,25 @@ export default function TablaCompras() {
                   <td>{compra.CargarA}</td>
                   <td>{compra.Estado}</td>
                   <td>
-                    <button type="button" onClick={(e) => {e.stopPropagation(); handleNext(compra.Id ?? "");}} aria-label={`Siguiente paso para compra ${compra.Id}`} className="btn btn-sm btn-primary">
-                      Siguiente paso
-                    </button>
+                    {['completado','completada'].includes((compra?.Estado ?? '').toLowerCase())
+                      ? (
+                        <span className="badge badge-success" aria-label="Compra completada">
+                          La compra ya ha sido completada
+                        </span>
+                      )
+                      : (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleNext(compra?.Id ?? ''); }}
+                          aria-label={`Siguiente paso para compra ${compra?.Id ?? ''}`}
+                          className="btn"
+                        >
+                          Siguiente paso
+                        </button>
+                      )
+                    }
                   </td>
+
                 </tr>
               ))}
             </tbody>
