@@ -83,6 +83,32 @@
   transition: background-color 9999s ease-out 0s;
 }
 
+/* ===== Botones de paginación siempre claros ===== */
+.tabla-tickets button,
+.tabla-tickets select {
+  background: #fff !important;
+  color: #0f172a !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+.tabla-tickets button:hover:not(:disabled) {
+  background: #f3f4f6 !important;
+}
+
+.tabla-tickets button:disabled {
+  background: #f9fafb !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+}
+
+/* Fuerza esquema claro */
+.tabla-tickets {
+  color-scheme: light;
+  isolation: isolate;
+}
+
+
 /* Si el SO está en oscuro, re-aplica los tokens claros aquí */
 @media (prefers-color-scheme: dark){
   .tabla-tickets{
