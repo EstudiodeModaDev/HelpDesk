@@ -71,38 +71,18 @@ export default function FormTarea({ onAgregar }: FormTareaProps) {
 
         <label className="ft-field" htmlFor={ids.solicitante}>
           <span>Solicitante</span>
-          <input
-            id={ids.solicitante}
-            name="solicitante"
-            value={form.solicitante || ""}
-            onChange={onChange("solicitante")}
-            placeholder="Buscar solicitante"
-            autoComplete="off"
-          />
+          <input id={ids.solicitante} name="solicitante" value={form.solicitante || ""} onChange={onChange("solicitante")} placeholder="Buscar solicitante" autoComplete="off"/>
         </label>
 
         <label className="ft-field" htmlFor={ids.responsable}>
           <span>Responsable</span>
-          <input
-            id={ids.responsable}
-            name="responsable"
-            value={form.responsable || ""}
-            onChange={onChange("responsable")}
-            placeholder="Nombre del responsable"
-            autoComplete="off"
-          />
+          <input id={ids.responsable} name="responsable" value={form.responsable || ""} onChange={onChange("responsable")} placeholder="Nombre del responsable" autoComplete="off"/>
         </label>
 
         <div className="ft-grid-3">
           <label className="ft-field" htmlFor={ids.fecha}>
             <span>Fecha del evento</span>
-            <input
-              id={ids.fecha}
-              name="fecha"
-              type="date"
-              value={form.fecha || ""}
-              onChange={onChange("fecha")}
-            />
+            <input id={ids.fecha} name="fecha" type="date" value={form.fecha || ""} onChange={onChange("fecha")}/>
           </label>
 
           <label className="ft-field" htmlFor={ids.hora}>
