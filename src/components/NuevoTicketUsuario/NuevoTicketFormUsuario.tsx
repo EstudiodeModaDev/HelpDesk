@@ -21,7 +21,7 @@ export default function NuevoTicketUsuarioForm() {
   const {state, errors, submitting, setField, handleSubmit,} = useNuevoUsuarioTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
 
   return (
-    <div className="ticket-form">
+    <div className="ticket-form" data-force-light>
       <h2 className="tf-title">Nuevo Ticket</h2>
 
       <form onSubmit={handleSubmit} noValidate className="tf-grid">
