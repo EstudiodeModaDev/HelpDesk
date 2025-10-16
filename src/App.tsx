@@ -17,6 +17,7 @@ import type { UsuariosSPService } from './Services/Usuarios.Service';
 import type { LogService } from './Services/Log.service';
 import NuevaFactura from './components/Facturas/Facturas';
 import ComprasPage from './components/Compras/ComprasPage';
+import NuevoTicketUsuarioForm from './components/NuevoTicketUsuario/NuevoTicketFormUsuario';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -76,6 +77,7 @@ const NAVS_TECNICO: MenuItem[] = [
 const NAVS_USUARIO: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
+  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketUsuarioForm/> },
 ];
 
 function getNavsForRole(role: Role | string) {
