@@ -171,7 +171,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
         {/* UN */}
         <div className="field">
           <label className="label">Motivo</label>
-          <select className="control" value={state.un} onChange={(e) => setField("motivo", e.target.value)}>
+          <select className="control" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)}>
             <option value="">Seleccione motivo</option>
             {Motivos.map((o) => (
               <option key={o} value={o}>{o}</option>
