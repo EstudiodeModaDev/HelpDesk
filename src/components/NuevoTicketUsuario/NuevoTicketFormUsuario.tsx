@@ -2,7 +2,7 @@ import "./NuevoTicketForm.css";
 import type { FranquiciasService } from "../../Services/Franquicias.service";
 import type { UserOption } from "../../Models/Commons";
 import { useGraphServices } from "../../graph/GrapServicesContext";
-import { useNuevoTicketForm } from "../../Funcionalidades/NuevoTicket";
+import {  useNuevoUsuarioTicketForm } from "../../Funcionalidades/NuevoTicket";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
@@ -18,7 +18,7 @@ export default function NuevoTicketUsuarioForm() {
     Logs: LogService
   };
 
-  const {state, errors, submitting, loadingCatalogos, setField, handleSubmit,} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
+  const {state, errors, submitting, setField, handleSubmit,} = useNuevoUsuarioTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
 
   return (
     <div className="ticket-form">
@@ -54,7 +54,7 @@ export default function NuevoTicketUsuarioForm() {
 
         {/* Submit */}
         <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
+          <button type="submit" disabled={submitting} className="tf-submit">
             {submitting ? "Enviando..." : "Enviar Ticket"}
           </button>
         </div>

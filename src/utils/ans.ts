@@ -137,11 +137,7 @@ export const norm = (s: string) =>
   s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
 
 /** Determina el ANS por palabras clave/exclusiones. */
-export function calculoANS(
-  categoria: string,
-  subcategoria: string,
-  articulo?: string
-): ANSLevel {
+export function calculoANS(categoria: string, subcategoria: string, articulo?: string): ANSLevel {
   const combinacion = norm(`${categoria} ${subcategoria} ${articulo ?? ''}`);
 
   if (EXCLUDE.some(k => combinacion.includes(norm(k)))) return '';
