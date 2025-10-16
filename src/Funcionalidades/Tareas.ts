@@ -1,16 +1,16 @@
 import React from "react";
-import type { GetAllOpts } from "../Models/Commons";
+//import type { GetAllOpts } from "../Models/Commons";
 import type { TareasService } from "../Services/Tareas.service";
-import type { FilterMode, Tarea } from "../Models/Tareas";
+import type {  Tarea } from "../Models/Tareas";
 
 export function useTareas(TareaSvc: TareasService,) {
   const [rows, setRows] = React.useState<Tarea[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [filterMode, setFilterMode] = React.useState<FilterMode>("Pendientes");
+  //const [filterMode, setFilterMode] = React.useState<FilterMode>("Pendientes");
 
   // construir filtro OData
-  const buildFilter = React.useCallback((): GetAllOpts => {
+  /*const buildFilter = React.useCallback((): GetAllOpts => {
     const filters: string[] = [];
 
     if (filterMode === "Pendientes") {
@@ -21,13 +21,13 @@ export function useTareas(TareaSvc: TareasService,) {
       filter: filters.join(" and "),
       orderby: "created desc"
     };
-  }, [filterMode]); 
+  }, [filterMode]); */
 
   // cargar primera página (o recargar)
   const loadTasks = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const items = await TareaSvc.getAll(buildFilter())
+      const items = await TareaSvc.getAll()
       setRows(items);
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tickets");
@@ -35,7 +35,7 @@ export function useTareas(TareaSvc: TareasService,) {
     } finally {
       setLoading(false);
     }
-  }, [TareaSvc, buildFilter]);
+  }, [TareaSvc]);
 
   React.useEffect(() => {
     loadTasks();
@@ -48,7 +48,7 @@ export function useTareas(TareaSvc: TareasService,) {
     loading,
     error,
     // filtros
-    setFilterMode,
+    //setFilterMode,
 
     // acciones
     reloadAll,
