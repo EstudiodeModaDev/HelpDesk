@@ -8,10 +8,15 @@ export type NuevaTarea = {
 };
 
 export type Tarea = {
-  id: string;
-  titulo: string;
-  responsable: string;
-  solicitante: string;
-  fechaSolicitada?: string;
-  estado?: "Pendiente" | "Iniciada" | "Finalizada" | string;
+  Id: string;
+  Title: string;
+  Reportadapor: string;
+  Quienlasolicita: string;
+  Fechadesolicitud?: string;
+  Fechadelanota?: string;
+  ReportadaporCorreo: string;
+  Estado: string;
+  Cantidaddediasalarma: string;
 };
+
+export type FilterMode = 'Pendientes' | 'Inciadas' | 'Finalizadas';

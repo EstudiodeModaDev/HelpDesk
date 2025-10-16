@@ -1,9 +1,14 @@
-import type { Tarea } from "../../../Models/Tareas";
-import "./TareasRegistradas.css";          // base
+import { useTareas } from "../../../Funcionalidades/Tareas";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { TareasService } from "../../../Services/Tareas.service";
+import "./TareasRegistradas.css";          
 
-export default function ListaTareas({ tareas }: { tareas: Tarea[] }) {
+export default function ListaTareas() {
+  const {Tareas} = useGraphServices() as ReturnType<typeof useGraphServices> & {Tareas: TareasService;};
+  const {rows} = useTareas(Tareas);
+  
   return (
-    <div className="lt-scope">{/* ⬅️ wrapper que fija tokens y color-scheme */}
+    <div className="lt-scope">
       <section className="lt-card">
         <header className="lt-header">
           <nav className="lt-tabs" aria-label="Filtros de tareas">
@@ -15,19 +20,19 @@ export default function ListaTareas({ tareas }: { tareas: Tarea[] }) {
         </header>
 
         <div className="lt-list" role="list">
-          {tareas.map((t) => (
-            <article key={t.id} className="lt-item" role="listitem">
+          {rows.map((t) => (
+            <article key={t.Id} className="lt-item" role="listitem">
               <div className="lt-item__head">
-                <h3 className="lt-item__title">{t.titulo}</h3>
-                <span className={`lt-badge ${String(t.estado).toLowerCase()}`} title={t.estado}>
-                  ● {t.estado ?? "—"}
+                <h3 className="lt-item__title">{t.Title}</h3>
+                <span className={`lt-badge ${String(t.Estado).toLowerCase()}`} title={t.Estado}>
+                  ● {t.Estado ?? "—"}
                 </span>
               </div>
 
               <ul className="lt-meta">
-                <li><strong>Responsable:</strong> {t.responsable}</li>
-                <li><strong>Solicitada por:</strong> {t.solicitante}</li>
-                {t.fechaSolicitada && <li><strong>Fecha solicitada:</strong> {t.fechaSolicitada}</li>}
+                <li><strong>Responsable:</strong> {t.Reportadapor}</li>
+                <li><strong>Solicitada por:</strong> {t.Quienlasolicita}</li>
+                {t.Fechadesolicitud && <li><strong>Fecha solicitada:</strong> {t.Fechadesolicitud}</li>}
               </ul>
 
               <div className="lt-actions">
