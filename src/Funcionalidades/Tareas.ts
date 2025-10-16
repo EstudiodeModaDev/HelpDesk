@@ -19,7 +19,7 @@ export function useTareas(TareaSvc: TareasService) {
     } else if (filterMode === "Iniciadas") {
       f.push(`fields/Estado eq '${q("Iniciada")}'`); // ajusta al valor real
     } else if (filterMode === "Finalizadas") {
-      f.push(`startswith(fields/Estado,'${q("Terminada")}')`);
+      f.push(`startswith(fields/Estado,'${q("Finalizada")}')`);
     }
 
     return {

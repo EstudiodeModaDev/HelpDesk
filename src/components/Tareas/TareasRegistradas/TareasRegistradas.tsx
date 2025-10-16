@@ -12,28 +12,13 @@ export default function ListaTareas() {
         <section className="lt-card">
           <header className="lt-header">
             <nav className="lt-tabs" aria-label="Filtros de tareas" role="tablist">
-              <button
-                className={`lt-tab ${filterMode === "Pendientes" ? "is-active" : ""}`}
-                role="tab"
-                aria-selected={filterMode === "Pendientes"}
-                onClick={() => setFilterMode("Pendientes")}
-              >
+              <button className={`lt-tab ${filterMode === "Pendientes" ? "is-active" : ""}`} role="tab" aria-selected={filterMode === "Pendientes"} onClick={() => setFilterMode("Pendientes")}>
                 Pendientes
               </button>
-              <button
-                className={`lt-tab ${filterMode === "Iniciadas" ? "is-active" : ""}`}
-                role="tab"
-                aria-selected={filterMode === "Iniciadas"}
-                onClick={() => setFilterMode("Iniciadas")}
-              >
+              <button className={`lt-tab ${filterMode === "Iniciadas" ? "is-active" : ""}`} role="tab" aria-selected={filterMode === "Iniciadas"} onClick={() => setFilterMode("Iniciadas")}>
                 Iniciadas
               </button>
-              <button
-                className={`lt-tab ${filterMode === "Finalizadas" ? "is-active" : ""}`}
-                role="tab"
-                aria-selected={filterMode === "Finalizadas"}
-                onClick={() => setFilterMode("Finalizadas")}
-              >
+              <button className={`lt-tab ${filterMode === "Finalizadas" ? "is-active" : ""}`} role="tab" aria-selected={filterMode === "Finalizadas"} onClick={() => setFilterMode("Finalizadas")}>
                 Finalizadas
               </button>
             </nav>
