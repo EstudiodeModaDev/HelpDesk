@@ -10,7 +10,6 @@ export function useTareas(TareaSvc: TareasService,) {
   const [error, setError] = React.useState<string | null>(null);
   const [filterMode, setFilterMode] = React.useState<FilterMode>("Pendientes");
 
-  // construir filtro OData
     const buildFilter = React.useCallback((): GetAllOpts => {
         const f: string[] = [];
         const q = (s: string) => s.replace(/'/g, "''"); // escape OData
@@ -32,25 +31,24 @@ export function useTareas(TareaSvc: TareasService,) {
         };
     }, [filterMode]);
 
-  // cargar primera página (o recargar)
-  const loadTasks = React.useCallback(async () => {
-    setLoading(true); setError(null);
-    try {
-      const items = await TareaSvc.getAll(buildFilter())
-      setRows(items);
-    } catch (e: any) {
-      setError(e?.message ?? "Error cargando tickets");
-      setRows([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [TareaSvc]);
+    const loadTasks = React.useCallback(async () => {
+        setLoading(true); setError(null);
+        try {
+        const items = await TareaSvc.getAll(buildFilter())
+        setRows(items);
+        } catch (e: any) {
+        setError(e?.message ?? "Error cargando tickets");
+        setRows([]);
+        } finally {
+        setLoading(false);
+        }
+    }, [TareaSvc]);
 
-  React.useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
+    React.useEffect(() => {
+        loadTasks();
+    }, [loadTasks]);
 
-  const reloadAll  = React.useCallback(() => { loadTasks(); }, [loadTasks]);
+    const reloadAll  = React.useCallback(() => { loadTasks(); }, [loadTasks]);
   return {
     // datos visibles (solo la página actual)
     rows,
