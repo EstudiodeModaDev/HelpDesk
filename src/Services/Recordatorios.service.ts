@@ -1,6 +1,6 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts } from '../Models/Commons';
-import type { Recordatorios } from '../Models/Recordatorios';
+import type { Tarea } from '../Models/Tareas';
 import { ensureIds } from '../utils/Commons';
 
 export class RecordatoriosService {
@@ -27,7 +27,7 @@ export class RecordatoriosService {
   // ---------- helpers ----------
 
   // ---------- mapping ----------
-  private toModel(item: any): Recordatorios {
+  private toModel(item: any): Tarea {
     const f = item?.fields ?? {};
     return {
         Id: String(item?.id ?? ''),
@@ -43,7 +43,7 @@ export class RecordatoriosService {
   }
 
   // ---------- CRUD ----------
-  async create(record: Omit<Recordatorios, 'ID'>) {
+  async create(record: Omit<Tarea, 'ID'>) {
     await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
@@ -52,7 +52,7 @@ export class RecordatoriosService {
     return this.toModel(res);
   }
 
-  async update(id: string, changed: Partial<Omit<Recordatorios, 'ID'>>) {
+  async update(id: string, changed: Partial<Omit<Tarea, 'ID'>>) {
     await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);;
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
