@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
 import { ReFacturasService } from "../Services/ReFacturas.service";
+import { useAuth } from "../auth/authContext";
 
 // 🎯 Estado y acciones disponibles para este módulo
 export type FacturasUx = {
@@ -17,6 +18,8 @@ export type FacturasUx = {
 export function useFacturas(): FacturasUx {
   // Traemos el GraphRest desde el contexto global (ya autenticado)
   const { graph } = useGraphServices();
+  const { account } = useAuth();
+  account?.name
 
   // Creamos una instancia del servicio de facturas (que se conecta a SharePoint)
   const service = useMemo(() => new ReFacturasService(graph), [graph]);

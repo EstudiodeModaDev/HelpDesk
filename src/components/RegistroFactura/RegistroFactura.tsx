@@ -14,18 +14,18 @@ export default function RegistroFactura() {
 
   // Estado del formulario
   const [formData, setFormData] = useState<ReFactura>({
-    fechadeemision: "",
-    numerofactura: "",
-    proveedor: "",
+    FechaEmision: "",
+    NoFactura: "",
+    Proveedor: "",
     Title: "",
     tipodefactura: "",
-    item: "",
-    descripcionitem: "",
-    valor: 0,
-    cc: "",
-    co: "",
+    Items: "",
+    DescripItems: "",
+    ValorAnIVA: 0,
+    CC: "",
+    CO: "",
     un: "",
-    detalle: "",
+    DetalleFac: "",
   });
 
   // Cambios en los inputs
@@ -49,18 +49,18 @@ export default function RegistroFactura() {
 
     // Limpiar campos
     setFormData({
-      fechadeemision: "",
-      numerofactura: "",
-      proveedor: "",
+      FechaEmision: "",
+      NoFactura: "",
+      Proveedor: "",
       Title: "",
       tipodefactura: "",
-      item: "",
-      descripcionitem: "",
-      valor: 0,
-      cc: "",
-      co: "",
+      Items: "",
+      DescripItems: "",
+      ValorAnIVA: 0,
+      CC: "",
+      CO: "",
       un: "",
-      detalle: "",
+      DetalleFac: "",
     });
   };
 
@@ -78,8 +78,8 @@ export default function RegistroFactura() {
                 Fecha de emisión
                 <input
                   type="date"
-                  name="fechadeemision"
-                  value={formData.fechadeemision}
+                  name="FechaEmision"
+                  value={formData.FechaEmision}
                   onChange={handleChange}
                   required
                 />
@@ -92,8 +92,8 @@ export default function RegistroFactura() {
                 No. Factura
                 <input
                   type="number"
-                  name="numerofactura"
-                  value={formData.numerofactura}
+                  name="NoFactura"
+                  value={formData.NoFactura}
                   onChange={handleChange}
                   required
                 />
@@ -106,8 +106,8 @@ export default function RegistroFactura() {
                 Proveedor
                 <input
                   type="text"
-                  name="proveedor"
-                  value={formData.proveedor}
+                  name="Proveedor"
+                  value={formData.Proveedor}
                   onChange={handleChange}
                   required
                 />
@@ -161,8 +161,8 @@ export default function RegistroFactura() {
                 Ítem
                 <input
                   type="text"
-                  name="item"
-                  value={formData.item}
+                  name="Items"
+                  value={formData.Items}
                   onChange={handleChange}
                 />
               </label>
@@ -173,9 +173,9 @@ export default function RegistroFactura() {
               <label>
                 Descripción del ítem
                 <textarea
-                  name="descripcionitem"
+                  name="DescripItems"
                   rows={3}
-                  value={formData.descripcionitem}
+                  value={formData.DescripItems}
                   onChange={handleChange}
                 ></textarea>
               </label>
@@ -187,9 +187,9 @@ export default function RegistroFactura() {
                 Valor (en pesos)
                 <input
                   type="number"
-                  name="valor"
+                  name="ValorAnIVA"
                   placeholder="Ej: $100000"
-                  value={formData.valor || ""}
+                  value={formData.ValorAnIVA || ""}
                   onChange={handleChange}
                 />
               </label>
@@ -201,8 +201,8 @@ export default function RegistroFactura() {
                 Centro Costos (C.C)
                 <input
                   type="text"
-                  name="cc"
-                  value={formData.cc}
+                  name="CC"
+                  value={formData.CC}
                   onChange={handleChange}
                 />
               </label>
@@ -214,8 +214,8 @@ export default function RegistroFactura() {
                 Centro Operativo (C.O)
                 <input
                   type="text"
-                  name="co"
-                  value={formData.co}
+                  name="CO"
+                  value={formData.CO}
                   onChange={handleChange}
                 />
               </label>
@@ -239,9 +239,9 @@ export default function RegistroFactura() {
               <label>
                 Detalle
                 <textarea
-                  name="detalle"
+                  name="DetalleFac"
                   rows={3}
-                  value={formData.detalle}
+                  value={formData.DetalleFac}
                   onChange={handleChange}
                 ></textarea>
               </label>

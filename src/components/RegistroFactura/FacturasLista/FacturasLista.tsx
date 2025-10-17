@@ -69,13 +69,13 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               facturas.map((factura, index) => (
                 <tr key={factura.id0 || index}>
                   <td>{index + 1}</td>
-                  <td>{formatearFecha(factura.fechadeemision)}</td>
-                  <td>{factura.numerofactura}</td>
-                  <td>{factura.proveedor}</td>
+                  <td>{formatearFecha(factura.FechaEmision)}</td>
+                  <td>{factura.NoFactura}</td>
+                  <td>{factura.Proveedor}</td>
                   <td>{factura.Title}</td>
                   <td>{factura.tipodefactura}</td>
                   <td>
-                    {factura.valor.toLocaleString("es-CO", {
+                    {factura.ValorAnIVA.toLocaleString("es-CO", {
                       style: "currency",
                       currency: "COP",
                       minimumFractionDigits: 0,
