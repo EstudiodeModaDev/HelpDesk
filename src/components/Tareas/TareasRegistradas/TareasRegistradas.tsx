@@ -101,7 +101,7 @@ export default function ListaTareas() {
               </ul>
 
               <div className="lt-actions">
-                {!t.Estado.includes("Finalizado") && (
+                {!t.Estado.startsWith("Finalizado") && (
                   t.Estado === "pendiente" ? (
                     <button type="button" className="lt-link" onClick={(e) => {e.stopPropagation(); iniciarTarea(String(t.Id ?? ""));}} aria-label={`Marcar como iniciada el recordatorio ${t?.Id ?? ""}`}>
                       Marcar como iniciada
