@@ -42,6 +42,13 @@ const NAVS_ADMIN: MenuItem[] = [
   { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
   {
+    id: 'admin', label: 'Administración', icon: '⚙️', children: [
+       { id: 'anuncios',    label: 'Anuncios', to: <RegistroFactura/>},
+       { id: 'plantillas',  label: 'Plantillas', to: <RegistroFactura/>},
+       { id: 'usuarios',    label: 'Usuarios', to: <RegistroFactura/>},
+    ]
+  },
+  {
     id: 'acciones', label: 'Acciones', icon: '🛠️', children: [
       {
         id: 'siesa', label: 'Siesa', icon: '📂', children: [
