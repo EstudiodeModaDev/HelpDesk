@@ -1,6 +1,7 @@
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts, PageResult } from '../Models/Commons';
-import type { Facturas } from '../Models/Facturas';
+import type { ReFactura } from '../Models/RegistroFacturaInterface';
+
 
 export class FacturasService {
   private graph!: GraphRest;
@@ -67,22 +68,27 @@ export class FacturasService {
   }
 
   // ---------- mapping ----------
-  private toModel(item: any): Facturas {
+  private toModel(item: any): ReFactura {
     const f = item?.fields ?? {};
     return {
-        Id: String(item?.id ?? item.ID ?? item.Id ?? ''),
-        Title: f.Title, //Reportada por
-        FechaEmision: f.title,
-        NoFactura: f.NoFactura,
-        IdProveedor: f.IdProveedor,
-        CO: f.CO,
-        Total: f.Total,
-        un: f.un
+      id0: Number(item?.id ?? 0),
+      FechaEmision: f.FechadeEmision ?? "",
+      NoFactura: f.Numerofactura ?? "",
+      Proveedor: f.Proveedor ?? "",
+      Title: f.Title ?? "",
+      tipodefactura: f.TipoFactura ?? "",
+      Items: f.Item ?? "",
+      DescripItems: f.Descripcion ?? "",
+      ValorAnIVA: Number(f.Valor) || 0,
+      CC: f.Cc ?? "",
+      CO: f.Co ?? "",
+      un: f.Un ?? "",
+      DetalleFac: f.Detalle ?? "",
     };
   }
 
   // ---------- CRUD ----------
-  async create(record: Omit<Facturas, 'ID'>) {
+  async create(record: Omit<ReFactura, 'ID'>) {
     await this.ensureIds()
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
@@ -91,7 +97,7 @@ export class FacturasService {
     return this.toModel(res);
   }
 
-  async update(id: string, changed: Partial<Omit<Facturas, 'ID'>>) {
+  async update(id: string, changed: Partial<Omit<ReFactura, 'ID'>>) {
     await this.ensureIds()
     await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
@@ -116,7 +122,7 @@ export class FacturasService {
     return this.toModel(res);
   }
 
-  async getAll(opts?: GetAllOpts): Promise<PageResult<Facturas>> {
+  async getAll(opts?: GetAllOpts): Promise<PageResult<ReFactura>> {
     await this.ensureIds();
     const qs = new URLSearchParams({ $expand: 'fields' });
     if (opts?.filter)  qs.set('$filter', opts.filter);
@@ -128,11 +134,11 @@ export class FacturasService {
   }
 
   // Seguir el @odata.nextLink tal cual lo entrega Graph
-  async getByNextLink(nextLink: string): Promise<PageResult<Facturas>> {
+  async getByNextLink(nextLink: string): Promise<PageResult<ReFactura>> {
     return this.fetchPage(nextLink, /*isAbsolute*/ true);
   }
 
-  private async fetchPage(url: string, isAbsolute = false): Promise<PageResult<Facturas>> {
+  private async fetchPage(url: string, isAbsolute = false): Promise<PageResult<ReFactura>> {
     const res = isAbsolute
       ? await this.graph.getAbsolute<any>(url)  // 👈 URL absoluta (nextLink)
       : await this.graph.get<any>(url);         // 👈 path relativo
