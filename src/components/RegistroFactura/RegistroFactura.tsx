@@ -64,23 +64,6 @@ export default function RegistroFactura() {
     });
   };
 
-  // Estado de filtros para la lista
-  const [filtros, setFiltros] = useState<Partial<ReFactura>>({
-    fechadeemision: "",
-    numerofactura: "",
-    proveedor: "",
-    Title: "",
-    tipodefactura: "",
-  });
-
-  // Cambios en filtros
-  const handleFiltroChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFiltros((prev) => ({ ...prev, [name]: value }));
-  };
-
   // Render
   return (
     <div className="registro-container">
@@ -281,11 +264,9 @@ export default function RegistroFactura() {
           </div>
         </form>
       ) : (
+        // 📋 Vista de facturas con su propio componente de filtros
         <div>
-          {/* 🔍 Filtros */}
-          <FacturaFiltros filtros={filtros} onChange={handleFiltroChange} />
-
-          {/* 📋 Lista de facturas */}
+          <FacturaFiltros />
           <FacturasLista onVolver={() => setMostrarLista(false)} />
         </div>
       )}
