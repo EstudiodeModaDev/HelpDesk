@@ -101,52 +101,19 @@ export default function ListaTareas() {
               </ul>
 
               <div className="lt-actions">
-                {/* Editar (placeholder) */}
-                <button
-                  className="lt-link"
-                  type="button"
-                  onClick={() => { /* abrir editor */ }}
-                >
-                  Editar
-                </button>
-
-                {/* Acción siguiente según estado */}
-                {t.Estado === "Pendiente" ? (
-                  <button
-                    type="button"
-                    className="lt-link"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      iniciarTarea(String(t.Id ?? ""));
-                    }}
-                    aria-label={`Marcar como iniciada el recordatorio ${t?.Id ?? ""}`}
-                  >
-                    Marcar como iniciada
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="lt-link"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      finalizarTarea({
-                        Id: String(t.Id ?? ""),
-                        Fechadesolicitud: t.Fechadesolicitud ?? "",
-                      });
-                    }}
-                    aria-label={`Marcar como finalizada el recordatorio ${t?.Id ?? ""}`}
-                  >
-                    Marcar como finalizada
-                  </button>
+                {!t.Estado.includes("Finalizado") && (
+                  t.Estado === "pendiente" ? (
+                    <button type="button" className="lt-link" onClick={(e) => {e.stopPropagation(); iniciarTarea(String(t.Id ?? ""));}} aria-label={`Marcar como iniciada el recordatorio ${t?.Id ?? ""}`}>
+                      Marcar como iniciada
+                    </button>
+                  ) : (
+                    <button type="button" className="lt-link" onClick={(e) => { e.stopPropagation(); finalizarTarea({Id: String(t.Id ?? ""), Fechadesolicitud: t.Fechadesolicitud ?? "",});}} aria-label={`Marcar como finalizada el recordatorio ${t?.Id ?? ""}`}>
+                      Marcar como finalizada
+                    </button>
+                  )
                 )}
 
-                {/* Eliminar */}
-                <button
-                  className="lt-link danger"
-                  type="button"
-                  onClick={() => handleDelete({ Id: String(t.Id ?? ""), Title: t.Title })}
-                  aria-label={`Eliminar tarea ${t.Title ?? ""}`}
-                >
+                <button className="lt-link danger" type="button" onClick={() => handleDelete({ Id: String(t.Id ?? ""), Title: t.Title })} aria-label={`Eliminar tarea ${t.Title ?? ""}`}>
                   Eliminar
                 </button>
               </div>
