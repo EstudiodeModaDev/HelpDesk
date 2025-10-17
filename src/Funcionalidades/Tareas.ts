@@ -85,20 +85,33 @@ export function useTareas(TareaSvc: TareasService) {
 
         const tareaCreated = await TareaSvc?.create(payload);
         console.log(tareaCreated);
-        alert("caso creado con ID " + tareaCreated?.Id);
+        alert("El recordatorio ha sido agendado");
         loadTasks()
     } catch (err) {
       console.error("Error en handleSubmit:", err);
     } 
   };
 
+  const deleteTask = React.useCallback(async (Id: string) => {
+    try {
+
+        const tareaDeleted = await TareaSvc.delete(Id);
+        console.log(tareaDeleted);
+        alert("El recordatorio se ha eliminado con éxito");
+        loadTasks()
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+      alert("Ha ocurrido un error al eliminar el recordatorio");
+    } 
+  }, [TareaSvc, buildFilter]); 
+
   React.useEffect(() => {
     loadTasks();
-  }, [loadTasks]); // se ejecuta al montar y cada vez que cambie el filtro
+  }, [loadTasks]); 
 
   const reloadAll = React.useCallback(() => { loadTasks(); }, [loadTasks]);
 
-  return { rows, loading, error, filterMode, errors, state, setFilterMode, reloadAll, setField, handleSubmit};
+  return { rows, loading, error, filterMode, errors, state, setFilterMode, reloadAll, setField, handleSubmit, deleteTask};
 }
 
 

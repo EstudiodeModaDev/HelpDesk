@@ -242,6 +242,63 @@
   border: 1px solid #e0e7ff;
 }
 
+/* === Ancho y padding de la tarjeta === */
+.ft-card,
+.lt-card{
+  width: min(820px, 96vw);     /* ⬅️ más ancho */
+  max-width: 820px;            /* control en desktop */
+  padding: 22px 22px 18px;     /* un poco más de aire */
+}
+
+/* Si tu contenedor padre centra: asegúrate de no forzar min-height */
+.lt-card{ min-height: unset; } /* evita que “estire” verticalmente */
+
+/* === Grilla responsiva del formulario === */
+.ft-form{
+  gap: 14px;
+}
+
+/* En ≥ 640px ponemos 2 columnas suaves */
+@media (min-width: 640px){
+  .ft-form{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 14px;
+    row-gap: 14px;
+  }
+  /* Campos de una columna por defecto */
+  .ft-form .ft-field{ grid-column: span 2; }   /* todos full por defecto */
+
+  /* El fieldset de Programación va en 2 columnas internas */
+  .ft-fieldset{
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .ft-legend{
+    grid-column: 1 / -1;      /* legend a lo ancho */
+  }
+
+  /* Fecha y Hora en la misma fila */
+  .ft-fieldset .ft-field{ grid-column: span 1; }
+
+  /* Días para recordatorio + botón en una fila si quieres */
+  .ft-actions{ grid-column: 2; justify-self: end; }
+}
+
+/* === Ajustes visuales menores para mantener proporciones === */
+.ft-title{ font-size: 22px; }
+.ft-form input[type="text"],
+.ft-form input[type="date"],
+.ft-form input[type="time"],
+.ft-form select,
+.rs__control{
+  height: 44px;                /* mantiene altura pareja al crecer el ancho */
+  border-radius: 12px;
+}
+
+
 /* ====== Responsive ====== */
 @media (max-width: 480px){
   .ft-card{ margin: 16px 12px; padding: 14px; }

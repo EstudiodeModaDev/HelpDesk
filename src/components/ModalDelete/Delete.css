@@ -1,0 +1,21 @@
+.cd-backdrop{
+  position: fixed; inset: 0; background: rgba(2,6,23,.45);
+  display: grid; place-items: center; z-index: 80;
+}
+.cd-dialog{
+  width: min(480px, 92vw);
+  background: #fff; color: #0f172a;
+  border: 1px solid #e5e7eb; border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(2,6,23,.18);
+  padding: 16px;
+}
+.cd-message{ margin: 8px 0 14px; color:#475569; }
+.cd-actions{ display:flex; justify-content:flex-end; gap:10px; }
+.cd-btn{
+  height: 38px; padding: 0 14px; border-radius: 10px; font-weight: 600; cursor: pointer;
+  border: 1px solid transparent; background: #f1f5f9;
+}
+.cd-cancel{ background:#f8fafc; border-color:#e5e7eb; }
+.cd-primary{ background:#2563eb; color:#fff; border-color:#2563eb; }
+.cd-danger{ background:#dc2626; color:#fff; border-color:#dc2626; }
+.cd-btn:focus{ outline:none; box-shadow: 0 0 0 4px rgba(37,99,235,.35); }
