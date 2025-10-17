@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import { FacturaEditar as facturaFx } from "../../../Funcionalidades/FacturaEditar";
+import "./FacturaEditar.css"
 
 // Props del componente
 interface Props {

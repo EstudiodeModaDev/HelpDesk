@@ -1,13 +1,63 @@
+/* 🧩 Contenedor principal de filtros */
 .filtros-container {
-  background: #f8f9fb;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: #ffffff; /* Fondo blanco */
+  padding: 15px 20px; /* Reduce el padding para ahorrar espacio */
+  border-radius: 12px; /* Bordes más suaves */
+  margin-bottom: 15px; /* Menos espacio abajo */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
+  height: auto; /* Ajusta la altura según el contenido */
 }
 
+/* 🧾 Título */
+.filtros-container h3 {
+  font-size: 16px; /* Fuente un poco más pequeña */
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px; /* Menos espacio debajo del título */
+  margin-top: 0; /* Elimina el margen superior */
+}
+
+/* 📦 Rejilla de filtros (grid) */
 .filtros-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Reduce el tamaño mínimo a 160px */
+  gap: 12px; /* Reduce el espacio entre los inputs */
+  align-items: center;
 }
 
+/* 🧩 Campos de filtro */
+.filtros-grid input,
+.filtros-grid select {
+  padding: 8px; /* Menos padding para los inputs */
+  border-radius: 6px; /* Bordes más redondeados */
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%; /* Asegura que los campos ocupen todo el espacio disponible */
+  box-sizing: border-box; /* Evita que los elementos se desborden */
+}
+
+/* 🧩 Enfoque en los campos de entrada */
+.filtros-grid input:focus,
+.filtros-grid select:focus {
+  border-color: #2980b9; /* Borde azul al hacer foco */
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3); /* Efecto de resplandor */
+}
+
+/* 🧩 Estilos para las etiquetas de los campos (en caso de que añadas etiquetas en el futuro) */
+.filtros-grid label {
+  font-size: 13px; /* Etiquetas un poco más pequeñas */
+  color: #333;
+  margin-bottom: 4px; /* Menos margen debajo de las etiquetas */
+}
+
+/* 🧩 Aseguramos que los inputs y selects no se desborden en pantallas pequeñas */
+@media (max-width: 768px) {
+  .filtros-grid {
+    grid-template-columns: 1fr; /* 1 columna en pantallas pequeñas */
+  }
+
+  .filtros-container {
+    padding: 10px; /* Menos padding en pantallas pequeñas */
+  }
+}

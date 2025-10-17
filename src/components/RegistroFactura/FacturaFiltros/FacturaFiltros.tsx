@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
+import "./FacturaFiltros.css";
 
 export default function FacturaFiltros() {
   // 🔍 Estado interno para manejar los filtros

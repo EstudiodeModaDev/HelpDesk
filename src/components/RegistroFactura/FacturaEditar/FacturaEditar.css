@@ -1,24 +1,81 @@
+/* 🧩 Contenedor de fondo (modal backdrop) */
 .modal-backdrop {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex; justify-content: center; align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
+/* 🧾 Modal de edición */
 .modal {
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
+  width: 90%;
+  max-width: 500px; /* Limitamos el tamaño máximo */
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.modal-form input, .modal-form textarea {
+/* 🧩 Formulario en el modal */
+.modal-form input, 
+.modal-form textarea {
   width: 100%;
+  padding: 10px;
   margin: 8px 0;
-  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+.modal-form input:focus,
+.modal-form textarea:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+}
+
+/* 🧩 Botones del modal */
 .modal-buttons {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* 🧩 Botón de guardar y cancelar */
+.btn-guardar, .btn-cancelar {
+  padding: 12px 25px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn-guardar {
+  background-color: #2980b9;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background-color: #3498db;
+  transform: scale(1.05);
+}
+
+.btn-cancelar {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: #c0392b;
+  transform: scale(1.05);
 }

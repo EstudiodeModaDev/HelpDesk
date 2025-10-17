@@ -3,6 +3,7 @@ import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import FacturasLista from "./FacturasLista/FacturasLista";
 //import FacturaFiltros from "./FacturaFiltros/FacturaFiltros";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
+import "./RegistroFactura.css"
 
 // 🧾 Componente principal del registro de facturas
 export default function RegistroFactura() {
