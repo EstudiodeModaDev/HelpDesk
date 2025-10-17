@@ -8,7 +8,17 @@ import "./TareasRegistradas.css";
 export default function ListaTareas() {
   const { Tareas } =
     useGraphServices() as ReturnType<typeof useGraphServices> & { Tareas: TareasService };
-  const { rows, setFilterMode, filterMode, deleteTask, reloadAll, iniciarTarea, finalizarTarea } = useTareas(Tareas);
+
+  const {
+    rows,
+    setFilterMode,
+    filterMode,
+    deleteTask,
+    iniciarTarea,
+    finalizarTarea,
+    // reloadAll, // tu hook ya recarga tras acciones; no lo necesitamos aquí
+  } = useTareas(Tareas);
+
   const confirm = useConfirm();
 
   async function handleDelete(t: { Id: string; Title?: string }) {
@@ -26,9 +36,9 @@ export default function ListaTareas() {
     });
     if (!ok) return;
 
-    deleteTask(t.Id)
-    reloadAll()
-    setFilterMode((prev: typeof filterMode) => prev);
+    await deleteTask(t.Id);
+    // await reloadAll?.(); // innecesario si deleteTask ya recarga
+    setFilterMode((prev: typeof filterMode) => prev); // opcional, fuerza efecto si dependes del filtro
   }
 
   return (
@@ -73,7 +83,7 @@ export default function ListaTareas() {
                   className={`lt-badge ${String(t.Estado ?? "")
                     .toLowerCase()
                     .replace(/\s+/g, "-")}`}
-                  title={t.Estado}
+                  title={t.Estado ?? ""}
                   aria-label={`Estado: ${t.Estado ?? "—"}`}
                 >
                   ● {t.Estado ?? "—"}
@@ -81,38 +91,60 @@ export default function ListaTareas() {
               </div>
 
               <ul className="lt-meta">
-                <li>
-                  <strong>Responsable:</strong> {t.Reportadapor}
-                </li>
-                <li>
-                  <strong>Solicitada por:</strong> {t.Quienlasolicita}
-                </li>
+                <li><strong>Responsable:</strong> {t.Reportadapor}</li>
+                <li><strong>Solicitada por:</strong> {t.Quienlasolicita}</li>
                 {t.Fechadesolicitud && (
                   <li>
-                    <strong>Fecha solicitada:</strong>{" "}
-                    {toISODateTimeFlex(t.Fechadesolicitud)}
+                    <strong>Fecha solicitada:</strong> {toISODateTimeFlex(t.Fechadesolicitud)}
                   </li>
                 )}
               </ul>
 
               <div className="lt-actions">
-                <button className="lt-link" onClick={() => {/* abrir editor */}}>
-                   {t.Estado === "Pendiente"
-                      ? (
-                        <button type="button" onClick={(e) => { e.stopPropagation(); iniciarTarea(t.Id ?? ""); }} aria-label={`Siguiente paso para el recordatorio ${t?.Id ?? ''}`} className="lt-link">
-                          Marcar como iniciada
-                        </button>
-                      )
-                      : (
-                        <button type="button" onClick={(e) => { e.stopPropagation(); finalizarTarea({Id: t.Id ?? "", Fechadesolicitud: t.Fechadesolicitud}); }} aria-label={`Siguiente paso para el recordatorio ${t?.Id ?? ''}`} className="lt-link">
-                          Marcar como finalizada
-                        </button>
-                      )
-                    }
+                {/* Editar (placeholder) */}
+                <button
+                  className="lt-link"
+                  type="button"
+                  onClick={() => { /* abrir editor */ }}
+                >
+                  Editar
                 </button>
+
+                {/* Acción siguiente según estado */}
+                {t.Estado === "Pendiente" ? (
+                  <button
+                    type="button"
+                    className="lt-link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      iniciarTarea(String(t.Id ?? ""));
+                    }}
+                    aria-label={`Marcar como iniciada el recordatorio ${t?.Id ?? ""}`}
+                  >
+                    Marcar como iniciada
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="lt-link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      finalizarTarea({
+                        Id: String(t.Id ?? ""),
+                        Fechadesolicitud: t.Fechadesolicitud ?? "",
+                      });
+                    }}
+                    aria-label={`Marcar como finalizada el recordatorio ${t?.Id ?? ""}`}
+                  >
+                    Marcar como finalizada
+                  </button>
+                )}
+
+                {/* Eliminar */}
                 <button
                   className="lt-link danger"
-                  onClick={() => handleDelete({Id: t.Id ?? "", Title: t.Title})}
+                  type="button"
+                  onClick={() => handleDelete({ Id: String(t.Id ?? ""), Title: t.Title })}
                   aria-label={`Eliminar tarea ${t.Title ?? ""}`}
                 >
                   Eliminar
