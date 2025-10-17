@@ -18,6 +18,7 @@ import type { LogService } from './Services/Log.service';
 import ComprasPage from './components/Compras/ComprasPage';
 import NuevoTicketUsuarioForm from './components/NuevoTicketUsuario/NuevoTicketFormUsuario';
 import RegistroFactura from './components/RegistroFactura/RegistroFactura';
+import InfoPage from './components/Info/Informacion';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -39,6 +40,7 @@ const NAVS_ADMIN: MenuItem[] = [
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
+  { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
   {
     id: 'acciones', label: 'Acciones', icon: '🛠️', children: [
       {
@@ -62,6 +64,7 @@ const NAVS_TECNICO: MenuItem[] = [
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
+  { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
   {
     id: 'acciones', label: 'Acciones', icon: '🛠️', children: [
       {
@@ -349,6 +352,7 @@ function LoggedApp({
             {selected === 'ticketTable' && <TablaTickets />}
             {selected === 'task' && <TareasPage />}
             {selected === 'formatos' && <Formatos />}
+            {selected === 'info' && <InfoPage />}
           </>
         )}
       </main>
