@@ -18,9 +18,9 @@ const buildFilter = React.useCallback((): GetAllOpts => {
 
   const qEsc = escOData(q.toLowerCase());
   const filters = [
-    `startswith(tolower(fields/Tienda), ${qEsc})`,
-    `startswith(tolower(fields/CORREO), ${qEsc})`,
-    `startswith(tolower(fields/IDENTIFICADOR), ${qEsc})`,
+    `contains(fields/Tienda, ${qEsc})`,
+    `contains(fields/CORREO, ${qEsc})`,
+    `contains(fields/IDENTIFICADOR, ${qEsc})`,
   ];
 
   return { filter: filters.join(" or "), top: 150 };
