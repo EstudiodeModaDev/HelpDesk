@@ -156,7 +156,6 @@
 /* ========== Scroll area del cuerpo de la tabla ========== */
 /* Si quieres estilos precisos, añade className="store-scroll" al div que tiene max-height */
 .store-info .store-scroll {
-  max-height: 430px;
   overflow: auto;
 }
 

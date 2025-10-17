@@ -24,7 +24,6 @@ const COLS = [
   { key: "Direccion", label: "Dirección" },
   { key: "Local", label: "Local" },
   { key: "Proveedor", label: "Proveedor de servicio" },
-  // segundo parámetro opcional; igual podrías escribir (v) => ...
   { key: "Identificador", label: "Identificador" },
   { key: "ComparteCon", label: "¿Comparte servicio?" }, // verifica que esta key sea la correcta
   { key: "Nota", label: "Comparte con" },
