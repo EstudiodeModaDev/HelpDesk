@@ -1,26 +1,12 @@
-/* 🧩 Contenedor de fondo (modal backdrop) */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-/* 🧾 Modal de edición */
+/* 🧩 Modal de edición */
 .modal {
   background: #fff;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   width: 90%;
-  max-width: 500px; /* Limitamos el tamaño máximo */
-  overflow: hidden;
+  max-width: 500px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
 /* 🧩 Formulario en el modal */
@@ -32,7 +18,7 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 14px;
-  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+  box-sizing: border-box;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -50,7 +36,6 @@
   margin-top: 15px;
 }
 
-/* 🧩 Botón de guardar y cancelar */
 .btn-guardar, .btn-cancelar {
   padding: 12px 25px;
   font-size: 14px;

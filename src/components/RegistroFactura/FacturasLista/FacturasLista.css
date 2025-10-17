@@ -1,4 +1,4 @@
-/* 🧾 Contenedor de la lista de facturas */
+/* 🧩 Contenedor de la lista de facturas */
 .facturas-lista {
   margin-top: 40px;
   background-color: #fff;
@@ -6,21 +6,21 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 25px;
   overflow: hidden;
-  max-height: 65vh; /* Máxima altura visible */
+  max-height: 65vh;
   display: flex;
   flex-direction: column;
 }
 
-/* 📋 Tabla con scroll vertical */
+/* 🧩 Tabla con scroll vertical */
 .tabla-scroll {
   flex: 1;
-  overflow-y: auto; /* Solo scroll vertical */
-  max-height: 50vh; /* Limitar altura para scroll solo si hay muchas filas */
-  margin-bottom: 10px;
+  overflow-y: auto;
+  max-height: 50vh;
+  margin-bottom: 20px;
   border-radius: 10px;
 }
 
-/* 📋 Tabla */
+/* 🧩 Tabla */
 .tabla-facturas {
   width: 100%;
   border-collapse: collapse;
@@ -36,7 +36,7 @@
 }
 
 .tabla-facturas th {
-  background-color: #2971b9;
+  background-color: #2980b9;
   color: white;
   font-weight: 700;
 }
@@ -45,18 +45,26 @@
   background-color: #f2f6fa;
 }
 
-/* 🧩 Botones de edición y eliminación */
-.btn-editar, .btn-eliminar {
+/* 🧩 Estilo de los botones de acción (editar y eliminar) */
+.btn-editar,
+.btn-eliminar {
   border: none;
   background: none;
   cursor: pointer;
   font-size: 18px;
+  color: #2980b9;
+  transition: color 0.3s;
 }
 
-/* 🔽 Botón fijo de volver */
+.btn-editar:hover,
+.btn-eliminar:hover {
+  color: #3498db;
+}
+
+/* 🧩 Botón fijo de volver */
 .btn-volver-fijo {
   position: sticky;
-  bottom: 10px; /* Asegura que esté fijo al final */
+  bottom: 10px;
   display: block;
   margin: 20px auto 0 auto;
   background-color: #3a31e5;
@@ -67,14 +75,29 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  width: 300px; /* Ajustamos el tamaño */
+  width: 300px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  text-align: center;
 }
 
 .btn-volver-fijo:hover {
   background-color: #1096f5;
+  transform: scale(1.05);
+}
+
+/* 🧩 Botón "Registrar factura" */
+.btn-registrar {
+  background-color: #2980b9;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  border: none;
+}
+
+.btn-registrar:hover {
+  background-color: #3498db;
   transform: scale(1.05);
 }

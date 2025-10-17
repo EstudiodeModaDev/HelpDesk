@@ -1,18 +1,16 @@
 /* 🧩 Contenedor principal */
 .registro-container {
-  width: 100%; /* El contenedor tomará todo el ancho disponible */
-  max-width: 1200px; /* Limitamos el ancho máximo del formulario */
+  width: 100%;
+  max-width: 1200px;
   min-height: 70vh;
-  margin: 0 auto; /* Alineación centrada */
+  margin: 0 auto;
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-  padding: 15px 20px; /* Reducimos el padding para maximizar el uso del espacio */
-  position: relative;
+  padding: 15px 20px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow: hidden; /* Asegura que no haya scroll horizontal */
   font-family: 'Arial', sans-serif;
 }
 
@@ -27,13 +25,13 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px 15px; /* Reducimos los márgenes entre los campos */
+  gap: 10px 15px;
   align-items: start;
 }
 
 @media (max-width: 768px) {
   .form-grid {
-    grid-template-columns: 1fr; /* 1 columna en pantallas pequeñas */
+    grid-template-columns: 1fr;
   }
 }
 
@@ -41,25 +39,18 @@
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 6px; /* Reducimos el espacio entre label y input */
+  gap: 6px;
 }
 
 .campo input,
 .campo select,
 .campo textarea {
-  padding: 6px 10px; /* Reducido el padding para hacer los inputs más pequeños */
+  padding: 6px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 13px; /* Reducido el tamaño de la fuente */
+  font-size: 13px;
   transition: border-color 0.3s, box-shadow 0.3s;
-  width: 100%; /* Asegura que los campos ocupen todo el espacio disponible */
-}
-
-/* 🧩 Campo de "Detalle" con más espacio */
-.campo.full-width textarea {
-  resize: vertical;
-  min-height: 100px; /* Más pequeño que antes */
-  font-size: 14px;
+  width: 100%;
 }
 
 .campo input:focus,
@@ -69,62 +60,25 @@
   box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
 }
 
-/* 🧩 Etiquetas de los campos */
-.campo label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
 /* 🧩 Botones */
 .botones-container {
   display: flex;
   justify-content: center;
   gap: 20px;
   margin-top: 20px;
-  width: 100%; /* Asegura que los botones se alineen al contenedor */
-  flex-wrap: wrap; /* Permite que los botones se ajusten si no caben */
 }
 
-/* 🔘 Botón principal */
 .btn-registrar {
   background-color: #2980b9;
   color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px; /* Botón más pequeño */
+  padding: 10px 20px;
   font-size: 14px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-registrar:hover {
   background-color: #3498db;
   transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* 🟦 Botón secundario */
-.btn-ver-facturas {
-  background-color: #16a085;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.btn-ver-facturas:hover {
-  background-color: #1abc9c;
-  transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* 👀 Mejorar la apariencia de los botones cuando no hay foco */
-input:focus, textarea:focus, select:focus {
-  outline: none;
 }
