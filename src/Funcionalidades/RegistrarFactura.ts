@@ -2,27 +2,22 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
-import { ReFacturasService } from "../Services/ReFacturas.service";
+
 import { useAuth } from "../auth/authContext";
+import { FacturasService } from "../Services/Facturas.service";
 
 // 🎯 Estado y acciones disponibles para este módulo
-export type FacturasUx = {
-  facturas: ReFactura[];                                      // Lista de facturas cargadas
-  loading: boolean;                                           // Indica si hay una operación en curso
-  error: string | null;                                       // Guarda errores ocurridos
-  obtenerFacturas: () => Promise<ReFactura[]>;                // Función para traer todas las facturas
-  registrarFactura: (f: Omit<ReFactura, "id0">) => Promise<ReFactura>; // Función para registrar nueva factura
-};
+
 
 // 🧩 Hook que encapsula toda la lógica de facturas
-export function useFacturas(): FacturasUx {
+export function useFacturas() {
   // Traemos el GraphRest desde el contexto global (ya autenticado)
   const { graph } = useGraphServices();
   const { account } = useAuth();
   account?.name
 
   // Creamos una instancia del servicio de facturas (que se conecta a SharePoint)
-  const service = useMemo(() => new ReFacturasService(graph), [graph]);
+  const service = useMemo(() => new FacturasService(graph), [graph]);
 
   // Estado local del hook
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
@@ -35,8 +30,8 @@ export function useFacturas(): FacturasUx {
     setError(null);
     try {
       const lista = await service.getAll();
-      setFacturas(lista);
-      return lista;
+      setFacturas(lista.items);
+      return lista.items;
     } catch (err: any) {
       console.error("Error al obtener facturas:", err);
       setError(err?.message ?? "Error desconocido al cargar facturas");
