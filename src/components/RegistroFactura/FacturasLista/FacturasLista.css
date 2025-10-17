@@ -1,0 +1,78 @@
+/* 🧾 Contenedor de tabla */
+.facturas-lista {
+  margin-top: 40px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  overflow: hidden;
+  max-height: 65vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 📋 Tabla con scroll */
+.tabla-scroll {
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* 📋 Tabla */
+.tabla-facturas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tabla-facturas th,
+.tabla-facturas td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+.tabla-facturas th {
+  background-color: #2971b9;
+  color: rgb(255, 255, 255);
+  font-weight: 700;
+}
+
+.tabla-facturas tr:hover {
+  background-color: #f2f6fa;
+}
+
+.btn-editar, .btn-eliminar {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* 🔽 Botón fijo centrado */
+.btn-volver-fijo {
+  position: sticky;
+  bottom: -20px;
+  display: block;
+  margin: 20px auto 0 auto;
+  background-color: #3a31e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 500px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  text-align: center;
+}
+
+.btn-volver-fijo:hover {
+  background-color: #1096f5;
+  transform: scale(1.05);
+}
