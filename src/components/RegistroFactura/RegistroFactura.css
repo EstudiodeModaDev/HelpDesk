@@ -1,25 +1,28 @@
 /* 🧩 Contenedor principal */
 .registro-container {
-  width: 85vw;
-  min-height: 60vh;
+  width: 90vw;
+  min-height: 70vh;
   margin: 30px auto;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
-  padding: 40px 60px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+  padding: 40px 50px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   overflow: hidden;
+  font-family: 'Arial', sans-serif;
 }
 
 /* 🧾 Formulario */
 .registro-form {
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 📦 Nueva rejilla */
+/* 📦 Nueva rejilla (3 columnas en pantallas grandes y 1 columna en pantallas pequeñas) */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -27,18 +30,56 @@
   align-items: start;
 }
 
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 🧩 Campo (label encima del input) */
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-/* 🔘 Contenedor de botones */
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%; /* Asegura que los campos ocupen todo el espacio disponible */
+}
+
+/* 🧩 Campo de "Detalle" con más espacio */
+.campo.full-width textarea {
+  resize: vertical;
+  min-height: 120px; /* Hace el campo de "Detalle" más grande */
+  font-size: 15px;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+}
+
+/* 🧩 Etiquetas de los campos */
+.campo label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 🧩 Botones */
 .botones-container {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   margin-top: 30px;
 }
 
@@ -47,18 +88,18 @@
   background-color: #2980b9;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 25px;
-  font-size: 15px;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-registrar:hover {
   background-color: #3498db;
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* 🟦 Botón secundario */
@@ -66,17 +107,21 @@
   background-color: #16a085;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 25px;
-  font-size: 15px;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-ver-facturas:hover {
   background-color: #1abc9c;
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* 👀 Mejorar la apariencia de los botones cuando no hay foco */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+}

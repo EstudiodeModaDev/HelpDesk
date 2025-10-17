@@ -4,6 +4,8 @@ import FacturaFiltros from "../FacturaFiltros/FacturaFiltros";
 import FacturaEditar from "../FacturaEditar/FacturaEditar";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
+import "./FacturasLista.css"
+
 
 /**
  * 🧾 Componente que lista todas las facturas y permite filtrarlas o editarlas.
