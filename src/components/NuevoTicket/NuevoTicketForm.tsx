@@ -12,41 +12,19 @@ import { UsuariosSPService } from "../../Services/Usuarios.Service";
 import type { TicketsService } from "../../Services/Tickets.service";
 import RichTextBase64 from "../RichTextBase64/RichTextBase64";
 import type { LogService } from "../../Services/Log.service";
-
-const norm = (s: string) =>
-  (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+import { norm } from "../../utils/Commons";
 
 export type UserOptionEx = UserOption & { source?: "Empleado" | "Franquicia" };
 type CategoriaItem = { ID: string | number; Title: string };
 
 export default function NuevoTicketForm() {
-  const {
-    Categorias,
-    SubCategorias,
-    Articulos,
-    Franquicias: FranquiciasSvc,
-    Usuarios: UsuariosSPServiceSvc,
-    Tickets: TicketsSvc,
-    Logs: LogsSvc
-  } = useGraphServices() as ReturnType<typeof useGraphServices> & {
+  const {Categorias, SubCategorias, Articulos, Franquicias: FranquiciasSvc, Usuarios: UsuariosSPServiceSvc, Tickets: TicketsSvc, Logs: LogsSvc} = useGraphServices() as ReturnType<typeof useGraphServices> & {
     Franquicias: FranquiciasService;
     Usuarios: UsuariosSPService;
     Tickets: TicketsService;
     Logs: LogService
   };
-
-  const {
-    state,
-    errors,
-    submitting,
-    categorias,
-    subcategoriasAll,
-    articulosAll,
-    loadingCatalogos,
-    setField,
-    handleSubmit,
-  } = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
-
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit,} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: TicketsSvc, Usuarios: UsuariosSPServiceSvc, Logs: LogsSvc});
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
     onlyEnabled: true,

@@ -1,183 +1,115 @@
-import * as React from "react";
-import "./InfoTienda.css"
+import type { ReactNode } from "react";
+import "./InfoTienda.css";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { InternetService } from "../../../Services/Internet.service";
+import { useInfoInternetTiendas } from "../../../Funcionalidades/InfoTienda";
+import type { InternetTiendas } from "../../../Models/Internet";
 
-// ===== Tipos =====
-export type StoreInfo = {
-  tienda: string;
-  correo: string;
-  empresa: string | number;
-  nit?: string;
-  ciudad?: string;
-  centroComercial?: string;
-  direccion?: string;
-  local?: string | number;
-  proveedorServicio?: string;
-  identificador?: string | number;
-  comparteServicio?: string;
-  comparteCon?: string;
+type Column<K extends keyof InternetTiendas = keyof InternetTiendas> = {
+  key: K;
+  label: string;
+  render?: (v: InternetTiendas[K], row: InternetTiendas) => ReactNode;
 };
 
-export type SectionKey = "info" | "servicio" | "contacto" | "todo";
+/** Usa `satisfies` para validar keys pero tipa el array como Column[] */
+const COLS = [
+  { key: "Tienda", label: "Tienda" },
+  { key: "CORREO", label: "Correo", render: (v: string) => <a href={`mailto:${v}`}>{v}</a> },
+  { key: "Compa_x00f1__x00ed_a", label: "Empresa" },
+  { key: "Title", label: "Ciudad" },
+  { key: "Centro_x0020_Comercial", label: "Centro Comercial" },
+  { key: "DIRECCI_x00d3_N", label: "Dirección" },
+  { key: "Local", label: "Local" },
+  { key: "PROVEEDOR", label: "Proveedor de servicio" },
+  { key: "IDENTIFICADOR", label: "Identificador", render: (v: InternetTiendas["IDENTIFICADOR"]) => <code>{String(v ?? "N/A")}</code> },
+  { key: "SERVICIO_x0020_COMPARTIDO", label: "¿Comparte servicio?" },
+  { key: "Nota", label: "Comparte con" },
+] satisfies readonly Column[];
 
-// ===== Utilidades =====
-const LABELS: Record<keyof StoreInfo, string> = {
-  tienda: "Tienda",
-  correo: "Correo",
-  empresa: "Empresa",
-  nit: "NIT",
-  ciudad: "Ciudad",
-  centroComercial: "Centro Comercial",
-  direccion: "Dirección",
-  local: "Local",
-  proveedorServicio: "Proveedor de servicio",
-  identificador: "Identificador",
-  comparteServicio: "¿Comparte servicio?",
-  comparteCon: "Comparte con",
-};
-
-function toRows(store: Partial<StoreInfo>) {
-  return (Object.keys(LABELS) as (keyof StoreInfo)[])
-    .map((k) => ({ key: k, label: LABELS[k], value: (store as any)[k] ?? "N/A" }));
-}
-
-// ===== Componente principal =====
 export default function StoreInfoPanel() {
-  const [query, setQuery] = React.useState("");
-  const [section, setSection] = React.useState<SectionKey>("todo");
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [store, setStore] = React.useState<Partial<StoreInfo>>({});
+  // Renombre para evitar confusiones con el tipo importado
+  const { InternetTiendas: InternetSvc } = useGraphServices() as ReturnType<typeof useGraphServices> & {
+    InternetTiendas: InternetService;
+  };
 
-  // Demo: datos iniciales (puedes remplazar por fetch real)
-  React.useEffect(() => {
-    setStore({
-      tienda: "Pilatos Arkadia",
-      correo: "pilatosarkadia@estudiodemoda.com.co",
-      empresa: 1,
-      nit: "",
-      ciudad: "Medellín",
-      centroComercial: "Arkadia",
-      direccion: "Cra. 70 #1-141",
-      local: 175,
-      proveedorServicio: "TIGO",
-      identificador: "214040182",
-      comparteServicio: "N/A",
-      comparteCon: "N/A",
-    });
-  }, []);
+  const { setQuery, rows, loading, error, loadQuery, query } = useInfoInternetTiendas(InternetSvc);
 
-  async function handleSearch(ev?: React.FormEvent) {
-    ev?.preventDefault();
-    setLoading(true); setError(null);
-    try {
-      // TODO: reemplaza con tu integración (Graph/SharePoint/REST)
-      // Ejemplo de espera simulada
-      await new Promise((r) => setTimeout(r, 500));
-      // setStore(await fetchStoreInfo(query))
-      if (!query.trim()) throw new Error("Escribe el nombre de una tienda para buscar");
-    } catch (e: any) {
-      setError(e?.message ?? "Error buscando la tienda");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const rows = toRows(filterBySection(store, section));
-
-    return (
+  return (
     <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
-        {/* Título */}
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-        INFORMACIÓN DE LA TIENDA
-        </h1>
+      <h1 className="text-3xl md:text-4xl font-bold tracking-tight">INFORMACIÓN DE LA TIENDA</h1>
 
-        {/* Barra de acciones */}
-        <form
-        onSubmit={handleSearch}
-        className="mt-6 flex flex-col md:flex-row gap-3 items-stretch md:items-center"
-        >
-        <input
+      {/* Acciones */}
+      <form
+        onSubmit={(e) => { e.preventDefault(); loadQuery(); }}
+        className="store-actions"
+      >
+        <div className="store-actions__left">
+          <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Arkadia"
+            placeholder="Buscar por nombre de la tienda o identificador de servicio..."
             className="flex-1 px-4 py-3 text-base shadow-sm"
             aria-label="Buscar tienda"
-        />
-        <button
+          />
+          <button
             type="submit"
             disabled={loading}
             className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
             aria-label="Buscar"
-        >
+          >
             <span className="i-lucide-check mr-1" aria-hidden />
             {loading ? "Buscando…" : "Buscar"}
-        </button>
-
-        {/* Selector de sección */}
-        <div className="relative">
-            <label className="sr-only" htmlFor="section">Sección</label>
-            <select
-            id="section"
-            value={section}
-            onChange={(e) => setSection(e.target.value as SectionKey)}
-            className="px-4 py-3 text-sm shadow-sm"
-            aria-label="Seleccionar sección"
-            >
-            <option value="todo">Información de la tienda</option>
-            <option value="contacto">Contacto</option>
-            <option value="info">Ubicación</option>
-            <option value="servicio">Servicio</option>
-            </select>
+          </button>
         </div>
-        </form>
+      </form>
 
-        {/* Estado */}
-        {error && <div className="alert-error mt-4">{error}</div>}
+      {error && <div className="alert-error mt-4">{error}</div>}
 
-        {/* Tabla scrollable */}
-        <div className="card mt-6 overflow-hidden">
+      {/* Tabla */}
+      <div className="card mt-6 overflow-hidden">
         <div className="store-scroll">
-            <table className="w-full border-collapse">
-            <tbody>
-                {rows.map((r) => (
-                <tr key={String(r.key)}>
-                    <th
-                    scope="row"
-                    className="sticky left-0 text-left text-sm font-semibold px-4 py-3"
-                    >
-                    {r.label}
-                    </th>
-                    <td className="px-4 py-3 text-sm">
-                    {String(r.value ?? "N/A")}
-                    </td>
-                </tr>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                {COLS.map((c) => (
+                  <th
+                    key={c.key}
+                    scope="col"
+                    className="text-left text-sm font-semibold px-4 py-3 sticky top-0 bg-white"
+                  >
+                    {c.label}
+                  </th>
                 ))}
+              </tr>
+            </thead>
+
+            <tbody>
+            {rows.length === 0 && (
+                <tr>
+                <td className="px-4 py-3 text-sm" colSpan={COLS.length}>
+                    {loading ? "Cargando…" : "Sin resultados"}
+                </td>
+                </tr>
+            )}
+
+            {rows.map((r: InternetTiendas) => (
+                <tr key={r.ID}>
+                {COLS.map((c) => {
+                    // TS infiere v como InternetTiendas[typeof c.key]
+                    const v = r[c.key];
+                    return (
+                    <td key={c.key} className="px-4 py-3 text-sm">
+                        {c.render ? c.render(v) : String(v ?? "N/A")}
+                    </td>
+                    );
+                })}
+                </tr>
+            ))}
             </tbody>
-            </table>
+          </table>
         </div>
-        </div>
-
-        {/* Pie de página opcional */}
-        <p className="tip mt-3">
-        Tip: Puedes reemplazar la búsqueda por un fetch real y llenar el estado <code>store</code> con los datos de SharePoint/Graph.
-        </p>
+      </div>
     </section>
-    );
-
+  );
 }
-
-// ===== Filtrado por sección (para el selector de la derecha) =====
-function filterBySection(store: Partial<StoreInfo>, section: SectionKey): Partial<StoreInfo> {
-  if (section === "todo") return store;
-  const m: Record<SectionKey, (keyof StoreInfo)[]> = {
-    todo: Object.keys(LABELS) as (keyof StoreInfo)[],
-    contacto: ["tienda", "correo"],
-    info: ["ciudad", "centroComercial", "direccion", "local"],
-    servicio: ["proveedorServicio", "identificador", "comparteServicio", "comparteCon"],
-  };
-  return Object.fromEntries(
-    m[section].map((k) => [k, (store as any)[k]])
-  ) as Partial<StoreInfo>;
-}
-

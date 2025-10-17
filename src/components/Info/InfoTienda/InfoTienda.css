@@ -207,6 +207,45 @@
 .store-info .badge--ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
 .store-info .badge--warn { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
 .store-info .badge--danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+/* Barra de acciones: izquierda y derecha */
+.store-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1.5rem; /* sustituye mt-6 si quieres */
+}
+
+.store-actions__left {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  flex: 1 1 auto;   /* ocupa todo el espacio disponible */
+}
+
+.store-actions__left input[type="text"] {
+  flex: 1 1 auto;   /* el input crece */
+  min-width: 220px;
+}
+
+.store-actions__right {
+  margin-left: auto; /* empuja a la derecha */
+  display: flex;
+  align-items: center;
+}
+
+/* En pantallas pequeñas, que se apile normal */
+@media (max-width: 767px) {
+  .store-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .store-actions__right {
+    margin-left: 0;
+  }
+}
+
+
 
 /* ========== Compactación responsiva ========== */
 @media (max-width: 680px) {
