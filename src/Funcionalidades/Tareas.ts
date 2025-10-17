@@ -114,7 +114,6 @@ export function useTareas(TareaSvc: TareasService) {
         Cantidaddediasalarma: Number(state.diasRecordatorio ?? 0),
         Estado: "Pendiente",
         Quienlasolicita: state.solicitante?.label ?? "",
-        QuienlasolicitaCorreo: state.solicitante?.value ?? "",
         Reportadapor: account?.name ?? "",
         ReportadaporCorreo: (account as any)?.username ?? (account as any)?.email ?? "",
         Title: state.titulo,
