@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// src/components/RegistrarFactura/FacturasLista/FacturasLista.tsx
+import { useEffect, useState } from "react";
 import FacturaFiltros from "../FacturaFiltros/FacturaFiltros";
 import FacturaEditar from "../FacturaEditar/FacturaEditar";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
@@ -8,30 +9,13 @@ import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
  * 🧾 Componente que lista todas las facturas y permite filtrarlas o editarlas.
  *
  * - Usa `useFacturas()` para obtener la lista desde SharePoint.
- * - Permite aplicar filtros básicos (fecha, número, proveedor, tipo...).
- * - Al hacer clic en ✏️, se abre el componente `FacturaEditar` para modificar.
- * - Tiene un botón para volver al formulario de registro principal.
+ * - Muestra los filtros de búsqueda (ahora internos en FacturaFiltros).
+ * - Permite editar facturas existentes.
  */
-export default function FacturasLista({
-  onVolver,
-  filtrosExternos, // ✅ NUEVO: filtros que vienen desde RegistroFactura (opcional)
-}: {
-  onVolver: () => void;
-  filtrosExternos?: Partial<ReFactura>;
-}) {
-  const { obtenerFacturas } = useFacturas(); // solo lectura
+export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
+  const { obtenerFacturas } = useFacturas();
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
-
-  // 🧠 Estado local de filtros
-  // Si vienen filtros desde RegistroFactura, los toma como iniciales
-  const [filtros, setFiltros] = useState({
-    fechadeemision: filtrosExternos?.fechadeemision || "",
-    numerofactura: filtrosExternos?.numerofactura || "",
-    proveedor: filtrosExternos?.proveedor || "",
-    Title: filtrosExternos?.Title || "",
-    tipodefactura: filtrosExternos?.tipodefactura || "",
-  });
 
   /**
    * 📦 Cargar las facturas al montar el componente
@@ -49,29 +33,6 @@ export default function FacturasLista({
   }, [obtenerFacturas]);
 
   /**
-   * 🎯 Actualiza los filtros cuando el usuario escribe en un input o select
-   */
-  const handleFiltroChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFiltros((prev) => ({ ...prev, [name]: value }));
-  };
-
-  /**
-   * 🔍 Filtra las facturas según los criterios introducidos
-   * Este filtro combina tanto los filtros internos como los externos
-   */
-  const facturasFiltradas = facturas.filter((f) => {
-    const filtrosCombinados = { ...filtros, ...filtrosExternos };
-    return Object.entries(filtrosCombinados).every(([key, val]) =>
-      val
-        ? String((f as any)[key]).toLowerCase().includes(String(val).toLowerCase())
-        : true
-    );
-  });
-
-  /**
    * 🗓️ Formatea la fecha en formato local colombiano
    */
   const formatearFecha = (fecha?: string) => {
@@ -86,8 +47,7 @@ export default function FacturasLista({
   return (
     <div className="facturas-lista">
       {/* 🔎 Filtros de búsqueda */}
-      {/* ✅ Si los filtros se controlan desde el padre, igual se renderizan aquí */}
-      <FacturaFiltros filtros={filtros} onChange={handleFiltroChange} />
+      <FacturaFiltros />
 
       {/* 📋 Tabla de facturas */}
       <div className="tabla-scroll">
@@ -105,8 +65,8 @@ export default function FacturasLista({
             </tr>
           </thead>
           <tbody>
-            {facturasFiltradas.length > 0 ? (
-              facturasFiltradas.map((factura, index) => (
+            {facturas.length > 0 ? (
+              facturas.map((factura, index) => (
                 <tr key={factura.id0 || index}>
                   <td>{index + 1}</td>
                   <td>{formatearFecha(factura.fechadeemision)}</td>

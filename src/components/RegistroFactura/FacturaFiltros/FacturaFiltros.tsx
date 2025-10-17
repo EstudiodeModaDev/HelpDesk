@@ -1,16 +1,26 @@
 // src/components/RegistrarFactura/FacturaFiltros.tsx
-import React from "react";
+import React, { useState } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 
+export default function FacturaFiltros() {
+  // 🔍 Estado interno para manejar los filtros
+  const [filtros, setFiltros] = useState<Partial<ReFactura>>({
+    fechadeemision: "",
+    numerofactura: "",
+    proveedor: "",
+    Title: "",
+    tipodefactura: "",
+  });
 
-// 🧠 Interfaz para los props
-interface Props {
-  filtros: Partial<ReFactura>;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-}
+  // 🧠 Maneja los cambios dentro del mismo componente
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFiltros((prev) => ({ ...prev, [name]: value }));
+  };
 
-export default function FacturaFiltros({ filtros, onChange }: Props) {
   return (
     <div className="filtros-container">
       <h3>🔍 Filtros de búsqueda</h3>
@@ -20,7 +30,7 @@ export default function FacturaFiltros({ filtros, onChange }: Props) {
           type="date"
           name="fechadeemision"
           value={filtros.fechadeemision || ""}
-          onChange={onChange}
+          onChange={handleChange}
           placeholder="Fecha"
         />
 
@@ -28,7 +38,7 @@ export default function FacturaFiltros({ filtros, onChange }: Props) {
           type="text"
           name="numerofactura"
           value={filtros.numerofactura || ""}
-          onChange={onChange}
+          onChange={handleChange}
           placeholder="Número de factura"
         />
 
@@ -36,7 +46,7 @@ export default function FacturaFiltros({ filtros, onChange }: Props) {
           type="text"
           name="proveedor"
           value={filtros.proveedor || ""}
-          onChange={onChange}
+          onChange={handleChange}
           placeholder="Proveedor"
         />
 
@@ -44,14 +54,14 @@ export default function FacturaFiltros({ filtros, onChange }: Props) {
           type="text"
           name="Title"
           value={filtros.Title || ""}
-          onChange={onChange}
+          onChange={handleChange}
           placeholder="NIT"
         />
 
         <select
           name="tipodefactura"
           value={filtros.tipodefactura || ""}
-          onChange={onChange}
+          onChange={handleChange}
         >
           <option value="">Tipo de factura</option>
           <option value="SC11">SC11</option>
