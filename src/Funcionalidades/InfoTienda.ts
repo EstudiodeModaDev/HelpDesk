@@ -79,7 +79,7 @@ export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService, 
     const qEsc = escOData(q);
     const filters = [
       `startswith(fields/Tienda, ${qEsc})`,
-      `startswith(fields/CORREO), ${qEsc})`,
+      `startswith(fields/CORREO, ${qEsc})`,
       `startswith(fields/IDENTIFICADOR, ${qEsc})`,
     ];
 
