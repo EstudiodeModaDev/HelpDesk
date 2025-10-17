@@ -1,44 +1,131 @@
 import React from "react";
 import type { GetAllOpts } from "../Models/Commons";
 import type { InternetTiendasService } from "../Services/InternetTiendas.service";
-import type { InternetTiendas } from "../Models/Internet";
+import type { InfoInternetTienda, InternetTiendas } from "../Models/Internet";
+import type { SociedadesService } from "../Services/Sociedades.service";
 
-const escOData = (s:string) => `'${String(s).replace(/'/g, "''")}'`;
 
-export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService,) {
-  
-  const [rows, setRows] = React.useState<InternetTiendas[]>([]);
+const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
+
+/** Util: chunk de arrays para evitar URLs enormes al hacer ORs */
+const chunk = <T,>(arr: T[], size = 12) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+
+/** Carga un diccionario nombreEmpresa -> NIT, consultando por lotes */
+async function getCompaniesMapByIds(
+  CompaniesSvc: SociedadesService,
+  ids: string[] | number[]
+): Promise<Record<string, string>> {
+  const map: Record<string, string> = {};
+  if (!CompaniesSvc) return map;
+
+  const unique = Array.from(new Set(ids.map((x) => String(x).trim()).filter(Boolean)));
+  if (!unique.length) return map;
+
+  for (const group of chunk(unique, 20)) {
+    const ors = group.map(id => `id eq ${escOData(id)}`).join(" or ");
+    const { items } = await CompaniesSvc.getAll({
+      filter: ors,
+      top: 500,
+    });
+
+    for (const it of items ?? []) {
+      const k = String(it?.id ?? "").trim();
+      if (!k) continue;
+      map[k] = String(it?.fields?.Nit ?? "N/A");
+    }
+  }
+  return map;
+}
+
+async function getNamesCompaniesMapByIds(
+  CompaniesSvc: SociedadesService,
+  ids: string[] | number[]
+): Promise<Record<string, string>> {
+  const map: Record<string, string> = {};
+  if (!CompaniesSvc) return map;
+
+  const unique = Array.from(new Set(ids.map((x) => String(x).trim()).filter(Boolean)));
+  if (!unique.length) return map;
+
+  for (const group of chunk(unique, 20)) {
+    const ors = group.map(id => `id eq ${escOData(id)}`).join(" or ");
+    const { items } = await CompaniesSvc.getAll({
+      filter: ors,
+      top: 500,
+    });
+
+    for (const it of items ?? []) {
+      const k = String(it?.id ?? "").trim();
+      if (!k) continue;
+      map[k] = String(it?.fields?.Title ?? "N/A");
+    }
+  }
+  return map;
+}
+
+export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService, CompaniesSvc: SociedadesService) {
+  const [rows, setRows] = React.useState<InfoInternetTienda[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
 
-const buildFilter = React.useCallback((): GetAllOpts => {
-  const q = query.trim();
-  if (q.length < 2) return { top: 0 };
+  const buildFilter = React.useCallback((): GetAllOpts => {
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) return { top: 0 };
 
-  const qEsc = escOData(q.toLowerCase());
-  const filters = [
-    `startsWith(fields/Tienda, ${qEsc})`,
-    `startsWith(fields/CORREO, ${qEsc})`,
-    `startsWith(fields/IDENTIFICADOR, ${qEsc})`,
-  ];
+    const qEsc = escOData(q);
+    const filters = [
+      `startswith(fields/Tienda, ${qEsc})`,
+      `startswith(fields/CORREO), ${qEsc})`,
+      `startswith(fields/IDENTIFICADOR, ${qEsc})`,
+    ];
 
-  return { filter: filters.join(" or "), top: 150 };
-}, [query]);
-
+    return {
+      filter: filters.join(" or "),
+      top: 150,
+    };
+  }, [query]);
 
   const loadQuery = React.useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const items = await InfoInternetSvc.getAll(buildFilter()); // debe devolver {items,nextLink}
-      setRows(items);
+
+      const  items: InternetTiendas[]  = await InfoInternetSvc.getAll(buildFilter()); 
+
+      const companyNames = items.map(r => r.Compa_x00f1__x00ed_a ?? "");
+      const companiesMap = await getCompaniesMapByIds(CompaniesSvc, companyNames);
+      const companiesName = await getNamesCompaniesMapByIds(CompaniesSvc, companyNames)
+
+      // 3) Mapear a tu modelo normalizado
+      const view: InfoInternetTienda[] = items.map(r => ({
+        ID: r.ID,
+        Ciudad: r.Title ?? "N/A",
+        CentroComercial: r.Centro_x0020_Comercial ?? "N/A",
+        Tienda: r.Tienda ?? "N/A",
+        Correo: r.CORREO ?? "N/A",
+        Proveedor: r.PROVEEDOR ?? "N/A",
+        Identificador: r.IDENTIFICADOR ?? "N/A",
+        Comparte: r.SERVICIO_x0020_COMPARTIDO ?? "N/A",
+        Direccion: r.DIRECCI_x00d3_N ?? "N/A",
+        Local: r.Local ?? "N/A",
+        Nota: r.Nota ?? "N/A",
+        ComparteCon: r.Nota ?? "N/A", // si es otra columna, cámbiala aquí
+        Nit: companiesMap[(r.Compa_x00f1__x00ed_a ?? "").trim()] ?? "N/A",
+        Sociedad: companiesName[(r.Compa_x00f1__x00ed_a ?? "").trim()] ?? "N/A",   
+      }));
+
+      setRows(view);
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando tickets");
+      setError(e?.message ?? "Error cargando tiendas");
       setRows([]);
     } finally {
       setLoading(false);
     }
-  }, [InfoInternetSvc, buildFilter]);
+  }, [InfoInternetSvc, CompaniesSvc, buildFilter]);
 
   return {
     // datos visibles (solo la página actual)
@@ -47,11 +134,8 @@ const buildFilter = React.useCallback((): GetAllOpts => {
     error,
     query,
 
-    // paginación (servidor)
+    // acciones
     setQuery,
-    loadQuery
-
+    loadQuery,
   };
 }
-
-

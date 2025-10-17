@@ -3,41 +3,48 @@ import "./InfoTienda.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { InternetService } from "../../../Services/Internet.service";
 import { useInfoInternetTiendas } from "../../../Funcionalidades/InfoTienda";
-import type { InternetTiendas } from "../../../Models/Internet";
+import type { InfoInternetTienda } from "../../../Models/Internet";
+import type { SociedadesService } from "../../../Services/Sociedades.service";
 
-type Column<K extends keyof InternetTiendas = keyof InternetTiendas> = {
+/* 1) render con segundo parámetro OPCIONAL */
+type Column<K extends keyof InfoInternetTienda = keyof InfoInternetTienda> = {
   key: K;
   label: string;
-  render?: (v: InternetTiendas[K], row: InternetTiendas) => ReactNode;
+  render?: (v: InfoInternetTienda[K], row?: InfoInternetTienda) => ReactNode;
 };
 
+/* 2) COLS: usa (v, _row) o solo (v) gracias al row opcional */
 const COLS = [
   { key: "Tienda", label: "Tienda" },
-  { key: "CORREO", label: "Correo", render: (v: string) => <a href={`mailto:${v}`}>{v}</a> },
-  { key: "Compa_x00f1__x00ed_a", label: "Empresa" },
-  { key: "Title", label: "Ciudad" },
-  { key: "Centro_x0020_Comercial", label: "Centro Comercial" },
-  { key: "DIRECCI_x00d3_N", label: "Dirección" },
+  { key: "Correo", label: "Correo"},
+  { key: "Sociedad", label: "Empresa" },
+  { key: "Nit", label: "NIT" },
+  { key: "Ciudad", label: "Ciudad" },
+  { key: "CentroComercial", label: "Centro Comercial" },
+  { key: "Direccion", label: "Dirección" },
   { key: "Local", label: "Local" },
-  { key: "PROVEEDOR", label: "Proveedor de servicio" },
-  { key: "IDENTIFICADOR", label: "Identificador", render: (v: InternetTiendas["IDENTIFICADOR"]) => <code>{String(v ?? "N/A")}</code> },
-  { key: "SERVICIO_x0020_COMPARTIDO", label: "¿Comparte servicio?" },
+  { key: "Proveedor", label: "Proveedor de servicio" },
+  // segundo parámetro opcional; igual podrías escribir (v) => ...
+  { key: "Identificador", label: "Identificador" },
+  { key: "ComparteCon", label: "¿Comparte servicio?" }, // verifica que esta key sea la correcta
   { key: "Nota", label: "Comparte con" },
 ] satisfies readonly Column[];
 
+/* 3) destructuring con nombre correcto en el tipo */
 export default function StoreInfoPanel() {
-  // Renombre para evitar confusiones con el tipo importado
-  const { InternetTiendas: InternetSvc } = useGraphServices() as ReturnType<typeof useGraphServices> & {
-    InternetTiendas: InternetService;
-  };
+  const { InternetTiendas: InternetSvc, Sociedades: CompaniasSvc } =
+    useGraphServices() as ReturnType<typeof useGraphServices> & {
+      InternetTiendas: InternetService;
+      Sociedades: SociedadesService; // <- corregido
+    };
 
-  const { setQuery, rows, loading, error, loadQuery, query } = useInfoInternetTiendas(InternetSvc);
+  const { setQuery, rows, loading, error, loadQuery, query } =
+    useInfoInternetTiendas(InternetSvc, CompaniasSvc);
 
   return (
     <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight">INFORMACIÓN DE LA TIENDA</h1>
 
-      {/* Acciones */}
       <form onSubmit={(e) => { e.preventDefault(); loadQuery(); }} className="store-actions">
         <div className="store-actions__left">
           <input
@@ -52,7 +59,6 @@ export default function StoreInfoPanel() {
             type="submit"
             disabled={loading}
             className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
-            aria-label="Buscar"
           >
             <span className="i-lucide-check mr-1" aria-hidden />
             {loading ? "Buscando…" : "Buscar"}
@@ -62,45 +68,39 @@ export default function StoreInfoPanel() {
 
       {error && <div className="alert-error mt-4">{error}</div>}
 
-      {/* Tabla */}
       <div className="card mt-6 overflow-hidden">
         <div className="store-scroll">
           <table className="w-full border-collapse">
             <thead>
               <tr>
                 {COLS.map((c) => (
-                  <th
-                    key={c.key}
-                    scope="col"
-                    className="text-left text-sm font-semibold px-4 py-3 sticky top-0 bg-white"
-                  >
+                  <th key={c.key} scope="col" className="text-left text-sm font-semibold px-4 py-3 sticky top-0 bg-white">
                     {c.label}
                   </th>
                 ))}
               </tr>
             </thead>
-
             <tbody>
-            {rows.length === 0 && (
+              {rows.length === 0 && (
                 <tr>
-                <td className="px-4 py-3 text-sm" colSpan={COLS.length}>
+                  <td className="px-4 py-3 text-sm" colSpan={COLS.length}>
                     {loading ? "Cargando…" : "Sin resultados"}
-                </td>
+                  </td>
                 </tr>
-            )}
+              )}
 
-            {rows.map((r: InternetTiendas) => (
+              {rows.map((r) => (
                 <tr key={r.ID}>
-                {COLS.map((c) => {
+                  {COLS.map((c) => {
                     const v = r[c.key];
                     return (
-                    <td key={c.key} className="px-4 py-3 text-sm">
-                        {c.render ? c.render(v) : String(v ?? "N/A")}
-                    </td>
+                      <td key={c.key} className="px-4 py-3 text-sm">
+                        {String(v ?? "N/A")}
+                      </td>
                     );
-                })}
+                  })}
                 </tr>
-            ))}
+              ))}
             </tbody>
           </table>
         </div>
