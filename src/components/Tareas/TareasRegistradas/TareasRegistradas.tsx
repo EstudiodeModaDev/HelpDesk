@@ -38,7 +38,7 @@ export default function ListaTareas() {
                 <ul className="lt-meta">
                   <li><strong>Responsable:</strong> {t.Reportadapor}</li>
                   <li><strong>Solicitada por:</strong> {t.Quienlasolicita}</li>
-                  {t.Fechadesolicitud && <li><strong>Fecha solicitada:</strong> {t.Fechadesolicitud}</li>}
+                  {t.Fechadesolicitud && <li><strong>Fecha solicitada:</strong> {String(t.Fechadesolicitud)}</li>}
                 </ul>
 
                 <div className="lt-actions">
