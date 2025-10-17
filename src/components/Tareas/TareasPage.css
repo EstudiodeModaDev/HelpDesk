@@ -1,0 +1,21 @@
+/* TareasPage.css */
+.tareas-page{
+  display: grid;
+  grid-template-columns: minmax(420px, 520px) minmax(560px, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 16px;
+}
+
+.ft-card,
+.lt-card{
+  padding: 22px 22px 18px;
+  border-radius: 14px;
+}
+
+/* Responsive: en pantallas pequeñas apila */
+@media (max-width: 900px){
+  .tareas-page{
+    grid-template-columns: 1fr;
+  }
+}

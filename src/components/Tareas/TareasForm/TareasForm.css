@@ -245,8 +245,6 @@
 /* === Ancho y padding de la tarjeta === */
 .ft-card,
 .lt-card{
-  width: min(820px, 96vw);     /* ⬅️ más ancho */
-  max-width: 820px;            /* control en desktop */
   padding: 22px 22px 18px;     /* un poco más de aire */
 }
 
@@ -303,4 +301,12 @@
 @media (max-width: 480px){
   .ft-card{ margin: 16px 12px; padding: 14px; }
   .ft-title{ font-size: 18px; }
+}
+
+.tareas-page .ft-card,
+.tareas-page .lt-card{
+  width: 100%;
+  max-width: none;
+  margin: 0;           /* evita centrar dentro del grid */
+  min-height: unset;   /* opcional: que no se “estire” de más */
 }
