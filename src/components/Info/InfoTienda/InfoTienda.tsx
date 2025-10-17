@@ -11,7 +11,6 @@ type Column<K extends keyof InternetTiendas = keyof InternetTiendas> = {
   render?: (v: InternetTiendas[K], row: InternetTiendas) => ReactNode;
 };
 
-/** Usa `satisfies` para validar keys pero tipa el array como Column[] */
 const COLS = [
   { key: "Tienda", label: "Tienda" },
   { key: "CORREO", label: "Correo", render: (v: string) => <a href={`mailto:${v}`}>{v}</a> },
@@ -39,10 +38,7 @@ export default function StoreInfoPanel() {
       <h1 className="text-3xl md:text-4xl font-bold tracking-tight">INFORMACIÓN DE LA TIENDA</h1>
 
       {/* Acciones */}
-      <form
-        onSubmit={(e) => { e.preventDefault(); loadQuery(); }}
-        className="store-actions"
-      >
+      <form onSubmit={(e) => { e.preventDefault(); loadQuery(); }} className="store-actions">
         <div className="store-actions__left">
           <input
             type="text"
@@ -96,7 +92,6 @@ export default function StoreInfoPanel() {
             {rows.map((r: InternetTiendas) => (
                 <tr key={r.ID}>
                 {COLS.map((c) => {
-                    // TS infiere v como InternetTiendas[typeof c.key]
                     const v = r[c.key];
                     return (
                     <td key={c.key} className="px-4 py-3 text-sm">

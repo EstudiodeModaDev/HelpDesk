@@ -12,19 +12,20 @@ export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService,)
   const [error, setError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
 
-  const buildFilter = React.useCallback((): GetAllOpts => {
-    const filters: string[] = [];
+const buildFilter = React.useCallback((): GetAllOpts => {
+  const q = query.trim();
+  if (q.length < 2) return { top: 0 };
 
-      filters.push(`(contains(tolower(fields/Tienda), tolower(${escOData(query)})))`);
-      filters.push(`(contains(tolower(fields/CORREO), tolower(${escOData(query)})))`);
-      filters.push(`(contains(tolower(fields/IDENTIFICADOR), tolower(${escOData(query)})))`);
-      filters.push(`(contains(tolower(fields/IDENTIFICADOR), tolower(${escOData(query)})))`);
-    
-    return {
-      filter: filters.join(" or "),
-      top: 200
-    };
-  }, [query]); 
+  const qEsc = escOData(q.toLowerCase());
+  const filters = [
+    `startswith(tolower(fields/Tienda), ${qEsc})`,
+    `startswith(tolower(fields/CORREO), ${qEsc})`,
+    `startswith(tolower(fields/IDENTIFICADOR), ${qEsc})`,
+  ];
+
+  return { filter: filters.join(" or "), top: 150 };
+}, [query]);
+
 
   const loadQuery = React.useCallback(async () => {
     setLoading(true); setError(null);
