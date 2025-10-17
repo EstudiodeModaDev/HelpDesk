@@ -8,9 +8,7 @@ import type { SociedadesService } from "../Services/Sociedades.service";
 const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
 
 /** Carga un diccionario nombreEmpresa -> NIT, consultando por lotes */
-  async function getCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,
-    concurrency = 8
-  ): Promise<Record<string, string>> {
+  async function getCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,concurrency = 8): Promise<Record<string, string>> {
     const map: Record<string, string> = {};
     if (!CompaniesSvc) return map;
 
@@ -32,7 +30,7 @@ const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
         if (r.status !== "fulfilled") continue;
         const { rawId, item } = r.value as { rawId: string; item: any };
 
-        const nit = item?.fields?.["Nit"];
+        const nit = item?.Nit
         const nitStr = String(nit ?? "N/A");
 
         map[rawId] = nitStr;
@@ -52,7 +50,7 @@ const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
     return map;
   }
 
-    async function getNamesCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,
+  async function getNamesCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,
     concurrency = 8
   ): Promise<Record<string, string>> {
     const map: Record<string, string> = {};
@@ -76,7 +74,7 @@ const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
         if (r.status !== "fulfilled") continue;
         const { rawId, item } = r.value as { rawId: string; item: any };
 
-        const nit = item?.fields?.["Title"];
+        const nit = item?.Title
         const nitStr = String(nit ?? "N/A");
 
         map[rawId] = nitStr;
