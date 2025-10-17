@@ -1,13 +1,56 @@
+/* 🧩 Contenedor principal de filtros */
 .filtros-container {
-  background: #f8f9fb;
-  padding: 15px;
-  border-radius: 8px;
+  background: #ffffff; /* Fondo blanco */
+  padding: 20px;
+  border-radius: 16px;
   margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave para el contenedor */
 }
 
+/* 🧾 Título */
+.filtros-container h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* 📦 Rejilla de filtros (grid) */
 .filtros-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Adaptativo, 180px de mínimo */
+  gap: 15px;
+  align-items: center;
 }
 
+/* 🧩 Campos de filtro */
+.filtros-grid input,
+.filtros-grid select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  width: 100%; /* Asegura que los campos ocupen todo el espacio disponible */
+}
+
+/* 🧩 Enfoque en los campos de entrada */
+.filtros-grid input:focus,
+.filtros-grid select:focus {
+  border-color: #2980b9; /* Borde azul al hacer foco */
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3); /* Efecto de resplandor */
+}
+
+/* 🧩 Estilos para las etiquetas de los campos (en caso de que añadas etiquetas en el futuro) */
+.filtros-grid label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+/* 🧩 Aseguramos que los inputs y selects no se desborden en pantallas pequeñas */
+@media (max-width: 768px) {
+  .filtros-grid {
+    grid-template-columns: 1fr; /* 1 columna en pantallas pequeñas */
+  }
+}
