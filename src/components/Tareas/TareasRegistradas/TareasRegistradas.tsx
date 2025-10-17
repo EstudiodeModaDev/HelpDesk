@@ -8,7 +8,7 @@ import "./TareasRegistradas.css";
 export default function ListaTareas() {
   const { Tareas } =
     useGraphServices() as ReturnType<typeof useGraphServices> & { Tareas: TareasService };
-  const { rows, setFilterMode, filterMode, deleteTask, reloadAll } = useTareas(Tareas);
+  const { rows, setFilterMode, filterMode, deleteTask, reloadAll, iniciarTarea, finalizarTarea } = useTareas(Tareas);
   const confirm = useConfirm();
 
   async function handleDelete(t: { Id: string; Title?: string }) {
@@ -97,7 +97,18 @@ export default function ListaTareas() {
 
               <div className="lt-actions">
                 <button className="lt-link" onClick={() => {/* abrir editor */}}>
-                  Editar
+                   {t.Estado === "Pendiente"
+                      ? (
+                        <button type="button" onClick={(e) => { e.stopPropagation(); iniciarTarea(t.Id ?? ""); }} aria-label={`Siguiente paso para el recordatorio ${t?.Id ?? ''}`} className="lt-link">
+                          Marcar como iniciada
+                        </button>
+                      )
+                      : (
+                        <button type="button" onClick={(e) => { e.stopPropagation(); finalizarTarea({Id: t.Id ?? "", Fechadesolicitud: t.Fechadesolicitud}); }} aria-label={`Siguiente paso para el recordatorio ${t?.Id ?? ''}`} className="lt-link">
+                          Marcar como finalizada
+                        </button>
+                      )
+                    }
                 </button>
                 <button
                   className="lt-link danger"

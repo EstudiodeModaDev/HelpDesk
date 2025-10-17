@@ -1,33 +1,68 @@
 import React from "react";
-//import type { GetAllOpts } from "../Models/Commons";
 import type { TareasService } from "../Services/Tareas.service";
-import type {  FilterMode, NuevaTarea, Tarea, TareasError } from "../Models/Tareas";
+import type { FilterMode, NuevaTarea, Tarea, TareasError } from "../Models/Tareas";
 import type { GetAllOpts } from "../Models/Commons";
 import { useAuth } from "../auth/authContext";
+
+/* ==== Helpers de fecha ==== */
+
+// Devuelve "YYYY-MM-DD" (para columnas de solo fecha en SharePoint)
+const toISODateOnly = (dateStr: string) => dateStr; // <input type="date"> ya da "YYYY-MM-DD"
+
+// Combina fecha local + hora local y devuelve ISO (para columnas fecha+hora)
+function combineLocalDateTime(dateStr: string, timeStr: string) {
+  const [h, m] = (timeStr || "00:00").split(":").map(Number);
+  const d = new Date(dateStr + "T00:00:00");
+  d.setHours(h || 0, m || 0, 0, 0);
+  return d.toISOString();
+}
+
+// Normaliza Date a 00:00 local (replica Today() de Power Apps)
+function localDateOnly(d: Date) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+// Parsea ISO/Date
+function toDate(v?: string | Date | null): Date | null {
+  if (!v) return null;
+  if (v instanceof Date) return v;
+  const dt = new Date(v);
+  return isNaN(+dt) ? null : dt;
+}
+
+// patch uniforme para cualquier servicio
+async function patchTarea(TareaSvc: any, id: string, data: Partial<Tarea>) {
+  if (typeof TareaSvc.update === "function") return TareaSvc.update(id, data);
+  if (typeof TareaSvc.patch === "function") return TareaSvc.patch(id, data);
+  if (typeof TareaSvc.set === "function") return TareaSvc.set(id, data);
+  throw new Error("TareasService no expone update/patch/set()");
+}
 
 export function useTareas(TareaSvc: TareasService) {
   const [rows, setRows] = React.useState<Tarea[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [filterMode, setFilterMode] = React.useState<FilterMode>("Pendientes");
+
   const [state, setState] = React.useState<NuevaTarea>({
     diasRecordatorio: 2,
     titulo: "",
     fecha: "",
     hora: "",
-    solicitante: null
-  })
+    solicitante: null,
+  });
   const [errors, setErrors] = React.useState<TareasError>({});
+
   const { account } = useAuth();
 
   const buildFilter = React.useCallback((): GetAllOpts => {
     const f: string[] = [];
-    const q = (s: string) => s.replace(/'/g, "''"); // escape OData
+    const q = (s: string) => s.replace(/'/g, "''");
 
     if (filterMode === "Pendientes") {
       f.push(`fields/Estado eq '${q("Pendiente")}'`);
     } else if (filterMode === "Iniciadas") {
-      f.push(`fields/Estado eq '${q("Iniciada")}'`); // ajusta al valor real
+      f.push(`fields/Estado eq '${q("Iniciada")}'`);
     } else if (filterMode === "Finalizadas") {
       f.push(`startswith(fields/Estado,'${q("Finalizada")}')`);
     }
@@ -37,29 +72,31 @@ export function useTareas(TareaSvc: TareasService) {
       orderby: "createdDateTime desc",
       top: 1000,
     };
-  }, [filterMode]); // <-- depende del filtro
+  }, [filterMode]);
 
   const loadTasks = React.useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
-      const items = await TareaSvc.getAll(buildFilter()); // usa SIEMPRE el filtro vigente
+      const items = await TareaSvc.getAll(buildFilter());
       setRows(items);
     } catch (e: any) {
-      setError(e?.message ?? "Error cargando tareas"); // wording
+      setError(e?.message ?? "Error cargando tareas");
       setRows([]);
     } finally {
       setLoading(false);
     }
-  }, [TareaSvc, buildFilter]); 
+  }, [TareaSvc, buildFilter]);
 
-  const setField = <K extends keyof NuevaTarea>(k: K, v: NuevaTarea[K]) => setState((s) => ({ ...s, [k]: v }));
+  const setField = <K extends keyof NuevaTarea>(k: K, v: NuevaTarea[K]) =>
+    setState((s) => ({ ...s, [k]: v }));
 
   const validate = () => {
     const e: TareasError = {};
-    if (!state.fecha) e.fecha = "Requerida";
-    if (!state.fecha || !state.hora){e.fecha = "Requerida"; e.hora = "Requerida"}
-    if (!state.solicitante) e.solicitante = "Requerido";
     if (!state.titulo) e.titulo = "Requerido";
+    if (!state.solicitante) e.solicitante = "Requerido";
+    if (!state.fecha) e.fecha = "Requerida";
+    if (!state.hora) e.hora = "Requerida";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -69,50 +106,104 @@ export function useTareas(TareaSvc: TareasService) {
     if (!validate()) return;
 
     try {
-        const fechaCompleta = new Date(`${state.fecha}T${state.hora}`).toISOString()
-        console.log(fechaCompleta);
+      // Fecha del evento (si la columna es solo fecha, NO combines hora aquí)
+      const fechaNota = toISODateOnly(state.fecha ?? "");
+      const fechaHoraEvento = combineLocalDateTime(state.fecha ?? "", state.hora ?? "");
 
-        const payload= {
-            Cantidaddediasalarma: state.diasRecordatorio,
-            Estado: "Pendiente",
-            Quienlasolicita: state.solicitante?.label ?? "",
-            Reportadapor: account?.name ?? "",
-            ReportadaporCorreo: state.solicitante?.value ?? "",
-            Title: state.titulo,
-            Fechadelanota: fechaCompleta,
-            Fechadesolicitud: new Date().toISOString()
-        };
+      const payload = {
+        Cantidaddediasalarma: Number(state.diasRecordatorio ?? 0),
+        Estado: "Pendiente",
+        Quienlasolicita: state.solicitante?.label ?? "",
+        QuienlasolicitaCorreo: state.solicitante?.value ?? "",
+        Reportadapor: account?.name ?? "",
+        ReportadaporCorreo: (account as any)?.username ?? (account as any)?.email ?? "",
+        Title: state.titulo,
+        Fechadelanota: fechaNota,      
+        Fechadesolicitud: fechaHoraEvento
+      };
 
-        const tareaCreated = await TareaSvc?.create(payload);
-        console.log(tareaCreated);
-        alert("El recordatorio ha sido agendado");
-        loadTasks()
+      await TareaSvc.create(payload);
+
+      // Reset de form + recarga
+      setState({
+        diasRecordatorio: 2,
+        titulo: "",
+        fecha: "",
+        hora: "",
+        solicitante: null,
+      });
+      await loadTasks();
+      // opcional: setFilterMode("Pendientes");
+      alert("El recordatorio ha sido agendado");
     } catch (err) {
       console.error("Error en handleSubmit:", err);
-    } 
+      alert("Ha ocurrido un error al crear el recordatorio");
+    }
   };
 
-  const deleteTask = React.useCallback(async (Id: string) => {
-    try {
-
-        const tareaDeleted = await TareaSvc.delete(Id);
-        console.log(tareaDeleted);
+  const deleteTask = React.useCallback(
+    async (Id: string) => {
+      try {
+        await TareaSvc.delete(Id);
+        await loadTasks();
         alert("El recordatorio se ha eliminado con éxito");
-        loadTasks()
-    } catch (err) {
-      console.error("Error en handleSubmit:", err);
-      alert("Ha ocurrido un error al eliminar el recordatorio");
-    } 
-  }, [TareaSvc, buildFilter]); 
+      } catch (err) {
+        console.error("Error al eliminar:", err);
+        alert("Ha ocurrido un error al eliminar el recordatorio");
+      }
+    },
+    [TareaSvc, loadTasks]
+  );
+
+
+  const iniciarTarea = React.useCallback(
+    async (Id: string) => {
+      await patchTarea(TareaSvc, Id, { Estado: "Iniciada" });
+      await loadTasks();
+    },
+    [TareaSvc, loadTasks]
+  );
+
+  const finalizarTarea = React.useCallback(
+    async (t: Pick<Tarea, "Id" | "Fechadesolicitud">) => {
+      const hoy = localDateOnly(new Date());
+      const f = toDate(t.Fechadesolicitud);
+      const fSolo = f ? localDateOnly(f) : null;
+
+      const Estado =
+        fSolo && fSolo.getTime() > hoy.getTime()
+          ? "Finalizada a tiempo"
+          : "Finalizada fuera de tiempo";
+
+      await patchTarea(TareaSvc, t.Id ?? "", { Estado });
+      await loadTasks();
+    },
+    [TareaSvc, loadTasks]
+  );
 
   React.useEffect(() => {
     loadTasks();
-  }, [loadTasks]); 
+  }, [loadTasks]);
 
-  const reloadAll = React.useCallback(() => { loadTasks(); }, [loadTasks]);
+  const reloadAll = React.useCallback(() => {
+    loadTasks();
+  }, [loadTasks]);
 
-  return { rows, loading, error, filterMode, errors, state, setFilterMode, reloadAll, setField, handleSubmit, deleteTask};
+  return {
+    rows,
+    loading,
+    error,
+    filterMode,
+    setFilterMode,
+    // form
+    state,
+    errors,
+    setField,
+    handleSubmit,
+    // acciones
+    deleteTask,
+    iniciarTarea,
+    finalizarTarea,
+    reloadAll,
+  };
 }
-
-
-
