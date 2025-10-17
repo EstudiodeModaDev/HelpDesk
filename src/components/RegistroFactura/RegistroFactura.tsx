@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import FacturasLista from "./FacturasLista/FacturasLista";
-import FacturaFiltros from "./FacturaFiltros/FacturaFiltros";
+//import FacturaFiltros from "./FacturaFiltros/FacturaFiltros";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 
 // 🧾 Componente principal del registro de facturas
@@ -266,7 +266,7 @@ export default function RegistroFactura() {
       ) : (
         // 📋 Vista de facturas con su propio componente de filtros
         <div>
-          <FacturaFiltros />
+          
           <FacturasLista onVolver={() => setMostrarLista(false)} />
         </div>
       )}
