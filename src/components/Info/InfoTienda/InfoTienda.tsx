@@ -84,82 +84,87 @@ export default function StoreInfoPanel() {
 
   const rows = toRows(filterBySection(store, section));
 
-  return (
-    <section className="w-full max-w-[1100px] mx-auto p-6 md:p-10">
-      {/* Título */}
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+    return (
+    <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
+        {/* Título */}
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
         INFORMACIÓN DE LA TIENDA
-      </h1>
+        </h1>
 
-      {/* Barra de acciones */}
-      <form onSubmit={handleSearch} className="mt-6 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+        {/* Barra de acciones */}
+        <form
+        onSubmit={handleSearch}
+        className="mt-6 flex flex-col md:flex-row gap-3 items-stretch md:items-center"
+        >
         <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Arkadia"
-          className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
-          aria-label="Buscar tienda"
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Arkadia"
+            className="flex-1 px-4 py-3 text-base shadow-sm"
+            aria-label="Buscar tienda"
         />
         <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold bg-indigo-600 text-white shadow hover:bg-indigo-700 disabled:opacity-60"
-          aria-label="Buscar"
+            type="submit"
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
+            aria-label="Buscar"
         >
-          <span className="i-lucide-check mr-1" aria-hidden />
-          {loading ? "Buscando…" : "Buscar"}
+            <span className="i-lucide-check mr-1" aria-hidden />
+            {loading ? "Buscando…" : "Buscar"}
         </button>
 
         {/* Selector de sección */}
         <div className="relative">
-          <label className="sr-only" htmlFor="section">Sección</label>
-          <select
+            <label className="sr-only" htmlFor="section">Sección</label>
+            <select
             id="section"
             value={section}
             onChange={(e) => setSection(e.target.value as SectionKey)}
-            className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500"
+            className="px-4 py-3 text-sm shadow-sm"
             aria-label="Seleccionar sección"
-          >
+            >
             <option value="todo">Información de la tienda</option>
             <option value="contacto">Contacto</option>
             <option value="info">Ubicación</option>
             <option value="servicio">Servicio</option>
-          </select>
+            </select>
         </div>
-      </form>
+        </form>
 
-      {/* Estado */}
-      {error && (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800">
-          {error}
-        </div>
-      )}
+        {/* Estado */}
+        {error && <div className="alert-error mt-4">{error}</div>}
 
-      {/* Tabla scrollable */}
-      <div className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="max-h-[430px] overflow-y-auto">
-          <table className="w-full border-collapse text-slate-800">
+        {/* Tabla scrollable */}
+        <div className="card mt-6 overflow-hidden">
+        <div className="store-scroll">
+            <table className="w-full border-collapse">
             <tbody>
-              {rows.map((r) => (
-                <tr key={String(r.key)} className="even:bg-slate-50">
-                  <th scope="row" className="w-[280px] sticky left-0 bg-slate-50 text-left text-sm font-semibold text-slate-700 border-b border-slate-200 px-4 py-3">
+                {rows.map((r) => (
+                <tr key={String(r.key)}>
+                    <th
+                    scope="row"
+                    className="sticky left-0 text-left text-sm font-semibold px-4 py-3"
+                    >
                     {r.label}
-                  </th>
-                  <td className="border-b border-slate-200 px-4 py-3 text-sm">
+                    </th>
+                    <td className="px-4 py-3 text-sm">
                     {String(r.value ?? "N/A")}
-                  </td>
+                    </td>
                 </tr>
-              ))}
+                ))}
             </tbody>
-          </table>
+            </table>
         </div>
-      </div>
+        </div>
 
-      {/* Pie de página opcional */}
-      <p className="mt-3 text-xs text-slate-500">Tip: Puedes reemplazar la búsqueda por un fetch real y llenar el estado <code>store</code> con los datos de SharePoint/Graph.</p>
+        {/* Pie de página opcional */}
+        <p className="tip mt-3">
+        Tip: Puedes reemplazar la búsqueda por un fetch real y llenar el estado <code>store</code> con los datos de SharePoint/Graph.
+        </p>
     </section>
-  );
+    );
+
 }
 
 // ===== Filtrado por sección (para el selector de la derecha) =====

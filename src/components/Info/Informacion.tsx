@@ -4,7 +4,7 @@ import "./Info.css"
 export default function InfoPage() {
 
   return (
-    <div className="tareas-page">
+    <div className="Info-page">
       <StoreInfoPanel />
     </div>
   );
