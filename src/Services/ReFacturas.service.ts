@@ -44,13 +44,38 @@ export class ReFacturasService {
 
   // 🟢 Crear factura
   async create(record: Omit<ReFactura, "id0">) {
-    const ids = await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    const ids = await ensureIds(
+      this.siteId,
+      this.listId,
+      this.graph,
+      this.hostname,
+      this.sitePath,
+      this.listName
+    );
     this.siteId = ids.siteId;
     this.listId = ids.listId;
 
+    // 🔁 Mapeo de nombres locales → campos SharePoint
+    const fields = {
+      FechadeEmision: record.fechadeemision,
+      Numerofactura: record.numerofactura,
+      Proveedor: record.proveedor,
+      Title: record.Title, // NIT
+      TipoFactura: record.tipodefactura,
+      Item: record.item,
+      Descripcion: record.descripcionitem,
+      Valor: record.valor,
+      Cc: record.cc,
+      Co: record.co,
+      Un: record.un,
+      Detalle: record.detalle,
+    };
+
+    console.log("📤 Enviando a SharePoint:", fields);
+
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
-      { fields: record }
+      { fields }
     );
 
     return this.toModel(res);
@@ -58,7 +83,14 @@ export class ReFacturasService {
 
   // 🔍 Obtener todas las facturas
   async getAll(opts?: GetAllOpts) {
-    const ids = await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+    const ids = await ensureIds(
+      this.siteId,
+      this.listId,
+      this.graph,
+      this.hostname,
+      this.sitePath,
+      this.listName
+    );
     this.siteId = ids.siteId;
     this.listId = ids.listId;
 
@@ -78,24 +110,61 @@ export class ReFacturasService {
   // ✏️ Actualizar factura
   async update(id: string, changed: Partial<ReFactura>) {
     if (!id) throw new Error("ID de factura requerido");
-    const ids = await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+
+    const ids = await ensureIds(
+      this.siteId,
+      this.listId,
+      this.graph,
+      this.hostname,
+      this.sitePath,
+      this.listName
+    );
     this.siteId = ids.siteId;
     this.listId = ids.listId;
 
+    // 🔁 Mapeo solo de los campos modificados
+    const fields = {
+      ...(changed.fechadeemision && { FechadeEmision: changed.fechadeemision }),
+      ...(changed.numerofactura && { Numerofactura: changed.numerofactura }),
+      ...(changed.proveedor && { Proveedor: changed.proveedor }),
+      ...(changed.Title && { Title: changed.Title }),
+      ...(changed.tipodefactura && { TipoFactura: changed.tipodefactura }),
+      ...(changed.item && { Item: changed.item }),
+      ...(changed.descripcionitem && { Descripcion: changed.descripcionitem }),
+      ...(changed.valor && { Valor: changed.valor }),
+      ...(changed.cc && { Cc: changed.cc }),
+      ...(changed.co && { Co: changed.co }),
+      ...(changed.un && { Un: changed.un }),
+      ...(changed.detalle && { Detalle: changed.detalle }),
+    };
+
+    console.log("✏️ Actualizando en SharePoint:", fields);
+
     const res = await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
-      changed
+      fields
     );
+
     return this.toModel({ id, fields: res });
   }
 
   // 🗑️ Eliminar factura
   async delete(id: string) {
     if (!id) throw new Error("ID de factura requerido");
-    const ids = await ensureIds(this.siteId, this.listId, this.graph, this.hostname, this.sitePath, this.listName);
+
+    const ids = await ensureIds(
+      this.siteId,
+      this.listId,
+      this.graph,
+      this.hostname,
+      this.sitePath,
+      this.listName
+    );
     this.siteId = ids.siteId;
     this.listId = ids.listId;
 
-    await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
+    await this.graph.delete(
+      `/sites/${this.siteId}/lists/${this.listId}/items/${id}`
+    );
   }
 }
