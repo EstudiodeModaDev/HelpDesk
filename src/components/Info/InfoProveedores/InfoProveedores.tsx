@@ -11,7 +11,7 @@ export default function InfoProveedores() {
 
   return (
     <section className="store-info w-full max-w-[1100px] mx-auto p-6 md:p-10">
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight">INFORMACIÓN DE LA TIENDA</h1>
+      <h1 className="text-3xl md:text-4xl font-bold tracking-tight">PROVEEDORES DE INTERNET</h1>
 
       <form className="store-actions">
         {/* 👉 Desplegable a la derecha */}

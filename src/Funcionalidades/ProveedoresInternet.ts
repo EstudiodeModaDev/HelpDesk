@@ -15,9 +15,9 @@ export function useProveedores(ProveedoresSvc: ProveedoresService,) {
     const filters: string[] = [];
 
     if (filterMode === "tigo") {
-      filters.push(`fields/Proveedor eq 'Tigo`);
+      filters.push(`fields/Proveedor eq 'Tigo'`);
     } else {
-      filters.push(`fields/Proveedor eq 'Claro`);
+      filters.push(`fields/Proveedor eq 'Claro'`);
     }
 
     return {
