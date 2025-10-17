@@ -15,9 +15,9 @@ import CajerosPOSForm from './components/CajerosPOS/CajerosPOS';
 import type { TicketsService } from './Services/Tickets.service';
 import type { UsuariosSPService } from './Services/Usuarios.Service';
 import type { LogService } from './Services/Log.service';
-import NuevaFactura from './components/Facturas/Facturas';
 import ComprasPage from './components/Compras/ComprasPage';
 import NuevoTicketUsuarioForm from './components/NuevoTicketUsuario/NuevoTicketFormUsuario';
+import RegistroFactura from './components/RegistroFactura/RegistroFactura';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -49,7 +49,7 @@ const NAVS_ADMIN: MenuItem[] = [
       },
       {
         id: 'cesar', label: 'Cesar', icon: '', children: [
-          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <NuevaFactura/>},
+          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <RegistroFactura/>},
           { id: 'compras', label: 'Compras', icon: '💰', to: <ComprasPage/>},
         ]
       },
