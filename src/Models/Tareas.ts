@@ -13,8 +13,8 @@ export type Tarea = {
   Title: string;
   Reportadapor: string;
   Quienlasolicita: string;
-  Fechadesolicitud?: string;
-  Fechadelanota?: string;
+  Fechadesolicitud?: string | Date;
+  Fechadelanota?: string | Date;
   ReportadaporCorreo: string;
   Estado: string;
   Cantidaddediasalarma: number;

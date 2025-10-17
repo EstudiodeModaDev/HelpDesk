@@ -3,7 +3,6 @@ import React from "react";
 import type { TareasService } from "../Services/Tareas.service";
 import type {  FilterMode, NuevaTarea, Tarea, TareasError } from "../Models/Tareas";
 import type { GetAllOpts } from "../Models/Commons";
-import { toGraphDateTime } from "../utils/Date";
 import { useAuth } from "../auth/authContext";
 
 export function useTareas(TareaSvc: TareasService) {
@@ -70,19 +69,18 @@ export function useTareas(TareaSvc: TareasService) {
     if (!validate()) return;
 
     try {
-        const fechaCompleta = new Date(`${state.fecha}T${state.hora}`)
-        const fechaEvento  = toGraphDateTime(fechaCompleta);
-        console.log(fechaEvento);
+        const fechaCompleta = new Date(`${state.fecha}T${state.hora}`).toISOString()
+        console.log(fechaCompleta);
 
-        const payload: Tarea= {
+        const payload= {
             Cantidaddediasalarma: state.diasRecordatorio,
             Estado: "Pendiente",
             Quienlasolicita: state.solicitante?.label ?? "",
             Reportadapor: account?.name ?? "",
             ReportadaporCorreo: state.solicitante?.value ?? "",
             Title: state.titulo,
-            Fechadelanota: fechaEvento,
-            Fechadesolicitud: String(new Date())
+            Fechadelanota: fechaCompleta,
+            Fechadesolicitud: new Date().toISOString()
         };
 
         const tareaCreated = await TareaSvc?.create(payload);
