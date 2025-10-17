@@ -7,12 +7,6 @@ import type { SociedadesService } from "../Services/Sociedades.service";
 
 const escOData = (s: string) => `'${String(s).replace(/'/g, "''")}'`;
 
-/** Util: chunk de arrays para evitar URLs enormes al hacer ORs */
-const chunk = <T,>(arr: T[], size = 12) =>
-  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size)
-  );
-
 /** Carga un diccionario nombreEmpresa -> NIT, consultando por lotes */
   async function getCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,
     concurrency = 8
@@ -58,31 +52,50 @@ const chunk = <T,>(arr: T[], size = 12) =>
     return map;
   }
 
-async function getNamesCompaniesMapByIds(
-  CompaniesSvc: SociedadesService,
-  ids: string[] | number[]
-): Promise<Record<string, string>> {
-  const map: Record<string, string> = {};
-  if (!CompaniesSvc) return map;
+    async function getNamesCompaniesMapByIds(CompaniesSvc: SociedadesService, ids: Array<string | number>,
+    concurrency = 8
+  ): Promise<Record<string, string>> {
+    const map: Record<string, string> = {};
+    if (!CompaniesSvc) return map;
 
-  const unique = Array.from(new Set(ids.map((x) => String(x).trim()).filter(Boolean)));
-  if (!unique.length) return map;
+    const unique = Array.from(new Set(ids.map(String).map(s => s.trim()).filter(Boolean)));
+    if (unique.length === 0) return map;
 
-  for (const group of chunk(unique, 20)) {
-    const ors = group.map(id => `id eq ${escOData(id)}`).join(" or ");
-    const { items } = await CompaniesSvc.getAll({
-      filter: ors,
-      top: 500,
-    });
+    for (let i = 0; i < unique.length; i += concurrency) {
+      const slice = unique.slice(i, i + concurrency);
 
-    for (const it of items ?? []) {
-      const k = String(it?.id ?? "").trim();
-      if (!k) continue;
-      map[k] = String(it?.fields?.Title ?? "N/A");
+      const results = await Promise.allSettled(
+        slice.map(async (rawId) => {
+          const idForGet = rawId ? Number(rawId) : rawId;
+          const item = await CompaniesSvc.get(String(idForGet));
+          return { rawId, item };
+        })
+      );
+
+      for (const r of results) {
+        if (r.status !== "fulfilled") continue;
+        const { rawId, item } = r.value as { rawId: string; item: any };
+
+        const nit = item?.fields?.["Title"];
+        const nitStr = String(nit ?? "N/A");
+
+        map[rawId] = nitStr;
+
+        const spId = item?.fields?.ID;
+        if (spId != null) {
+          map[String(spId)] = nitStr;
+        }
+
+        const graphId = item?.id;
+        if (graphId) {
+          map[String(graphId)] = nitStr;
+        }
+      }
     }
+
+    return map;
   }
-  return map;
-}
+
 
 export function useInfoInternetTiendas(InfoInternetSvc: InternetTiendasService, CompaniesSvc: SociedadesService) {
   const [rows, setRows] = React.useState<InfoInternetTienda[]>([]);
