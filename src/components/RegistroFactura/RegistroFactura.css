@@ -47,10 +47,10 @@
 .campo input,
 .campo select,
 .campo textarea {
-  padding: 8px;
+  padding: 6px 10px; /* Reducido el padding para hacer los inputs más pequeños */
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 14px;
+  font-size: 13px; /* Reducido el tamaño de la fuente */
   transition: border-color 0.3s, box-shadow 0.3s;
   width: 100%;
 }
