@@ -1,80 +1,24 @@
-import { useCallback, useMemo, useState, useId } from "react";
-import type { ChangeEvent, FormEvent } from "react";
 import "./TareasForm.css";
-import type { NuevaTarea } from "../../../Models/Tareas";
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import type { TareasService } from "../../../Services/Tareas.service";
+import { useTareas } from "../../../Funcionalidades/Tareas";
 
-export interface FormTareaProps {
-  onAgregar: (t: NuevaTarea) => void;
-}
+export default function FormTarea() {
 
-const ESTADOS: NuevaTarea["estado"][] = ["Pendiente", "Iniciada", "Finalizada"];
-
-export default function FormTarea({ onAgregar }: FormTareaProps) {
-  const [form, setForm] = useState<NuevaTarea>({
-    titulo: "",
-    solicitante: "",
-    responsable: "",
-    fecha: "",
-    hora: "",
-    estado: "Pendiente",
-  });
-
-  // IDs accesibles y únicos
-  const uid = useId();
-  const ids = useMemo(
-    () => ({
-      titulo: `${uid}-titulo`,
-      solicitante: `${uid}-solicitante`,
-      responsable: `${uid}-responsable`,
-      fecha: `${uid}-fecha`,
-      hora: `${uid}-hora`,
-      estado: `${uid}-estado`,
-    }),
-    [uid]
-  );
-
-  const onChange =
-    <K extends keyof NuevaTarea>(k: K) =>
-    (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setForm((f) => ({ ...f, [k]: e.target.value as NuevaTarea[K] }));
-    };
-
-  const limpiar = useCallback(() => {
-    setForm({
-      titulo: "",
-      solicitante: "",
-      responsable: "",
-      fecha: "",
-      hora: "",
-      estado: "Pendiente",
-    });
-  }, []);
-
-  const submit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!form.titulo.trim()) return;
-    onAgregar(form);
-    limpiar();
-  };
-
-  const disabled = form.titulo.trim().length === 0;
+  const {Tareas} = useGraphServices() as ReturnType<typeof useGraphServices> & { Tareas: TareasService;};
+  const {handleSubmit, errors, setField, state} = useTareas(Tareas);
 
   return (
     <section className="ft-scope ft-card" role="region" aria-labelledby="ft_title">
       <h2 id="ft_title" className="ft-title">Nueva Tarea</h2>
 
-      <form className="ft-form" onSubmit={submit} onReset={limpiar} noValidate>
-        <label className="ft-field" htmlFor={ids.titulo}>
-          <span>Asunto *</span>
-          <input id={ids.titulo}  name="titulo" value={form.titulo} onChange={onChange("titulo")} placeholder="Asunto de la tarea" autoComplete="off" required aria-required="true"/>
-        </label>
+      <form className="ft-form" onSubmit={handleSubmit} noValidate>
+        {/* Asunto */}
+        <label className="ft-field" htmlFor="titulo">Asunto *</label>
+        <input id="titulo"  type="text" placeholder="Ingrese el asunto del recordatorio" value={state.titulo} onChange={(e) => setField("titulo", e.target.value)} autoComplete="off" required aria-required="true"/>
+        {errors.titulo && <small className="error">{errors.titulo}</small>}
 
-        <label className="ft-field" htmlFor={ids.solicitante}>
-          <span>Solicitante</span>
-          <input id={ids.solicitante} name="solicitante" value={form.solicitante || ""} onChange={onChange("solicitante")} placeholder="Buscar solicitante" autoComplete="off"/>
-        </label>
-
-        <label className="ft-field" htmlFor={ids.responsable}>
+       {/* <label className="ft-field" htmlFor={ids.responsable}>
           <span>Responsable</span>
           <input id={ids.responsable} name="responsable" value={form.responsable || ""} onChange={onChange("responsable")} placeholder="Nombre del responsable" autoComplete="off"/>
         </label>
@@ -118,7 +62,7 @@ export default function FormTarea({ onAgregar }: FormTareaProps) {
             Guardar
           </button>
           <button type="reset" className="ft-btn-ghost">Limpiar</button>
-        </div>
+        </div>*/}
       </form>
     </section>
   );

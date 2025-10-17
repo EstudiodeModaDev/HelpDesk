@@ -1,14 +1,15 @@
+import type { UserOption } from "./Commons";
+
 export type NuevaTarea = {
   titulo: string;
-  solicitante?: string;
-  responsable?: string;
+  solicitante?: UserOption | null;
   fecha?: string; // yyyy-mm-dd
   hora?: string;  // hh:mm
-  estado?: "Pendiente" | "Iniciada" | "Finalizada";
+  diasRecordatorio: number;
 };
 
 export type Tarea = {
-  Id: string;
+  Id?: string;
   Title: string;
   Reportadapor: string;
   Quienlasolicita: string;
@@ -16,7 +17,9 @@ export type Tarea = {
   Fechadelanota?: string;
   ReportadaporCorreo: string;
   Estado: string;
-  Cantidaddediasalarma: string;
+  Cantidaddediasalarma: number;
 };
+
+export type TareasError = Partial<Record<keyof NuevaTarea, string>>;
 
 export type FilterMode = 'Pendientes' | 'Iniciadas' | 'Finalizadas';

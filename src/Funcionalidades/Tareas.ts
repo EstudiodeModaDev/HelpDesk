@@ -1,14 +1,25 @@
 import React from "react";
 //import type { GetAllOpts } from "../Models/Commons";
 import type { TareasService } from "../Services/Tareas.service";
-import type {  FilterMode, Tarea } from "../Models/Tareas";
+import type {  FilterMode, NuevaTarea, Tarea, TareasError } from "../Models/Tareas";
 import type { GetAllOpts } from "../Models/Commons";
+import { toGraphDateTime } from "../utils/Date";
+import { useAuth } from "../auth/authContext";
 
 export function useTareas(TareaSvc: TareasService) {
   const [rows, setRows] = React.useState<Tarea[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [filterMode, setFilterMode] = React.useState<FilterMode>("Pendientes");
+  const [state, setState] = React.useState<NuevaTarea>({
+    diasRecordatorio: 2,
+    titulo: "",
+    fecha: "",
+    hora: "",
+    solicitante: null
+  })
+  const [errors, setErrors] = React.useState<TareasError>({});
+  const { account } = useAuth();
 
   const buildFilter = React.useCallback((): GetAllOpts => {
     const f: string[] = [];
@@ -40,7 +51,48 @@ export function useTareas(TareaSvc: TareasService) {
     } finally {
       setLoading(false);
     }
-  }, [TareaSvc, buildFilter]); // <-- depende de buildFilter
+  }, [TareaSvc, buildFilter]); 
+
+  const setField = <K extends keyof NuevaTarea>(k: K, v: NuevaTarea[K]) => setState((s) => ({ ...s, [k]: v }));
+
+  const validate = () => {
+    const e: TareasError = {};
+    if (!state.fecha) e.fecha = "Requerida";
+    if (!state.fecha || !state.hora){e.fecha = "Requerida"; e.hora = "Requerida"}
+    if (!state.solicitante) e.solicitante = "Requerido";
+    if (!state.titulo) e.titulo = "Requerido";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    try {
+        const fechaCompleta = new Date(`${state.fecha}T${state.hora}`)
+        const fechaEvento  = toGraphDateTime(fechaCompleta);
+        console.log(fechaEvento);
+
+        const payload: Tarea= {
+            Cantidaddediasalarma: state.diasRecordatorio,
+            Estado: "Pendiente",
+            Quienlasolicita: state.solicitante?.label ?? "",
+            Reportadapor: account?.name ?? "",
+            ReportadaporCorreo: state.solicitante?.value ?? "",
+            Title: state.titulo,
+            Fechadelanota: fechaEvento,
+            Fechadesolicitud: String(new Date())
+        };
+
+        const tareaCreated = await TareaSvc?.create(payload);
+        console.log(tareaCreated);
+        alert("caso creado con ID " + tareaCreated?.Id);
+        loadTasks()
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+    } 
+  };
 
   React.useEffect(() => {
     loadTasks();
@@ -48,7 +100,7 @@ export function useTareas(TareaSvc: TareasService) {
 
   const reloadAll = React.useCallback(() => { loadTasks(); }, [loadTasks]);
 
-  return { rows, loading, error, filterMode, setFilterMode, reloadAll };
+  return { rows, loading, error, filterMode, errors, state, setFilterMode, reloadAll, setField, handleSubmit};
 }
 
 
