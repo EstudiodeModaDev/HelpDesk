@@ -14,18 +14,18 @@ export default function RegistroFactura() {
 
   // Estado del formulario
   const [formData, setFormData] = useState<ReFactura>({
-    fechadeemision: "",
-    numerofactura: "",
-    proveedor: "",
+    FechaEmision: "",
+    NoFactura: "",
+    Proveedor: "",
     Title: "",
     tipodefactura: "",
-    item: "",
-    descripcionitem: "",
-    valor: 0,
-    cc: "",
-    co: "",
+    Items: "",
+    DescripItems: "",
+    ValorAnIVA: 0,
+    CC: "",
+    CO: "",
     un: "",
-    detalle: "",
+    DetalleFac: "",
   });
 
   // Cambios en los inputs
@@ -49,18 +49,18 @@ export default function RegistroFactura() {
 
     // Limpiar campos
     setFormData({
-      fechadeemision: "",
-      numerofactura: "",
-      proveedor: "",
+      FechaEmision: "",
+      NoFactura: "",
+      Proveedor: "",
       Title: "",
       tipodefactura: "",
-      item: "",
-      descripcionitem: "",
-      valor: 0,
-      cc: "",
-      co: "",
+      Items: "",
+      DescripItems: "",
+      ValorAnIVA: 0,
+      CC: "",
+      CO: "",
       un: "",
-      detalle: "",
+      DetalleFac: "",
     });
   };
 
@@ -79,7 +79,7 @@ export default function RegistroFactura() {
                 <input
                   type="date"
                   name="fechadeemision"
-                  value={formData.fechadeemision}
+                  value={formData.FechaEmision}
                   onChange={handleChange}
                   required
                 />
@@ -93,7 +93,7 @@ export default function RegistroFactura() {
                 <input
                   type="number"
                   name="numerofactura"
-                  value={formData.numerofactura}
+                  value={formData.NoFactura}
                   onChange={handleChange}
                   required
                 />
@@ -107,7 +107,7 @@ export default function RegistroFactura() {
                 <input
                   type="text"
                   name="proveedor"
-                  value={formData.proveedor}
+                  value={formData.Proveedor}
                   onChange={handleChange}
                   required
                 />
@@ -162,7 +162,7 @@ export default function RegistroFactura() {
                 <input
                   type="text"
                   name="item"
-                  value={formData.item}
+                  value={formData.Items}
                   onChange={handleChange}
                 />
               </label>
@@ -175,7 +175,7 @@ export default function RegistroFactura() {
                 <textarea
                   name="descripcionitem"
                   rows={3}
-                  value={formData.descripcionitem}
+                  value={formData.DescripItems}
                   onChange={handleChange}
                 ></textarea>
               </label>
@@ -189,7 +189,7 @@ export default function RegistroFactura() {
                   type="number"
                   name="valor"
                   placeholder="Ej: $100000"
-                  value={formData.valor || ""}
+                  value={formData.ValorAnIVA || ""}
                   onChange={handleChange}
                 />
               </label>
@@ -202,7 +202,7 @@ export default function RegistroFactura() {
                 <input
                   type="text"
                   name="cc"
-                  value={formData.cc}
+                  value={formData.CC}
                   onChange={handleChange}
                 />
               </label>
@@ -215,7 +215,7 @@ export default function RegistroFactura() {
                 <input
                   type="text"
                   name="co"
-                  value={formData.co}
+                  value={formData.CO}
                   onChange={handleChange}
                 />
               </label>
@@ -241,7 +241,7 @@ export default function RegistroFactura() {
                 <textarea
                   name="detalle"
                   rows={3}
-                  value={formData.detalle}
+                  value={formData.DetalleFac}
                   onChange={handleChange}
                 ></textarea>
               </label>

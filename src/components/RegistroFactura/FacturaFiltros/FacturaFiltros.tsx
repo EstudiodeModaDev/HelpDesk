@@ -6,9 +6,9 @@ import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 export default function FacturaFiltros() {
   // 🔍 Estado interno para manejar los filtros
   const [filtros, setFiltros] = useState<Partial<ReFactura>>({
-    fechadeemision: "",
-    numerofactura: "",
-    proveedor: "",
+    FechaEmision: "",
+    NoFactura: "",
+    Proveedor: "",
     Title: "",
     tipodefactura: "",
   });
@@ -29,7 +29,7 @@ export default function FacturaFiltros() {
         <input
           type="date"
           name="fechadeemision"
-          value={filtros.fechadeemision || ""}
+          value={filtros.FechaEmision || ""}
           onChange={handleChange}
           placeholder="Fecha"
         />
@@ -37,7 +37,7 @@ export default function FacturaFiltros() {
         <input
           type="text"
           name="numerofactura"
-          value={filtros.numerofactura || ""}
+          value={filtros.NoFactura || ""}
           onChange={handleChange}
           placeholder="Número de factura"
         />
@@ -45,7 +45,7 @@ export default function FacturaFiltros() {
         <input
           type="text"
           name="proveedor"
-          value={filtros.proveedor || ""}
+          value={filtros.Proveedor || ""}
           onChange={handleChange}
           placeholder="Proveedor"
         />

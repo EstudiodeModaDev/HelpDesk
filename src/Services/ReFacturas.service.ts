@@ -15,7 +15,7 @@ export class ReFacturasService {
     graph: GraphRest,
     hostname = "estudiodemoda.sharepoint.com",
     sitePath = "/sites/TransformacionDigital/IN/Test",
-    listName = "facturas"
+    listName = "Facturas"
   ) {
     this.graph = graph;
     this.hostname = hostname;
@@ -27,18 +27,18 @@ export class ReFacturasService {
     const f = item?.fields ?? {};
     return {
       id0: Number(item?.id ?? 0),
-      fechadeemision: f.FechadeEmision ?? "",
-      numerofactura: f.Numerofactura ?? "",
-      proveedor: f.Proveedor ?? "",
+      FechaEmision: f.FechadeEmision ?? "",
+      NoFactura: f.Numerofactura ?? "",
+      Proveedor: f.Proveedor ?? "",
       Title: f.Title ?? "",
       tipodefactura: f.TipoFactura ?? "",
-      item: f.Item ?? "",
-      descripcionitem: f.Descripcion ?? "",
-      valor: Number(f.Valor) || 0,
-      cc: f.Cc ?? "",
-      co: f.Co ?? "",
+      Items: f.Item ?? "",
+      DescripItems: f.Descripcion ?? "",
+      ValorAnIVA: Number(f.Valor) || 0,
+      CC: f.Cc ?? "",
+      CO: f.Co ?? "",
       un: f.Un ?? "",
-      detalle: f.Detalle ?? "",
+      DetalleFac: f.Detalle ?? "",
     };
   }
 
@@ -57,18 +57,18 @@ export class ReFacturasService {
 
     // 🔁 Mapeo de nombres locales → campos SharePoint
     const fields = {
-      FechadeEmision: record.fechadeemision,
-      Numerofactura: record.numerofactura,
-      Proveedor: record.proveedor,
+      FechadeEmision: record.FechaEmision,
+      Numerofactura: record.NoFactura,
+      Proveedor: record.Proveedor,
       Title: record.Title, // NIT
       TipoFactura: record.tipodefactura,
-      Item: record.item,
-      Descripcion: record.descripcionitem,
-      Valor: record.valor,
-      Cc: record.cc,
-      Co: record.co,
+      Item: record.Items,
+      Descripcion: record.DescripItems,
+      Valor: record.ValorAnIVA,
+      Cc: record.CC,
+      Co: record.CO,
       Un: record.un,
-      Detalle: record.detalle,
+      Detalle: record.DetalleFac,
     };
 
     console.log("📤 Enviando a SharePoint:", fields);
@@ -124,18 +124,18 @@ export class ReFacturasService {
 
     // 🔁 Mapeo solo de los campos modificados
     const fields = {
-      ...(changed.fechadeemision && { FechadeEmision: changed.fechadeemision }),
-      ...(changed.numerofactura && { Numerofactura: changed.numerofactura }),
-      ...(changed.proveedor && { Proveedor: changed.proveedor }),
+      ...(changed.FechaEmision && { FechadeEmision: changed.FechaEmision }),
+      ...(changed.NoFactura && { Numerofactura: changed.NoFactura }),
+      ...(changed.Proveedor && { Proveedor: changed.Proveedor }),
       ...(changed.Title && { Title: changed.Title }),
       ...(changed.tipodefactura && { TipoFactura: changed.tipodefactura }),
-      ...(changed.item && { Item: changed.item }),
-      ...(changed.descripcionitem && { Descripcion: changed.descripcionitem }),
-      ...(changed.valor && { Valor: changed.valor }),
-      ...(changed.cc && { Cc: changed.cc }),
-      ...(changed.co && { Co: changed.co }),
+      ...(changed.Items && { Item: changed.Items }),
+      ...(changed.DescripItems && { Descripcion: changed.DescripItems }),
+      ...(changed.ValorAnIVA && { Valor: changed.ValorAnIVA }),
+      ...(changed.CC && { Cc: changed.CC }),
+      ...(changed.CO && { Co: changed.CO }),
       ...(changed.un && { Un: changed.un }),
-      ...(changed.detalle && { Detalle: changed.detalle }),
+      ...(changed.DetalleFac && { Detalle: changed.DetalleFac }),
     };
 
     console.log("✏️ Actualizando en SharePoint:", fields);

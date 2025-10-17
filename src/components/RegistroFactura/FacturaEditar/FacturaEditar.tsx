@@ -25,10 +25,10 @@ export default function FacturaEditarCompo({ factura, onClose }: Props) {
     valor: number;
     detalle: string;
   }>({
-    proveedor: factura.proveedor ?? "",
+    proveedor: factura.Proveedor ?? "",
     Title: factura.Title ?? "",
-    valor: typeof factura.valor === "number" ? factura.valor : Number(factura.valor) || 0,
-    detalle: factura.detalle ?? "",
+    valor: typeof factura.ValorAnIVA === "number" ? factura.ValorAnIVA : Number(factura.ValorAnIVA) || 0,
+    detalle: factura.DetalleFac ?? "",
   });
 
   // Manejador de cambios: parsea 'valor' a número
@@ -51,10 +51,10 @@ export default function FacturaEditarCompo({ factura, onClose }: Props) {
 
     // Construimos el objeto con los cambios — tipo Partial<ReFactura>
     const cambios: Partial<ReFactura> = {
-      proveedor: formData.proveedor,
+      Proveedor: formData.proveedor,
       Title: formData.Title,
-      valor: formData.valor,
-      detalle: formData.detalle,
+      ValorAnIVA: formData.valor,
+      DetalleFac: formData.detalle,
       // No sobreescribimos id0 ni fechas/números a menos que quieras
     };
 
@@ -73,7 +73,7 @@ export default function FacturaEditarCompo({ factura, onClose }: Props) {
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h3>✏️ Editar Factura #{factura.numerofactura}</h3>
+        <h3>✏️ Editar Factura #{factura.NoFactura}</h3>
 
         <form onSubmit={handleSubmit} className="modal-form">
           <input
