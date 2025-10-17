@@ -1,20 +1,18 @@
-// src/components/RegistrarFactura/RegistroFactura.tsx
 import React, { useState } from "react";
 import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import FacturasLista from "./FacturasLista/FacturasLista";
-//import FacturaFiltros from "./FacturaFiltros"; // ✅ Nuevo import
-import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import FacturaFiltros from "./FacturaFiltros/FacturaFiltros";
+import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 
 // 🧾 Componente principal del registro de facturas
 export default function RegistroFactura() {
-  // 🎣 Usamos el hook con la lógica de negocio
+  // Hook que maneja la lógica de negocio
   const { registrarFactura } = useFacturas();
 
-  // 🗂️ Controla si se muestra la lista o el formulario
+  // Estado para alternar entre formulario y lista
   const [mostrarLista, setMostrarLista] = useState(false);
 
-  // 📋 Estado del formulario
+  // Estado del formulario
   const [formData, setFormData] = useState<ReFactura>({
     fechadeemision: "",
     numerofactura: "",
@@ -30,24 +28,26 @@ export default function RegistroFactura() {
     detalle: "",
   });
 
-  // 📝 Actualiza el estado cada vez que se cambia un input
+  // Cambios en los inputs
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "valor" ? Number(value) : value, // convierte el valor a número si es 'valor'
+      [name]: name === "valor" ? Number(value) : value,
     }));
   };
 
-  // 💾 Enviar el formulario
+  // Enviar formulario
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // evita que se recargue la página
-    await registrarFactura(formData); // usa el hook para guardar
+    e.preventDefault();
+    await registrarFactura(formData);
     alert("✅ Factura registrada con éxito");
 
-    // 🔁 Limpia el formulario
+    // Limpiar campos
     setFormData({
       fechadeemision: "",
       numerofactura: "",
@@ -64,7 +64,7 @@ export default function RegistroFactura() {
     });
   };
 
-  // 🧠 Estado de filtros (solo se usa cuando está activa la vista de lista)
+  // Estado de filtros para la lista
   const [filtros, setFiltros] = useState<Partial<ReFactura>>({
     fechadeemision: "",
     numerofactura: "",
@@ -73,7 +73,7 @@ export default function RegistroFactura() {
     tipodefactura: "",
   });
 
-  // 🔍 Maneja los cambios en los campos de filtro
+  // Cambios en filtros
   const handleFiltroChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -81,16 +81,15 @@ export default function RegistroFactura() {
     setFiltros((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🖼️ Render
+  // Render
   return (
     <div className="registro-container">
       <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
 
-      {/* Si no se está mostrando la lista, renderiza el formulario */}
       {!mostrarLista ? (
         <form className="registro-form" onSubmit={handleSubmit}>
           <div className="form-grid">
-            {/* 🔹 Aquí irían todos los campos (inputs y selects) que ya tenías */}
+            {/* 📆 Fecha de emisión */}
             <div className="campo">
               <label>
                 Fecha de emisión
@@ -103,12 +102,174 @@ export default function RegistroFactura() {
                 />
               </label>
             </div>
-            {/* ... resto de los inputs idénticos ... */}
+
+            {/* 🔢 Número de factura */}
+            <div className="campo">
+              <label>
+                No. Factura
+                <input
+                  type="number"
+                  name="numerofactura"
+                  value={formData.numerofactura}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </div>
+
+            {/* 🏢 Proveedor */}
+            <div className="campo">
+              <label>
+                Proveedor
+                <input
+                  type="text"
+                  name="proveedor"
+                  value={formData.proveedor}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </div>
+
+            {/* 🧾 NIT */}
+            <div className="campo">
+              <label>
+                NIT
+                <input
+                  type="number"
+                  name="Title"
+                  value={formData.Title}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </div>
+
+            {/* 🧩 Tipo de Factura */}
+            <div className="campo">
+              <label>
+                Tipo de Factura
+                <select
+                  name="tipodefactura"
+                  value={formData.tipodefactura}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccionar tipo</option>
+                  <option value="SC11">
+                    SC11 - Arrend. Eq. Computación y Comunicación
+                  </option>
+                  <option value="SC40">
+                    SC40 - Mnto. Eq. Cómputo y Comunicación Compras RC
+                  </option>
+                  <option value="SC41">
+                    SC41 - Mnto. Eq. Cómputo y Comunicación Servicios RC
+                  </option>
+                  <option value="SC70">
+                    SC70 - Útiles, Papelería y Fotocopias RC
+                  </option>
+                </select>
+              </label>
+            </div>
+
+            {/* 🧾 Ítem */}
+            <div className="campo">
+              <label>
+                Ítem
+                <input
+                  type="text"
+                  name="item"
+                  value={formData.item}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* 📝 Descripción del ítem */}
+            <div className="campo full-width">
+              <label>
+                Descripción del ítem
+                <textarea
+                  name="descripcionitem"
+                  rows={3}
+                  value={formData.descripcionitem}
+                  onChange={handleChange}
+                ></textarea>
+              </label>
+            </div>
+
+            {/* 💰 Valor */}
+            <div className="campo">
+              <label>
+                Valor (en pesos)
+                <input
+                  type="number"
+                  name="valor"
+                  placeholder="Ej: $100000"
+                  value={formData.valor || ""}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* 🏢 Centro Costos */}
+            <div className="campo">
+              <label>
+                Centro Costos (C.C)
+                <input
+                  type="text"
+                  name="cc"
+                  value={formData.cc}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* 🏭 Centro Operativo */}
+            <div className="campo">
+              <label>
+                Centro Operativo (C.O)
+                <input
+                  type="text"
+                  name="co"
+                  value={formData.co}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* 🧱 Unidad de Negocio */}
+            <div className="campo">
+              <label>
+                Unidad de Negocio (U.N)
+                <input
+                  type="text"
+                  name="un"
+                  value={formData.un}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* 🧾 Detalle */}
+            <div className="campo full-width">
+              <label>
+                Detalle
+                <textarea
+                  name="detalle"
+                  rows={3}
+                  value={formData.detalle}
+                  onChange={handleChange}
+                ></textarea>
+              </label>
+            </div>
           </div>
 
-          {/* 🔘 Botones */}
+          {/* Botones */}
           <div className="botones-container">
-            <button type="submit" className="btn-registrar">💾 Registrar Factura</button>
+            <button type="submit" className="btn-registrar">
+              💾 Registrar Factura
+            </button>
 
             <button
               type="button"
@@ -120,12 +281,11 @@ export default function RegistroFactura() {
           </div>
         </form>
       ) : (
-        // 📋 Si mostrarLista = true, muestra el componente de lista
         <div>
-          {/* 🧭 BLOQUE NUEVO: filtros de búsqueda */}
-          {/* Este bloque permite filtrar la lista según varios criterios */}
+          {/* 🔍 Filtros */}
           <FacturaFiltros filtros={filtros} onChange={handleFiltroChange} />
-          {/* 📑 Luego mostramos la lista, pasando el callback para volver */}
+
+          {/* 📋 Lista de facturas */}
           <FacturasLista onVolver={() => setMostrarLista(false)} />
         </div>
       )}
