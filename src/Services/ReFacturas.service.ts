@@ -57,7 +57,7 @@ export class ReFacturasService {
 
     // 🔁 Mapeo de nombres locales → campos SharePoint
     const fields = {
-      FechadeEmision: record.FechaEmision,
+      FechaEmision: record.FechaEmision,
       Numerofactura: record.NoFactura,
       Proveedor: record.Proveedor,
       Title: record.Title, // NIT
