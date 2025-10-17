@@ -17,7 +17,8 @@ export type comprasState = {
   cargarA: CargarA;
   noCO: string;         
   marcasPct: Record<string, number>;
-  motivo: string
+  motivo: string,
+  estado?: string;
 };
 export type Compra = {
   Title: string;
@@ -34,5 +35,6 @@ export type Compra = {
   PorcentajeSuperdry: string;
   PorcentajeKipling: string;
   PorcentajeBroken: string;
-  Id?: string
+  Id?: string,
+  Estado?: string
 }

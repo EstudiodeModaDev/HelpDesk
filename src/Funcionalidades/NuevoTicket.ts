@@ -2,17 +2,19 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import { calcularFechaSolucion, calculoANS } from "../utils/ans";
 import { fetchHolidays} from "../Services/Festivos";
-import type { FormState, FormErrors } from "../Models/nuevoTicket";
+import type { FormState, FormErrors, UserFormState, FormUserErrors } from "../Models/nuevoTicket";
 import type { Articulo, Categoria, Subcategoria } from "../Models/Categorias";
 import type {  GetAllOpts, } from "../Models/Commons";
 import type { FlowToUser } from "../Models/FlujosPA";
 import type { TZDate } from "@date-fns/tz";
-import type { TicketsService } from "../Services/Tickets.service";
+import { TicketsService } from "../Services/Tickets.service";
 import { toGraphDateTime } from "../utils/Date";
 import type { Holiday } from "festivos-colombianos";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import { FlowClient } from "./FlowClient";
 import type { LogService } from "../Services/Log.service";
+import { useAuth } from "../auth/authContext";
+import type { UsuariosSP } from "../Models/Usuarios";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -23,7 +25,6 @@ type Svc = {
   Logs: LogService
 }; 
 
-// Helpers para tolerar nombres internos distintos
 export const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
 
 export function useNuevoTicketForm(services: Svc) {
@@ -341,3 +342,182 @@ export function useNuevoTicketForm(services: Svc) {
     handleSubmit,
   };
 }
+
+export function useNuevoUsuarioTicketForm(services: Svc) {
+  const { Usuarios, Tickets, Logs} = services;
+  const { account, } = useAuth();
+  const [state, setState] = useState<UserFormState>({
+    archivo: null,
+    Correosolicitante: account?.username ?? "",
+    descripcion: "",
+    motivo: "",
+    solicitante: ""
+  });
+  const [errors, setErrors] = useState<FormUserErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null);
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
+
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      try {
+        const hs = await fetchHolidays();
+        if (!cancel) setHolidays(hs);
+      } catch (e) {
+        if (!cancel) console.error("Error festivos:", e);
+      }
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, []);
+
+  const setField = <K extends keyof UserFormState>(k: K, v: UserFormState[K]) => setState((s) => ({ ...s, [k]: v }));
+
+  const validate = () => {
+    const e: FormUserErrors = {};
+    if (!state.descripcion) e.descripcion = "Requerida";
+    if (state.descripcion.length < 60) e.descripcion = "La descripción debe tener minimo 60 caracteres";
+    if (!state.motivo.trim()) e.motivo = "Ingrese el motivo";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const pickTecnicoConMenosCasos = async (): Promise<UsuariosSP | null> => {
+    const tecnicos = await Usuarios.getAll({filter: "fields/Rol eq 'Tecnico' and fields/Disponible eq 'Disponible'", top: 50});
+
+    console.table(tecnicos)
+
+    if (!tecnicos || tecnicos.length === 0) return null;
+
+    let min = Number.POSITIVE_INFINITY;
+    let candidatos: UsuariosSP[] = [];
+
+    for (const t of tecnicos) {
+      const carga = Number(t.Numerodecasos ?? 0); 
+      if (carga < min) {
+        min = carga;
+        candidatos = [t];
+      } else if (carga === min) {
+        candidatos.push(t);
+      }
+    }
+
+    const elegido = candidatos[Math.floor(Math.random() * candidatos.length)] ?? null;
+
+    if (elegido) {
+      console.log(`Asignar a: ${elegido.Title} (casos activos: ${elegido.Numerodecasos ?? 0})`);
+    }
+
+    return elegido;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    setSubmitting(true);
+    try {
+      const apertura = new Date();
+      const solucion = calcularFechaSolucion(apertura, 2.5, holidays);
+      setFechaSolucion(solucion);
+
+      const aperturaISO  = toGraphDateTime(apertura);
+      const tiempoSolISO = toGraphDateTime(solucion as any);
+
+      const resolutor = await pickTecnicoConMenosCasos();
+      console.log(resolutor);
+
+      const payload = {
+        Title: state.motivo,
+        Descripcion: state.descripcion,
+        FechaApertura: aperturaISO,
+        TiempoSolucion: tiempoSolISO,
+        Nombreresolutor: resolutor?.Title,
+        Correoresolutor: resolutor?.Correo,
+        Solicitante: account?.name,
+        CorreoSolicitante: account?.username,
+        Estadodesolicitud: "En Atención",
+      };
+
+      const ticketCreated = await Tickets?.create(payload);
+      console.log(ticketCreated);
+      if (resolutor) {
+        const casosActuales = Number(resolutor.Numerodecasos ?? 0); // ← default 0 ANTES de Number()
+        const nuevoTotal = casosActuales + 1;
+        await Usuarios.update(String(resolutor.Id), {Numerodecasos: nuevoTotal,});
+      }
+
+      alert("caso creado con ID " + ticketCreated?.ID)
+      Logs.create({
+        Actor: "Sitema", 
+        Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated!.ID ?? ""}`, 
+        CorreoActor: "", 
+        Tipo_de_accion: 
+        "Creacion", 
+        Title: ticketCreated?.ID ?? ""
+      })
+
+      if (ticketCreated?.CorreoSolicitante) {
+        const title = `Asignación de Caso - ${ticketCreated.ID}`;
+        const message = `
+          <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
+          Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
+          <strong>ID del Caso:</strong> ${ticketCreated.ID}<br>
+          <strong>Asunto del caso:</strong> ${payload.Title}<br>
+          <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
+          El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
+          Si hay algun cambio con su ticket sera notificado.
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
+
+          try {
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated?.CorreoSolicitante, title, message, mail: true, });
+          } catch (err) {
+            console.error("[Flow] Error enviando a solicitante:", err);
+          }
+        }
+
+        // Notificar resolutor    
+        if (ticketCreated?.CorreoResolutor) {
+          const title = `Nuevo caso asignado - ${ticketCreated.ID}`;
+          const message = `
+          <p>¡Hola!<br><br>
+          Tienes un nuevo caso asignado con estos detalles:<br><br>
+          <strong>ID del Caso:</strong> ${ticketCreated}<br>
+          <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
+          <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
+          <strong>Asunto:</strong> ${payload.Title}<br>
+          <strong>Fecha máxima para categorización:</strong> ${ticketCreated.FechaApertura}<br><br>
+          En caso de no categorizar el ticket este se vencera y sera irreversible.<br><br>
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
+
+          try {
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated.CorreoResolutor, title, message, mail: true,});
+          } catch (err) {
+            console.error("[Flow] Error enviando a resolutor:", err);
+          }
+        }
+ 
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return {
+    // estado de formulario
+    state,
+    setField,
+    errors,
+    submitting,
+    fechaSolucion,
+    // acciones
+    handleSubmit,
+  };
+}
+

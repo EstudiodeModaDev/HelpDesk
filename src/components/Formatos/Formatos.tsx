@@ -108,7 +108,7 @@ export default function Formatos() {
 
   // Pantalla inicial: selector + TyC
   return (
-    <section className="tg-card">
+    <section className="tg-card tg-scope">
       <label className="tg-label" htmlFor="tg_select">Tipo de solicitud</label>
 
       <select

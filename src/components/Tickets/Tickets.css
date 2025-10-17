@@ -1,23 +1,13 @@
-/* ======= Forzar tema CLARO en TablaTickets, incluso con SO/navegador oscuro ======= */
+/* ===== Forzar tema CLARO en TablaTickets (CSS puro) ===== */
 .tabla-tickets{
-  /* Bloquea el tema del navegador en claro para inputs nativos/controles */
-  color-scheme: only light;
-
-  /* Tokens claros locales al módulo */
-  --bg: #ffffff;
-  --card: #f8fafc;
-  --text: #0f172a;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --primary: #2563eb;
-  --ring: #93c5fd;
-  --shadow: 0 8px 24px rgba(2,6,23,.08);
-
+  /* Fuerza controles nativos (inputs/selects) en claro */
+  color-scheme: light;
+  isolation: isolate;                 /* evita inversiones heredadas */
   background: var(--bg) !important;
   color: var(--text);
 }
 
-/* Barra de filtros (inputs, botones, selects) siempre claros */
+/* Barra de filtros siempre clara */
 .tabla-tickets .filtros,
 .tabla-tickets .filtros input[type="text"],
 .tabla-tickets .filtros input[type="date"],
@@ -28,12 +18,11 @@
   border: 1px solid var(--border) !important;
 }
 
-/* Placeholder y focus ring consistentes en claro */
 .tabla-tickets .filtros input::placeholder{ color: var(--muted) !important; }
 .tabla-tickets .filtros input:focus,
 .tabla-tickets .filtros select:focus{
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 35%, transparent) !important;
+  box-shadow: 0 0 0 4px rgba(147,197,253,.35) !important;
   outline: none !important;
 }
 
@@ -46,7 +35,7 @@
 }
 .tabla-tickets table{ color: var(--text); }
 .tabla-tickets thead th{
-  background: color-mix(in oklab, var(--card) 92%, white) !important;
+  background: #f8fafc !important;      /* equivalente a var(--card) */
   color: var(--text) !important;
   border-bottom: 1px solid var(--border) !important;
 }
@@ -55,26 +44,26 @@
   color: var(--text) !important;
 }
 .tabla-tickets tbody tr:nth-child(odd){
-  background: color-mix(in oklab, var(--bg) 95%, #f2f6ff 5%) !important;
+  background: #fbfdff !important;       /* alternado claro */
 }
 .tabla-tickets tbody tr:hover{
-  background: color-mix(in oklab, var(--primary) 12%, transparent) !important;
+  background: rgba(37,99,235,.08) !important; /* hover claro */
 }
 
 /* Paginación */
 .tabla-tickets .table-wrap + div button,
 .tabla-tickets .table-wrap + div select{
-  background: var(--card) !important;
+  background: #f8fafc !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
 }
 .tabla-tickets .table-wrap + div button[disabled]{
-  background: var(--card) !important;
+  background: #f8fafc !important;
   color: var(--muted) !important;
   border-color: var(--border) !important;
 }
 
-/* Chips/indicadores circulares de estado (si tu CSS los usa) */
+/* Chips/indicadores */
 .tabla-tickets .estado-circulo{
   display: inline-block;
   width: 10px; height: 10px;
@@ -82,8 +71,45 @@
   border: 1px solid rgba(0,0,0,.06);
 }
 
-/* (Opcional) si algún estilo global aplica tema oscuro por media query,
-   neutralízalo para este módulo */
+/* SVGs e iconos usan el color del texto del módulo */
+.tabla-tickets svg { fill: currentColor; color: var(--text); }
+
+/* Chrome autofill en claro */
+.tabla-tickets input:-webkit-autofill,
+.tabla-tickets input:-webkit-autofill:hover,
+.tabla-tickets input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* ===== Botones de paginación siempre claros ===== */
+.tabla-tickets button,
+.tabla-tickets select {
+  background: #fff !important;
+  color: #0f172a !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+.tabla-tickets button:hover:not(:disabled) {
+  background: #f3f4f6 !important;
+}
+
+.tabla-tickets button:disabled {
+  background: #f9fafb !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+}
+
+/* Fuerza esquema claro */
+.tabla-tickets {
+  color-scheme: light;
+  isolation: isolate;
+}
+
+
+/* Si el SO está en oscuro, re-aplica los tokens claros aquí */
 @media (prefers-color-scheme: dark){
   .tabla-tickets{
     --bg: #ffffff !important;
@@ -95,5 +121,6 @@
     --ring: #93c5fd !important;
     --shadow: 0 8px 24px rgba(2,6,23,.08) !important;
     background: var(--bg) !important;
+    color: var(--text) !important;
   }
 }

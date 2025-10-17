@@ -139,11 +139,6 @@
   background: color-mix(in oklab, var(--bg) 95%, #f2f6ff 5%);
 }
 
-.table-wrap tbody tr:hover{
-  background: color-mix(in oklab, var(--primary) 12%, transparent);
-  cursor: pointer;
-}
-
 /* accesible con teclado en filas clicables */
 .table-wrap tbody tr:focus{
   outline: none;

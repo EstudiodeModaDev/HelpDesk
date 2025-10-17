@@ -9,6 +9,31 @@
   --tf-gap: 16px;
 }
 
+.ticket-form[data-force-light] {
+  color-scheme: light;
+  isolation: isolate;         
+  background: var(--tf-bg);
+  color: var(--tf-fg);
+}
+
+.dark .ticket-form[data-force-light],
+.dark .ticket-form[data-force-light] * {
+  color-scheme: light !important;
+}
+
+.ticket-form[data-force-light] .tf-input,
+.ticket-form[data-force-light] .tf-checkbox,
+.ticket-form[data-force-light] .tf-submit {
+  background: #fff !important;
+  color: var(--tf-fg) !important;
+  border-color: var(--tf-border) !important;
+}
+
+.ticket-form[data-force-light] .tf-input:focus {
+  border-color: var(--tf-focus) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
 .ticket-form {
   background: var(--tf-bg);
   color: var(--tf-fg);
@@ -132,6 +157,14 @@
   border-radius: 12px !important;
   overflow: hidden;
   box-shadow: 0 12px 28px rgba(0,0,0,0.12) !important;
+}
+
+.rs__menu,
+.rs__menu * {
+  color-scheme: light !important;
+  background: #fff !important;
+  color: var(--tf-fg) !important;
+  border: none;
 }
 
 .rs__option {

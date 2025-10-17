@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useId } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import "./TareasForm.css";
 import type { NuevaTarea } from "../../../Models/Tareas";
@@ -19,17 +19,18 @@ export default function FormTarea({ onAgregar }: FormTareaProps) {
     estado: "Pendiente",
   });
 
-  // Para IDs únicos y accesibles
+  // IDs accesibles y únicos
+  const uid = useId();
   const ids = useMemo(
     () => ({
-      titulo: "ft_titulo",
-      solicitante: "ft_solicitante",
-      responsable: "ft_responsable",
-      fecha: "ft_fecha",
-      hora: "ft_hora",
-      estado: "ft_estado",
+      titulo: `${uid}-titulo`,
+      solicitante: `${uid}-solicitante`,
+      responsable: `${uid}-responsable`,
+      fecha: `${uid}-fecha`,
+      hora: `${uid}-hora`,
+      estado: `${uid}-estado`,
     }),
-    []
+    [uid]
   );
 
   const onChange =
@@ -51,9 +52,7 @@ export default function FormTarea({ onAgregar }: FormTareaProps) {
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const tituloOk = form.titulo.trim().length > 0;
-    if (!tituloOk) return;
-
+    if (!form.titulo.trim()) return;
     onAgregar(form);
     limpiar();
   };
@@ -61,58 +60,29 @@ export default function FormTarea({ onAgregar }: FormTareaProps) {
   const disabled = form.titulo.trim().length === 0;
 
   return (
-    <section className="ft-card" role="region" aria-labelledby="ft_title">
+    <section className="ft-scope ft-card" role="region" aria-labelledby="ft_title">
       <h2 id="ft_title" className="ft-title">Nueva Tarea</h2>
 
       <form className="ft-form" onSubmit={submit} onReset={limpiar} noValidate>
         <label className="ft-field" htmlFor={ids.titulo}>
           <span>Asunto *</span>
-          <input
-            id={ids.titulo}
-            name="titulo"
-            value={form.titulo}
-            onChange={onChange("titulo")}
-            placeholder="Asunto de la tarea"
-            autoComplete="off"
-            required
-            aria-required="true"
-          />
+          <input id={ids.titulo}  name="titulo" value={form.titulo} onChange={onChange("titulo")} placeholder="Asunto de la tarea" autoComplete="off" required aria-required="true"/>
         </label>
 
         <label className="ft-field" htmlFor={ids.solicitante}>
           <span>Solicitante</span>
-          <input
-            id={ids.solicitante}
-            name="solicitante"
-            value={form.solicitante || ""}
-            onChange={onChange("solicitante")}
-            placeholder="Buscar solicitante"
-            autoComplete="off"
-          />
+          <input id={ids.solicitante} name="solicitante" value={form.solicitante || ""} onChange={onChange("solicitante")} placeholder="Buscar solicitante" autoComplete="off"/>
         </label>
 
         <label className="ft-field" htmlFor={ids.responsable}>
           <span>Responsable</span>
-          <input
-            id={ids.responsable}
-            name="responsable"
-            value={form.responsable || ""}
-            onChange={onChange("responsable")}
-            placeholder="Nombre del responsable"
-            autoComplete="off"
-          />
+          <input id={ids.responsable} name="responsable" value={form.responsable || ""} onChange={onChange("responsable")} placeholder="Nombre del responsable" autoComplete="off"/>
         </label>
 
         <div className="ft-grid-3">
           <label className="ft-field" htmlFor={ids.fecha}>
             <span>Fecha del evento</span>
-            <input
-              id={ids.fecha}
-              name="fecha"
-              type="date"
-              value={form.fecha || ""}
-              onChange={onChange("fecha")}
-            />
+            <input id={ids.fecha} name="fecha" type="date" value={form.fecha || ""} onChange={onChange("fecha")}/>
           </label>
 
           <label className="ft-field" htmlFor={ids.hora}>

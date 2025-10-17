@@ -41,8 +41,6 @@ export default function TablaTickets() {
     });
   }, [rows, search]);
 
-  const resetFiltrosLocal = () => setSearch("");
-
   return (
     <div className="tabla-tickets">
       {/* Barra de filtros (oculta en detalle) */}
@@ -92,11 +90,6 @@ export default function TablaTickets() {
           {/* Recargar primera página */}
           <button type="button" onClick={reloadAll} title="Recargar">
             ⟳
-          </button>
-
-          {/* Limpiar búsqueda local */}
-          <button type="button" onClick={resetFiltrosLocal} title="Limpiar búsqueda">
-            Limpiar
           </button>
         </div>
       )}

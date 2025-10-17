@@ -1,3 +1,4 @@
+/* ========= Paleta y tokens globales (fallback) ========= */
 :root{
   --card-bg:#fff; --card-bd:#e5e7eb; --ink:#0f172a; --muted:#6b7280;
   --primary:#2d6df6; --primary-ink:#fff; --ring:rgba(45,109,246,.42);
@@ -10,6 +11,40 @@
   }
 }
 
+/* ========= Scope: forzar tema CLARO solo en ERP ========= */
+.erp-scope{
+  /* bloquea modo oscuro automático */
+  color-scheme: light;
+  isolation: isolate;
+
+  /* tokens fijos para claro */
+  --card-bg:#ffffff;
+  --card-bd:#e5e7eb;
+  --ink:#0f172a;
+  --muted:#6b7280;
+  --primary:#2d6df6;
+  --primary-ink:#ffffff;
+  --ring:rgba(45,109,246,.42);
+  --radius:14px;
+  --shadow:0 12px 28px rgba(2,6,23,.08);
+}
+
+/* asegura que, aunque el SO esté en dark, el scope siga claro */
+@media (prefers-color-scheme: dark){
+  .erp-scope{
+    --card-bg:#ffffff !important;
+    --card-bd:#e5e7eb !important;
+    --ink:#0f172a !important;
+    --muted:#6b7280 !important;
+    --primary:#2d6df6 !important;
+    --primary-ink:#ffffff !important;
+    --ring:rgba(45,109,246,.42) !important;
+    --shadow:0 12px 28px rgba(2,6,23,.08) !important;
+    background:#ffffff !important;
+  }
+}
+
+/* ========= Card ========= */
 .erp-card{
   background:var(--card-bg);
   border:1px solid var(--card-bd);
@@ -19,27 +54,40 @@
 }
 
 .erp-title{
-  margin:0 0 14px; text-align:center; color:var(--ink); font-weight:800;
+  margin:0 0 14px; 
+  text-align:center; 
+  color:var(--ink); 
+  font-weight:800;
 }
 
-/* Tabla */
+/* ========= Tabla (grid) ========= */
 .erp-table{ display:grid; gap:10px; }
 .erp-header, .erp-row{
   display:grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1.1fr 1.1fr 1.2fr 110px;
-  gap:10px; align-items:center;
+  gap:10px; 
+  align-items:center;
 }
 .erp-header{
-  color:var(--muted); font-weight:700; font-size:.95rem;
-  padding-bottom:4px; border-bottom:1px dashed var(--card-bd);
+  color:var(--muted); 
+  font-weight:700; 
+  font-size:.95rem;
+  padding-bottom:4px; 
+  border-bottom:1px dashed var(--card-bd);
 }
 .erp-cell{ width:100%; }
 
+/* ========= Campos ========= */
 .erp-input, .erp-select{
-  width:100%; min-height:38px; padding:8px 10px;
-  border:1px solid var(--card-bd); border-radius:10px;
-  background:transparent; color:var(--ink);
-  outline:none; box-sizing:border-box;
+  width:100%; 
+  min-height:38px; 
+  padding:8px 10px;
+  border:1px solid var(--card-bd); 
+  border-radius:10px;
+  background:transparent; 
+  color:var(--ink);
+  outline:none; 
+  box-sizing:border-box;
   transition:border-color .2s, box-shadow .2s;
 }
 .erp-input:focus, .erp-select:focus{
@@ -47,33 +95,69 @@
   box-shadow:0 0 0 3px var(--ring);
 }
 
+/* ⇨ Asegura fondo claro de inputs/selects dentro del scope */
+.erp-scope .erp-input,
+.erp-scope .erp-select{
+  background:#fff !important;
+  color:var(--ink) !important;
+  border-color:var(--card-bd) !important;
+}
+.erp-scope .erp-input::placeholder{ color:var(--muted) !important; }
+
+/* ========= Acciones por fila ========= */
 .erp-cell--acciones{ text-align:center; }
 
-/* Botones */
-.erp-actions{ display:flex; gap:10px; justify-content:center; margin-top:12px; }
+/* ========= Botones ========= */
+.erp-actions{ 
+  display:flex; 
+  gap:10px; 
+  justify-content:center; 
+  margin-top:12px; 
+}
 .erp-btn{
-  border:1px solid var(--card-bd); background:#fff; color:var(--ink);
-  border-radius:10px; padding:10px 14px; cursor:pointer;
-  transition: filter .15s, box-shadow .2s, transform .05s;
+  border:1px solid var(--card-bd); 
+  background:#fff; 
+  color:var(--ink);
+  border-radius:10px; 
+  padding:10px 14px; 
+  cursor:pointer;
+  transition: filter .15s, box-shadow .2s, transform .05s, background .15s;
 }
 .erp-btn:hover{ filter:brightness(.98); }
 .erp-btn:active{ transform: translateY(1px); }
 .erp-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* variantes */
 .erp-btn--primary{
-  background:var(--primary); color:var(--primary-ink); border-color:transparent;
+  background:var(--primary); 
+  color:var(--primary-ink); 
+  border-color:transparent;
   box-shadow:0 8px 20px rgba(45,109,246,.35);
 }
+.erp-btn--primary:hover{ filter:brightness(.96); box-shadow:0 10px 24px rgba(45,109,246,.40); }
+
 .erp-btn--ghost{
-  background:transparent; color:var(--ink); border:1px solid var(--card-bd);
+  background:transparent; 
+  color:var(--ink); 
+  border:1px solid var(--card-bd);
 }
 
-/* Error */
+/* ⇨ Asegura estilos de botones claros dentro del scope */
+.erp-scope .erp-btn{ background:#fff; color:var(--ink); border-color:var(--card-bd); }
+.erp-scope .erp-btn--primary{ background:var(--primary); color:var(--primary-ink); border-color:transparent; }
+.erp-scope .erp-btn--ghost{ background:transparent; color:var(--ink); border-color:var(--card-bd); }
+
+/* ========= Error ========= */
 .erp-error{
-  margin-top:8px; background:#fde8e8; border:1px solid #f5c2c2;
-  color:#7a1f1f; padding:10px 12px; border-radius:10px;
+  margin-top:8px; 
+  background:#fde8e8; 
+  border:1px solid #f5c2c2;
+  color:#7a1f1f; 
+  padding:10px 12px; 
+  border-radius:10px;
 }
 
-/* Responsive */
+/* ========= Responsive ========= */
 @media (max-width: 1200px){
   .erp-header, .erp-row{ grid-template-columns: 1fr 1fr; }
 }

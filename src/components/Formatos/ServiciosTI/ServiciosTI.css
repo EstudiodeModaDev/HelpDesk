@@ -1,4 +1,4 @@
-/* ========= Paleta y tokens ========= */
+/* ========= Paleta y tokens (globales opcionales) ========= */
 :root{
   --card-bg:#fff; --card-bd:#e5e7eb; --ink:#0f172a; --muted:#6b7280;
   --primary:#2d6df6; --primary-ink:#fff; --ring:rgba(45,109,246,.42);
@@ -11,6 +11,37 @@
   }
 }
 
+/* ========= SCOPE: Forzar tema CLARO solo en este módulo ========= */
+.su-scope{
+  color-scheme: light;
+  isolation: isolate;
+
+  /* Tokens fijos en claro (sobrescriben los globales dentro del scope) */
+  --card-bg:#ffffff;
+  --card-bd:#e5e7eb;
+  --ink:#0f172a;
+  --muted:#6b7280;
+  --primary:#2d6df6;
+  --primary-ink:#ffffff;
+  --ring:rgba(45,109,246,.42);
+  --radius:14px;
+  --shadow:0 12px 28px rgba(2,6,23,.08);
+}
+
+/* Mantén los mismos valores si el SO está en oscuro */
+@media (prefers-color-scheme: dark){
+  .su-scope{
+    --card-bg:#ffffff !important;
+    --card-bd:#e5e7eb !important;
+    --ink:#0f172a !important;
+    --muted:#6b7280 !important;
+    --primary:#2d6df6 !important;
+    --primary-ink:#ffffff !important;
+    --ring:rgba(45,109,246,.42) !important;
+    --shadow:0 12px 28px rgba(2,6,23,.08) !important;
+  }
+}
+
 /* ========= Card base ========= */
 .su-card{
   background:var(--card-bg);
@@ -18,6 +49,7 @@
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   padding:18px;
+  color:var(--ink);
 }
 
 /* Título */
@@ -39,7 +71,7 @@
   margin-bottom:8px;
 }
 
-/* ========= LAYOUT (Opción A: grid-areas) ========= */
+/* ========= LAYOUT (grid-areas) ========= */
 .su-form{
   display:grid;
   grid-template-columns: minmax(420px,1fr) minmax(420px,1fr);
@@ -71,6 +103,7 @@
 .su-field{ display:grid; gap:6px; }
 .su-field > label{ color:var(--muted); font-size:.92rem; }
 
+/* Inputs/selects/textarea con fondo fijo claro dentro del scope */
 .su-field input[type="text"],
 .su-field input[type="number"],
 .su-field input[type="date"],
@@ -80,11 +113,11 @@
   min-height:40px;
   padding:10px 12px;
   border:1px solid var(--card-bd);
-  background:transparent;
+  background:#fff;                 /* <- fija en claro */
   color:var(--ink);
   border-radius:12px;
   outline:none;
-  transition:border-color .2s, box-shadow .2s;
+  transition:border-color .2s, box-shadow .2s, background .2s;
   box-sizing:border-box;
 }
 .su-field textarea{ min-height:110px; resize:vertical; }
@@ -99,7 +132,6 @@
 /* Quitar flechas a number (opcional) */
 .su-field input[type="number"]::-webkit-outer-spin-button,
 .su-field input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-
 .su-field input[type="number"]{ -moz-appearance:textfield; }
 
 /* ========= Sección derecha: Servicios y programas ========= */
@@ -122,7 +154,15 @@
 .su-check{
   display:flex; align-items:center; gap:10px; color:var(--ink);
 }
-.su-check input{ width:18px; height:18px; accent-color: var(--primary); }
+
+/* Checkbox consistente en claro */
+.su-check input{
+  width:18px; height:18px;
+  accent-color: var(--primary);      /* compatibilidad moderna */
+  background:#fff;                   /* asegura claro */
+  border:1px solid var(--card-bd);
+  border-radius:4px;
+}
 
 /* Extensión y Observaciones */
 .su-right .su-field--obs textarea{ min-height:140px; }
@@ -139,13 +179,15 @@
   width:auto;                /* evita “barra” a lo ancho */
   display:inline-flex;
 }
+.su-btn:hover{ background:#f9fafb; }
+.su-btn:active{ transform: translateY(1px); }
+.su-btn[disabled]{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+
 .su-btn--primary{
   background:var(--primary); color:var(--primary-ink); border-color:transparent;
   box-shadow:0 8px 20px rgba(45,109,246,.35);
 }
 .su-btn--primary:hover{ filter:brightness(.96); box-shadow:0 10px 24px rgba(45,109,246,.40); }
-.su-btn:active{ transform: translateY(1px); }
-.su-btn[disabled]{ opacity:.6; cursor:not-allowed; box-shadow:none; }
 
 /* ========= Responsive ========= */
 @media (max-width: 980px){

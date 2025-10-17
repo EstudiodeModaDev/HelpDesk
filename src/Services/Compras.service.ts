@@ -89,7 +89,8 @@ export class ComprasService {
       PorcentajeSuperdry: f.PorcentajeSuperdry,
       SolicitadoPor: f.SolicitadoPor,
       Title: f.Title,
-      UN: f.UN
+      UN: f.UN,
+      Estado: f.Estado
     }
   }
 
