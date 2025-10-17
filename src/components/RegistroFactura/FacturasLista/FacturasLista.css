@@ -1,4 +1,4 @@
-/* 🧾 Contenedor de tabla */
+/* 🧾 Contenedor de la lista de facturas */
 .facturas-lista {
   margin-top: 40px;
   background-color: #fff;
@@ -6,17 +6,18 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 25px;
   overflow: hidden;
-  max-height: 65vh;
+  max-height: 65vh; /* Máxima altura visible */
   display: flex;
   flex-direction: column;
 }
 
-/* 📋 Tabla con scroll */
+/* 📋 Tabla con scroll vertical */
 .tabla-scroll {
   flex: 1;
-  overflow-y: auto;
-  border-radius: 10px;
+  overflow-y: auto; /* Solo scroll vertical */
+  max-height: 50vh; /* Limitar altura para scroll solo si hay muchas filas */
   margin-bottom: 10px;
+  border-radius: 10px;
 }
 
 /* 📋 Tabla */
@@ -36,7 +37,7 @@
 
 .tabla-facturas th {
   background-color: #2971b9;
-  color: rgb(255, 255, 255);
+  color: white;
   font-weight: 700;
 }
 
@@ -44,6 +45,7 @@
   background-color: #f2f6fa;
 }
 
+/* 🧩 Botones de edición y eliminación */
 .btn-editar, .btn-eliminar {
   border: none;
   background: none;
@@ -51,21 +53,21 @@
   font-size: 18px;
 }
 
-/* 🔽 Botón fijo centrado */
+/* 🔽 Botón fijo de volver */
 .btn-volver-fijo {
   position: sticky;
-  bottom: -20px;
+  bottom: 10px; /* Asegura que esté fijo al final */
   display: block;
   margin: 20px auto 0 auto;
   background-color: #3a31e5;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 10px 8px;
+  padding: 10px 20px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  width: 500px;
+  width: 300px; /* Ajustamos el tamaño */
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   z-index: 100;
