@@ -1,9 +1,10 @@
 import React from "react";
-import type { SortDir, SortField, Ticket } from "../Models/Tickets";
+import type { SortDir, SortField, Ticket, ticketOption } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
+import type { RelacionadorState } from "../Models/nuevoTicket";
 
 export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   if (!fecha) return new Date(NaN);
@@ -79,27 +80,21 @@ export function calcularColorEstado(ticket: Ticket): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-export function useTickets(
-  TicketsSvc: TicketsService,
-  userMail: string,
-  isAdmin: boolean
-) {
-  // UI state
+
+export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin: boolean) {
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  // filtros
   const [filterMode, setFilterMode] = React.useState<FilterMode>("En curso");
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
   const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
-
-  // paginación servidor
   const [pageSize, setPageSize] = React.useState<number>(10); // = $top
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
-
   const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
+  const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
+
+  const setField = <K extends keyof RelacionadorState>(k: K, v: RelacionadorState[K]) => setState((s) => ({ ...s, [k]: v }));
 
   // construir filtro OData
   const buildFilter = React.useCallback((): GetAllOpts => {
@@ -140,7 +135,29 @@ export function useTickets(
     };
   }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize, sorts]); 
 
-  // cargar primera página (o recargar)
+  const toTicketOptions = React.useCallback(
+    async (opts?: {includeIdInLabel?: boolean; fallbackIfEmptyTitle?: string; idPrefix?: string; top?: number; orderby?: string;}): Promise<ticketOption[]> => {
+      const {includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#", top = 500, orderby = "created desc",} = opts ?? {};
+
+      const seen = new Set<string>();
+      const { items } = await TicketsSvc.getAll({orderby, top,});
+      const result = items.filter((t: any) => t && t.ID != null).map((t: any): ticketOption => {
+          const id = String(t.ID);
+          const title = (t.Title ?? "").trim() || fallbackIfEmptyTitle;
+          const label = includeIdInLabel ? `${title} — ID: ${idPrefix}${id}` : title;
+          return { value: id, label };
+        })
+        .filter((opt: ticketOption) => {
+          if (seen.has(opt.value)) return false;
+          seen.add(opt.value);
+          return true;
+        });
+
+      return result;
+    },
+    [TicketsSvc]
+  );
+
   const loadFirstPage = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
@@ -233,7 +250,10 @@ export function useTickets(
     // acciones
     reloadAll,
     toggleSort,
+    setField,
     sorts,
+    toTicketOptions,
+    state, setState
   };
 }
 

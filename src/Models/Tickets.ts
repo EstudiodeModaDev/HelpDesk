@@ -37,6 +37,11 @@ export type FormObservadorState = {
     observador: UserOption | null;
 }
 
+export type ticketOption = {
+  value: string;      //Id Ticket
+  label: string;      //Nombre del ticket
+};
+
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
 export type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';

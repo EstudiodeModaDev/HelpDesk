@@ -1,59 +1,49 @@
 import * as React from "react";
 import "./RelacionadorInline.css";
+import Select from "react-select";
+import type { ticketOption } from "../../../../Models/Tickets";
+import { useTickets } from "../../../../Funcionalidades/Tickets";
+import { useGraphServices } from "../../../../graph/GrapServicesContext";
 
 export type TicketLite = { ID: number | string; Title: string };
-type Mode = "padre" | "hijo";
+type Mode = "padre" | "hijo" | "masiva";
 
 type Props = {
   currentId: number | string;
-  tickets: TicketLite[];
-  defaultMode?: Mode;
   onCancel: () => void;
   onConfirm: (payload: { mode: Mode; selected: TicketLite[] }) => void;
+  userMail: string;
+  isAdmin: boolean
 };
 
-export default function RelacionadorInline({
-  currentId,
-  tickets,
-  defaultMode = "padre",
-  onCancel,
-  onConfirm,
-}: Props) {
-  const [mode, setMode] = React.useState<Mode>(defaultMode);
+export default function RelacionadorInline({/*currentId,*/ onCancel, onConfirm, userMail, isAdmin}: Props) {
+  const [mode, setMode] = React.useState<Mode>("padre");
   const [query, setQuery] = React.useState("");
   const [open, setOpen] = React.useState(false);
-  const [activeIndex, setActiveIndex] = React.useState<number>(-1); // item resaltado en la lista
+  const [tickets, setTickets] = React.useState<ticketOption[]>([]);
   const [selectedOne, setSelectedOne] = React.useState<TicketLite | null>(null);
 
-  // Excluir el ticket actual
-  const baseOptions = React.useMemo(
-    () => tickets.filter((t) => String(t.ID) !== String(currentId)),
-    [tickets, currentId]
-  );
+  const { Tickets } = useGraphServices();
+  const {toTicketOptions, state, setField} = useTickets(Tickets, userMail, isAdmin);
 
-  // Filtrado (si query vacío => todos)
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return baseOptions;
-    return baseOptions.filter(
-      (t) =>
-        String(t.ID).toLowerCase().includes(q) ||
-        (t.Title ?? "").toLowerCase().includes(q)
-    );
-  }, [baseOptions, query]);
-
-  // Reset selección al cambiar modo
   React.useEffect(() => {
     setSelectedOne(null);
     setQuery("");
-    setActiveIndex(-1);
   }, [mode]);
 
-  // Si cambia el filtro, reajustar el índice activo
   React.useEffect(() => {
-    if (filtered.length === 0) setActiveIndex(-1);
-    else if (activeIndex >= filtered.length) setActiveIndex(0);
-  }, [filtered.length]); // eslint-disable-line react-hooks/exhaustive-deps
+    let alive = true;
+    (async () => {
+      try {
+        const charged = await toTicketOptions(); 
+        if (alive) setTickets(charged);
+      } catch (e: any) {
+      } 
+  })();
+
+  return () => { alive = false; };
+}, [toTicketOptions]); // si toTicketOptions viene de useCallback, inclúyelo
+
 
   // Abrir/cerrar control con click fuera
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
@@ -66,39 +56,6 @@ export default function RelacionadorInline({
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  function chooseItem(item: TicketLite) {
-    setSelectedOne(item);
-    setQuery(`${item.Title} — ID: ${item.ID}`);
-    setOpen(false);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-      setOpen(true);
-      setActiveIndex(0);
-      e.preventDefault();
-      return;
-    }
-    if (!open) return;
-
-    if (e.key === "ArrowDown") {
-      setActiveIndex((i) => (filtered.length ? (i + 1) % filtered.length : -1));
-      e.preventDefault();
-    } else if (e.key === "ArrowUp") {
-      setActiveIndex((i) =>
-        filtered.length ? (i <= 0 ? filtered.length - 1 : i - 1) : -1
-      );
-      e.preventDefault();
-    } else if (e.key === "Enter") {
-      if (activeIndex >= 0 && filtered[activeIndex]) {
-        chooseItem(filtered[activeIndex]);
-      }
-      e.preventDefault();
-    } else if (e.key === "Escape") {
-      setOpen(false);
-    }
-  }
-
   function handleConfirm() {
     if (!selectedOne) return;
     onConfirm({ mode, selected: [selectedOne] });
@@ -110,84 +67,39 @@ export default function RelacionadorInline({
         {/* Select modo (nativo) */}
         <label className="relc-field">
           <span className="relc-field__label">Relación</span>
-          <select
-            className="relc-native"
-            value={mode}
-            onChange={(e) => setMode(e.target.value as Mode)}
-          >
+          <select className="relc-native" value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
             <option value="padre">Padre de</option>
             <option value="hijo">Hijo de</option>
+            <option value="masiva">Masiva</option>
           </select>
         </label>
 
-        {/* Combobox de tickets (input + lista) */}
+        {/* Combobox de tickets */}
         <div className="relc-field relc-field--grow" ref={wrapRef}>
           <span className="relc-field__label">Ticket</span>
 
-          <div
-            className="relc-combobox"
-            role="combobox"
-            aria-haspopup="listbox"
-            aria-expanded={open}
-            aria-owns="relc-listbox"
-          >
-            <input
-              className="relc-input"
-              placeholder="Buscar o seleccionar"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setOpen(true);
-                setActiveIndex(0);
-                // si el usuario empieza a escribir, des-seleccionamos
-                setSelectedOne(null);
-              }}
-              onFocus={() => setOpen(true)}
-              onKeyDown={handleKeyDown}
-              aria-autocomplete="list"
-              aria-controls="relc-listbox"
-            />
+          <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-expanded={open} aria-owns="relc-listbox">
+            <input className="relc-input" placeholder="Buscar o seleccionar" value={query} onChange={(e) => {setQuery(e.target.value);setOpen(true); setSelectedOne(null);}}
+              onFocus={() => setOpen(true)} aria-autocomplete="list" aria-controls="relc-listbox"/>
 
-            <button
-              type="button"
-              className="relc-combo__caret"
-              aria-label={open ? "Cerrar" : "Abrir"}
-              onClick={() => setOpen((v) => !v)}
-            >
+            <button type="button" className="relc-combo__caret" aria-label={open ? "Cerrar" : "Abrir"} onClick={() => setOpen((v) => !v)}>
               ▾
             </button>
+
+            {/* Ticket */}
+            <div className="tf-field">
+              <label className="tf-label">Ticket</label>
+              <Select<ticketOption, false>
+                options={tickets}
+                placeholder={"Buscar ticket"}
+                value={state.TicketRelacionar}
+                onChange={(opt) => setField("TicketRelacionar", opt ?? null)}
+                classNamePrefix="rs"
+                isClearable
+              />
+            </div>
           </div>
 
-          {open && (
-            <ul id="relc-listbox" role="listbox" className="relc-list">
-              {filtered.length === 0 ? (
-                <li className="relc-empty" aria-disabled="true">
-                  Sin resultados
-                </li>
-              ) : (
-                filtered.map((t, idx) => {
-                  const isActive = idx === activeIndex;
-                  return (
-                    <li
-                      key={String(t.ID)}
-                      role="option"
-                      aria-selected={isActive}
-                      className={`relc-item ${isActive ? "is-selected" : ""}`}
-                      onMouseDown={(e) => {
-                        // mousedown para no perder el foco del input antes del click
-                        e.preventDefault();
-                        chooseItem(t);
-                      }}
-                      onMouseEnter={() => setActiveIndex(idx)}
-                    >
-                      <span className="relc-title">{t.Title}</span>
-                      <span className="relc-id">ID: {t.ID}</span>
-                    </li>
-                  );
-                })
-              )}
-            </ul>
-          )}
         </div>
       </div>
 

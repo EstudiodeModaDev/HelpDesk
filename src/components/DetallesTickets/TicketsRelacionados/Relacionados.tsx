@@ -13,7 +13,6 @@ type Props = {
   emptyChildrenText?: string;
   onSelect?: (t: Ticket) => void;         // callback al seleccionar
   buildHref?: (id: number | string) => string; // opcional: si también quieres navegar
-  // opcional: callback para guardar relación en backend
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
@@ -32,18 +31,12 @@ export default function TicketsAsociados({
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
-  const [options, setOptions] = React.useState<TicketLite[]>([]);
   const [loadingOpts, setLoadingOpts] = React.useState(false);
 
   async function openRelacionador() {
     try {
       setShowRel(true);
       setLoadingOpts(true);
-      const res = await Tickets.getAll({ top: 400, orderby: "created asc"});
-      const items = (res?.items ?? [])
-        .filter((t: any) => String(t.ID) !== String(ticket.ID))
-        .map((t: any) => ({ ID: t.ID, Title: t.Title } as TicketLite));
-      setOptions(items);
     } finally {
       setLoadingOpts(false);
     }
@@ -99,11 +92,9 @@ export default function TicketsAsociados({
             <div className="ta-skeleton" style={{ height: 40 }} aria-hidden />
           ) : (
             <RelacionadorInline
-              currentId={Number(ticket.ID)}
-              tickets={options}
-              onCancel={closeRelacionador}
-              onConfirm={handleRelacionConfirm}
-            />
+                currentId={Number(ticket.ID)}
+                onCancel={closeRelacionador}
+                onConfirm={handleRelacionConfirm} userMail={""} isAdmin={true}            />
           )}
         </div>
       ) : (

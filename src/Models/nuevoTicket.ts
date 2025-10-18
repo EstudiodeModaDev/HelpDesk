@@ -1,6 +1,6 @@
 import type { UserOption } from "./Commons";
 import type { FormEscalamientoState } from "./Internet";
-import type { FormObservadorState, FormReasignarState } from "./Tickets";
+import type { FormObservadorState, FormReasignarState, ticketOption } from "./Tickets";
 
 export type FormState = {
   solicitante: UserOption | null;
@@ -15,6 +15,10 @@ export type FormState = {
   articulo: string;
   archivo: File | null;
   ANS?: "";
+};
+
+export type RelacionadorState = {
+  TicketRelacionar: ticketOption | null;
 };
 
 export type UserFormState = {
