@@ -137,10 +137,11 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
   const toTicketOptions = React.useCallback(
     async (opts?: {includeIdInLabel?: boolean; fallbackIfEmptyTitle?: string; idPrefix?: string; top?: number; orderby?: string;}): Promise<ticketOption[]> => {
-      const {includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#", top = 500, orderby = "created desc",} = opts ?? {};
+      const {includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#",} = opts ?? {};
 
       const seen = new Set<string>();
-      const { items } = await TicketsSvc.getAll({orderby, top,});
+      const { items, nextLink } = await TicketsSvc.getAll();;
+      console.log(nextLink)
       const result = items.filter((t: any) => t && t.ID != null).map((t: any): ticketOption => {
           const id = String(t.ID);
           const title = (t.Title ?? "").trim() || fallbackIfEmptyTitle;

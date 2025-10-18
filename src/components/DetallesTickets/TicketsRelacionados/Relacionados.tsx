@@ -16,14 +16,7 @@ type Props = {
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
-export default function TicketsAsociados({
-  title = "Tickets Asociados",
-  ticket,
-  emptyChildrenText = "No es hijo de ningun caso",
-  onSelect,
-  buildHref, // opcional
-  onRelateConfirm,
-}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref,  onRelateConfirm,}: Props) {
   const { Tickets } = useGraphServices();
 
   // Hook de relacionados
