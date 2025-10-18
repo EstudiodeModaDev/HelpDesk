@@ -176,6 +176,30 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     }
   }, [TicketsSvc, buildFilter, sorts]);
 
+  const handleConfirm = React.useCallback(
+    async (actualId: string | number, relatedId: string | number, type: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (type === "padre") {
+          await TicketsSvc.update(String(actualId), { IdCasoPadre: String(relatedId) });
+        } else if (type === "hijo") {
+          await TicketsSvc.update(String(relatedId), { IdCasoPadre: String(actualId) });
+        } else {
+          // "masiva": deja definido qué harás aquí
+          throw new Error("Relación 'masiva' aún no implementada");
+        }
+        return true;  // éxito
+      } catch (e: any) {
+        setError(e?.message ?? "Error actualizando relación del ticket");
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [TicketsSvc]
+  );
+
   React.useEffect(() => {
     loadFirstPage();
   }, [loadFirstPage]);
@@ -254,7 +278,8 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     setField,
     sorts,
     toTicketOptions,
-    state, setState
+    state, setState,
+    handleConfirm
   };
 }
 
@@ -264,50 +289,48 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-const loadRelateds = React.useCallback(async () => {
-  if (!ticket?.ID) {
-    setPadre(null);
-    setHijos([]);
-    return;
-  }
-
-  setLoading(true);
-  setError(null);
-
-  try {
-    // --- Padre (si aplica) ---
-    const idPadre = ticket.IdCasoPadre;
-    if (idPadre != null && idPadre !== "") {
-      const padreRes = await TicketsSvc.get(String(ticket.IdCasoPadre));
-      setPadre(padreRes ?? null);
-    } else {
+  const loadRelateds = React.useCallback(async () => {
+    if (!ticket?.ID) {
       setPadre(null);
+      setHijos([]);
+      return;
     }
 
-    // --- Hijos ---
-    const hijosRes = await TicketsSvc.getAll({
-      filter: `fields/IdCasoPadre eq ${Number(ticket.ID)}`,
-    });
-    setHijos(hijosRes?.items ?? []);
-  } catch (e: any) {
-    setError(e?.message ?? "Error cargando tickets");
-    setPadre(null);
-    setHijos([]);
-  } finally {
-    setLoading(false);
-  }
-}, [TicketsSvc, ticket?.ID, ticket?.IdCasoPadre]);
+    setLoading(true);
+    setError(null);
 
+    try {
+      // --- Padre (si aplica) ---
+      const idPadre = ticket.IdCasoPadre;
+      if (idPadre != null && idPadre !== "") {
+        const padreRes = await TicketsSvc.get(String(ticket.IdCasoPadre));
+        setPadre(padreRes ?? null);
+      } else {
+        setPadre(null);
+      }
+
+      // --- Hijos ---
+      const hijosRes = await TicketsSvc.getAll({
+        filter: `fields/IdCasoPadre eq ${Number(ticket.ID)}`,
+      });
+      setHijos(hijosRes?.items ?? []);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando tickets");
+      setPadre(null);
+      setHijos([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [TicketsSvc, ticket?.ID, ticket?.IdCasoPadre]);
 
   React.useEffect(() => {
     loadRelateds();
   }, [loadRelateds])
 
-
   return {
     padre, hijos,
     loading,
     error,
-    loadRelateds
+    loadRelateds,
   };
 }

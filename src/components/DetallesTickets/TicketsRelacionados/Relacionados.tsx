@@ -20,7 +20,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
   const { Tickets } = useGraphServices();
 
   // Hook de relacionados
-  const { padre, hijos, loading, error } = useTicketsRelacionados(Tickets, ticket);
+  const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
@@ -43,7 +43,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
   function handleClick(e: React.MouseEvent, t: Ticket) {
     if (onSelect) {
       e.preventDefault();
-      onSelect(t);   // ✅ no recargamos aquí; el padre cambia el ticket y el hook se dispara solo
+      onSelect(t);
     }
   }
 
@@ -77,7 +77,9 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
             <RelacionadorInline
                 currentId={Number(ticket.ID)}
                 onCancel={closeRelacionador}
-                userMail={""} isAdmin={true}            />
+                userMail={""} isAdmin={true}  
+                reload={loadRelateds}        
+            />
           )}
         </div>
       ) : (

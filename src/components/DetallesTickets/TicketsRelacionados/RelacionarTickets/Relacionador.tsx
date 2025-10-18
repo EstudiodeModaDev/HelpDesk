@@ -11,15 +11,16 @@ type Mode = "padre" | "hijo" | "masiva";
 type Props = {
   currentId: number | string;
   onCancel: () => void;
+  reload: () => void;
   userMail: string;
-  isAdmin: boolean
+  isAdmin: boolean;
 };
 
-export default function RelacionadorInline({/*currentId,*/ onCancel, userMail, isAdmin}: Props) {
+export default function RelacionadorInline({currentId, onCancel, userMail, isAdmin, reload}: Props) {
   const [mode, setMode] = React.useState<Mode>("padre");
   const [tickets, setTickets] = React.useState<ticketOption[]>([]);
   const { Tickets } = useGraphServices();
-  const {toTicketOptions, state, setField} = useTickets(Tickets, userMail, isAdmin);
+  const {toTicketOptions, state, setField, handleConfirm} = useTickets(Tickets, userMail, isAdmin);
 
   React.useEffect(() => {
     let alive = true;
@@ -87,7 +88,7 @@ export default function RelacionadorInline({/*currentId,*/ onCancel, userMail, i
         <button
           type="button"
           className="relc-btn relc-btn--circle relc-btn--ok"
-          //onClick={handleConfirm}
+          onClick={() => {handleConfirm(currentId, state.TicketRelacionar?.value ?? "", mode); reload()}}
           title="Confirmar"
           aria-label="Confirmar"
         >
