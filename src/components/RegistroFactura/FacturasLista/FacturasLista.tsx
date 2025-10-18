@@ -75,7 +75,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{factura.NoFactura}</td>
                   <td>{factura.Proveedor}</td>
                   <td>{factura.Title}</td>
-                  <td>{factura.tipodefactura}</td>
+                  <td>{factura.Items}</td>
                   <td>
                     {factura.ValorAnIVA.toLocaleString("es-CO", {
                       style: "currency",

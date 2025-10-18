@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
-import "./FacturaFiltros.css";
 
 export default function FacturaFiltros() {
   // 🔍 Estado interno para manejar los filtros
@@ -11,17 +10,39 @@ export default function FacturaFiltros() {
     NoFactura: "",
     Proveedor: "",
     Title: "",
-    tipodefactura: "",
+    Items: "",
+    DescripItems: "",
   });
+
+  // 📘 Diccionario de opciones (mismo que en el registro principal)
+  const opcionesFactura = [
+    { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },
+    { codigo: "SC40", descripcion: "MMTO. EQ. COMPUTO Y COMU COMPRAS RC" },
+    { codigo: "SC41", descripcion: "MMTO. EQ. COMPUTO Y COMU SERVICIOS RC" },
+    { codigo: "SC70", descripcion: "UTILES, PAPELERIA Y FOTOCOPIAS RC" },
+    { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
+  ];
 
   // 🧠 Maneja los cambios dentro del mismo componente
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFiltros((prev) => ({ ...prev, [name]: value }));
+
+    // Si cambia el ítem, también actualiza la descripción automáticamente
+    if (name === "Items") {
+      const seleccion = opcionesFactura.find((o) => o.codigo === value);
+      setFiltros((prev) => ({
+        ...prev,
+        Items: value,
+        DescripItems: seleccion ? seleccion.descripcion : "",
+      }));
+    } else {
+      setFiltros((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
+  // 🧩 Renderizado
   return (
     <div className="filtros-container">
       <h3>🔍 Filtros de búsqueda</h3>
@@ -29,7 +50,7 @@ export default function FacturaFiltros() {
       <div className="filtros-grid">
         <input
           type="date"
-          name="fechadeemision"
+          name="FechaEmision"
           value={filtros.FechaEmision || ""}
           onChange={handleChange}
           placeholder="Fecha"
@@ -37,7 +58,7 @@ export default function FacturaFiltros() {
 
         <input
           type="text"
-          name="numerofactura"
+          name="NoFactura"
           value={filtros.NoFactura || ""}
           onChange={handleChange}
           placeholder="Número de factura"
@@ -45,7 +66,7 @@ export default function FacturaFiltros() {
 
         <input
           type="text"
-          name="proveedor"
+          name="Proveedor"
           value={filtros.Proveedor || ""}
           onChange={handleChange}
           placeholder="Proveedor"
@@ -59,17 +80,28 @@ export default function FacturaFiltros() {
           placeholder="NIT"
         />
 
+        {/* 🧾 Ítem (Código + descripción automática) */}
         <select
-          name="tipodefactura"
-          value={filtros.tipodefactura || ""}
+          name="Items"
+          value={filtros.Items || ""}
           onChange={handleChange}
         >
-          <option value="">Tipo de factura</option>
-          <option value="SC11">SC11</option>
-          <option value="SC40">SC40</option>
-          <option value="SC41">SC41</option>
-          <option value="SC70">SC70</option>
+          <option value="">Seleccionar código</option>
+          {opcionesFactura.map((op) => (
+            <option key={op.codigo} value={op.codigo}>
+              {op.codigo} - {op.descripcion}
+            </option>
+          ))}
         </select>
+
+        {/* 📝 Descripción del ítem (solo lectura) */}
+        <input
+          type="text"
+          name="DescripItems"
+          value={filtros.DescripItems || ""}
+          readOnly
+          placeholder="Descripción del ítem"
+        />
       </div>
     </div>
   );
