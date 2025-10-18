@@ -140,7 +140,7 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
       const {includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#",} = opts ?? {};
 
       const seen = new Set<string>();
-      const { items, nextLink } = await TicketsSvc.getAll({orderby: "Created desc"});;
+      const { items, nextLink } = await TicketsSvc.getAll({orderby: "fields/Created desc"});;
       console.log(nextLink)
       const result = items.filter((t: any) => t && t.ID != null).map((t: any): ticketOption => {
           const id = String(t.ID);
