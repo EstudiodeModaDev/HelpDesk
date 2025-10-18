@@ -16,11 +16,11 @@ type Props = {
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
-export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref,  onRelateConfirm,}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref,}: Props) {
   const { Tickets } = useGraphServices();
 
   // Hook de relacionados
-  const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
+  const { padre, hijos, loading, error } = useTicketsRelacionados(Tickets, ticket);
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
@@ -37,16 +37,6 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
 
   function closeRelacionador() {
     setShowRel(false);
-  }
-
-  async function handleRelacionConfirm(payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) {
-
-    if (onRelateConfirm) {
-      await onRelateConfirm(payload);
-    }
-
-    setShowRel(false);
-    loadRelateds();
   }
 
   // ====== Navegación por click en padre/hijo ======
@@ -87,7 +77,7 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
             <RelacionadorInline
                 currentId={Number(ticket.ID)}
                 onCancel={closeRelacionador}
-                onConfirm={handleRelacionConfirm} userMail={""} isAdmin={true}            />
+                userMail={""} isAdmin={true}            />
           )}
         </div>
       ) : (
