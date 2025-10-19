@@ -8,8 +8,7 @@ import { useGraphServices } from "../../../../graph/GrapServicesContext";
 export type TicketLite = { ID: number | string; Title: string };
 type Mode = "padre" | "hijo" | "masiva";
 
-type Props = {
-  currentId: number | string;
+type Props = { currentId: number | string;
   onCancel: () => void;
   reload: () => void;
   userMail: string;
@@ -56,7 +55,7 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
           <span className="relc-field__label">Ticket</span>
 
           <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-owns="relc-listbox">
-          {(["padre", "hijo"].includes(mode)) && (
+          {(["padre", "hijo"].includes(mode)) ? (
             <div className="tf-field">
               <label className="tf-label">Ticket</label>
               <Select<ticketOption, false>
@@ -68,7 +67,18 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
                 isClearable
               />
             </div>
+          ) : (
+            <div className="tf-field">
+              <label htmlFor="archivo" className="tf-label">Archivo</label>
+              <input
+                id="archivo"
+                type="file"
+                onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
+                className="tf-input"
+              />
+            </div>
           )}
+
           </div>
 
         </div>

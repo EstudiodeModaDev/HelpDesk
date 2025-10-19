@@ -18,7 +18,8 @@ export type FormState = {
 };
 
 export type RelacionadorState = {
-  TicketRelacionar: ticketOption | null;
+  TicketRelacionar?: ticketOption | null;
+  archivo?: File | null
 };
 
 export type UserFormState = {
