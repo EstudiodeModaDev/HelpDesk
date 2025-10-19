@@ -56,19 +56,19 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
           <span className="relc-field__label">Ticket</span>
 
           <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-owns="relc-listbox">
-
-            {/* Ticket */}
+          {(["padre", "hijo"].includes(mode)) && (
             <div className="tf-field">
               <label className="tf-label">Ticket</label>
               <Select<ticketOption, false>
                 options={tickets}
-                placeholder={"Buscar ticket"}
+                placeholder="Buscar ticket"
                 value={state.TicketRelacionar}
                 onChange={(opt) => setField("TicketRelacionar", opt ?? null)}
                 classNamePrefix="rs"
                 isClearable
               />
             </div>
+          )}
           </div>
 
         </div>
@@ -76,22 +76,10 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
 
       {/* Acciones */}
       <div className="relc-actions">
-        <button
-          type="button"
-          className="relc-btn relc-btn--circle relc-btn--danger"
-          onClick={onCancel}
-          title="Cancelar"
-          aria-label="Cancelar"
-        >
+        <button type="button" className="relc-btn relc-btn--circle relc-btn--danger" onClick={onCancel} title="Cancelar" aria-label="Cancelar">
           ×
         </button>
-        <button
-          type="button"
-          className="relc-btn relc-btn--circle relc-btn--ok"
-          onClick={() => {handleConfirm(currentId, state.TicketRelacionar?.value ?? "", mode); reload()}}
-          title="Confirmar"
-          aria-label="Confirmar"
-        >
+        <button type="button" className="relc-btn relc-btn--circle relc-btn--ok" onClick={() => {handleConfirm(currentId, state.TicketRelacionar?.value ?? "", mode); reload()}} title="Confirmar" aria-label="Confirmar">
           ✓
         </button>
       </div>
