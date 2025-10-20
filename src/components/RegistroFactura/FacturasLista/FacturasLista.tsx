@@ -1,4 +1,3 @@
-// src/components/RegistrarFactura/FacturasLista/FacturasLista.tsx
 import { useEffect, useState } from "react";
 import FacturaFiltros from "../FacturaFiltros/FacturaFiltros";
 import FacturaEditar from "../FacturaEditar/FacturaEditar";
@@ -8,17 +7,14 @@ import "./FacturasLista.css";
 
 /**
  * 🧾 Componente que lista todas las facturas y permite filtrarlas o editarlas.
- *
- * - Usa `useFacturas()` para obtener la lista desde SharePoint.
- * - Muestra los filtros de búsqueda (ahora internos en FacturaFiltros).
- * - Permite editar facturas existentes.
  */
 export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   const { obtenerFacturas } = useFacturas();
-  const [facturas, setFacturas] = useState<ReFactura[]>([]);
-  const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
 
-  // 🟢 Estado para mostrar mensajes visuales
+  // 🧱 Estados base
+  const [facturas, setFacturas] = useState<ReFactura[]>([]);
+  const [facturasFiltradas, setFacturasFiltradas] = useState<ReFactura[]>([]); // ✅ Lista filtrada
+  const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
 
   // 📦 Cargar las facturas al montar el componente
@@ -27,22 +23,13 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
       try {
         const lista = await obtenerFacturas();
         setFacturas(lista);
+        setFacturasFiltradas(lista); // ✅ Inicialmente mostrar todas
       } catch (err) {
         console.error("Error al cargar facturas:", err);
       }
     };
     cargarFacturas();
   }, [obtenerFacturas]);
-
-  // 🗓️ Formatea la fecha en formato local colombiano
-  const formatearFecha = (fecha?: string) => {
-    if (!fecha) return "";
-    return new Date(fecha).toLocaleDateString("es-CO", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
 
   // 🧹 Limpia el mensaje luego de 3 segundos
   useEffect(() => {
@@ -52,13 +39,60 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     }
   }, [mensaje]);
 
+  // 🗓️ Formatea la fecha
+  const formatearFecha = (fecha?: string) => {
+    if (!fecha) return "";
+    return new Date(fecha).toLocaleDateString("es-CO", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  /**
+   * 🧠 Nueva función que recibe los filtros desde FacturaFiltros
+   * y filtra la lista local sin recargar desde el servidor.
+   */
+  const aplicarFiltros = (filtros: Partial<ReFactura>) => {
+    const filtradas = facturas.filter((f) => {
+      // 📅 Filtrar por fecha si existe
+      const coincideFecha = filtros.FechaEmision
+        ? f.FechaEmision?.slice(0, 10) === filtros.FechaEmision
+        : true;
+
+      // 🔢 Número de factura
+      const coincideNumero = filtros.NoFactura
+        ? f.NoFactura?.toLowerCase().includes(filtros.NoFactura.toLowerCase())
+        : true;
+
+      // 🏢 Proveedor
+      const coincideProveedor = filtros.Proveedor
+        ? f.Proveedor?.toLowerCase().includes(filtros.Proveedor.toLowerCase())
+        : true;
+
+      // 🧾 NIT
+      const coincideNIT = filtros.Title
+        ? f.Title?.toLowerCase().includes(filtros.Title.toLowerCase())
+        : true;
+
+      // 💡 Ítem
+      const coincideItem = filtros.Items
+        ? f.Items === filtros.Items
+        : true;
+
+      return coincideFecha && coincideNumero && coincideProveedor && coincideNIT && coincideItem;
+    });
+
+    setFacturasFiltradas(filtradas);
+  };
+
   return (
     <div className="facturas-lista">
       {/* 🔔 Notificación visual */}
       {mensaje && <div className="notificacion">{mensaje}</div>}
 
-      {/* 🔎 Filtros de búsqueda */}
-      <FacturaFiltros />
+      {/* 🔎 Filtros de búsqueda (se envía la función aplicarFiltros) */}
+      <FacturaFiltros onFiltrar={aplicarFiltros} />
 
       {/* 📋 Tabla de facturas */}
       <div className="tabla-scroll">
@@ -79,8 +113,8 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
             </tr>
           </thead>
           <tbody>
-            {facturas.length > 0 ? (
-              facturas.map((factura, index) => (
+            {facturasFiltradas.length > 0 ? (
+              facturasFiltradas.map((factura, index) => (
                 <tr key={factura.id0 || index}>
                   <td>{index + 1}</td>
                   <td>{formatearFecha(factura.FechaEmision)}</td>
@@ -111,8 +145,8 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               ))
             ) : (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", padding: "1rem" }}>
-                  No hay facturas registradas.
+                <td colSpan={11} style={{ textAlign: "center", padding: "1rem" }}>
+                  No hay facturas que coincidan con los filtros.
                 </td>
               </tr>
             )}
@@ -130,24 +164,22 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         <FacturaEditar
           factura={facturaEdit}
           onClose={() => setFacturaEdit(null)}
-          // 🗑️ Cuando se elimina una factura, la quitamos de la lista local
           onEliminar={(idEliminado) => {
-  console.log("🗑️ Eliminando factura, debería mostrar mensaje");
-  setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
-  setMensaje("🗑️ Factura eliminada correctamente");
-  setTimeout(() => setFacturaEdit(null), 100);
-}}
-          // 💾 Cuando se guarda una factura, recargamos la lista completa
+            setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
+            setFacturasFiltradas((prev) => prev.filter((f) => f.id0 !== idEliminado)); // ✅ Mantener filtro
+            setMensaje("🗑️ Factura eliminada correctamente");
+            setTimeout(() => setFacturaEdit(null), 100);
+          }}
           onGuardar={async () => {
-  console.log("💾 Guardando factura, debería mostrar mensaje");
-  try {
-    const lista = await obtenerFacturas();
-    setFacturas(lista);
-    setMensaje("✅ Factura actualizada correctamente");
-    setTimeout(() => setFacturaEdit(null), 100);
-  } catch (err) {
-    console.error("Error al refrescar lista tras editar:", err);
-  }
+            try {
+              const lista = await obtenerFacturas();
+              setFacturas(lista);
+              setFacturasFiltradas(lista); // ✅ Refrescar lista filtrada
+              setMensaje("✅ Factura actualizada correctamente");
+              setTimeout(() => setFacturaEdit(null), 100);
+            } catch (err) {
+              console.error("Error al refrescar lista tras editar:", err);
+            }
           }}
         />
       )}
