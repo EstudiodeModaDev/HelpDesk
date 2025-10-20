@@ -9,6 +9,7 @@ interface Props {
   factura: ReFactura;
   onClose: () => void;
   onEliminar?: (id: number) => void; // 🆕 callback al eliminar
+  onGuardar?: () => void;            // 💾 callback al guardar
 }
 
 /**

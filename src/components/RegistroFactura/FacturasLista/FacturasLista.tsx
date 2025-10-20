@@ -117,17 +117,30 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
       </button>
 
       {/* 🧰 Modal o panel de edición */}
-      {facturaEdit && (
+{facturaEdit && (
   <FacturaEditar
     factura={facturaEdit}
     onClose={() => setFacturaEdit(null)}
+
     // 🆕 Cuando se elimina una factura, la quitamos de la lista local
     onEliminar={(idEliminado) => {
       setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
       setFacturaEdit(null);
     }}
+
+    // 🆕 Cuando se guarda una factura editada, recargamos la lista completa
+    onGuardar={async () => {
+      try {
+        const lista = await obtenerFacturas(); // 🔄 vuelve a traer las facturas del SharePoint
+        setFacturas(lista);
+        setFacturaEdit(null);
+      } catch (err) {
+        console.error("Error al refrescar lista tras editar:", err);
+      }
+    }}
   />
 )}
+
 
     </div>
   );
