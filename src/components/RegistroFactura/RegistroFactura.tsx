@@ -722,7 +722,7 @@ const handleCompraSeleccionada = async (id: string) => {
                 ></textarea>
               </label>
             </div>
-          </div>
+          
 
                       {/* 📦 Fecha de entrega contabilidad */}
             <div className="campo">
@@ -751,6 +751,7 @@ const handleCompraSeleccionada = async (id: string) => {
                 required
               />
             </label>
+          </div>
           </div>
 
           {/* 🗒️ Observaciones */}
