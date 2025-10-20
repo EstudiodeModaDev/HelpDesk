@@ -1,12 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import FacturasLista from "./FacturasLista/FacturasLista";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css"
 import { useAuth } from "../../auth/authContext";
 
+//imports nuevos para traer los datos de compras
+// imports nuevos
+
+import type { Compra } from "../../Models/Compras";
+import { ComprasService } from "../../Services/Compras.service";
+import { GraphRest } from "../../graph/GraphRest";
+
+
+
 // 🧾 Componente principal del registro de facturas
 export default function RegistroFactura() {
+
+//nuevas const de compras
+const { getToken } = useAuth();
+const [compras, setCompras] = useState<Compra[]>([]);
+const [selectedCompra, setSelectedCompra] = useState<string>("");
+
+const graph = new GraphRest(getToken);
+const comprasService = new ComprasService(graph);
+
+//lo nuevo de compras 
+
+// 🧩 cargar lista de compras al iniciar
+useEffect(() => {
+  const fetchCompras = async () => {
+    try {
+      const { items } = await comprasService.getAll({ top: 100 });
+      setCompras(items);
+    } catch (error) {
+      console.error("Error cargando compras:", error);
+    }
+  };
+  fetchCompras();
+}, []);
+
+// 🧠 cuando el usuario selecciona una compra
+const handleCompraSeleccionada = async (id: string) => {
+  setSelectedCompra(id);
+  if (!id) return;
+  try {
+    const compra = await comprasService.get(id);
+    // 🔄 Mapeo de campos comunes
+    setFormData((prev) => ({
+      ...prev,
+      Items: compra.Title || prev.Items,
+      DescripItems: prev.DescripItems || "", // no existe en Compra
+      CC: compra.CCosto || prev.CC,
+      CO: compra.CO || prev.CO,
+      un: compra.UN || prev.un,
+    }));
+  } catch (error) {
+    console.error("Error al cargar la compra seleccionada:", error);
+  }
+};
+
   // Hook que maneja la lógica de negocio
   const { registrarFactura } = useFacturas();
 
@@ -97,6 +150,24 @@ export default function RegistroFactura() {
   return (
     <div className="registro-container">
       <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
+
+      <div className="form-group mb-3">
+  <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
+  <select
+    id="compraSelect"
+    className="form-control"
+    value={selectedCompra}
+    onChange={(e) => handleCompraSeleccionada(e.target.value)}
+  >
+    <option value="">-- Seleccione una compra --</option>
+    {compras.map((c) => (
+      <option key={c.Id} value={c.Id}>
+        {c.Title} - {c.SolicitadoPor}
+      </option>
+    ))}
+  </select>
+</div>
+
 
       {!mostrarLista ? (
         <form className="registro-form" onSubmit={handleSubmit}>
@@ -679,7 +750,7 @@ export default function RegistroFactura() {
           {/* Botones */}
           <div className="botones-container">
             <button type="submit" className="btn-registrar">
-              💾 Registrar Factura
+              ✅  Registrar Factura
             </button>
 
             <button
