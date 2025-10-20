@@ -28,7 +28,7 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px 35px;
+  gap: 12px 35px;
   align-items: start;
 }
 
