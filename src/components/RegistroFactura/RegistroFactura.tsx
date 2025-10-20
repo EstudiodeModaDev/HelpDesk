@@ -65,7 +65,7 @@ const handleCompraSeleccionada = async (id: string) => {
     setFormData((prev) => ({
       ...prev,
       Items: compra.CodigoItem || prev.Items,
-      DescripItems: prev.DescripItems || "", // no existe en Compra
+      DescripItems: compra.DescItem || prev.DescripItems || "", // no existe en Compra
       CC: compra.CCosto || prev.CC,
       CO: compra.CO || prev.CO,
       un: compra.UN || prev.un,
