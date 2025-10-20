@@ -5,6 +5,9 @@ import type { DateRange, FilterMode } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { RelacionadorState } from "../Models/nuevoTicket";
+import { FlowClient } from "./FlowClient";
+import { fileToBase64 } from "../utils/Commons";
+import type { MasiveFlow } from "../Models/FlujosPA";
 
 export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   if (!fecha) return new Date(NaN);
@@ -19,7 +22,6 @@ export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   return isNaN(dt.getTime()) ? new Date(NaN) : dt;
 }
 
-// Reemplaza tu parseFecha por esta versión
 export function parseFechaFlex(fecha?: string): Date {
   if (!fecha) return new Date(NaN);
   const t = fecha.trim();
@@ -95,6 +97,9 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
 
   const setField = <K extends keyof RelacionadorState>(k: K, v: RelacionadorState[K]) => setState((s) => ({ ...s, [k]: v }));
+
+   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c6d30061fb55449798cbdb76da3172e5/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n-NqCPMlsQaZ9PDJyG6f9hLmkTtHvRjybLqc9Ilk8eM")
+  
 
   // construir filtro OData
   const buildFilter = React.useCallback((): GetAllOpts => {
@@ -255,6 +260,25 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     });
   }, []);
 
+  async function sendFileToFlow(file: File, uploader?: string ) {
+    const contentBase64 = await fileToBase64(file);
+
+    const payload = {
+      uploader: uploader ?? "",      
+      file: {
+        name: file.name,
+        contentType: file.type || "application/octet-stream",
+        contentBase64
+      }
+    };
+
+    try {
+      await notifyFlow.invoke<MasiveFlow, any>({file: payload.file,});
+      } catch (err) {
+       console.error("[Flow] Error enviando a solicitante:", err);
+    }
+  }
+
   return {
     // datos visibles (solo la página actual)
     rows,
@@ -279,7 +303,8 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
     sorts,
     toTicketOptions,
     state, setState,
-    handleConfirm
+    handleConfirm,   
+    sendFileToFlow
   };
 }
 

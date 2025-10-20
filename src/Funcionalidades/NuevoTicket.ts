@@ -16,6 +16,7 @@ import type { LogService } from "../Services/Log.service";
 import { useAuth } from "../auth/authContext";
 import type { UsuariosSP } from "../Models/Usuarios";
 
+
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
   SubCategorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -29,7 +30,6 @@ export const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !
 
 export function useNuevoTicketForm(services: Svc) {
   const { Categorias, SubCategorias, Articulos, Tickets, Usuarios, Logs} = services;
-
   const [state, setState] = useState<FormState>({
     solicitante: null,
     resolutor: null,

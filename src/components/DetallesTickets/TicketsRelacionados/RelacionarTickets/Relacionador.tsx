@@ -19,7 +19,7 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
   const [mode, setMode] = React.useState<Mode>("padre");
   const [tickets, setTickets] = React.useState<ticketOption[]>([]);
   const { Tickets } = useGraphServices();
-  const {toTicketOptions, state, setField, handleConfirm} = useTickets(Tickets, userMail, isAdmin);
+  const {toTicketOptions, state, setField, handleConfirm, sendFileToFlow} = useTickets(Tickets, userMail, isAdmin);
 
   React.useEffect(() => {
     let alive = true;
@@ -52,8 +52,6 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
 
         {/* Combobox de tickets */}
         <div className="relc-field relc-field--grow" ref={wrapRef}>
-          <span className="relc-field__label">Ticket</span>
-
           <div className="relc-combobox" role="combobox" aria-haspopup="listbox" aria-owns="relc-listbox">
           {(["padre", "hijo"].includes(mode)) ? (
             <div className="tf-field">
@@ -69,14 +67,33 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
             </div>
           ) : (
             <div className="tf-field">
-              <label htmlFor="archivo" className="tf-label">Archivo</label>
-              <input
-                id="archivo"
-                type="file"
-                onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
-                className="tf-input"
+              <label htmlFor="archivo" className="tf-label">Cargar Excel de tickets</label>
+
+              <input id="archivo" type="file" className="tf-input" accept=".xlsx,.xls" onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  if (!f) { setField("archivo", null); return; }
+                  // Validación básica de tamaño (opcional)
+                  const MAX_MB = 10;
+                  if (f.size > MAX_MB * 1024 * 1024) {
+                    alert(`Archivo demasiado grande (> ${MAX_MB}MB).`);
+                    e.currentTarget.value = ""; // limpia el input
+                    return;
+                  }
+                  setField("archivo", f);
+                }}
               />
+
+              {/* Botón para limpiar selección (opcional) */}
+              {state.archivo && (
+                <button type="button" className="tf-link" onClick={() => {
+                  setField("archivo", null);
+                  (document.getElementById("archivo") as HTMLInputElement | null)!.value = "";
+                }}>
+                  Quitar archivo
+                </button>
+              )}
             </div>
+
           )}
 
           </div>
@@ -89,8 +106,33 @@ export default function RelacionadorInline({currentId, onCancel, userMail, isAdm
         <button type="button" className="relc-btn relc-btn--circle relc-btn--danger" onClick={onCancel} title="Cancelar" aria-label="Cancelar">
           ×
         </button>
-        <button type="button" className="relc-btn relc-btn--circle relc-btn--ok" onClick={() => {handleConfirm(currentId, state.TicketRelacionar?.value ?? "", mode); reload()}} title="Confirmar" aria-label="Confirmar">
-          ✓
+        <button type="button" className="relc-btn relc-btn--circle relc-btn--ok" 
+          onClick={async (e) => {
+            e.preventDefault();           
+            try {
+              if (mode === "masiva") {
+                if (!state.archivo) {
+                  alert("Selecciona un archivo .xlsx antes de enviar.");
+                  return;
+                }
+                await sendFileToFlow(state.archivo);
+                alert("Archivo enviado al flujo correctamente.");
+              } else {
+                const related = state.TicketRelacionar?.value ?? "";
+                if (!related) {
+                  alert("Elige un ticket a relacionar.");
+                  return;
+                }
+                const ok = await handleConfirm(currentId, related, mode); // mode: "padre" | "hijo"
+                if (!ok) return; // no recargues si falló la actualización
+              }
+            await reload();
+          } catch (err: any) {
+            console.error(err);
+            alert(err?.message ?? "Ocurrió un error en la acción.");
+          }
+        }} title="Confirmar" aria-label="Confirmar">
+                ✓
         </button>
       </div>
     </div>

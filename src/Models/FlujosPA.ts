@@ -56,3 +56,11 @@ export type FlowToReasign = {
   IDCaso: number;
   IDSolicitante: number;
 };
+
+export type MasiveFlow = {
+  file: {
+    name: string
+    contentType: string
+    contentBase64: string
+  };
+}
