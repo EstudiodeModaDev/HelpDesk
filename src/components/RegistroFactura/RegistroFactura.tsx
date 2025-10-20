@@ -167,27 +167,31 @@ const handleCompraSeleccionada = async (id: string) => {
     <div className="registro-container">
       <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
 
-      <div className="form-group mb-3">
-  <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
-  <select
-    id="compraSelect"
-    className="form-control"
-    value={selectedCompra}
-    onChange={(e) => handleCompraSeleccionada(e.target.value)}
-  >
-    <option value="">-- Seleccione una compra --</option>
-    {compras.map((c) => (
-      <option key={c.Id} value={c.Id}>
-        {c.Title} - {c.SolicitadoPor}
-      </option>
-    ))}
-  </select>
-</div>
-
+      
 
       {!mostrarLista ? (
         <form className="registro-form" onSubmit={handleSubmit}>
           <div className="form-grid">
+
+            {/* relacionamiento con compras  */}
+                      <div className="form-group mb-3">
+              <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
+              <select
+                id="compraSelect"
+                className="form-control"
+                value={selectedCompra}
+                onChange={(e) => handleCompraSeleccionada(e.target.value)}
+              >
+                <option value="">-- Seleccione una compra --</option>
+                {compras.map((c) => (
+                  <option key={c.Id} value={c.Id}>
+                    {c.Title} - {c.SolicitadoPor}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
             {/* 📆 Fecha de emisión */}
             <div className="campo">
               <label>
