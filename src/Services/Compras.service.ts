@@ -92,7 +92,8 @@ export class ComprasService {
       UN: f.UN,
       Estado: f.Estado,
       CodigoItem: f.CodigoItem,
-      DescItem: f.DescItem
+      DescItem: f.DescItem,
+      CorreoSolicitante: f.CorreoSolicitante
     }
   }
 

@@ -14,8 +14,14 @@ import type { Holiday } from "festivos-colombianos";
 import type { Log } from "../Models/Log";
 import type { TicketsService } from "../Services/Tickets.service";
 import type { LogService } from "../Services/Log.service";
+import { pickTecnicoConMenosCasos } from "../utils/Commons";
+import type { UsuariosSPService } from "../Services/Usuarios.Service";
+import type { FlowToUser } from "../Models/FlujosPA";
+import { FlowClient } from "./FlowClient";
 
-export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsService, LogSvc: LogService) {
+ const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
+
+export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsService, LogSvc: LogService, Usuarios: UsuariosSPService) {
 
   const MARCAS = ["MFG", "DIESEL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
   const NEXT: Record<string, string> = {
@@ -52,7 +58,8 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     marcasPct: { ...zeroMarcas() },
     motivo: "",
     codigoItem: "",
-    DescItem: ""
+    DescItem: "",
+    CorreoSolicitante: ""
   });
   const [saving, setSaving] = React.useState(false)
   const [holidays, setHolidays] = React.useState<Holiday[]>([])
@@ -97,7 +104,6 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
       };
     }, []);
   
-  
   const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -117,7 +123,8 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
       Title: state.tipoCompra,
       UN: state.un,
       DescItem: state.DescItem,
-      CodigoItem: state.codigoItem
+      CodigoItem: state.codigoItem,
+      CorreoSolicitante: state.CorreoSolicitante
     })
 
     const ticketpayload = {
@@ -155,7 +162,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     
     alert("Se ha creado la solicitud de compra con éxito")
     console.log(compra)
-    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: "", solicitadoPorCorreo: "", codigoItem: "", DescItem: ""})  }, 
+    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: "", solicitadoPorCorreo: "", codigoItem: "", DescItem: "", CorreoSolicitante: ""})  }, 
     [state, ComprasSvc, holidays]
   ); 
   
@@ -189,6 +196,97 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     }
   }, [ComprasSvc, buildFilter]);
 
+  const ticketEntrega = async (tipo: string, solicitante: string, Correosolicitante: string, entrega: string) => {
+    try {
+      const apertura = new Date();
+      const solucion = calcularFechaSolucion(apertura, 56, holidays);
+
+      const aperturaISO  = toGraphDateTime(apertura);
+      const tiempoSolISO = toGraphDateTime(solucion as any);
+
+      const resolutor = await pickTecnicoConMenosCasos(Usuarios);
+      console.log(resolutor);
+
+      const payload = {
+        Title: `Entrega de ${tipo} solicitada por ${solicitante}`,
+        Descripcion:  `El proveedor ha hecho enrega de ${entrega} se crea ticket para la configuración y entrega a ${solicitante}`,
+        FechaApertura: aperturaISO,
+        TiempoSolucion: tiempoSolISO,
+        Nombreresolutor: resolutor?.Title,
+        Correoresolutor: resolutor?.Correo,
+        Solicitante: solicitante,
+        CorreoSolicitante: Correosolicitante,
+        Estadodesolicitud: "En Atención",
+        Categoria: "Hardware",
+        SubCategoria: "Entrega",
+        Fuente: "Self service",     
+        ANS: "ANS 4"
+      };
+
+      const ticketCreated = await TicketsSvc?.create(payload);
+      console.log(ticketCreated);
+      if (resolutor) {
+        const casosActuales = Number(resolutor.Numerodecasos ?? 0);
+        const nuevoTotal = casosActuales + 1;
+        await Usuarios.update(String(resolutor.Id), {Numerodecasos: nuevoTotal,});
+      }
+
+      alert("caso creado con ID " + ticketCreated?.ID)
+      LogSvc.create({
+        Actor: "Sitema", 
+        Descripcion:  `Se ha creado un nuevo ticket para el siguiente requerimiento: ${ticketCreated!.ID ?? ""}`, 
+        CorreoActor: "", 
+        Tipo_de_accion: 
+        "Creacion", 
+        Title: ticketCreated?.ID ?? ""
+      })
+
+      if (ticketCreated?.CorreoSolicitante) {
+        const title = `Asignación de Caso - ${ticketCreated.ID}`;
+        const message = `
+          <p>¡Hola ${payload.Solicitante ?? ""}!<br><br>
+          Tu solicitud ha sido registrada exitosamente y ha sido asignada a un técnico para su gestión. Estos son los detalles del caso:<br><br>
+          <strong>ID del Caso:</strong> ${ticketCreated.ID}<br>
+          <strong>Asunto del caso:</strong> ${payload.Title}<br>
+          <strong>Resolutor asignado:</strong> ${payload.Nombreresolutor ?? "—"}<br>
+          El resolutor asignado se pondrá en contacto contigo en el menor tiempo posible para darte solución a tu requerimiento.<br><br>
+          Si hay algun cambio con su ticket sera notificado.
+          Este es un mensaje automático, por favor no respondas.
+          </p>`.trim();
+
+          try {
+            await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated?.CorreoSolicitante, title, message, mail: true, });
+          } catch (err) {
+            console.error("[Flow] Error enviando a solicitante:", err);
+          }
+        }
+ 
+      if (ticketCreated?.CorreoResolutor) {
+        const title = `Nuevo caso asignado - ${ticketCreated.ID}`;
+        const message = `
+        <p>¡Hola!<br><br>
+        Tienes un nuevo caso asignado con estos detalles:<br><br>
+        <strong>ID del Caso:</strong> ${ticketCreated}<br>
+        <strong>Solicitante:</strong> ${payload.Solicitante ?? "—"}<br>
+        <strong>Correo del Solicitante:</strong> ${payload.CorreoSolicitante ?? "—"}<br>
+        <strong>Asunto:</strong> ${payload.Title}<br>
+        <strong>Fecha máxima para categorización:</strong> ${ticketCreated.FechaApertura}<br><br>
+        En caso de no categorizar el ticket este se vencera y sera irreversible.<br><br>
+        Este es un mensaje automático, por favor no respondas.
+        </p>`.trim();
+
+        try {
+          await notifyFlow.invoke<FlowToUser, any>({recipient: ticketCreated.CorreoResolutor, title, message, mail: true,});
+        } catch (err) {
+          console.error("[Flow] Error enviando a resolutor:", err);
+        }
+      }
+ 
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+    }
+  };
+
   const handleNext = React.useCallback(async (idItem: string) => {
     if (saving) return;
     setSaving(true);
@@ -200,14 +298,16 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
       const prev = (current.Estado) ?? "";
       const next = NEXT[prev];
 
-      // 2) Si ya está en terminal, no hay nada que hacer
       if (prev === next) {
         setSaving(false);
         return;
       }
 
       try {
-        const updated = await ComprasSvc.update(idItem, { Estado: next },        );
+        const updated = await ComprasSvc.update(idItem, { Estado: next },);
+        if(updated.Estado === "Pendiente por entrega al usuario"){
+          await ticketEntrega(current.Title, current.SolicitadoPor, current.CorreoSolicitante, state.productoServicio)
+        }
         alert(`Se ha actualizado el registro con el siguiente estado: ${updated?.Estado ?? "—"}`)
         reloadAll()
 

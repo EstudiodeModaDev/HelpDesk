@@ -6,8 +6,8 @@ import { useCompras } from "../../../Funcionalidades/Compras";
 import { toISODateTimeFlex } from "../../../utils/Date";
 
 export default function TablaCompras() {
-    const { Compras, Tickets, Logs} = useGraphServices();
-    const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext} = useCompras(Compras, Tickets, Logs)
+    const { Compras, Tickets, Logs, Usuarios} = useGraphServices();
+    const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext} = useCompras(Compras, Tickets, Logs, Usuarios)
 
   const [search, setSearch] = React.useState("");
 

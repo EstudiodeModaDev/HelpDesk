@@ -21,7 +21,8 @@ export type comprasState = {
   motivo: string,
   estado?: string;
   codigoItem: string;
-  DescItem: string
+  DescItem: string,
+  CorreoSolicitante: string
 };
 
 export type Compra = {
@@ -42,7 +43,8 @@ export type Compra = {
   Id?: string,
   Estado?: string,
   CodigoItem: string;
-  DescItem: string
+  DescItem: string;
+  CorreoSolicitante: string
 }
 export const Items = [
     { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },
