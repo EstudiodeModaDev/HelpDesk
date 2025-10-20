@@ -2,24 +2,25 @@
 .registro-container {
   width: 100%;
   max-width: 1250px;
-  min-height: 80vh;
-  margin: 20px auto;
+  min-height: 90vh;
+  margin: 40px auto;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-  padding: 25px 35px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  padding: 40px 50px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  font-family: 'Arial', sans-serif;
+  font-family: "Segoe UI", sans-serif;
 }
 
 /* 🧾 Título */
 .registro-container h2 {
   text-align: center;
   color: #2c3e50;
-  margin-bottom: 25px;
-  font-size: 22px;
+  margin-bottom: 35px;
+  font-size: 24px;
+  font-weight: 600;
 }
 
 /* 🧾 Formulario */
@@ -27,23 +28,23 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 25px;
 }
 
-/* 📦 Rejilla principal (3 columnas) */
+/* 📦 Rejilla principal */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px 20px;
+  gap: 22px 28px;
   align-items: start;
 }
 
+/* Responsivo */
 @media (max-width: 992px) {
   .form-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -59,7 +60,7 @@
 
 /* 🏷️ Etiquetas */
 .campo label {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 13px;
   color: #333;
 }
@@ -71,13 +72,12 @@
 .form-group select {
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 12.5px;
+  font-size: 13px;
   transition: border-color 0.3s, box-shadow 0.3s;
   width: 100%;
   background-color: #fff;
-  padding: 4px 8px;
-  height: 32px; /* tamaño compacto uniforme */
-  box-sizing: border-box;
+  padding: 6px 10px;
+  height: 36px;
 }
 
 .campo input:focus,
@@ -85,7 +85,7 @@
 .campo textarea:focus,
 .form-group select:focus {
   border-color: #2980b9;
-  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+  box-shadow: 0 0 8px rgba(41, 128, 185, 0.25);
   outline: none;
 }
 
@@ -99,14 +99,31 @@
     grid-column: span 2;
   }
 }
-
 @media (max-width: 768px) {
   .full-width {
     grid-column: span 1;
   }
 }
 
-/* 🧩 Campo de selección de compra (ocupa toda la fila) */
+/* 💬 Textareas */
+.campo textarea {
+  min-height: 40px;
+  max-height: 70px;
+  font-size: 13px;
+  padding: 8px 10px;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+/* Campos específicos */
+textarea[name="descripcionItem"],
+textarea[name="detalleFac"],
+textarea[name="observaciones"] {
+  min-height: 40px;
+  max-height: 70px;
+}
+
+/* 🧩 Campo de selección de compra */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -115,82 +132,56 @@
 }
 
 .form-group label {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 13px;
   color: #333;
 }
 
 .form-group select {
-  height: 32px;
-  font-size: 12.5px;
-  padding: 4px 8px;
+  height: 36px;
+  font-size: 13px;
+  padding: 6px 10px;
 }
 
-/* 💬 Textareas más compactos (Descripción, Detalle, Observaciones) */
-.campo textarea {
-  min-height: 35px;
-  max-height: 70px;
-  font-size: 12.5px;
-  padding: 6px 8px;
-  line-height: 1.3;
-  resize: vertical;
-}
-
-/* Campos específicos para asegurar tamaño consistente */
-textarea[name="descripcionItem"],
-textarea[name="detalleFac"],
-textarea[name="observaciones"] {
-  min-height: 35px;
-  max-height: 70px;
-}
-
-/* Normalización visual de los campos tipo date y texto */
-.campo input[type="date"],
-.campo input[type="text"],
-.campo input[type="number"] {
-  height: 32px;
-  font-size: 12.5px;
-  padding: 4px 8px;
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-/* Ajuste para el ícono del calendario (mantener estilo limpio) */
-.campo input[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 0.8;
-  cursor: pointer;
-}
-
-/* 💾 Botones (alineados en una fila) */
+/* 🧩 Botones */
 .botones-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 25px;
-  grid-column: span 3;
+  gap: 25px;
+  margin-top: 20px;
 }
 
 .btn-registrar {
-  background-color: #2980b9;
+  background-color: #007bff;
   color: white;
-  padding: 10px 22px;
+  padding: 10px 25px;
   font-size: 14px;
+  font-weight: 500;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
   border: none;
-  font-weight: 500;
 }
 
 .btn-registrar:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+  background-color: #0069d9;
+  transform: scale(1.04);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 🧾 Asegurar que la lista de facturas no cambie de posición */
-.facturas-lista {
-  width: 100%;
-  margin-top: 25px;
+/* 🧩 Botón secundario */
+.btn-secundario {
+  background-color: #f4f4f4;
+  color: #333;
+  padding: 10px 25px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+  border: 1px solid #ddd;
+}
+
+.btn-secundario:hover {
+  background-color: #eaeaea;
+  transform: scale(1.03);
 }
