@@ -31,14 +31,29 @@ const comprasService = new ComprasService(graph);
 useEffect(() => {
   const fetchCompras = async () => {
     try {
-      const { items } = await comprasService.getAll({ top: 100 });
+      // 🎯 Filtramos solo las compras con estado permitido
+      const filtro = [
+        "Pendiente por registro de inventario",
+        "Pendiente por entrega al usuario",
+        "Pendiente por registro de factura"
+      ]
+        .map(e => `fields/Estado eq '${e}'`)
+        .join(" or ");
+
+      const { items } = await comprasService.getAll({
+        filter: filtro,
+        orderby: "fields/FechaSolicitud desc", // opcional
+        top: 100,
+      });
+
       setCompras(items);
     } catch (error) {
-      console.error("Error cargando compras:", error);
+      console.error("Error cargando compras filtradas:", error);
     }
   };
   fetchCompras();
 }, []);
+
 
 // 🧠 cuando el usuario selecciona una compra
 const handleCompraSeleccionada = async (id: string) => {
