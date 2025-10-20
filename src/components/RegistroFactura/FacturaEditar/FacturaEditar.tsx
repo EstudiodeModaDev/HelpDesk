@@ -8,6 +8,7 @@ import "./FacturaEditar.css"
 interface Props {
   factura: ReFactura;
   onClose: () => void;
+  onEliminar?: (id: number) => void; // 🆕 callback al eliminar
 }
 
 /**
@@ -16,7 +17,7 @@ interface Props {
  * - Asegura que `valor` sea number y usa `id0` como identificador.
  * - Ahora también permite eliminar la factura seleccionada.
  */
-export default function FacturaEditarCompo({ factura, onClose }: Props) {
+export default function FacturaEditarCompo({ factura, onClose, onEliminar }: Props) {
   // obtenemos las funciones lógicas (actualizar/eliminar...) desde funcionalidades
   const { actualizarFactura, eliminarFactura } = facturaFx();
 
@@ -73,21 +74,24 @@ export default function FacturaEditarCompo({ factura, onClose }: Props) {
   };
 
   // 🗑️ Nueva función: elimina la factura actual
-  const handleEliminar = async () => {
-    const id = factura.id0;
-    if (id == null) {
-      console.error("No se encontró id0 en la factura. No se puede eliminar.");
-      return;
-    }
+const handleEliminar = async () => {
+  const id = factura.id0;
+  if (id == null) {
+    console.error("No se encontró id0 en la factura. No se puede eliminar.");
+    return;
+  }
 
-    // Confirmación antes de eliminar
-    const confirmar = window.confirm(`¿Seguro deseas eliminar la factura #${factura.NoFactura}?`);
-    if (!confirmar) return;
+  const confirmar = window.confirm(`¿Seguro deseas eliminar la factura #${factura.NoFactura}?`);
+  if (!confirmar) return;
 
-    // Llamada a la lógica que elimina (espera id)
-    const ok = await eliminarFactura(id);
-    if (ok) onClose();
-  };
+  const ok = await eliminarFactura(id);
+  if (ok) {
+    // 🔔 Notificamos al componente padre que se eliminó
+    onEliminar?.(id);
+    onClose();
+  }
+};
+
 
   return (
     <div className="modal-backdrop">

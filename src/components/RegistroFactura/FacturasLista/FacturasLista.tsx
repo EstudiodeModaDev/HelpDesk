@@ -118,11 +118,17 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
 
       {/* 🧰 Modal o panel de edición */}
       {facturaEdit && (
-        <FacturaEditar
-          factura={facturaEdit}
-          onClose={() => setFacturaEdit(null)}
-        />
-      )}
+  <FacturaEditar
+    factura={facturaEdit}
+    onClose={() => setFacturaEdit(null)}
+    // 🆕 Cuando se elimina una factura, la quitamos de la lista local
+    onEliminar={(idEliminado) => {
+      setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
+      setFacturaEdit(null);
+    }}
+  />
+)}
+
     </div>
   );
 }
