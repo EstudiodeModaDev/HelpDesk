@@ -102,7 +102,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
         </div>
 
         {/*Tipificacion*/}
-        <div className="field"></div>
+        <div className="field">
           <select name="Items" value={state.codigoItem} onChange={(e) => {const codigo = e.target.value;
                                                                     setField("codigoItem", codigo); 
                                                                     const item = Items.find(i => String(i.codigo) === String(codigo));
@@ -116,6 +116,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
                 </option>
                 ))}
           </select>
+        </div>
 
         {/* Producto/Servicio/Alquiler */}
         <div className="field">
@@ -179,7 +180,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           {ccError && <small className="error">{ccError}</small>}
         </div>
 
-        {/* UN */}
+        {/* Motivo */}
         <div className="field">
           <label className="label">Motivo</label>
           <select className="control" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)}>
