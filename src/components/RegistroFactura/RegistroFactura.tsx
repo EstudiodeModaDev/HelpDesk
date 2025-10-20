@@ -3,6 +3,7 @@ import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import FacturasLista from "./FacturasLista/FacturasLista";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css"
+import { useAuth } from "../../auth/authContext";
 
 // 🧾 Componente principal del registro de facturas
 export default function RegistroFactura() {
@@ -11,6 +12,7 @@ export default function RegistroFactura() {
 
   // Estado para alternar entre formulario y lista
   const [mostrarLista, setMostrarLista] = useState(false);
+  const {account} = useAuth()
 
   // Estado del formulario
   const [formData, setFormData] = useState<ReFactura>({
@@ -28,6 +30,7 @@ export default function RegistroFactura() {
     FecEntregaCont: "",
     DocERP: "",
     Observaciones: "",
+    RegistradoPor: account?.name ?? "",
   });
 
   // Diccionario de opciones
@@ -67,6 +70,7 @@ export default function RegistroFactura() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await registrarFactura(formData);
+
     alert("✅ Factura registrada con éxito");
 
     // Limpiar campos
@@ -85,6 +89,7 @@ export default function RegistroFactura() {
       FecEntregaCont: "",
       DocERP: "",
       Observaciones: "",
+      RegistradoPor: "",
     });
   };
 

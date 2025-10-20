@@ -14,4 +14,5 @@ export interface ReFactura {
   FecEntregaCont: string;
   DocERP: string;
   Observaciones: string;
+  RegistradoPor: string;
 }
