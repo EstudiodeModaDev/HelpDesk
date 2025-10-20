@@ -70,12 +70,12 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               <th>N°Fac</th>
               <th>Proveedor</th>
               <th>NIT</th>
-              <th>Item</th>
               <th>Valor</th>
               <th>FechaCont</th>
               <th>Item</th>
               <th>DocERP</th>
               <th>Obs</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
