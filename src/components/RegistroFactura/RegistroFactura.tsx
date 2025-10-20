@@ -716,7 +716,7 @@ const handleCompraSeleccionada = async (id: string) => {
                 Detalle Fac
                 <textarea
                   name="DetalleFac"
-                  rows={3}
+                  rows={1}
                   value={formData.DetalleFac}
                   onChange={handleChange}
                 ></textarea>
