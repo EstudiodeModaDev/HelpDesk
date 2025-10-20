@@ -251,7 +251,7 @@ const handleCompraSeleccionada = async (id: string) => {
             {/* 🧾 Ítem (Código + descripción automática) */}
             <div className="campo">
               <label>
-                Ítem
+                Ítems
                 <select
                   name="Items"
                   value={formData.Items}
@@ -284,7 +284,7 @@ const handleCompraSeleccionada = async (id: string) => {
             {/* 💰 Valor */}
             <div className="campo">
               <label>
-                Valor (en pesos)
+                Valor antes iva (en pesos)
                 <input
                   type="number"
                   name="ValorAnIVA"
@@ -713,7 +713,7 @@ const handleCompraSeleccionada = async (id: string) => {
             {/* 🧾 Detalle */}
             <div className="campo full-width">
               <label>
-                Detalle
+                Detalle Fac
                 <textarea
                   name="DetalleFac"
                   rows={3}

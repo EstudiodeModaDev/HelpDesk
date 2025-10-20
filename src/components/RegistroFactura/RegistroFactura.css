@@ -1,17 +1,25 @@
 /* 🧩 Contenedor principal */
 .registro-container {
   width: 100%;
-  max-width: 1200px;
-  min-height: 70vh;
-  margin: 0 auto;
+  max-width: 1250px;
+  min-height: 80vh;
+  margin: 20px auto;
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-  padding: 15px 20px;
+  padding: 25px 35px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   font-family: 'Arial', sans-serif;
+}
+
+/* 🧾 Título */
+.registro-container h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-size: 22px;
 }
 
 /* 🧾 Formulario */
@@ -19,14 +27,21 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
-/* 📦 Nueva rejilla (3 columnas en pantallas grandes y 1 columna en pantallas pequeñas) */
+/* 📦 Rejilla principal */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px 15px;
+  gap: 15px 20px;
   align-items: start;
+}
+
+@media (max-width: 992px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -35,29 +50,72 @@
   }
 }
 
-/* 🧩 Campo (label encima del input) */
+/* 🧩 Campo base */
 .campo {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
+/* 🏷️ Etiquetas */
+.campo label {
+  font-weight: bold;
+  font-size: 13px;
+  color: #333;
+}
+
+/* 🧠 Inputs, selects y textareas */
 .campo input,
 .campo select,
-.campo textarea {
-  padding: 6px 10px;
+.campo textarea,
+.form-group select {
+  padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 13px;
   transition: border-color 0.3s, box-shadow 0.3s;
   width: 100%;
+  background-color: #fff;
 }
 
 .campo input:focus,
 .campo select:focus,
-.campo textarea:focus {
+.campo textarea:focus,
+.form-group select:focus {
   border-color: #2980b9;
   box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+  outline: none;
+}
+
+/* 🧱 Campos de ancho completo (textarea o listas largas) */
+.full-width {
+  grid-column: span 3;
+}
+
+@media (max-width: 992px) {
+  .full-width {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .full-width {
+    grid-column: span 1;
+  }
+}
+
+/* 🧩 Campo de selección de compra */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  grid-column: span 3;
+}
+
+.form-group label {
+  font-weight: bold;
+  font-size: 13px;
+  color: #333;
 }
 
 /* 🧩 Botones */
@@ -65,20 +123,28 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 .btn-registrar {
   background-color: #2980b9;
   color: white;
-  padding: 10px 20px;
+  padding: 10px 22px;
   font-size: 14px;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
+  border: none;
 }
 
 .btn-registrar:hover {
   background-color: #3498db;
   transform: scale(1.05);
+}
+
+/* 💬 Área de observaciones */
+textarea {
+  resize: vertical;
+  min-height: 60px;
+  max-height: 150px;
 }
