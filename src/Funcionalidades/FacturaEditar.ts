@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { ReFacturasService } from "../Services/ReFacturas.service";
+import { FacturasService } from "../Services/Facturas.service";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
 
 // 🧩 Lógica para crear, actualizar o eliminar facturas
 export function FacturaEditar() {
-  const service = new ReFacturasService((window as any).graphInstance); // Graph se obtiene desde contexto global o se inyecta externamente
+  const service = new FacturasService((window as any).graphInstance); // Graph se obtiene desde contexto global o se inyecta externamente
 
   // 🟢 Crear nueva factura
   const registrarFactura = useCallback(async (nuevaFactura: ReFactura) => {
