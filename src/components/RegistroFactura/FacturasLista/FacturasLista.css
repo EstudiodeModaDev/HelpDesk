@@ -45,6 +45,32 @@
   background-color: #f2f6fa;
 }
 
+/* 🔔 Notificación flotante */
+.notificacion {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: #4caf50;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: fadein 0.3s ease, fadeout 0.3s ease 2.7s;
+  font-weight: 500;
+  z-index: 1000;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeout {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+
 /* 🧩 Estilo de los botones de acción (editar y eliminar) */
 .btn-editar,
 .btn-eliminar {
@@ -102,27 +128,4 @@
   transform: scale(1.05);
 }
 
-/* 🔔 Notificación flotante */
-.notificacion {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background-color: #4caf50;
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  animation: fadein 0.3s ease, fadeout 0.3s ease 2.7s;
-  font-weight: 500;
-  z-index: 1000;
-}
 
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeout {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-10px); }
-}
