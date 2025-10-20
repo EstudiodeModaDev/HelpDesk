@@ -6,34 +6,33 @@ import { useAuth } from "../auth/authContext";
 
 type Svc = {Inventario: InventarioService}; 
 
-const EMPTY: Inventario = {
-  Title: "",
-  Marca: "",
-  Serial: "",
-  Referencia: "",
-  ResponsableEntrada: "",
-  DiscoCap: "",
-  DiscoTec: "",
-  MemoriaCap: "",
-  MemoriaTec: "",
-  FechaEntrada: "",
-  CasoEntrada: "",
-  ResponsableSalida: "",
-  CasoSalida: "",
-  Estado: "",
-  UbicacionAnterior: "",
-  UbicacionActual: "",
-  Categoria: "",
-  AsignadoA: "",
-  PrestadoA: "",
-  Comprometido: "",
-  Compania: "",
-  ControlActivos: "",
-  Proveedor: "",
-};
-
 export function useInventario(services: Svc) {
   const {Inventario} = services;
+    const EMPTY: Inventario = {
+    Title: "",
+    Marca: "",
+    Serial: "",
+    Referencia: "",
+    ResponsableEntrada: "",
+    DiscoCap: "",
+    DiscoTec: "",
+    MemoriaCap: "",
+    MemoriaTec: "",
+    FechaEntrada: toISODateFlex(new Date()),
+    CasoEntrada: "",
+    ResponsableSalida: "",
+    CasoSalida: "",
+    Estado: "",
+    UbicacionAnterior: "",
+    UbicacionActual: "",
+    Categoria: "",
+    AsignadoA: "",
+    PrestadoA: "",
+    Comprometido: "",
+    Compania: "",
+    ControlActivos: "",
+    Proveedor: "",
+  };
   const [state, setState] = useState<Inventario>({...EMPTY,});
   const [errors, setErrors] = useState<InventarioErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -44,16 +43,17 @@ export function useInventario(services: Svc) {
      ============================ */
   const setField = <K extends keyof Inventario>(k: K, v: Inventario[K]) => setState((s) => ({ ...s, [k]: v }));
 
+
   const validate = () => {
     const e: InventarioErrors = {};
-    if (!state.AsignadoA) e.AsignadoA = "Requerido";
     if (!state.Categoria) e.Categoria = "Requerido";
     if (state.Compania) e.Compania = "Requerido";
     if (!state.Marca) e.Marca = "Selecciona una marca";
     if (!state.Proveedor) e.Proveedor = "Requerido";
     if (!state.Referencia) e.Referencia = "Requerido";
     if (!state.Title) e.Title = "Requerido";
-    setErrors(e);
+    setErrors(e)
+    console.table(e)
     return Object.keys(e).length === 0;
   };
 
