@@ -269,7 +269,7 @@ const handleCompraSeleccionada = async (id: string) => {
             </div>
 
             {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}
-            <div className="campo full-width">
+            <div className="campo">
               <label>
                 Descripción del ítem
                 <textarea
@@ -711,7 +711,7 @@ const handleCompraSeleccionada = async (id: string) => {
             </div>
 
             {/* 🧾 Detalle */}
-            <div className="campo full-width">
+            <div className="campo">
               <label>
                 Detalle Fac
                 <textarea
@@ -754,7 +754,7 @@ const handleCompraSeleccionada = async (id: string) => {
           </div>
 
           {/* 🗒️ Observaciones */}
-          <div className="campo full-width">
+          <div className="campo">
             <label>
               Observaciones
               <textarea
