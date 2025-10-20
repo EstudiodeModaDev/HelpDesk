@@ -4,7 +4,6 @@ export interface ReFactura {
   NoFactura: string;
   Proveedor: string;
   Title: string;   // nit va ser el title porque asi se guardo en la lista
-  tipodefactura: string;
   Items: string;
   DescripItems?: string;
   ValorAnIVA: number;
@@ -12,4 +11,7 @@ export interface ReFactura {
   CO: string;  // centro operativo
   un: string;  //unidad de negocio
   DetalleFac?: string;
+  FecEntregaCont: string;
+  DocERP: string;
+  Observaciones: string;
 }

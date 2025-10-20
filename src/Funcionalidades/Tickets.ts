@@ -1,9 +1,13 @@
 import React from "react";
-import type { SortDir, SortField, Ticket } from "../Models/Tickets";
+import type { SortDir, SortField, Ticket, ticketOption } from "../Models/Tickets";
 import { TicketsService } from "../Services/Tickets.service";
 import type { DateRange, FilterMode } from "../Models/Filtros";
 import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
+import type { RelacionadorState } from "../Models/nuevoTicket";
+import { FlowClient } from "./FlowClient";
+import { fileToBasePA64 } from "../utils/Commons";
+import type { MasiveFlow } from "../Models/FlujosPA";
 
 export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   if (!fecha) return new Date(NaN);
@@ -18,7 +22,6 @@ export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
   return isNaN(dt.getTime()) ? new Date(NaN) : dt;
 }
 
-// Reemplaza tu parseFecha por esta versión
 export function parseFechaFlex(fecha?: string): Date {
   if (!fecha) return new Date(NaN);
   const t = fecha.trim();
@@ -79,27 +82,24 @@ export function calcularColorEstado(ticket: Ticket): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-export function useTickets(
-  TicketsSvc: TicketsService,
-  userMail: string,
-  isAdmin: boolean
-) {
-  // UI state
+
+export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin: boolean) {
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-
-  // filtros
   const [filterMode, setFilterMode] = React.useState<FilterMode>("En curso");
   const today = React.useMemo(() => toISODateFlex(new Date()), []);
   const [range, setRange] = React.useState<DateRange>({ from: today, to: today });
-
-  // paginación servidor
   const [pageSize, setPageSize] = React.useState<number>(10); // = $top
   const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
   const [nextLink, setNextLink] = React.useState<string | null>(null);
-
   const [sorts, setSorts] = React.useState<Array<{field: SortField; dir: SortDir}>>([{ field: 'id', dir: 'desc' }]);
+  const [state, setState] = React.useState<RelacionadorState>({TicketRelacionar: null});
+
+  const setField = <K extends keyof RelacionadorState>(k: K, v: RelacionadorState[K]) => setState((s) => ({ ...s, [k]: v }));
+
+   const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c6d30061fb55449798cbdb76da3172e5/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=n-NqCPMlsQaZ9PDJyG6f9hLmkTtHvRjybLqc9Ilk8eM")
+  
 
   // construir filtro OData
   const buildFilter = React.useCallback((): GetAllOpts => {
@@ -140,7 +140,30 @@ export function useTickets(
     };
   }, [isAdmin, userMail, filterMode, range.from, range.to, pageSize, sorts]); 
 
-  // cargar primera página (o recargar)
+  const toTicketOptions = React.useCallback(
+    async (opts?: {includeIdInLabel?: boolean; fallbackIfEmptyTitle?: string; idPrefix?: string; top?: number; orderby?: string;}): Promise<ticketOption[]> => {
+      const {includeIdInLabel = true, fallbackIfEmptyTitle = "(Sin título)", idPrefix = "#",} = opts ?? {};
+
+      const seen = new Set<string>();
+      const { items, nextLink } = await TicketsSvc.getAll({orderby: "id desc"});;
+      console.log(nextLink)
+      const result = items.filter((t: any) => t && t.ID != null).map((t: any): ticketOption => {
+          const id = String(t.ID);
+          const title = (t.Title ?? "").trim() || fallbackIfEmptyTitle;
+          const label = includeIdInLabel ? `${title} — ID: ${idPrefix}${id}` : title;
+          return { value: id, label };
+        })
+        .filter((opt: ticketOption) => {
+          if (seen.has(opt.value)) return false;
+          seen.add(opt.value);
+          return true;
+        });
+
+      return result;
+    },
+    [TicketsSvc]
+  );
+
   const loadFirstPage = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
@@ -157,6 +180,30 @@ export function useTickets(
       setLoading(false);
     }
   }, [TicketsSvc, buildFilter, sorts]);
+
+  const handleConfirm = React.useCallback(
+    async (actualId: string | number, relatedId: string | number, type: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (type === "padre") {
+          await TicketsSvc.update(String(actualId), { IdCasoPadre: String(relatedId) });
+        } else if (type === "hijo") {
+          await TicketsSvc.update(String(relatedId), { IdCasoPadre: String(actualId) });
+        } else {
+          // "masiva": deja definido qué harás aquí
+          throw new Error("Relación 'masiva' aún no implementada");
+        }
+        return true;  // éxito
+      } catch (e: any) {
+        setError(e?.message ?? "Error actualizando relación del ticket");
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [TicketsSvc]
+  );
 
   React.useEffect(() => {
     loadFirstPage();
@@ -213,6 +260,26 @@ export function useTickets(
     });
   }, []);
 
+  async function sendFileToFlow(file: File, uploader?: string ) {
+    const contentBase64 = await fileToBasePA64(file);
+
+    const payload = {
+      uploader: uploader ?? "",      
+      file: {
+        name: file.name,
+        contentType: file.type || "application/octet-stream",
+        contentBase64
+      }
+    };
+
+    try {
+      await notifyFlow.invoke<MasiveFlow, any>({file: payload.file,});
+      setState((s) => ({ ...s, archivo: null }));
+      } catch (err) {
+       console.error("[Flow] Error enviando a solicitante:", err);
+    }
+  }
+
   return {
     // datos visibles (solo la página actual)
     rows,
@@ -233,7 +300,12 @@ export function useTickets(
     // acciones
     reloadAll,
     toggleSort,
+    setField,
     sorts,
+    toTicketOptions,
+    state, setState,
+    handleConfirm,   
+    sendFileToFlow
   };
 }
 
@@ -243,50 +315,48 @@ export function useTicketsRelacionados(TicketsSvc: TicketsService, ticket: Ticke
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-const loadRelateds = React.useCallback(async () => {
-  if (!ticket?.ID) {
-    setPadre(null);
-    setHijos([]);
-    return;
-  }
-
-  setLoading(true);
-  setError(null);
-
-  try {
-    // --- Padre (si aplica) ---
-    const idPadre = ticket.IdCasoPadre;
-    if (idPadre != null && idPadre !== "") {
-      const padreRes = await TicketsSvc.get(String(ticket.IdCasoPadre));
-      setPadre(padreRes ?? null);
-    } else {
+  const loadRelateds = React.useCallback(async () => {
+    if (!ticket?.ID) {
       setPadre(null);
+      setHijos([]);
+      return;
     }
 
-    // --- Hijos ---
-    const hijosRes = await TicketsSvc.getAll({
-      filter: `fields/IdCasoPadre eq ${Number(ticket.ID)}`,
-    });
-    setHijos(hijosRes?.items ?? []);
-  } catch (e: any) {
-    setError(e?.message ?? "Error cargando tickets");
-    setPadre(null);
-    setHijos([]);
-  } finally {
-    setLoading(false);
-  }
-}, [TicketsSvc, ticket?.ID, ticket?.IdCasoPadre]);
+    setLoading(true);
+    setError(null);
 
+    try {
+      // --- Padre (si aplica) ---
+      const idPadre = ticket.IdCasoPadre;
+      if (idPadre != null && idPadre !== "") {
+        const padreRes = await TicketsSvc.get(String(ticket.IdCasoPadre));
+        setPadre(padreRes ?? null);
+      } else {
+        setPadre(null);
+      }
+
+      // --- Hijos ---
+      const hijosRes = await TicketsSvc.getAll({
+        filter: `fields/IdCasoPadre eq ${Number(ticket.ID)}`,
+      });
+      setHijos(hijosRes?.items ?? []);
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando tickets");
+      setPadre(null);
+      setHijos([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [TicketsSvc, ticket?.ID, ticket?.IdCasoPadre]);
 
   React.useEffect(() => {
     loadRelateds();
   }, [loadRelateds])
 
-
   return {
     padre, hijos,
     loading,
     error,
-    loadRelateds
+    loadRelateds,
   };
 }

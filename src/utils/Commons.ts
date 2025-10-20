@@ -92,3 +92,16 @@ export const fileToBase64 = (file: Blob): Promise<string> =>
     reader.onerror = () => reject(reader.error ?? new Error("Error leyendo archivo"));
     reader.readAsDataURL(file);
   });
+
+export function fileToBasePA64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.readAsDataURL(file);
+    fr.onload = () => {
+      const dataUrl = String(fr.result || "");
+      const pureBase64 = dataUrl.substring(dataUrl.indexOf(",") + 1); // 👈 solo base64
+      resolve(pureBase64);
+    };
+    fr.onerror = reject;
+  });
+}

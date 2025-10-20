@@ -4,8 +4,7 @@ import FacturaFiltros from "../FacturaFiltros/FacturaFiltros";
 import FacturaEditar from "../FacturaEditar/FacturaEditar";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
-import "./FacturasLista.css"
-
+import "./FacturasLista.css";
 
 /**
  * 🧾 Componente que lista todas las facturas y permite filtrarlas o editarlas.
@@ -19,9 +18,10 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
 
-  /**
-   * 📦 Cargar las facturas al montar el componente
-   */
+  // 🟢 Estado para mostrar mensajes visuales
+  const [mensaje, setMensaje] = useState<string | null>(null);
+
+  // 📦 Cargar las facturas al montar el componente
   useEffect(() => {
     const cargarFacturas = async () => {
       try {
@@ -34,9 +34,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     cargarFacturas();
   }, [obtenerFacturas]);
 
-  /**
-   * 🗓️ Formatea la fecha en formato local colombiano
-   */
+  // 🗓️ Formatea la fecha en formato local colombiano
   const formatearFecha = (fecha?: string) => {
     if (!fecha) return "";
     return new Date(fecha).toLocaleDateString("es-CO", {
@@ -46,8 +44,19 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     });
   };
 
+  // 🧹 Limpia el mensaje luego de 3 segundos
+  useEffect(() => {
+    if (mensaje) {
+      const timer = setTimeout(() => setMensaje(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensaje]);
+
   return (
     <div className="facturas-lista">
+      {/* 🔔 Notificación visual */}
+      {mensaje && <div className="notificacion">{mensaje}</div>}
+
       {/* 🔎 Filtros de búsqueda */}
       <FacturaFiltros />
 
@@ -56,13 +65,16 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         <table className="tabla-facturas">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Fecha</th>
-              <th>Número</th>
+              <th>Num</th>
+              <th>FechaEmi</th>
+              <th>N°Fac</th>
               <th>Proveedor</th>
               <th>NIT</th>
-              <th>Tipo</th>
               <th>Valor</th>
+              <th>Items</th>
+              <th>FechaCont</th>
+              <th>DocERP</th>
+              <th>Obs</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -75,7 +87,6 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{factura.NoFactura}</td>
                   <td>{factura.Proveedor}</td>
                   <td>{factura.Title}</td>
-                  <td>{factura.tipodefactura}</td>
                   <td>
                     {factura.ValorAnIVA.toLocaleString("es-CO", {
                       style: "currency",
@@ -83,6 +94,10 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                       minimumFractionDigits: 0,
                     })}
                   </td>
+                  <td>{factura.Items}</td>
+                  <td>{formatearFecha(factura.FecEntregaCont)}</td>
+                  <td>{factura.DocERP}</td>
+                  <td>{factura.Observaciones}</td>
                   <td>
                     <button
                       className="btn-editar"
@@ -115,6 +130,25 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         <FacturaEditar
           factura={facturaEdit}
           onClose={() => setFacturaEdit(null)}
+          // 🗑️ Cuando se elimina una factura, la quitamos de la lista local
+          onEliminar={(idEliminado) => {
+  console.log("🗑️ Eliminando factura, debería mostrar mensaje");
+  setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
+  setMensaje("🗑️ Factura eliminada correctamente");
+  setTimeout(() => setFacturaEdit(null), 100);
+}}
+          // 💾 Cuando se guarda una factura, recargamos la lista completa
+          onGuardar={async () => {
+  console.log("💾 Guardando factura, debería mostrar mensaje");
+  try {
+    const lista = await obtenerFacturas();
+    setFacturas(lista);
+    setMensaje("✅ Factura actualizada correctamente");
+    setTimeout(() => setFacturaEdit(null), 100);
+  } catch (err) {
+    console.error("Error al refrescar lista tras editar:", err);
+  }
+          }}
         />
       )}
     </div>

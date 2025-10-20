@@ -13,18 +13,10 @@ type Props = {
   emptyChildrenText?: string;
   onSelect?: (t: Ticket) => void;         // callback al seleccionar
   buildHref?: (id: number | string) => string; // opcional: si también quieres navegar
-  // opcional: callback para guardar relación en backend
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
-export default function TicketsAsociados({
-  title = "Tickets Asociados",
-  ticket,
-  emptyChildrenText = "No es hijo de ningun caso",
-  onSelect,
-  buildHref, // opcional
-  onRelateConfirm,
-}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref,}: Props) {
   const { Tickets } = useGraphServices();
 
   // Hook de relacionados
@@ -32,18 +24,12 @@ export default function TicketsAsociados({
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
-  const [options, setOptions] = React.useState<TicketLite[]>([]);
   const [loadingOpts, setLoadingOpts] = React.useState(false);
 
   async function openRelacionador() {
     try {
       setShowRel(true);
       setLoadingOpts(true);
-      const res = await Tickets.getAll({ top: 400, orderby: "created asc"});
-      const items = (res?.items ?? [])
-        .filter((t: any) => String(t.ID) !== String(ticket.ID))
-        .map((t: any) => ({ ID: t.ID, Title: t.Title } as TicketLite));
-      setOptions(items);
     } finally {
       setLoadingOpts(false);
     }
@@ -53,21 +39,11 @@ export default function TicketsAsociados({
     setShowRel(false);
   }
 
-  async function handleRelacionConfirm(payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) {
-
-    if (onRelateConfirm) {
-      await onRelateConfirm(payload);
-    }
-
-    setShowRel(false);
-    loadRelateds();
-  }
-
   // ====== Navegación por click en padre/hijo ======
   function handleClick(e: React.MouseEvent, t: Ticket) {
     if (onSelect) {
       e.preventDefault();
-      onSelect(t);   // ✅ no recargamos aquí; el padre cambia el ticket y el hook se dispara solo
+      onSelect(t);
     }
   }
 
@@ -99,10 +75,10 @@ export default function TicketsAsociados({
             <div className="ta-skeleton" style={{ height: 40 }} aria-hidden />
           ) : (
             <RelacionadorInline
-              currentId={Number(ticket.ID)}
-              tickets={options}
-              onCancel={closeRelacionador}
-              onConfirm={handleRelacionConfirm}
+                currentId={Number(ticket.ID)}
+                onCancel={closeRelacionador}
+                userMail={""} isAdmin={true}  
+                reload={loadRelateds}        
             />
           )}
         </div>

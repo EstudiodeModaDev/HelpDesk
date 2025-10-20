@@ -23,6 +23,7 @@ export class ReFacturasService {
     this.listName = listName;
   }
 
+  // 🔁 Convertir un item de SharePoint a modelo local
   private toModel(item: any): ReFactura {
     const f = item?.fields ?? {};
     return {
@@ -30,8 +31,7 @@ export class ReFacturasService {
       FechaEmision: f.FechadeEmision ?? "",
       NoFactura: f.Numerofactura ?? "",
       Proveedor: f.Proveedor ?? "",
-      Title: f.Title ?? "",
-      tipodefactura: f.TipoFactura ?? "",
+      Title: f.Title ?? "", // NIT
       Items: f.Item ?? "",
       DescripItems: f.Descripcion ?? "",
       ValorAnIVA: Number(f.Valor) || 0,
@@ -39,6 +39,9 @@ export class ReFacturasService {
       CO: f.Co ?? "",
       un: f.Un ?? "",
       DetalleFac: f.Detalle ?? "",
+      FecEntregaCont: f.FecEntregaCont ?? "",
+      DocERP: f.DocERP ?? "",
+      Observaciones: f.Observaciones ?? "",
     };
   }
 
@@ -57,11 +60,10 @@ export class ReFacturasService {
 
     // 🔁 Mapeo de nombres locales → campos SharePoint
     const fields = {
-      FechaEmision: record.FechaEmision,
+      FechadeEmision: record.FechaEmision,
       Numerofactura: record.NoFactura,
       Proveedor: record.Proveedor,
-      Title: record.Title, // NIT
-      TipoFactura: record.tipodefactura,
+      Title: record.Title,
       Item: record.Items,
       Descripcion: record.DescripItems,
       Valor: record.ValorAnIVA,
@@ -69,6 +71,9 @@ export class ReFacturasService {
       Co: record.CO,
       Un: record.un,
       Detalle: record.DetalleFac,
+      FecEntregaCont: record.FecEntregaCont,
+      DocERP: record.DocERP,
+      Observaciones: record.Observaciones,
     };
 
     console.log("📤 Enviando a SharePoint:", fields);
@@ -107,7 +112,7 @@ export class ReFacturasService {
     return (res.value ?? []).map((x: any) => this.toModel(x));
   }
 
-  // ✏️ Actualizar factura
+  // ✏️ Actualizar factura (solo los campos modificados)
   async update(id: string, changed: Partial<ReFactura>) {
     if (!id) throw new Error("ID de factura requerido");
 
@@ -123,19 +128,21 @@ export class ReFacturasService {
     this.listId = ids.listId;
 
     // 🔁 Mapeo solo de los campos modificados
-    const fields = {
+    const fields: any = {
       ...(changed.FechaEmision && { FechadeEmision: changed.FechaEmision }),
       ...(changed.NoFactura && { Numerofactura: changed.NoFactura }),
       ...(changed.Proveedor && { Proveedor: changed.Proveedor }),
       ...(changed.Title && { Title: changed.Title }),
-      ...(changed.tipodefactura && { TipoFactura: changed.tipodefactura }),
       ...(changed.Items && { Item: changed.Items }),
       ...(changed.DescripItems && { Descripcion: changed.DescripItems }),
-      ...(changed.ValorAnIVA && { Valor: changed.ValorAnIVA }),
+      ...(changed.ValorAnIVA != null && { Valor: changed.ValorAnIVA }),
       ...(changed.CC && { Cc: changed.CC }),
       ...(changed.CO && { Co: changed.CO }),
       ...(changed.un && { Un: changed.un }),
       ...(changed.DetalleFac && { Detalle: changed.DetalleFac }),
+      ...(changed.FecEntregaCont && { FecEntregaCont: changed.FecEntregaCont }),
+      ...(changed.DocERP && { DocERP: changed.DocERP }),
+      ...(changed.Observaciones && { Observaciones: changed.Observaciones }),
     };
 
     console.log("✏️ Actualizando en SharePoint:", fields);

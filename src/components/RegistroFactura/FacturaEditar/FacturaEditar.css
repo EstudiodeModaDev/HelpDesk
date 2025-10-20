@@ -1,34 +1,58 @@
-/* 🧩 Modal de edición */
-.modal {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+/* 🌙 Fondo oscuro semitransparente */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-/* 🧩 Formulario en el modal */
-.modal-form input, 
+/* 🧩 Contenedor principal del modal */
+.modal {
+  background: #ffffff;
+  padding: 25px 30px;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 520px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease-out;
+  font-family: "Poppins", sans-serif;
+}
+
+/* 🧠 Título del modal */
+.modal h3 {
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #1e3a8a; /* azul institucional */
+  text-align: center;
+}
+
+/* ✏️ Campos del formulario */
+.modal-form input,
 .modal-form textarea {
   width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background-color: #f9fafb;
   font-size: 14px;
-  box-sizing: border-box;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
 }
 
 .modal-form input:focus,
 .modal-form textarea:focus {
-  border-color: #2980b9;
-  box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+  border-color: #2563eb; /* azul claro */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: none;
 }
 
-/* 🧩 Botones del modal */
+/* 🎛️ Botones */
 .modal-buttons {
   display: flex;
   justify-content: space-between;
@@ -36,31 +60,61 @@
   margin-top: 15px;
 }
 
-.btn-guardar, .btn-cancelar {
-  padding: 12px 25px;
+.btn-guardar,
+.btn-cancelar,
+.btn-eliminar {
+  flex: 1;
+  padding: 10px 0;
   font-size: 14px;
-  border-radius: 8px;
+  border-radius: 10px;
+  font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: background-color 0.3s, transform 0.1s;
+  transition: all 0.2s ease;
 }
 
+/* 💾 Guardar */
 .btn-guardar {
-  background-color: #2980b9;
-  color: white;
+  background-color: #2563eb;
+  color: #fff;
 }
 
 .btn-guardar:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
+  background-color: #1d4ed8;
+  transform: scale(1.03);
 }
 
+/* ❌ Cancelar */
 .btn-cancelar {
-  background-color: #e74c3c;
-  color: white;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
 }
 
 .btn-cancelar:hover {
-  background-color: #c0392b;
-  transform: scale(1.05);
+  background-color: #e5e7eb;
+  transform: scale(1.03);
+}
+
+/* 🗑️ Eliminar */
+.btn-eliminar {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.btn-eliminar:hover {
+  background-color: #dc2626;
+  transform: scale(1.03);
+}
+
+/* 🌟 Animación de aparición */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -76,7 +76,6 @@ export class FacturasService {
       NoFactura: f.Numerofactura ?? "",
       Proveedor: f.Proveedor ?? "",
       Title: f.Title ?? "",
-      tipodefactura: f.TipoFactura ?? "",
       Items: f.Item ?? "",
       DescripItems: f.Descripcion ?? "",
       ValorAnIVA: Number(f.Valor) || 0,
@@ -84,6 +83,9 @@ export class FacturasService {
       CO: f.Co ?? "",
       un: f.Un ?? "",
       DetalleFac: f.Detalle ?? "",
+      FecEntregaCont: f.FecEntregaCont ?? "",
+      DocERP: f.DocERP ?? "",
+      Observaciones: f.Observaciones ?? "",
     };
   }
 
