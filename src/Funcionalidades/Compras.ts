@@ -107,25 +107,6 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
   const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    const compra = ComprasSvc.create({
-      CargarA: state.cargarA, 
-      CCosto: state.ccosto?.value ?? "", 
-      CO: state.co?.value ?? "", 
-      Dispositivo: state.productoServicio, 
-      FechaSolicitud: state.fechaSolicitud,
-      PorcentajeBroken: String(state.marcasPct["BROKEN CHAINS"]) ?? "0",
-      PorcentajeDiesel: String(state.marcasPct["DIESEL"]) ?? "0",
-      PorcentajeKipling: String(state.marcasPct["KIPLING"]) ?? "0",
-      PorcentajeMFG: String(state.marcasPct["MFG"] ?? "0"),
-      PorcentajePilatos: String(state.marcasPct["PILATOS"] ?? "0"),
-      PorcentajeSuperdry: String(state.marcasPct["SUPERDRY"] ?? "0"),
-      SolicitadoPor: state.solicitadoPor,
-      Title: state.tipoCompra,
-      UN: state.un,
-      DescItem: state.DescItem,
-      CodigoItem: state.codigoItem,
-      CorreoSolicitante: state.CorreoSolicitante
-    })
 
     const ticketpayload = {
       Title: state.tipoCompra === "Alquiler" ? `Alquiler de ${state.productoServicio}` : `Compra de ${state.productoServicio}`,
@@ -145,6 +126,27 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     }
 
     const createdTicket = await TicketsSvc.create(ticketpayload)
+
+    const compra = ComprasSvc.create({
+      CargarA: state.cargarA, 
+      CCosto: state.ccosto?.value ?? "", 
+      CO: state.co?.value ?? "", 
+      Dispositivo: state.productoServicio, 
+      FechaSolicitud: state.fechaSolicitud,
+      PorcentajeBroken: String(state.marcasPct["BROKEN CHAINS"]) ?? "0",
+      PorcentajeDiesel: String(state.marcasPct["DIESEL"]) ?? "0",
+      PorcentajeKipling: String(state.marcasPct["KIPLING"]) ?? "0",
+      PorcentajeMFG: String(state.marcasPct["MFG"] ?? "0"),
+      PorcentajePilatos: String(state.marcasPct["PILATOS"] ?? "0"),
+      PorcentajeSuperdry: String(state.marcasPct["SUPERDRY"] ?? "0"),
+      SolicitadoPor: state.solicitadoPor,
+      Title: state.tipoCompra,
+      UN: state.un,
+      DescItem: state.DescItem,
+      CodigoItem: state.codigoItem,
+      CorreoSolicitante: state.CorreoSolicitante,
+      IdCreado: createdTicket.ID ?? ""
+    })
 
     const logpayload: Log = {
       Actor: "Sistema",

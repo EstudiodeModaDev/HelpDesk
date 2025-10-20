@@ -93,7 +93,8 @@ export class ComprasService {
       Estado: f.Estado,
       CodigoItem: f.CodigoItem,
       DescItem: f.DescItem,
-      CorreoSolicitante: f.CorreoSolicitante
+      CorreoSolicitante: f.CorreoSolicitante,
+      IdCreado: f.IdCreado
     }
   }
 

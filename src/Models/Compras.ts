@@ -44,7 +44,8 @@ export type Compra = {
   Estado?: string,
   CodigoItem: string;
   DescItem: string;
-  CorreoSolicitante: string
+  CorreoSolicitante: string;
+  IdCreado: string;
 }
 export const Items = [
     { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },

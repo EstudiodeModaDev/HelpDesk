@@ -7,8 +7,9 @@ import type { Log } from "../Models/Log";
 import type { AccountInfo } from "@azure/msal-browser";
 import { FlowClient } from "./FlowClient";
 import type { FlowToUser } from "../Models/FlujosPA";
+import type { ComprasService } from "../Services/Compras.service";
 
-type Svc = { Tickets?: TicketsService; Logs: LogService };
+type Svc = { Tickets?: TicketsService; Logs: LogService; ComprasSvc: ComprasService };
 
 export type FormDocumentarState = {
   resolutor: string;
@@ -20,7 +21,7 @@ export type FormDocumentarState = {
 export type FormDocErrors = Partial<Record<keyof FormDocumentarState, string>>;
 
 export function useDocumentarTicket(services: Svc) {
-  const { Tickets, Logs } = services;
+  const { Tickets, Logs, ComprasSvc } = services;
 
   const [state, setState] = useState<FormDocumentarState>({
     resolutor: "",
@@ -83,6 +84,14 @@ export function useDocumentarTicket(services: Svc) {
         const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
         alert("Caso cerrado. Enviando notificación al solicitante")
         await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
+        const comprasRelacionadas = await ComprasSvc.getAll({filter:  `fields/IdCrado eq '${ticket.ID}`})
+        await Promise.allSettled(
+          comprasRelacionadas.items.map((it) => {
+            const id = String(it.Id);   
+            return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });
+          })
+        );
+
         if (ticket.CorreoSolicitante) {
           const title = `Cierre de Ticket - ${ticket.ID}`;
           const message = `
