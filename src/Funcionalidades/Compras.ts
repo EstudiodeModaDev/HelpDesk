@@ -1,15 +1,22 @@
 import React from "react";
 
 import type { DateRange } from "../Models/Filtros";
-import { toISODateFlex } from "../utils/Date";
+import { toGraphDateTime, toISODateFlex, toISODateTimeFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { ComprasService } from "../Services/Compras.service";
 import type { Compra, comprasState } from "../Models/Compras";
 import type { CentroCostos } from "../Models/CentroCostos";
 import type { CentroCostosService } from "../Services/CentroCostos.service";
 import type { COService } from "../Services/COCostos.service";
+import type { Ticket } from "../Models/Tickets";
+import { calcularFechaSolucion } from "../utils/ans";
+import { fetchHolidays } from "../Services/Festivos";
+import type { Holiday } from "festivos-colombianos";
+import type { Log } from "../Models/Log";
+import type { TicketsService } from "../Services/Tickets.service";
+import type { LogService } from "../Services/Log.service";
 
-export function useCompras(ComprasSvc: ComprasService) {
+export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsService, LogSvc: LogService) {
 
   const MARCAS = ["MFG", "DIESEL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
   const NEXT: Record<string, string> = {
@@ -46,6 +53,7 @@ export function useCompras(ComprasSvc: ComprasService) {
     motivo: ""
   });
   const [saving, setSaving] = React.useState(false)
+  const [holidays, setHolidays] = React.useState<Holiday[]>([])
 
   //HELPERS
   const totalPct = React.useMemo( () => state.cargarA === "Marca" ? 
@@ -70,8 +78,25 @@ export function useCompras(ComprasSvc: ComprasService) {
     setErrors(e);
     return Object.keys(e).length === 0;
   }
+
+  // Carga de festivos inicial
+  React.useEffect(() => {
+      let cancel = false;
+      (async () => {
+        try {
+          const hs = await fetchHolidays();
+          if (!cancel) setHolidays(hs);
+        } catch (e) {
+          if (!cancel) console.error("Error festivos:", e);
+        }
+      })();
+      return () => {
+        cancel = true;
+      };
+    }, []);
   
-  const handleSubmit = React.useCallback((e: React.FormEvent) => {
+  
+  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     const compra = ComprasSvc.create({
@@ -88,11 +113,46 @@ export function useCompras(ComprasSvc: ComprasService) {
       PorcentajeSuperdry: String(state.marcasPct["SUPERDRY"] ?? "0"),
       SolicitadoPor: state.solicitadoPor,
       Title: state.tipoCompra,
-      UN: state.un})
+      UN: state.un
+    })
+
+    const ticketpayload: Ticket = {
+      ANS: "ANS 5",
+      TiempoSolucion: toGraphDateTime(calcularFechaSolucion(new Date(), 240, holidays)),
+      Categoria: "",
+      SubCategoria: "",
+      SubSubCategoria: "",
+      CorreoResolutor: "cesanchez@estudiodemoda.com.co",
+      Descripcion: `Se ha solicitado una compra del siguiente dispositivo:  ${state.productoServicio} por: ${state.solicitadoPor}`,
+
+      Estadodesolicitud: "En Atención",
+      FechaApertura: toISODateTimeFlex(String(new Date())),
+      Fuente: "Self service",
+      IdResolutor: "83",
+      Nombreresolutor: "Cesar Eduardo Sanchez Salazar",
+      Solicitante: state.solicitadoPor,
+      CorreoSolicitante: "",
+
+    }
+
+    const createdTicket = await TicketsSvc.create(ticketpayload)
+
+    const logpayload: Log = {
+      Actor: "Sistema",
+      Descripcion: state.tipoCompra === "Alquiler" ? "Se ha creado un ticket bajo concepto de alquiler del siguiente dispositivo:  " : "",
+      CorreoActor: "",
+      Tipo_de_accion: "Creacion",
+      Title: createdTicket.ID ?? ""
+    }
+
+    const createdLog = await LogSvc.create(logpayload)
+
+    console.log(createdLog)
+    
     alert("Se ha creado la solicitud de compra con éxito")
     console.log(compra)
     setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: ""})  }, 
-    [state, ComprasSvc]
+    [state, ComprasSvc, holidays]
   ); 
   
   const buildFilter = React.useCallback((): GetAllOpts => {
