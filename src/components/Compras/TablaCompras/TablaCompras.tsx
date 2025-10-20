@@ -84,14 +84,14 @@ export default function TablaCompras() {
                         </span>
                       )
                       : (
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); handleNext(compra?.Id ?? ''); setTicketCompra(compra.IdCreado)}}
-                          aria-label={`Siguiente paso para compra ${compra?.Id ?? ''}`}
-                          className="btn"
-                        >
-                          Siguiente paso
-                        </button>
+                        <div>
+                          <button type="button"  onClick={(e) => { e.stopPropagation(); handleNext(compra?.Id ?? ''); setTicketCompra(compra.IdCreado)}} aria-label={`Siguiente paso para compra ${compra?.Id ?? ''}`} className="btn">
+                            Siguiente paso
+                          </button>
+                          <button type="button"  onClick={(e) => { e.stopPropagation();  setOpenModal(true)}} aria-label={`Siguiente paso para compra ${compra?.Id ?? ''}`} className="btn">
+                            Agregar al inventario
+                          </button>
+                        </div>
                       )
                     }
                   </td>
