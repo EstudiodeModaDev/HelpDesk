@@ -18,7 +18,7 @@ interface Props {
  * - Asegura que `valor` sea number y usa `id0` como identificador.
  * - Ahora también permite eliminar la factura seleccionada.
  */
-export default function FacturaEditarCompo({ factura, onClose, onEliminar }: Props) {
+export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGuardar }: Props) {
   // obtenemos las funciones lógicas (actualizar/eliminar...) desde funcionalidades
   const { actualizarFactura, eliminarFactura } = facturaFx();
 
@@ -71,7 +71,10 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar }: Pro
 
     // Llamada a la lógica que actualiza (espera id, cambios)
     const ok = await actualizarFactura(id, cambios);
-    if (ok) onClose();
+    if (ok) {
+  onGuardar?.(); // 🔔 notifica al padre que recargue la lista
+  onClose();
+}
   };
 
   // 🗑️ Nueva función: elimina la factura actual
