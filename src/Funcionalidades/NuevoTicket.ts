@@ -414,8 +414,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
     return elegido;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!validate()) return;
 
     setSubmitting(true);

@@ -24,7 +24,7 @@ export default function NuevoTicketUsuarioForm() {
     <div className="ticket-form" data-force-light>
       <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={handleSubmit} noValidate className="tf-grid">
+      <form onSubmit={(e) => {e.preventDefault(); handleSubmit()}} noValidate className="tf-grid">
 
         {/* Motivo */}
         <div className="tf-field tf-col-2">
