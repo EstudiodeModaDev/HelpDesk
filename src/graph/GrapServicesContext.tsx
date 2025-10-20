@@ -25,6 +25,7 @@ import { CentroCostosService } from '../Services/CentroCostos.service';
 import { COService } from '../Services/COCostos.service';
 import { ComprasService } from '../Services/Compras.service';
 import { TareasService } from '../Services/Tareas.service';
+import { InventarioService } from '../Services/Inventario.service';
 
 // ================== Tipos ==================
 export type GraphSiteConfig = {
@@ -54,6 +55,7 @@ export type GraphSiteConfig = {
     CentroOperativo: string;
     Compras: string;
     Tareas: string;
+    Inventario: string;
   };
 };
 
@@ -81,7 +83,8 @@ export type GraphServices = {
   CentroCostos: CentroCostosService;
   CentroOperativo: COService;
   Compras: ComprasService;
-  Tareas: TareasService
+  Tareas: TareasService;
+  Inventario: InventarioService
 };
 
 // ================== Contexto ==================
@@ -119,7 +122,8 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     CentroCostos: "CentroCostos",
     CentroOperativo: "CentrosOperativos",
     Compras: "Compras",
-    Tareas: "Recordatorios"
+    Tareas: "Recordatorios",
+    Inventario: "Inventario"
   },
 };
 
@@ -157,6 +161,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         CentroOperativo:                config?.lists?.CentroOperativo          ?? base.lists.CentroOperativo,
         Compras:                        config?.lists?.Compras                  ?? base.lists.Compras,
         Tareas:                         config?.lists?.Tareas                   ?? base.lists.Tareas,
+        Inventario:                     config?.lists?.Inventario               ?? base.lists.Inventario,
       },
     };
   }, [config]);
@@ -192,9 +197,10 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const CentroOperativo           = new COService(graph, hostname, sitePath, lists.CentroOperativo)
     const Compras                   = new ComprasService(graph, hostname, sitePath, lists.Compras)
     const Tareas                    = new TareasService(graph, hostname, sitePath, lists.Tareas)
+    const Inventario                = new InventarioService(graph, hostname, sitePath, lists.Inventario)
 
     return {graph, Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
-        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos, CentroOperativo, Compras, Tareas};
+        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario};
   }, [graph, cfg]);
 
   return (

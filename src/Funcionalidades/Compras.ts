@@ -18,16 +18,14 @@ import { pickTecnicoConMenosCasos } from "../utils/Commons";
 import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import type { FlowToUser } from "../Models/FlujosPA";
 import { FlowClient } from "./FlowClient";
-
- const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
+const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a21d66d127ff43d7a940369623f0b27d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0ptZLGTXbYtVNKdmIvLdYPhw1Wcqb869N3AOZUf2OH4")
 
 export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsService, LogSvc: LogService, Usuarios: UsuariosSPService) {
 
   const MARCAS = ["MFG", "DIESEL", "PILATOS", "SUPERDRY", "KIPLING", "BROKEN CHAINS"] as const;
   const NEXT: Record<string, string> = {
     "Pendiente por orden de compra": "Pendiente por entrega de proveedor",
-    "Pendiente por entrega de proveedor": "Pendiente por registro de inventario",
-    "Pendiente por registro de inventario": "Pendiente por entrega al usuario",
+    "Pendiente por entrega de proveedor": "Pendiente por entrega al usuario",
     "Pendiente por entrega al usuario": "Pendiente por registro de factura",
     "Pendiente por registro de factura": "Completado"
   };
@@ -61,6 +59,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     DescItem: "",
     CorreoSolicitante: ""
   });
+  const [openModal, setOpenModal] = React.useState<boolean>(false)
   const [saving, setSaving] = React.useState(false)
   const [holidays, setHolidays] = React.useState<Holiday[]>([])
 
@@ -295,7 +294,6 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     setError(null);
 
     try {
-     
       const current = await ComprasSvc.get(idItem); 
       const prev = (current.Estado) ?? "";
       const next = NEXT[prev];
@@ -307,8 +305,10 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
 
       try {
         const updated = await ComprasSvc.update(idItem, { Estado: next },);
+
         if(updated.Estado === "Pendiente por entrega al usuario"){
           await ticketEntrega(current.Title, current.SolicitadoPor, current.CorreoSolicitante, state.productoServicio)
+          setOpenModal(true)
         }
         alert(`Se ha actualizado el registro con el siguiente estado: ${updated?.Estado ?? "—"}`)
         reloadAll()
@@ -369,8 +369,8 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
   const reloadAll  = React.useCallback(() => { loadFirstPage(); }, [loadFirstPage]);
 
   return {
-    rows, loading, error, MARCAS, pageSize,  pageIndex, hasNext, errors, state, range, totalPct,
-    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit, handleNext
+    rows, loading, error, MARCAS, pageSize,  pageIndex, hasNext, errors, state, range, totalPct, openModal,
+    setPageSize, nextPage, setRange, applyRange, reloadAll, setField, setMarcaPct, setState, zeroMarcas, handleSubmit, handleNext, setOpenModal
   };
 }
 

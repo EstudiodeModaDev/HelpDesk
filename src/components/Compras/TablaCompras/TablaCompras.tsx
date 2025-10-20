@@ -4,12 +4,14 @@ import "./TablaCompras.css"
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import { useCompras } from "../../../Funcionalidades/Compras";
 import { toISODateTimeFlex } from "../../../utils/Date";
+import CrearInventarioModal from "../../Inventario/ModalInventario/ModalInventario";
 
 export default function TablaCompras() {
     const { Compras, Tickets, Logs, Usuarios} = useGraphServices();
-    const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext} = useCompras(Compras, Tickets, Logs, Usuarios)
+    const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext, openModal, setOpenModal} = useCompras(Compras, Tickets, Logs, Usuarios)
 
   const [search, setSearch] = React.useState("");
+  const [ticketCompra, setTicketCompra] = React.useState("");
 
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -84,7 +86,7 @@ export default function TablaCompras() {
                       : (
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleNext(compra?.Id ?? ''); }}
+                          onClick={(e) => { e.stopPropagation(); handleNext(compra?.Id ?? ''); setTicketCompra(compra.IdCreado)}}
                           aria-label={`Siguiente paso para compra ${compra?.Id ?? ''}`}
                           className="btn"
                         >
@@ -125,6 +127,13 @@ export default function TablaCompras() {
             </div>
           )}
         </div>
+
+      <CrearInventarioModal
+        open={openModal}                
+        onClose={() => setOpenModal(false)}
+        submitting={loading}
+        IdTicket={ticketCompra}          
+      />
     </div>
   );
 }
