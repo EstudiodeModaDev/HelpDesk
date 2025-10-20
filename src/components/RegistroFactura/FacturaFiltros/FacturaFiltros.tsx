@@ -1,10 +1,16 @@
-// src/components/RegistrarFactura/FacturaFiltros.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 
-export default function FacturaFiltros() {
-  // 🔍 Estado interno para manejar los filtros
+/**
+ * 🔎 Componente de filtros reutilizable
+ * Recibe una prop `onFiltrar` para comunicar los filtros al padre.
+ */
+export default function FacturaFiltros({
+  onFiltrar,
+}: {
+  onFiltrar: (filtros: Partial<ReFactura>) => void;
+}) {
   const [filtros, setFiltros] = useState<Partial<ReFactura>>({
     FechaEmision: "",
     NoFactura: "",
@@ -14,7 +20,6 @@ export default function FacturaFiltros() {
     DescripItems: "",
   });
 
-  // 📘 Diccionario de opciones (mismo que en el registro principal)
   const opcionesFactura = [
     { codigo: "SC11", descripcion: "ARREND. EQ. COMPUTAC Y COMUNICACIÓN" },
     { codigo: "SC40", descripcion: "MMTO. EQ. COMPUTO Y COMU COMPRAS RC" },
@@ -23,13 +28,16 @@ export default function FacturaFiltros() {
     { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
   ];
 
-  // 🧠 Maneja los cambios dentro del mismo componente
+  // 🔁 Llama automáticamente al padre cada vez que cambian los filtros
+  useEffect(() => {
+    onFiltrar(filtros);
+  }, [filtros]);
+
+  // 🧠 Actualiza los filtros locales
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-
-    // Si cambia el ítem, también actualiza la descripción automáticamente
     if (name === "Items") {
       const seleccion = opcionesFactura.find((o) => o.codigo === value);
       setFiltros((prev) => ({
@@ -42,7 +50,6 @@ export default function FacturaFiltros() {
     }
   };
 
-  // 🧩 Renderizado
   return (
     <div className="filtros-container">
       <h3>🔍 Filtros de búsqueda</h3>
@@ -53,7 +60,6 @@ export default function FacturaFiltros() {
           name="FechaEmision"
           value={filtros.FechaEmision || ""}
           onChange={handleChange}
-          placeholder="Fecha"
         />
 
         <input
@@ -80,12 +86,8 @@ export default function FacturaFiltros() {
           placeholder="NIT"
         />
 
-        {/* 🧾 Ítem (Código + descripción automática) */}
-        <select
-          name="Items"
-          value={filtros.Items || ""}
-          onChange={handleChange}
-        >
+        {/* 🧾 Selector de ítem */}
+        <select name="Items" value={filtros.Items || ""} onChange={handleChange}>
           <option value="">Seleccionar código</option>
           {opcionesFactura.map((op) => (
             <option key={op.codigo} value={op.codigo}>
@@ -94,7 +96,6 @@ export default function FacturaFiltros() {
           ))}
         </select>
 
-        {/* 📝 Descripción del ítem (solo lectura) */}
         <input
           type="text"
           name="DescripItems"
