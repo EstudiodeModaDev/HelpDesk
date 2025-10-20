@@ -4,7 +4,7 @@ import type { DateRange } from "../Models/Filtros";
 import { toGraphDateTime, toISODateFlex, toISODateTimeFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { ComprasService } from "../Services/Compras.service";
-import type { Compra, comprasState } from "../Models/Compras";
+import { UN, type Compra, type comprasState } from "../Models/Compras";
 import type { CentroCostos } from "../Models/CentroCostos";
 import type { CentroCostosService } from "../Services/CentroCostos.service";
 import type { COService } from "../Services/COCostos.service";
@@ -336,9 +336,15 @@ export function useCO(COSvc: COService) {
     [CentrosOperativos]
   );
 
+  const UNOptions = React.useMemo(
+    () => UN.map(un => ({value: un.codigo, label: `${un.codigo} - ${un.descripcion}`})),
+    []
+  )
+
   return {
     CentrosOperativos, COOptions, loading, error,
     reload: LoadCentroOperativos,
+    UNOptions
   };
 }
 

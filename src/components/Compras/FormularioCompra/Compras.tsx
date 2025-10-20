@@ -1,6 +1,6 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
-import { Items, type CargarA, type Opcion, type TipoCompra } from "../../../Models/Compras";
+import { Items, type CargarA, type TipoCompra } from "../../../Models/Compras";
 import type { UserOptionEx } from "../../NuevoTicket/NuevoTicketForm";
 import { useFranquicias } from "../../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../../Funcionalidades/Workers";
@@ -10,11 +10,6 @@ import { useGraphServices } from "../../../graph/GrapServicesContext";
 import type { COOption } from "../../../Models/CO";
 import type { CCOption } from "../../../Models/CentroCostos";
 
-const UN_OPTS: Opcion[] = [
-  { value: "UND", label: "UND" },
-  { value: "PAR", label: "PAR" },
-  { value: "CJ",  label: "CJ"  },
-];
 const Motivos = ["Cambio por daño", "Renovación de equipo", "Renovación de licencia"] as const;
 
 /** --- Props --- */
@@ -40,7 +35,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
   const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
-  const { COOptions, loading: loadingCO,} = useCO(CentroOperativo as any);
+  const { COOptions, loading: loadingCO, UNOptions} = useCO(CentroOperativo as any);
   const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras, Tickets, Logs);
 
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
@@ -156,7 +151,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           <label className="label">UN</label>
           <select className="control" value={state.un} onChange={(e) => setField("un", e.target.value)}>
             <option value="">Seleccione UN</option>
-            {UN_OPTS.map((o) => (
+            {UNOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
