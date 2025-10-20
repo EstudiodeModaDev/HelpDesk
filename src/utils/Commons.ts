@@ -1,5 +1,7 @@
 // src/utils/Commons.ts
 import type { GraphRest } from "../graph/GraphRest";
+import type { UsuariosSP } from "../Models/Usuarios";
+import type { UsuariosSPService } from "../Services/Usuarios.Service";
 
 export type EnsureIdsResult = { siteId: string; listId: string };
 
@@ -34,11 +36,6 @@ function saveCache(
   } catch {}
 }
 
-/**
- * Resuelve y devuelve { siteId, listId } para una lista de SharePoint usando Graph.
- * - Usa cache localStorage si está disponible.
- * - Corrige sitePath y evita el ":" sobrante al final.
- */
 export async function ensureIds(
   siteId: string | undefined,
   listId: string | undefined,
@@ -80,10 +77,38 @@ export async function ensureIds(
   return { siteId, listId };
 }
 
-
 export function  norm (s?: string){
  return (s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 }
+
+export async function pickTecnicoConMenosCasos(Usuarios: UsuariosSPService): Promise<UsuariosSP | null>{
+  const tecnicos = await Usuarios.getAll({filter: "fields/Rol eq 'Tecnico' and fields/Disponible eq 'Disponible'", top: 50});
+
+  console.table(tecnicos)
+
+  if (!tecnicos || tecnicos.length === 0) return null;
+
+  let min = Number.POSITIVE_INFINITY;
+  let candidatos: UsuariosSP[] = [];
+
+  for (const t of tecnicos) {
+    const carga = Number(t.Numerodecasos ?? 0); 
+    if (carga < min) {
+      min = carga;
+      candidatos = [t];
+    } else if (carga === min) {
+      candidatos.push(t);
+    }
+  }
+
+  const elegido = candidatos[Math.floor(Math.random() * candidatos.length)] ?? null;
+
+  if (elegido) {
+    console.log(`Asignar a: ${elegido.Title} (casos activos: ${elegido.Numerodecasos ?? 0})`);
+  }
+
+  return elegido;
+};
 
 export const fileToBase64 = (file: Blob): Promise<string> =>
   new Promise((resolve, reject) => {

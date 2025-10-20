@@ -14,7 +14,7 @@ import type { UsuariosSPService } from "../Services/Usuarios.Service";
 import { FlowClient } from "./FlowClient";
 import type { LogService } from "../Services/Log.service";
 import { useAuth } from "../auth/authContext";
-import type { UsuariosSP } from "../Models/Usuarios";
+import { pickTecnicoConMenosCasos } from "../utils/Commons";
 
 
 type Svc = {
@@ -384,34 +384,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
     return Object.keys(e).length === 0;
   };
 
-  const pickTecnicoConMenosCasos = async (): Promise<UsuariosSP | null> => {
-    const tecnicos = await Usuarios.getAll({filter: "fields/Rol eq 'Tecnico' and fields/Disponible eq 'Disponible'", top: 50});
 
-    console.table(tecnicos)
-
-    if (!tecnicos || tecnicos.length === 0) return null;
-
-    let min = Number.POSITIVE_INFINITY;
-    let candidatos: UsuariosSP[] = [];
-
-    for (const t of tecnicos) {
-      const carga = Number(t.Numerodecasos ?? 0); 
-      if (carga < min) {
-        min = carga;
-        candidatos = [t];
-      } else if (carga === min) {
-        candidatos.push(t);
-      }
-    }
-
-    const elegido = candidatos[Math.floor(Math.random() * candidatos.length)] ?? null;
-
-    if (elegido) {
-      console.log(`Asignar a: ${elegido.Title} (casos activos: ${elegido.Numerodecasos ?? 0})`);
-    }
-
-    return elegido;
-  };
 
   const handleSubmit = async () => {
     if (!validate()) return;
@@ -425,7 +398,7 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
       const aperturaISO  = toGraphDateTime(apertura);
       const tiempoSolISO = toGraphDateTime(solucion as any);
 
-      const resolutor = await pickTecnicoConMenosCasos();
+      const resolutor = await pickTecnicoConMenosCasos(Usuarios);
       console.log(resolutor);
 
       const payload = {
