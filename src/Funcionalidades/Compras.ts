@@ -51,7 +51,9 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     cargarA: "CO",
     noCO: "",
     marcasPct: { ...zeroMarcas() },
-    motivo: ""
+    motivo: "",
+    codigoItem: "",
+    DescItem: ""
   });
   const [saving, setSaving] = React.useState(false)
   const [holidays, setHolidays] = React.useState<Holiday[]>([])
@@ -114,7 +116,9 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
       PorcentajeSuperdry: String(state.marcasPct["SUPERDRY"] ?? "0"),
       SolicitadoPor: state.solicitadoPor,
       Title: state.tipoCompra,
-      UN: state.un
+      UN: state.un,
+      DescItem: "",
+      CodigoItem: ""
     })
 
     const ticketpayload: Ticket = {
@@ -153,7 +157,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     
     alert("Se ha creado la solicitud de compra con éxito")
     console.log(compra)
-    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: "", solicitadoPorCorreo: ""})  }, 
+    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: "", solicitadoPorCorreo: "", codigoItem: "", DescItem: ""})  }, 
     [state, ComprasSvc, holidays]
   ); 
   

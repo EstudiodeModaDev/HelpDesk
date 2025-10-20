@@ -1,6 +1,6 @@
 import * as React from "react";
 import Select, { components, type GroupBase } from "react-select";
-import type { CargarA, Opcion, TipoCompra } from "../../../Models/Compras";
+import { Items, type CargarA, type Opcion, type TipoCompra } from "../../../Models/Compras";
 import type { UserOptionEx } from "../../NuevoTicket/NuevoTicketForm";
 import { useFranquicias } from "../../../Funcionalidades/Franquicias";
 import { useWorkers } from "../../../Funcionalidades/Workers";
@@ -105,6 +105,22 @@ export default function CompraFormulario({submitting = false,}: Props) {
           />
           {errors.fechaSolicitud && <small className="error">{errors.fechaSolicitud}</small>}
         </div>
+
+        {/*Tipificacion*/}
+        <div className="field"></div>
+          <select name="Items" value={state.codigoItem} onChange={(e) => {const codigo = e.target.value;
+                                                                    setField("codigoItem", codigo); 
+                                                                    const item = Items.find(i => String(i.codigo) === String(codigo));
+                                                                    setField("DescItem", item?.descripcion ?? "")
+                                                                    console.log("item ", item)
+                                                                    }} required>
+            <option value="">Seleccionar código</option>
+              {Items.map((op) => (
+                <option key={op.codigo} value={op.codigo}>
+                  {op.codigo} - {op.descripcion}
+                </option>
+                ))}
+          </select>
 
         {/* Producto/Servicio/Alquiler */}
         <div className="field">
