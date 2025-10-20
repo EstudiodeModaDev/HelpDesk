@@ -1,187 +1,103 @@
-/* 🧩 Contenedor principal */
+/* 🎨 Contenedor principal del formulario */
 .registro-container {
   width: 100%;
   max-width: 1250px;
-  min-height: 90vh;
-  margin: 40px auto;
+  min-height: 80vh;
+  margin: 20px auto;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  padding: 40px 50px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+  padding: 25px 35px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  font-family: "Segoe UI", sans-serif;
+  align-items: center;
 }
 
 /* 🧾 Título */
 .registro-container h2 {
   text-align: center;
-  color: #2c3e50;
-  margin-bottom: 35px;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  color: #222;
 }
 
-/* 🧾 Formulario */
+/* 🧱 Contenedor del formulario */
 .registro-form {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
 }
 
-/* 📦 Rejilla principal */
+/* 🧩 Grid general: tres columnas por fila */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px 28px;
+  grid-template-columns: repeat(3, 1fr); /* tres columnas iguales */
+  gap: 20px; /* espacio entre columnas y filas */
   align-items: start;
 }
 
-/* Responsivo */
-@media (max-width: 992px) {
-  .form-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 🧩 Campo base */
+/* 🎯 Cada campo */
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-/* 🏷️ Etiquetas */
+/* 🏷️ Estilo para labels */
 .campo label {
   font-weight: 600;
-  font-size: 13px;
   color: #333;
-}
-
-/* 🧠 Inputs, selects y textareas */
-.campo input,
-.campo select,
-.campo textarea,
-.form-group select {
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 13px;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  width: 100%;
-  background-color: #fff;
-  padding: 6px 10px;
-  height: 36px;
-}
-
-.campo input:focus,
-.campo select:focus,
-.campo textarea:focus,
-.form-group select:focus {
-  border-color: #2980b9;
-  box-shadow: 0 0 8px rgba(41, 128, 185, 0.25);
-  outline: none;
-}
-
-/* 🧱 Campos de ancho completo */
-.full-width {
-  grid-column: span 3;
-}
-
-@media (max-width: 992px) {
-  .full-width {
-    grid-column: span 2;
-  }
-}
-@media (max-width: 768px) {
-  .full-width {
-    grid-column: span 1;
-  }
-}
-
-/* 💬 Textareas */
-.campo textarea {
-  min-height: 40px;
-  max-height: 70px;
-  font-size: 13px;
-  padding: 8px 10px;
-  line-height: 1.4;
-  resize: vertical;
-}
-
-/* Campos específicos */
-textarea[name="descripcionItem"],
-textarea[name="detalleFac"],
-textarea[name="observaciones"] {
-  min-height: 40px;
-  max-height: 70px;
-}
-
-/* 🧩 Campo de selección de compra */
-.form-group {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  grid-column: span 3;
 }
 
-.form-group label {
-  font-weight: 600;
-  font-size: 13px;
-  color: #333;
-}
-
-.form-group select {
-  height: 36px;
-  font-size: 13px;
-  padding: 6px 10px;
-}
-
-/* 🧩 Botones */
-.botones-container {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  margin-top: 20px;
-}
-
-.btn-registrar {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 25px;
-  font-size: 14px;
-  font-weight: 500;
+/* ✍️ Inputs, selects y textareas uniformes */
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
-  border: none;
+  background-color: #fafafa;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.btn-registrar:hover {
-  background-color: #0069d9;
-  transform: scale(1.04);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+/* 🔵 Efecto al enfocar */
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #fff;
 }
 
-/* 🧩 Botón secundario */
-.btn-secundario {
-  background-color: #f4f4f4;
-  color: #333;
-  padding: 10px 25px;
-  font-size: 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.1s;
-  border: 1px solid #ddd;
+/* 🧾 Ajuste para el campo de texto largo (descripcion) */
+.campo textarea {
+  resize: none;
+  height: 40px;
 }
 
-.btn-secundario:hover {
-  background-color: #eaeaea;
-  transform: scale(1.03);
+/* 🧩 Grupo de selects grandes (como compras relacionadas) */
+.form-group {
+  grid-column: span 3; /* ocupa toda la fila */
+}
+
+/* 🧭 Espaciado inferior */
+.mb-3 {
+  margin-bottom: 20px;
+}
+
+/* 🧩 Responsivo: cuando la pantalla sea pequeña */
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr); /* dos por fila */
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr; /* una sola columna */
+  }
 }
