@@ -64,11 +64,12 @@ const handleCompraSeleccionada = async (id: string) => {
     // 🔄 Mapeo de campos comunes
     setFormData((prev) => ({
       ...prev,
-      Items: compra.Title || prev.Items,
+      Items: compra.CodigoItem || prev.Items,
       DescripItems: prev.DescripItems || "", // no existe en Compra
       CC: compra.CCosto || prev.CC,
       CO: compra.CO || prev.CO,
       un: compra.UN || prev.un,
+      DetalleFac: compra.Dispositivo || prev.DetalleFac,
     }));
   } catch (error) {
     console.error("Error al cargar la compra seleccionada:", error);
