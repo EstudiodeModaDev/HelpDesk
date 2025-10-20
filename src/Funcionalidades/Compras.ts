@@ -8,7 +8,6 @@ import type { Compra, comprasState } from "../Models/Compras";
 import type { CentroCostos } from "../Models/CentroCostos";
 import type { CentroCostosService } from "../Services/CentroCostos.service";
 import type { COService } from "../Services/COCostos.service";
-import type { Ticket } from "../Models/Tickets";
 import { calcularFechaSolucion } from "../utils/ans";
 import { fetchHolidays } from "../Services/Festivos";
 import type { Holiday } from "festivos-colombianos";
@@ -117,26 +116,25 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
       SolicitadoPor: state.solicitadoPor,
       Title: state.tipoCompra,
       UN: state.un,
-      DescItem: "",
-      CodigoItem: ""
+      DescItem: state.DescItem,
+      CodigoItem: state.codigoItem
     })
 
-    const ticketpayload: Ticket = {
-      ANS: "ANS 5",
+    const ticketpayload = {
+      Title: state.tipoCompra === "Alquiler" ? `Alquiler de ${state.productoServicio}` : `Compra de ${state.productoServicio}`,
+      Descripcion: `Se ha solicitado una compra del siguiente dispositivo:  ${state.productoServicio} por: ${state.solicitadoPor}`,
+      FechaApertura: toISODateTimeFlex(String(new Date())),
       TiempoSolucion: toGraphDateTime(calcularFechaSolucion(new Date(), 240, holidays)),
+      Fuente: "Self service",
       Categoria: state.tipoCompra === "Alquiler" ? "Alquiler" : "Compra",
       SubCategoria: state.productoServicio,
-      CorreoResolutor: "cesanchez@estudiodemoda.com.co",
-      Descripcion: `Se ha solicitado una compra del siguiente dispositivo:  ${state.productoServicio} por: ${state.solicitadoPor}`,
-
-      Estadodesolicitud: "En Atención",
-      FechaApertura: toISODateTimeFlex(String(new Date())),
-      Fuente: "Self service",
       IdResolutor: "83",
       Nombreresolutor: "Cesar Eduardo Sanchez Salazar",
+      Correoresolutor: "cesanchez@estudiodemoda.com.co",
+      ANS: "ANS 5",
       Solicitante: state.solicitadoPor,
+      Estadodesolicitud: "En Atención",
       CorreoSolicitante: "",
-
     }
 
     const createdTicket = await TicketsSvc.create(ticketpayload)
