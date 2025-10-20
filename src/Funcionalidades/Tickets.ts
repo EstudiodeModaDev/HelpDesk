@@ -274,6 +274,7 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
 
     try {
       await notifyFlow.invoke<MasiveFlow, any>({file: payload.file,});
+      setState((s) => ({ ...s, archivo: null }));
       } catch (err) {
        console.error("[Flow] Error enviando a solicitante:", err);
     }
