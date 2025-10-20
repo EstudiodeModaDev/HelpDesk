@@ -42,6 +42,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     tipoCompra: "Producto",
     productoServicio: "",
     solicitadoPor: "",
+    solicitadoPorCorreo: "",
     fechaSolicitud: new Date().toISOString().slice(0, 10),
     dispositivo: "",
     co: null,         
@@ -119,9 +120,8 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     const ticketpayload: Ticket = {
       ANS: "ANS 5",
       TiempoSolucion: toGraphDateTime(calcularFechaSolucion(new Date(), 240, holidays)),
-      Categoria: "",
-      SubCategoria: "",
-      SubSubCategoria: "",
+      Categoria: state.tipoCompra === "Alquiler" ? "Alquiler" : "Compra",
+      SubCategoria: state.productoServicio,
       CorreoResolutor: "cesanchez@estudiodemoda.com.co",
       Descripcion: `Se ha solicitado una compra del siguiente dispositivo:  ${state.productoServicio} por: ${state.solicitadoPor}`,
 
@@ -139,7 +139,9 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
 
     const logpayload: Log = {
       Actor: "Sistema",
-      Descripcion: state.tipoCompra === "Alquiler" ? "Se ha creado un ticket bajo concepto de alquiler del siguiente dispositivo:  " : "",
+      Descripcion: state.tipoCompra === "Alquiler" ? 
+        `Se ha creado un ticket bajo concepto de alquiler del siguiente dispositivo:  ${state.dispositivo} por solicitud de ${state.solicitadoPor}` :
+        `Se ha creado un ticket bajo concepto de compra:  ${state.dispositivo} por solicitud de ${state.solicitadoPor}`,
       CorreoActor: "",
       Tipo_de_accion: "Creacion",
       Title: createdTicket.ID ?? ""
@@ -151,7 +153,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     
     alert("Se ha creado la solicitud de compra con éxito")
     console.log(compra)
-    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: ""})  }, 
+    setState({productoServicio: "", cargarA: "CO", solicitadoPor: "", motivo: "", fechaSolicitud: "", tipoCompra: "Producto", dispositivo: "", noCO: "", marcasPct: { ...zeroMarcas() }, co: null, ccosto: null, un: "", solicitadoPorCorreo: ""})  }, 
     [state, ComprasSvc, holidays]
   ); 
   

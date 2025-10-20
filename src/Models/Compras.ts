@@ -9,6 +9,7 @@ export type comprasState = {
   tipoCompra: TipoCompra;
   productoServicio: string;     
   solicitadoPor: string;
+  solicitadoPorCorreo: string;
   fechaSolicitud: string;       
   dispositivo: string;
   co: COOption | null;                   

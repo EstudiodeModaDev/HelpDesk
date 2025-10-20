@@ -36,12 +36,12 @@ const Option = (props: any) => (
 
 export default function CompraFormulario({submitting = false,}: Props) {
 
-  const { Franquicias, CentroCostos, CentroOperativo, Compras } = useGraphServices();
+  const { Franquicias, CentroCostos, CentroOperativo, Compras, Tickets, Logs } = useGraphServices();
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
   const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
   const { COOptions, loading: loadingCO,} = useCO(CentroOperativo as any);
-  const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras as any);
+  const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras, Tickets, Logs);
 
   const combinedOptions: UserOptionEx[] = React.useMemo(() => {
     const map = new Map<string, UserOptionEx>();
@@ -87,7 +87,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
             isDisabled={submitting || loadingWorkers || loadingFranq}
             isLoading={loadingWorkers || loadingFranq}
             value={selectedSolicitante}
-            onChange={(opt) => setField("solicitadoPor", opt?.label ?? "")}
+            onChange={(opt) => {setField("solicitadoPor", opt?.label ?? ""); setField("solicitadoPorCorreo", opt?.email ?? "")}}
             filterOption={(o, input) => userFilter({ label: o.label, value: String(o.value ?? "") }, input)}
             components={{ Option }}
             isClearable
