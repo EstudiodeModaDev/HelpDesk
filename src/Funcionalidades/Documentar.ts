@@ -84,7 +84,7 @@ export function useDocumentarTicket(services: Svc) {
         const nuevoEstado = estadoActual === "en atencion" ? "Cerrado" : "Cerrado fuera de tiempo";
         alert("Caso cerrado. Enviando notificación al solicitante")
         await Tickets.update(ticket.ID!, { Estadodesolicitud: nuevoEstado });
-        const comprasRelacionadas = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}`})
+        const comprasRelacionadas = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
         await Promise.allSettled(
           comprasRelacionadas.items.map((it) => {
             const id = String(it.Id);   
