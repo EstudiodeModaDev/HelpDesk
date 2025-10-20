@@ -56,14 +56,17 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         <table className="tabla-facturas">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Fecha</th>
-              <th>Número</th>
+              <th>Num</th>
+              <th>FechaEmi</th>
+              <th>N°Fac</th>
               <th>Proveedor</th>
               <th>NIT</th>
-              <th>Tipo</th>
+              <th>Item</th>
               <th>Valor</th>
-              <th>Acciones</th>
+              <th>FechaCont</th>
+              <th>Item</th>
+              <th>DocERP</th>
+              <th>Obs</th>
             </tr>
           </thead>
           <tbody>
@@ -83,6 +86,9 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                       minimumFractionDigits: 0,
                     })}
                   </td>
+                  <td>{formatearFecha(factura.FecEntregaCont)}</td>
+                  <td>{factura.DocERP}</td>
+                  <td>{factura.Observaciones}</td>
                   <td>
                     <button
                       className="btn-editar"
@@ -112,11 +118,17 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
 
       {/* 🧰 Modal o panel de edición */}
       {facturaEdit && (
-        <FacturaEditar
-          factura={facturaEdit}
-          onClose={() => setFacturaEdit(null)}
-        />
-      )}
+  <FacturaEditar
+    factura={facturaEdit}
+    onClose={() => setFacturaEdit(null)}
+    // 🆕 Cuando se elimina una factura, la quitamos de la lista local
+    onEliminar={(idEliminado) => {
+      setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
+      setFacturaEdit(null);
+    }}
+  />
+)}
+
     </div>
   );
 }
