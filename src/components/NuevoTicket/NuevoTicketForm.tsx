@@ -28,7 +28,6 @@ export default function NuevoTicketForm() {
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
     onlyEnabled: true,
-    domainFilter: "estudiodemoda.com.co",
   });
   const { UseruserOptions, loading, error } = useUsuarios(UsuariosSPServiceSvc!);
 

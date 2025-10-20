@@ -4,7 +4,6 @@ import HtmlContent from "../Renderizador/Renderizador";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
 import type { Ticket } from "../../Models/Tickets";              // <-- NUEVO
-import { useUserPhoto } from "../../Funcionalidades/Workers";
 import Documentar from "../Documentar/Documentar";               // <-- NUEVO
 
 type Tab = "seguimiento" | "solucion";
@@ -151,18 +150,11 @@ export default function TicketHistorial({
 /* ---------- Subcomponente: una fila del historial (usa la foto por Graph) ---------- */
 
 function HistRow({ m }: { m: Log }) {
-  const upn = m.CorreoActor || undefined;
-  const photoUrl = useUserPhoto(upn);
-
   return (
     <div className="th-row">
       <div className="th-left th-left--stack">
         <div className="th-avatar">
-          {photoUrl ? (
-            <img src={photoUrl} alt={m.Actor ?? "Usuario"} className="th-avatar-img" />
-          ) : (
             <div className="th-avatar-fallback" aria-hidden>👤</div>
-          )}
         </div>
         <div className="th-nombre">{m.Actor}</div>
         <div className="th-fecha">{formatDateTime(m.Created ?? "")}</div>

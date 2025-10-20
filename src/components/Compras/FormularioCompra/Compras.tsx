@@ -33,7 +33,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
 
   const { Franquicias, CentroCostos, CentroOperativo, Compras, Tickets, Logs, Usuarios } = useGraphServices();
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
-  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true, domainFilter: "estudiodemoda.com.co" });
+  const { workersOptions, loadingWorkers, error: usersError } = useWorkers({ onlyEnabled: true,});
   const { ccOptions, loading: loadingCC, error: ccError } = useCentroCostos(CentroCostos as any);
   const { COOptions, loading: loadingCO, UNOptions} = useCO(CentroOperativo as any);
   const { setField, setMarcaPct,  handleSubmit, setState, zeroMarcas, MARCAS, errors, totalPct, state, } = useCompras(Compras, Tickets, Logs, Usuarios);
