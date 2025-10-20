@@ -19,6 +19,7 @@ import ComprasPage from './components/Compras/ComprasPage';
 import NuevoTicketUsuarioForm from './components/NuevoTicketUsuario/NuevoTicketFormUsuario';
 import RegistroFactura from './components/RegistroFactura/RegistroFactura';
 import InfoPage from './components/Info/Informacion';
+import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -41,10 +42,9 @@ const NAVS_ADMIN: MenuItem[] = [
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
-  {
-    id: 'admin', label: 'Administración', icon: '⚙️', children: [
+  { id: 'admin', label: 'Administración', icon: '⚙️', children: [
        { id: 'anuncios',    label: 'Anuncios', to: <RegistroFactura/>},
-       { id: 'plantillas',  label: 'Plantillas', to: <RegistroFactura/>},
+       { id: 'plantillas',  label: 'Plantillas', to: <CrearPlantilla/>},
        { id: 'usuarios',    label: 'Usuarios', to: <RegistroFactura/>},
     ]
   },
@@ -72,6 +72,11 @@ const NAVS_TECNICO: MenuItem[] = [
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
+  { id: 'admin', label: 'Administración', icon: '⚙️', children: [
+       { id: 'anuncios',    label: 'Anuncios', to: <RegistroFactura/>},
+       { id: 'plantillas',  label: 'Plantillas', to: <CrearPlantilla/>},
+    ]
+  },
   {
     id: 'acciones', label: 'Acciones', icon: '🛠️', children: [
       {
