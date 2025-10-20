@@ -149,7 +149,7 @@ export default function TablaTickets() {
                   <td>{ticket.ID}</td>
                   <td>{ticket.Nombreresolutor}</td>
                   <td>{ticket.Solicitante}</td>
-                  <td>{ticket.Title}</td>
+                  <td>{ticket.Title!.slice(0, 100)}</td>
                   <td>{toISODateTimeFlex(ticket.FechaApertura) || "–"}</td>
                   <td>{toISODateTimeFlex(ticket.TiempoSolucion) || "No tiene fecha máxima"}</td>
                   <td>

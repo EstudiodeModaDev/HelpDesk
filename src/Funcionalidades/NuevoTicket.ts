@@ -168,8 +168,7 @@ export function useNuevoTicketForm(services: Svc) {
       }
 
       const aperturaISO  = toGraphDateTime(apertura);           
-      const tiempoSolISO = toGraphDateTime(solucion as any);  
-      console.log(aperturaISO, tiempoSolISO)      
+      const tiempoSolISO = toGraphDateTime(solucion as any);      
 
       // Objeto de creación
       const payload = {

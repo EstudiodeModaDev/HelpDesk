@@ -150,7 +150,6 @@ export class FranquiciasService {
     try {
       const res = await this.graph.get<any>(url);
       const mappedRes = (res.value ?? []).map((x: any) => this.toModel(x));
-      console.log(mappedRes)
       return (mappedRes);
 
     } catch (e: any) {
