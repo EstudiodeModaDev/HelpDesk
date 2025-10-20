@@ -89,7 +89,7 @@ export default function RegistroFactura() {
       FecEntregaCont: "",
       DocERP: "",
       Observaciones: "",
-      RegistradoPor: "",
+      RegistradoPor: account?.name ?? "",
     });
   };
 
