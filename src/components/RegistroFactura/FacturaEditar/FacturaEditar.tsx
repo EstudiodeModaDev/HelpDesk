@@ -14,10 +14,11 @@ interface Props {
  * Componente visual: modal para editar una factura.
  * - Usa la lógica de Funcionalidades/FacturaEditar (renombrada aquí como facturaFx).
  * - Asegura que `valor` sea number y usa `id0` como identificador.
+ * - Ahora también permite eliminar la factura seleccionada.
  */
 export default function FacturaEditarCompo({ factura, onClose }: Props) {
-  // obtenemos la función lógica (actualizar/eliminar...) desde funcionalidades
-  const { actualizarFactura } = facturaFx();
+  // obtenemos las funciones lógicas (actualizar/eliminar...) desde funcionalidades
+  const { actualizarFactura, eliminarFactura } = facturaFx();
 
   // definimos el tipo del estado del formulario (valor siempre number)
   const [formData, setFormData] = useState<{
@@ -71,6 +72,23 @@ export default function FacturaEditarCompo({ factura, onClose }: Props) {
     if (ok) onClose();
   };
 
+  // 🗑️ Nueva función: elimina la factura actual
+  const handleEliminar = async () => {
+    const id = factura.id0;
+    if (id == null) {
+      console.error("No se encontró id0 en la factura. No se puede eliminar.");
+      return;
+    }
+
+    // Confirmación antes de eliminar
+    const confirmar = window.confirm(`¿Seguro deseas eliminar la factura #${factura.NoFactura}?`);
+    if (!confirmar) return;
+
+    // Llamada a la lógica que elimina (espera id)
+    const ok = await eliminarFactura(id);
+    if (ok) onClose();
+  };
+
   return (
     <div className="modal-backdrop">
       <div className="modal">
@@ -106,6 +124,14 @@ export default function FacturaEditarCompo({ factura, onClose }: Props) {
           <div className="modal-buttons">
             <button type="submit" className="btn-guardar">💾 Guardar</button>
             <button type="button" className="btn-cancelar" onClick={onClose}>❌ Cancelar</button>
+            {/* 🗑️ Botón para eliminar factura */}
+            <button
+              type="button"
+              className="btn-eliminar"
+              onClick={handleEliminar}
+            >
+              🗑️ Eliminar
+            </button>
           </div>
         </form>
       </div>
