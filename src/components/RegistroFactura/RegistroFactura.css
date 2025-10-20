@@ -1,103 +1,128 @@
-/* 🎨 Contenedor principal del formulario */
+/* 🌐 Contenedor principal */
 .registro-container {
   width: 100%;
-  max-width: 1250px;
-  min-height: 80vh;
-  margin: 20px auto;
+  max-width: 1300px;
+  margin: 30px auto;
+  padding: 30px 40px;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
-  padding: 25px 35px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* 🧾 Título */
+/* 🏷️ Título */
 .registro-container h2 {
   text-align: center;
   font-size: 1.8rem;
-  margin-bottom: 25px;
   color: #222;
+  margin-bottom: 25px;
 }
 
-/* 🧱 Contenedor del formulario */
+/* 📋 Formulario */
 .registro-form {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
-/* 🧩 Grid general: tres columnas por fila */
+/* 🧱 Grid de campos */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* tres columnas iguales */
-  gap: 20px; /* espacio entre columnas y filas */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px 35px;
   align-items: start;
 }
 
-/* 🎯 Cada campo */
-.campo {
+/* 🎯 Campo genérico */
+.campo,
+.form-group {
   display: flex;
   flex-direction: column;
-}
-
-/* 🏷️ Estilo para labels */
-.campo label {
-  font-weight: 600;
-  color: #333;
   font-size: 0.95rem;
-  margin-bottom: 6px;
-  display: flex;
-  flex-direction: column;
 }
 
-/* ✍️ Inputs, selects y textareas uniformes */
+/* 🏷️ Label */
+.campo label,
+.form-group label {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* ✏️ Inputs, selects, textareas */
 .campo input,
 .campo select,
-.campo textarea {
-  padding: 8px 10px;
-  font-size: 0.95rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fafafa;
-  transition: border-color 0.2s ease;
+.campo textarea,
+.form-group select {
   width: 100%;
-  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border 0.2s ease;
+  background-color: #f9f9f9;
 }
 
-/* 🔵 Efecto al enfocar */
 .campo input:focus,
 .campo select:focus,
 .campo textarea:focus {
-  border-color: #007bff;
+  border-color: #0078d7;
   outline: none;
   background-color: #fff;
 }
 
-/* 🧾 Ajuste para el campo de texto largo (descripcion) */
+/* 🧾 Textarea más discreta */
 .campo textarea {
   resize: none;
-  height: 40px;
+  min-height: 38px;
 }
 
-/* 🧩 Grupo de selects grandes (como compras relacionadas) */
+/* 🧩 Campo de relación con compras ocupa fila completa */
 .form-group {
-  grid-column: span 3; /* ocupa toda la fila */
+  grid-column: 1 / 4;
 }
 
-/* 🧭 Espaciado inferior */
-.mb-3 {
-  margin-bottom: 20px;
+/* 🔘 Botones en línea */
+.botones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
 }
 
-/* 🧩 Responsivo: cuando la pantalla sea pequeña */
-@media (max-width: 900px) {
+/* 🎨 Estilo de botones */
+.botones button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #0078d7;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.botones button:hover {
+  background-color: #005fa3;
+  transform: translateY(-1px);
+}
+
+.botones button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 📱 Responsivo */
+@media (max-width: 1024px) {
   .form-grid {
-    grid-template-columns: repeat(2, 1fr); /* dos por fila */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 720px) {
   .form-grid {
-    grid-template-columns: 1fr; /* una sola columna */
+    grid-template-columns: 1fr;
+  }
+  .registro-container {
+    padding: 20px;
   }
 }
