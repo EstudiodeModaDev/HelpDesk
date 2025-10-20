@@ -106,6 +106,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               <th>NIT</th>
               <th>Valor</th>
               <th>Items</th>
+              <th>CC</th>
               <th>FechaCont</th>
               <th>DocERP</th>
               <th>Obs</th>
@@ -129,6 +130,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                     })}
                   </td>
                   <td>{factura.Items}</td>
+                  <td>{factura.CC}</td>
                   <td>{formatearFecha(factura.FecEntregaCont)}</td>
                   <td>{factura.DocERP}</td>
                   <td>{factura.Observaciones}</td>
