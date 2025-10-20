@@ -69,13 +69,14 @@
 .campo select,
 .campo textarea,
 .form-group select {
-  padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 13px;
+  font-size: 12.5px;
   transition: border-color 0.3s, box-shadow 0.3s;
   width: 100%;
   background-color: #fff;
+  padding: 4px 8px;
+  height: 32px; /* tamaño compacto */
 }
 
 .campo input:focus,
@@ -87,7 +88,7 @@
   outline: none;
 }
 
-/* 🧱 Campos de ancho completo (textarea o listas largas) */
+/* 🧱 Campos de ancho completo */
 .full-width {
   grid-column: span 3;
 }
@@ -118,6 +119,37 @@
   color: #333;
 }
 
+.form-group select {
+  height: 32px;
+  font-size: 12.5px;
+  padding: 4px 8px;
+}
+
+/* 💬 Textareas más compactos (Descripción, Detalle, Observaciones) */
+.campo textarea {
+  min-height: 35px;
+  max-height: 70px;
+  font-size: 12.5px;
+  padding: 6px 8px;
+  line-height: 1.3;
+  resize: vertical;
+}
+
+/* Campos específicos (para asegurar tamaño consistente) */
+textarea[name="descripcionItem"],
+textarea[name="detalleFac"],
+textarea[name="observaciones"] {
+  min-height: 35px;
+  max-height: 70px;
+}
+
+/* Campos tipo input que deben verse más compactos */
+input[name="fechaEntrega"],
+input[name="documentoERP"] {
+  height: 32px;
+  font-size: 12.5px;
+}
+
 /* 🧩 Botones */
 .botones-container {
   display: flex;
@@ -140,51 +172,4 @@
 .btn-registrar:hover {
   background-color: #3498db;
   transform: scale(1.05);
-}
-
-/* 💬 Área de observaciones */
-textarea {
-  resize: vertical;
-  min-height: 60px;
-  max-height: 150px;
-}
-/* 🎯 Ajustes específicos para campos grandes */
-
-/* Select de compra relacionada */
-.form-group select {
-  height: 32px; /* antes era más alto */
-  font-size: 12px;
-  padding: 4px 8px;
-}
-
-/* Textareas más compactos */
-.campo textarea {
-  min-height: 35px; /* antes 60px */
-  max-height: 80px;
-  font-size: 12px;
-  padding: 6px 8px;
-  line-height: 1.3;
-}
-
-/* Campos específicos que deben reducir su tamaño */
-.campo select,
-.campo input {
-  height: 32px;
-  font-size: 12.5px;
-  padding: 4px 8px;
-}
-
-/* 🧾 Campos de texto amplios (para descripción, detalle y observaciones) */
-textarea[name="descripcionItem"],
-textarea[name="detalleFac"],
-textarea[name="observaciones"] {
-  min-height: 35px;
-  max-height: 70px;
-}
-
-/* 📅 Campos como fecha entrega, documento, etc. */
-input[name="fechaEntrega"],
-input[name="documentoERP"] {
-  height: 32px;
-  font-size: 12.5px;
 }
