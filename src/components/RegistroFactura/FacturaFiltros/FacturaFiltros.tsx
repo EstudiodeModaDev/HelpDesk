@@ -55,12 +55,15 @@ export default function FacturaFiltros({
       <h3>🔍 Filtros de búsqueda</h3>
 
       <div className="filtros-grid">
-        <input
-          type="date"
-          name="FechaEmision"
-          value={filtros.FechaEmision || ""}
-          onChange={handleChange}
-        />
+          <label>
+            Fecha de emisión
+            <input
+              type="date"
+              name="FechaEmision"
+              value={filtros.FechaEmision || ""}
+              onChange={handleChange}
+            />
+          </label>
 
         <input
           type="text"
@@ -103,6 +106,26 @@ export default function FacturaFiltros({
           readOnly
           placeholder="Descripción del ítem"
         />
+
+        <label>
+          Fecha entrega cont
+          <input
+            type="date"
+            name="FecEntregaCont"
+            value={filtros.FecEntregaCont || ""}
+            onChange={handleChange}
+          />
+        </label>
+
+          <input
+          type="text"
+          name="DocERP"
+          value={filtros.DocERP || ""}
+          readOnly
+          placeholder="Doc ERP"
+        />
+
+
       </div>
     </div>
   );
