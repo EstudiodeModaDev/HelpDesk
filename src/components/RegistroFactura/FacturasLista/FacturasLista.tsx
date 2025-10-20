@@ -132,20 +132,22 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
           onClose={() => setFacturaEdit(null)}
           // 🗑️ Cuando se elimina una factura, la quitamos de la lista local
           onEliminar={(idEliminado) => {
-            setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
-            setMensaje("🗑️ Factura eliminada correctamente");
-            setFacturaEdit(null);
-          }}
+  setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
+  setMensaje("🗑️ Factura eliminada correctamente");
+  // Cierra el modal con un pequeño retraso
+  setTimeout(() => setFacturaEdit(null), 100);
+}}
           // 💾 Cuando se guarda una factura, recargamos la lista completa
           onGuardar={async () => {
-            try {
-              const lista = await obtenerFacturas();
-              setFacturas(lista);
-              setMensaje("✅ Factura actualizada correctamente");
-              setFacturaEdit(null);
-            } catch (err) {
-              console.error("Error al refrescar lista tras editar:", err);
-            }
+  try {
+    const lista = await obtenerFacturas();
+    setFacturas(lista);
+    setMensaje("✅ Factura actualizada correctamente");
+    // Cierra el modal con un pequeño retraso
+    setTimeout(() => setFacturaEdit(null), 100);
+  } catch (err) {
+    console.error("Error al refrescar lista tras editar:", err);
+  }
           }}
         />
       )}
