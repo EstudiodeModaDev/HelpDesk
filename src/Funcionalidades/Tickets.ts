@@ -6,7 +6,7 @@ import { toISODateFlex } from "../utils/Date";
 import type { GetAllOpts } from "../Models/Commons";
 import type { RelacionadorState } from "../Models/nuevoTicket";
 import { FlowClient } from "./FlowClient";
-import { fileToBase64 } from "../utils/Commons";
+import { fileToBasePA64 } from "../utils/Commons";
 import type { MasiveFlow } from "../Models/FlujosPA";
 
 export function parseDDMMYYYYHHMM(fecha?: string | null): Date {
@@ -261,7 +261,7 @@ export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin
   }, []);
 
   async function sendFileToFlow(file: File, uploader?: string ) {
-    const contentBase64 = await fileToBase64(file);
+    const contentBase64 = await fileToBasePA64(file);
 
     const payload = {
       uploader: uploader ?? "",      
