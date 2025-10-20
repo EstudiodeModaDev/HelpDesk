@@ -71,8 +71,8 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               <th>Proveedor</th>
               <th>NIT</th>
               <th>Valor</th>
+              <th>Items</th>
               <th>FechaCont</th>
-              <th>Item</th>
               <th>DocERP</th>
               <th>Obs</th>
               <th>Acciones</th>
@@ -87,7 +87,6 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{factura.NoFactura}</td>
                   <td>{factura.Proveedor}</td>
                   <td>{factura.Title}</td>
-                  <td>{factura.Items}</td>
                   <td>
                     {factura.ValorAnIVA.toLocaleString("es-CO", {
                       style: "currency",
@@ -95,6 +94,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                       minimumFractionDigits: 0,
                     })}
                   </td>
+                  <td>{factura.Items}</td>
                   <td>{formatearFecha(factura.FecEntregaCont)}</td>
                   <td>{factura.DocERP}</td>
                   <td>{factura.Observaciones}</td>
