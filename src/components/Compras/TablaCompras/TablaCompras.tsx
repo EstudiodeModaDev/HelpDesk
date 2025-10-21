@@ -88,9 +88,15 @@ export default function TablaCompras() {
                           <button type="button"  onClick={(e) => { e.stopPropagation(); handleNext(compra?.Id ?? ''); setTicketCompra(compra.IdCreado)}} aria-label={`Siguiente paso para compra ${compra?.Id ?? ''}`} className="btn">
                             Siguiente paso
                           </button>
-                          <button type="button"  onClick={(e) => { e.stopPropagation();  setOpenModal(true)}} className="btn">
-                            Agregar al inventario
-                          </button>
+                            { (['producto','alquiler'].includes((compra?.Title ?? '').trim().toLowerCase())) && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setOpenModal(true); }}
+                                className="btn"
+                              >
+                                Agregar al inventario
+                              </button>
+                            )}
                         </div>
                       )
                     }

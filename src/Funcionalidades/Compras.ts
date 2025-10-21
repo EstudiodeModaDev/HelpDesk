@@ -28,6 +28,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
     "Pendiente por entrega de proveedor": "Pendiente por entrega al usuario",
     "Pendiente por entrega al usuario": "Pendiente por registro de factura",
     "Pendiente por registro de factura": "Completado"
+    //Los contratos y servicis no se van a inventario, pero deja la info para la causación de las facturas
   };
   type Marca = typeof MARCAS[number];
   const zeroMarcas = (): Record<Marca, number> => MARCAS.reduce((acc, m) => { acc[m] = 0; return acc; }, {} as Record<Marca, number>);

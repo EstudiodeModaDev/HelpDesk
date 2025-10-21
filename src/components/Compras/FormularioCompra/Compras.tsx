@@ -68,6 +68,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
             <option value="Producto">Producto</option>
             <option value="Servicio">Servicio</option>
             <option value="Alquiler">Alquiler</option>
+            <option value="Contrato">Contrato</option>
           </select>
         </div>
 
