@@ -84,7 +84,7 @@ const handleChange = (
       Title: formData.Title,
       ValorAnIVA: formData.ValorAnIVA,
       DetalleFac: formData.DetalleFac,
-      Items: factura.Items,
+      Items: formData.Items,
       CC: formData.CC,
       CO: formData.CO,
       un: formData.un,
