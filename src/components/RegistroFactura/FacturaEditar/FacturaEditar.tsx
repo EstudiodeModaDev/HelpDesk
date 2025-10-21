@@ -95,15 +95,21 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
 
         <form onSubmit={handleSubmit} className="modal-form">
           {/* Campos originales */}
-          <input name="proveedor" value={formData.proveedor} onChange={handleChange} placeholder="Proveedor" />
-          <input name="Title" value={formData.Title} onChange={handleChange} placeholder="NIT / Título" />
-          <input name="ValorAnIVA" type="number" value={formData.ValorAnIVA} onChange={handleChange} placeholder="Valor" />
+          <label>📅 Fecha de Emisión:
+          <input name="proveedor" value={formData.proveedor} onChange={handleChange} placeholder="Proveedor" /></label>
+          <label> NIT:
+          <input name="Title" value={formData.Title} onChange={handleChange} placeholder="NIT / Título" /></label>
+          <label> ValorAnIva:
+          <input name="ValorAnIVA" type="number" value={formData.ValorAnIVA} onChange={handleChange} placeholder="Valor" /></label>
           {/* <textarea name="DetalleFac" value={formData.DetalleFac} onChange={handleChange} placeholder="Detalle"></textarea> */}
 
           {/* 🆕 Campos nuevos */}
-          <input name="CC" value={formData.CC} onChange={handleChange} placeholder="Centro de Costo (CC)" />
-          <input name="CO" value={formData.CO} onChange={handleChange} placeholder="Centro Operativo (CO)" />
-          <input name="UN" value={formData.un} onChange={handleChange} placeholder="Unidad de Negocio (UN)" />
+          <label> C.C:
+          <input name="CC" value={formData.CC} onChange={handleChange} placeholder="Centro de Costo (CC)" /></label>
+          <label> C.O:
+          <input name="CO" value={formData.CO} onChange={handleChange} placeholder="Centro Operativo (CO)" /></label>
+          <label> U.N:
+          <input name="UN" value={formData.un} onChange={handleChange} placeholder="Unidad de Negocio (UN)" /></label>
           
           <label>📅 Fecha de Emisión:
           <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={handleChange} /></label>
@@ -112,7 +118,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           <input name="DocERP" value={formData.DocERP} onChange={handleChange} placeholder="Documento ERP" />
 
           <div className="modal-buttons">
-            <button type="submit" className="btn-guardar">💾 Guardar</button>
+            <button type="submit" className="btn-guardar">✅ Guardar</button>
             <button type="button" className="btn-cancelar" onClick={onClose}>❌ Cancelar</button>
             <button type="button" className="btn-eliminar" onClick={handleEliminar}>🗑️ Eliminar</button>
           </div>
