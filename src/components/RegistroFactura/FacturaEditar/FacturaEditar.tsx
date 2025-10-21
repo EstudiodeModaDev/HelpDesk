@@ -175,7 +175,8 @@ const handleChange = (
           <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={handleChange} /></label>
           <label> Fecha Entrega a Contabilidad:
           <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={handleChange} /></label>
-          <input name="DocERP" value={formData.DocERP} onChange={handleChange} placeholder="Documento ERP" />
+          <label> Doc ERP:
+          <input name="DocERP" value={formData.DocERP} onChange={handleChange} placeholder="Documento ERP" /></label>
 
           <div className="modal-buttons">
             <button type="submit" className="btn-guardar">✅ Guardar</button>

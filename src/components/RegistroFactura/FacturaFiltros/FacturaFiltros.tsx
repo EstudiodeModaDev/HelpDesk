@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./FacturaFiltros.css";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
+import { opcionescc, opcionesco, opcionesun } from "../RegistroFactura";
 
 /**
  * 🔎 Componente de filtros reutilizable
@@ -45,6 +46,7 @@ export default function FacturaFiltros({
         Items: value,
         DescripItems: seleccion ? seleccion.descripcion : "",
       }));
+      
     } else {
       setFiltros((prev) => ({ ...prev, [name]: value }));
     }
@@ -106,6 +108,38 @@ export default function FacturaFiltros({
           readOnly
           placeholder="Descripción del ítem"
         />
+
+
+        {/* 🧾 Selector de cc */}
+        <select name="CC" value={filtros.CC || ""} onChange={handleChange}>
+          <option value="">Seleccionar centro cos</option>
+          {opcionescc.map((oc) => (
+            <option key={oc.codigo} value={oc.codigo}>
+              {oc.codigo} - {oc.descripcion}
+            </option>
+          ))}
+        </select>
+
+        {/* 🧾 Selector de co */}
+        <select name="CO" value={filtros.CO || ""} onChange={handleChange}>
+          <option value="">Seleccionar centro ope</option>
+          {opcionesco.map((oco) => (
+            <option key={oco.codigo} value={oco.codigo}>
+              {oco.codigo} - {oco.descripcion}
+            </option>
+          ))}
+        </select>
+
+         {/* 🧾 Selector de un */}
+        <select name="UN" value={filtros.un || ""} onChange={handleChange}>
+          <option value="">Seleccionar centro ope</option>
+          {opcionesun.map((ou) => (
+            <option key={ou.codigo} value={ou.codigo}>
+              {ou.codigo} - {ou.descripcion}
+            </option>
+          ))}
+        </select>
+
 
         <label>
           Fecha entrega cont
