@@ -41,7 +41,8 @@
 
 /* 🧩 Campos del formulario */
 .modal-form input,
-.modal-form textarea {
+.modal-form textarea
+.modal-form select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
