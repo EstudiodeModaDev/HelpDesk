@@ -107,6 +107,8 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               <th>Valor</th>
               <th>Items</th>
               <th>CC</th>
+              <th>CO</th>
+              <th>UN</th>
               <th>FechaCont</th>
               <th>DocERP</th>
               <th>Obs</th>
@@ -131,6 +133,8 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   </td>
                   <td>{factura.Items}</td>
                   <td>{factura.CC}</td>
+                  <td>{factura.CO}</td>
+                  <td>{factura.un}</td>
                   <td>{formatearFecha(factura.FecEntregaCont)}</td>
                   <td>{factura.DocERP}</td>
                   <td>{factura.Observaciones}</td>
