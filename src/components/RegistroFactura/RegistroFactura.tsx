@@ -5,6 +5,9 @@ import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css"
 import { useAuth } from "../../auth/authContext";
 
+// 🔽 nuevo import del hook
+import { useProveedores } from "../../Funcionalidades/ProveedoresFactura";
+
 //imports nuevos para traer los datos de compras
 // imports nuevos
 
@@ -395,6 +398,10 @@ const { getToken } = useAuth();
 const [compras, setCompras] = useState<Compra[]>([]);
 const [selectedCompra, setSelectedCompra] = useState<string>("");
 
+//proveedores
+const { proveedores, loading, error } = useProveedores();
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
+
 const graph = new GraphRest(getToken);
 const comprasService = new ComprasService(graph);
 
@@ -556,6 +563,38 @@ const handleCompraSeleccionada = async (id: string) => {
                 ))}
               </select>
             </div>
+
+            {/* 🔹 Desplegable de proveedores */}
+      <div className="campo-proveedor">
+        <label htmlFor="proveedor-select">Proveedor:</label>
+        {loading ? (
+          <span>Cargando...</span>
+        ) : error ? (
+          <span style={{ color: "red" }}>{error}</span>
+        ) : (
+          <select
+            id="proveedor-select"
+            value={proveedorSeleccionado}
+            onChange={(e) => setProveedorSeleccionado(e.target.value)}
+          >
+            <option value="">-- Selecciona un proveedor --</option>
+            {proveedores.map((p) => (
+              <option key={p.Id} value={p.Id}>
+                {p.Title} — {p.Nit}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
+        <button
+          type="button"
+          className="btn-nuevo-proveedor"
+          onClick={() => alert("Abrir modal para registrar nuevo proveedor")}
+        >
+          + Nuevo proveedor
+        </button>
+      </div>
 
 
             {/* 📆 Fecha de emisión */}
