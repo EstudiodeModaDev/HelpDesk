@@ -28,8 +28,15 @@
 .modal h3 {
   margin-bottom: 20px;
   font-weight: 600;
-  color: #1e3a8a; /* azul institucional */
+  color: #1e3a8a;
   text-align: center;
+}
+
+/* ✏️ Contenedor general del formulario mejorado */
+.modal-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* 🧱 se adapta a 2 columnas o más */
+  gap: 12px 16px; /* espacio entre campos */
 }
 
 /* ✏️ Campos del formulario */
@@ -37,17 +44,35 @@
 .modal-form textarea {
   width: 100%;
   padding: 10px 12px;
-  margin-bottom: 12px;
   border-radius: 10px;
   border: 1px solid #cbd5e1;
   background-color: #f9fafb;
   font-size: 14px;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
+/* 🧾 Textarea ocupará toda la fila */
+.modal-form textarea {
+  grid-column: 1 / -1; /* 🆕 ocupa ambas columnas */
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* 🏷️ Labels de fecha */
+.modal-form label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-top: 4px;
+  margin-bottom: -4px;
+  grid-column: 1 / -1; /* 🆕 fuerza a ocupar fila completa encima del input */
+}
+
+/* 🔍 Mejora de enfoque */
 .modal-form input:focus,
 .modal-form textarea:focus {
-  border-color: #2563eb; /* azul claro */
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
   outline: none;
 }
@@ -57,7 +82,8 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
+  grid-column: 1 / -1; /* 🆕 los botones siempre van en una fila aparte */
 }
 
 .btn-guardar,
@@ -78,7 +104,6 @@
   background-color: #2563eb;
   color: #fff;
 }
-
 .btn-guardar:hover {
   background-color: #1d4ed8;
   transform: scale(1.03);
@@ -90,7 +115,6 @@
   color: #374151;
   border: 1px solid #d1d5db;
 }
-
 .btn-cancelar:hover {
   background-color: #e5e7eb;
   transform: scale(1.03);
@@ -101,7 +125,6 @@
   background-color: #ef4444;
   color: #fff;
 }
-
 .btn-eliminar:hover {
   background-color: #dc2626;
   transform: scale(1.03);

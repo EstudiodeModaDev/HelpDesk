@@ -2,101 +2,91 @@
 import React, { useState } from "react";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import { FacturaEditar as facturaFx } from "../../../Funcionalidades/FacturaEditar";
-import "./FacturaEditar.css"
+import "./FacturaEditar.css";
 
-
-// Props del componente
 interface Props {
   factura: ReFactura;
   onClose: () => void;
-  onEliminar?: (id: number) => void; // 🆕 callback al eliminar
-  onGuardar?: () => void;            // 💾 callback al guardar
+  onEliminar?: (id: number) => void;
+  onGuardar?: () => void;
 }
 
-/**
- * Componente visual: modal para editar una factura.
- * - Usa la lógica de Funcionalidades/FacturaEditar (renombrada aquí como facturaFx).
- * - Asegura que `valor` sea number y usa `id0` como identificador.
- * - Ahora también permite eliminar la factura seleccionada.
- */
 export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGuardar }: Props) {
-  // obtenemos las funciones lógicas (actualizar/eliminar...) desde funcionalidades
   const { actualizarFactura, eliminarFactura } = facturaFx();
 
-  // definimos el tipo del estado del formulario (valor siempre number)
-  const [formData, setFormData] = useState<{
-    proveedor: string;
-    Title: string;
-    ValorAnIVA: number;
-    DetalleFac: string;
-  }>({
+  // 🆕 Se agregan más campos al estado del formulario
+  const [formData, setFormData] = useState({
     proveedor: factura.Proveedor ?? "",
     Title: factura.Title ?? "",
     ValorAnIVA: typeof factura.ValorAnIVA === "number" ? factura.ValorAnIVA : Number(factura.ValorAnIVA) || 0,
     DetalleFac: factura.DetalleFac ?? "",
+    CC: factura.CC ?? "", // 🆕 Centro de costo
+    CO: factura.CO ?? "", // 🆕 Centro operativo
+    un: factura.un ?? "", // 🆕 Unidad de negocio
+    DocERP: factura.DocERP ?? "", // 🆕 Documento ERP
+    FechaEmision: factura.FechaEmision ?? "", // 🆕 Fecha de emisión
+    FecEntregaCont: factura.FecEntregaCont ?? "", // 🆕 Fecha de entrega contabilidad
   });
 
-  // Manejador de cambios: parsea 'valor' a número
+  // Manejador de cambios — ahora incluye los nuevos campos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    // si el campo es 'valor' convertimos a número (si no es numérico, queda 0)
-    if (name === "valor") {
+    if (name === "ValorAnIVA") {
       const n = value === "" ? 0 : Number(value);
-      setFormData((prev) => ({ ...prev, valor: Number.isNaN(n) ? 0 : n }));
+      setFormData((prev) => ({ ...prev, ValorAnIVA: Number.isNaN(n) ? 0 : n }));
       return;
     }
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Envío del formulario: construye cambios como Partial<ReFactura> y pasa id0
+  // Guardar cambios
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Construimos el objeto con los cambios — tipo Partial<ReFactura>
+    // 🆕 Incluimos los nuevos campos en el objeto de cambios
     const cambios: Partial<ReFactura> = {
       Proveedor: formData.proveedor,
       Title: formData.Title,
       ValorAnIVA: formData.ValorAnIVA,
       DetalleFac: formData.DetalleFac,
-      // No sobreescribimos id0 ni fechas/números a menos que quieras
+      CC: formData.CC,
+      CO: formData.CO,
+      un: formData.un,
+      DocERP: formData.DocERP,
+      FechaEmision: formData.FechaEmision,
+      FecEntregaCont: formData.FecEntregaCont,
     };
 
-    // Usar id0 (tu modelo lo tiene). Si no existe id0, abortamos con error controlado.
     const id = factura.id0;
     if (id == null) {
       console.error("No se encontró id0 en la factura. No se puede actualizar.");
       return;
     }
 
-    // Llamada a la lógica que actualiza (espera id, cambios)
     const ok = await actualizarFactura(id, cambios);
     if (ok) {
-  onGuardar?.(); // 🔔 notifica al padre que recargue la lista
-  onClose();
-}
+      onGuardar?.();
+      onClose();
+    }
   };
 
-  // 🗑️ Nueva función: elimina la factura actual
-const handleEliminar = async () => {
-  const id = factura.id0;
-  if (id == null) {
-    console.error("No se encontró id0 en la factura. No se puede eliminar.");
-    return;
-  }
+  // 🗑️ Eliminar factura (sin cambios)
+  const handleEliminar = async () => {
+    const id = factura.id0;
+    if (id == null) {
+      console.error("No se encontró id0 en la factura. No se puede eliminar.");
+      return;
+    }
 
-  const confirmar = window.confirm(`¿Seguro deseas eliminar la factura #${factura.NoFactura}?`);
-  if (!confirmar) return;
+    const confirmar = window.confirm(`¿Seguro deseas eliminar la factura #${factura.NoFactura}?`);
+    if (!confirmar) return;
 
-  const ok = await eliminarFactura(id);
-  if (ok) {
-    // 🔔 Notificamos al componente padre que se eliminó
-    onEliminar?.(id);
-    onClose();
-  }
-};
-
+    const ok = await eliminarFactura(id);
+    if (ok) {
+      onEliminar?.(id);
+      onClose();
+    }
+  };
 
   return (
     <div className="modal-backdrop">
@@ -104,43 +94,26 @@ const handleEliminar = async () => {
         <h3>✏️ Editar Factura #{factura.NoFactura}</h3>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <input
-            name="proveedor"
-            value={formData.proveedor}
-            onChange={handleChange}
-            placeholder="Proveedor"
-          />
-          <input
-            name="Title"
-            value={formData.Title}
-            onChange={handleChange}
-            placeholder="NIT / Título"
-          />
-          <input
-            name="ValorAnIVA"
-            type="number"
-            value={formData.ValorAnIVA}
-            onChange={handleChange}
-            placeholder="Valor"
-          />
-          <textarea
-            name="DetalleFac"
-            value={formData.DetalleFac}
-            onChange={handleChange}
-            placeholder="Detalle"
-          ></textarea>
+          {/* Campos originales */}
+          <input name="proveedor" value={formData.proveedor} onChange={handleChange} placeholder="Proveedor" />
+          <input name="Title" value={formData.Title} onChange={handleChange} placeholder="NIT / Título" />
+          <input name="ValorAnIVA" type="number" value={formData.ValorAnIVA} onChange={handleChange} placeholder="Valor" />
+          <textarea name="DetalleFac" value={formData.DetalleFac} onChange={handleChange} placeholder="Detalle"></textarea>
+
+          {/* 🆕 Campos nuevos */}
+          <input name="CC" value={formData.CC} onChange={handleChange} placeholder="Centro de Costo (CC)" />
+          <input name="CO" value={formData.CO} onChange={handleChange} placeholder="Centro Operativo (CO)" />
+          <input name="UN" value={formData.un} onChange={handleChange} placeholder="Unidad de Negocio (UN)" />
+          <input name="DocERP" value={formData.DocERP} onChange={handleChange} placeholder="Documento ERP" />
+          <label>📅 Fecha de Emisión:</label>
+          <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={handleChange} />
+          <label>📅 Fecha Entrega a Contabilidad:</label>
+          <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={handleChange} />
 
           <div className="modal-buttons">
             <button type="submit" className="btn-guardar">💾 Guardar</button>
             <button type="button" className="btn-cancelar" onClick={onClose}>❌ Cancelar</button>
-            {/* 🗑️ Botón para eliminar factura */}
-            <button
-              type="button"
-              className="btn-eliminar"
-              onClick={handleEliminar}
-            >
-              🗑️ Eliminar
-            </button>
+            <button type="button" className="btn-eliminar" onClick={handleEliminar}>🗑️ Eliminar</button>
           </div>
         </form>
       </div>
