@@ -98,7 +98,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           <input name="proveedor" value={formData.proveedor} onChange={handleChange} placeholder="Proveedor" />
           <input name="Title" value={formData.Title} onChange={handleChange} placeholder="NIT / Título" />
           <input name="ValorAnIVA" type="number" value={formData.ValorAnIVA} onChange={handleChange} placeholder="Valor" />
-          <textarea name="DetalleFac" value={formData.DetalleFac} onChange={handleChange} placeholder="Detalle"></textarea>
+          {/* <textarea name="DetalleFac" value={formData.DetalleFac} onChange={handleChange} placeholder="Detalle"></textarea> */}
 
           {/* 🆕 Campos nuevos */}
           <input name="CC" value={formData.CC} onChange={handleChange} placeholder="Centro de Costo (CC)" />
