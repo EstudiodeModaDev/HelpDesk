@@ -41,7 +41,7 @@
 
 /* 🧩 Campos del formulario */
 .modal-form input,
-.modal-form textarea
+.modal-form textarea,
 .modal-form select {
   width: 100%;
   padding: 10px 12px;
@@ -52,6 +52,16 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
+
+/* ✨ Enfoque */
+.modal-form input:focus,
+.modal-form textarea:focus,
+.modal-form select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
 
 /* 🧾 Textarea ocupará ambas columnas */
 .modal-form textarea {
