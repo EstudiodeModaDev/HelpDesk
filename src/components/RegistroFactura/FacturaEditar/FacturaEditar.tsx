@@ -105,10 +105,10 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           <input name="CO" value={formData.CO} onChange={handleChange} placeholder="Centro Operativo (CO)" />
           <input name="UN" value={formData.un} onChange={handleChange} placeholder="Unidad de Negocio (UN)" />
           <input name="DocERP" value={formData.DocERP} onChange={handleChange} placeholder="Documento ERP" />
-          <label>📅 Fecha de Emisión:</label>
-          <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={handleChange} />
-          <label>📅 Fecha Entrega a Contabilidad:</label>
-          <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={handleChange} />
+          <label>📅 Fecha de Emisión:
+          <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={handleChange} /></label>
+          <label>📅 Fecha Entrega a Contabilidad:
+          <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={handleChange} /></label>
 
           <div className="modal-buttons">
             <button type="submit" className="btn-guardar">💾 Guardar</button>
