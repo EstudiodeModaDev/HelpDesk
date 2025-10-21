@@ -565,7 +565,7 @@ const handleCompraSeleccionada = async (id: string) => {
             </div>
 
             {/* 🔹 Desplegable de proveedores */}
-      <div className="campo-proveedor">
+      <div className="form-group mb-3">
         <label htmlFor="proveedor-select">Proveedor:</label>
         {loading ? (
           <span>Cargando...</span>
