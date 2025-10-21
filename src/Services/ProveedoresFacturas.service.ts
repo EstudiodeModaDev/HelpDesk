@@ -66,6 +66,9 @@ export class ProveedoresFacturaService {
       }
   }
 
+  
+
+
 
   // ---------- mapping ----------
   private toModel(item: any): Proveedor {
@@ -161,6 +164,15 @@ export class ProveedoresFacturaService {
       throw e;
     }
   }
-
+    async add(proveedor: { Title: string; Nit: string }) {
+    await this.ensureIds();
+    const res = await this.graph.post<any>(
+      `/sites/${this.siteId}/lists/${this.listId}/items`,
+      { fields: proveedor }
+    );
+    return this.toModel(res);
+  }
 }
+
+
 

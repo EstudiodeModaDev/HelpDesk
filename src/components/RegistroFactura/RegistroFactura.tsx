@@ -1,19 +1,24 @@
+// src/components/RegistrarFactura/RegistroFactura.tsx
 import React, { useEffect, useState } from "react";
 import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
 import FacturasLista from "./FacturasLista/FacturasLista";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
-import "./RegistroFactura.css"
+import "./RegistroFactura.css";
 import { useAuth } from "../../auth/authContext";
 
-// 🔽 nuevo import del hook
+// 🔽 Hook existente para proveedores
 import { useProveedores } from "../../Funcionalidades/ProveedoresFactura";
+import ProveedorModal from "./ProveedorModal/ProveedorModal";
+
+
+
+
 
 //imports nuevos para traer los datos de compras
-// imports nuevos
-
 import type { Compra } from "../../Models/Compras";
 import { ComprasService } from "../../Services/Compras.service";
 import { GraphRest } from "../../graph/GraphRest";
+
 
  // Diccionario de opciones----------------------------------------------------------------------------------------------
  export const opcionesFactura = [
@@ -399,11 +404,17 @@ const [compras, setCompras] = useState<Compra[]>([]);
 const [selectedCompra, setSelectedCompra] = useState<string>("");
 
 //proveedores
-const { proveedores, loading, error } = useProveedores();
+const { proveedores, loading, error, agregarProveedor  } = useProveedores();
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
+const [isModalOpen, setIsModalOpen] = useState(false);
+  
 
 const graph = new GraphRest(getToken);
 const comprasService = new ComprasService(graph);
+
+
+
+
 
 //lo nuevo de compras 
 
@@ -590,7 +601,7 @@ const handleCompraSeleccionada = async (id: string) => {
         <button
           type="button"
           className="btn-nuevo-proveedor"
-          onClick={() => alert("Abrir modal para registrar nuevo proveedor")}
+          onClick={() => setIsModalOpen(true)}
         >
           + Nuevo proveedor
         </button>
@@ -841,6 +852,12 @@ const handleCompraSeleccionada = async (id: string) => {
           <FacturasLista onVolver={() => setMostrarLista(false)} />
         </div>
       )}
+        <ProveedorModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  onSave={agregarProveedor}
+/>
+
     </div>
   );
 }
