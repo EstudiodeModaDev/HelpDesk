@@ -81,7 +81,7 @@ export class FacturasService {
       ValorAnIVA: Number(f.ValorAnIVA) || 0,
       CC: f.CC ?? "",
       CO: f.CO ?? "",
-      un: f.UN ?? "",
+      un: f.un ?? "",
       DetalleFac: f.Detalle ?? "",
       FecEntregaCont: f.FecEntregaCont ?? "",
       DocERP: f.DocERP ?? "",
