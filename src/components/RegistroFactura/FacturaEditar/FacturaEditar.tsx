@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import { FacturaEditar as facturaFx } from "../../../Funcionalidades/FacturaEditar";
 import "./FacturaEditar.css";
+import { opcionescc, opcionesco, opcionesun } from "../RegistroFactura";
 
 interface Props {
   factura: ReFactura;
@@ -14,6 +15,42 @@ interface Props {
 export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGuardar }: Props) {
   const { actualizarFactura, eliminarFactura } = facturaFx();
 
+// Manejador de cambios — ahora incluye los nuevos campos
+// 🧠 Manejador de cambios — soporta input, textarea y select
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+
+  // 🧾 Si el campo es numérico (ValorAnIVA)
+  if (name === "ValorAnIVA") {
+    const n = value === "" ? 0 : Number(value);
+    setFormData((prev) => ({
+      ...prev,
+      ValorAnIVA: Number.isNaN(n) ? 0 : n,
+    }));
+    return;
+  }
+
+  // 🏷️ Si el campo pertenece a los select (CC, CO o un)
+  if (name === "CC" || name === "CO" || name === "un") {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    return;
+  }
+
+  // 📦 Por defecto: manejar cualquier input o textarea
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+
+
+  
   // 🆕 Se agregan más campos al estado del formulario
   const [formData, setFormData] = useState({
     proveedor: factura.Proveedor ?? "",
@@ -28,16 +65,8 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
     FecEntregaCont: factura.FecEntregaCont ?? "", // 🆕 Fecha de entrega contabilidad
   });
 
-  // Manejador de cambios — ahora incluye los nuevos campos
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    if (name === "ValorAnIVA") {
-      const n = value === "" ? 0 : Number(value);
-      setFormData((prev) => ({ ...prev, ValorAnIVA: Number.isNaN(n) ? 0 : n }));
-      return;
-    }
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  
+
 
   // Guardar cambios
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,7 +124,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
 
         <form onSubmit={handleSubmit} className="modal-form">
           {/* Campos originales */}
-          <label>📅 Fecha de Emisión:
+          <label> Proveedor:
           <input name="proveedor" value={formData.proveedor} onChange={handleChange} placeholder="Proveedor" /></label>
           <label> NIT:
           <input name="Title" value={formData.Title} onChange={handleChange} placeholder="NIT / Título" /></label>
@@ -105,15 +134,35 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
 
           {/* 🆕 Campos nuevos */}
           <label> C.C:
-          <input name="CC" value={formData.CC} onChange={handleChange} placeholder="Centro de Costo (CC)" /></label>
+          <select name="CC" value={formData.CC} onChange={handleChange} required> <option value="">Seleccionar centro de costo</option>
+                {opcionescc.map((cc) => (
+                  <option key={cc.codigo} value={cc.codigo}>
+                    {cc.codigo} - {cc.descripcion}
+                  </option>
+                ))}
+              </select></label>
+
           <label> C.O:
-          <input name="CO" value={formData.CO} onChange={handleChange} placeholder="Centro Operativo (CO)" /></label>
+          <select name="CO" value={formData.CO} onChange={handleChange} required> <option value="">Seleccionar centro operativo</option>
+                {opcionesco.map((co) => (
+                  <option key={co.codigo} value={co.codigo}>
+                    {co.codigo} - {co.descripcion}
+                  </option>
+                ))}
+              </select></label>
+
           <label> U.N:
-          <input name="UN" value={formData.un} onChange={handleChange} placeholder="Unidad de Negocio (UN)" /></label>
+          <select name="UN" value={formData.un} onChange={handleChange} required> <option value="">Seleccionar unidad de negocio</option>
+                {opcionesun.map((un) => (
+                  <option key={un.codigo} value={un.codigo}>
+                    {un.codigo} - {un.descripcion}
+                  </option>
+                ))}
+              </select></label>
           
-          <label>📅 Fecha de Emisión:
+          <label> Fecha de Emisión:
           <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={handleChange} /></label>
-          <label>📅 Fecha Entrega a Contabilidad:
+          <label> Fecha Entrega a Contabilidad:
           <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={handleChange} /></label>
           <input name="DocERP" value={formData.DocERP} onChange={handleChange} placeholder="Documento ERP" />
 
