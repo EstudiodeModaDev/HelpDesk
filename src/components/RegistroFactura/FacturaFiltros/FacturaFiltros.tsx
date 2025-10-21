@@ -124,7 +124,7 @@ export default function FacturaFiltros({
 
          {/* 🧾 Selector de un */}
         <select name="UN" value={filtros.un || ""} onChange={handleChange}>
-          <option value="">Sel centro ope</option>
+          <option value="">Sel und. negocio</option>
           {opcionesun.map((ou) => (
             <option key={ou.codigo} value={ou.codigo}>
               {ou.codigo} - {ou.descripcion}

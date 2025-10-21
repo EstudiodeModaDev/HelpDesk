@@ -1,20 +1,8 @@
-/* 🧩 Contenedor de la lista de facturas */
-.facturas-lista {
-  margin-top: 40px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 25px;
-  overflow: hidden;
-  max-height: 65vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 🧩 Tabla con scroll vertical */
+/* 🧩 Contenedor de la tabla con scroll vertical y horizontal */
 .tabla-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: auto; /* 👈 permite scroll horizontal si el contenido no cabe */
   max-height: 50vh;
   margin-bottom: 20px;
   border-radius: 10px;
@@ -25,107 +13,38 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  table-layout: fixed; /* 👈 fuerza ancho fijo por columna */
+  min-width: 1200px; /* 👈 evita que se aplaste demasiado */
 }
 
 .tabla-facturas th,
 .tabla-facturas td {
-  padding: 12px 10px;
+  padding: 12px 8px;
   border-bottom: 1px solid #ddd;
   text-align: center;
   font-size: 14px;
+  word-wrap: break-word; /* 👈 asegura que el texto se ajuste */
+  white-space: normal;
+  width: 100px; /* 👈 todas las columnas tienen tamaño similar */
 }
 
-.tabla-facturas th {
-  background-color: #2980b9;
-  color: white;
-  font-weight: 700;
+/* Puedes ajustar los anchos específicos si lo prefieres */
+.tabla-facturas th:nth-child(1),
+.tabla-facturas td:nth-child(1) {
+  width: 50px; /* Num */
 }
 
-.tabla-facturas tr:hover {
-  background-color: #f2f6fa;
+.tabla-facturas th:nth-child(4),
+.tabla-facturas td:nth-child(4) {
+  width: 150px; /* Proveedor */
 }
 
-/* 🔔 Notificación flotante */
-.notificacion {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background-color: #4caf50;
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  animation: fadein 0.3s ease, fadeout 0.3s ease 2.7s;
-  font-weight: 500;
-  z-index: 1000;
+.tabla-facturas th:nth-child(5),
+.tabla-facturas td:nth-child(5) {
+  width: 130px; /* NIT */
 }
 
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.tabla-facturas th:nth-child(13),
+.tabla-facturas td:nth-child(13) {
+  width: 180px; /* Deta / Observaciones */
 }
-
-@keyframes fadeout {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-10px); }
-}
-
-
-/* 🧩 Estilo de los botones de acción (editar y eliminar) */
-.btn-editar,
-.btn-eliminar {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 18px;
-  color: #2980b9;
-  transition: color 0.3s;
-}
-
-.btn-editar:hover,
-.btn-eliminar:hover {
-  color: #3498db;
-}
-
-/* 🧩 Botón fijo de volver */
-.btn-volver-fijo {
-  position: sticky;
-  bottom: 10px;
-  display: block;
-  margin: 20px auto 0 auto;
-  background-color: #3a31e5;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  width: 300px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.btn-volver-fijo:hover {
-  background-color: #1096f5;
-  transform: scale(1.05);
-}
-
-/* 🧩 Botón "Registrar factura" */
-.btn-registrar {
-  background-color: #2980b9;
-  color: white;
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.1s;
-  border: none;
-}
-
-.btn-registrar:hover {
-  background-color: #3498db;
-  transform: scale(1.05);
-}
-
-
