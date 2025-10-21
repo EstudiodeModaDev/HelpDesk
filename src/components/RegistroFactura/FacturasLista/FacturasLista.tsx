@@ -60,6 +60,11 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         ? f.FechaEmision?.slice(0, 10) === filtros.FechaEmision
         : true;
 
+      // 📅 Filtrar por fecha si existe
+      const coincideFechaEnt = filtros.FecEntregaCont
+        ? f.FecEntregaCont?.slice(0, 10) === filtros.FecEntregaCont
+        : true;
+
       // 🔢 Número de factura
       const coincideNumero = filtros.NoFactura
         ? f.NoFactura?.toLowerCase().includes(filtros.NoFactura.toLowerCase())
@@ -75,12 +80,32 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         ? f.Title?.toLowerCase().includes(filtros.Title.toLowerCase())
         : true;
 
-      // 💡 Ítem
+      //  Ítem
       const coincideItem = filtros.Items
         ? f.Items === filtros.Items
         : true;
 
-      return coincideFecha && coincideNumero && coincideProveedor && coincideNIT && coincideItem;
+        // cc
+      const coincidecc = filtros.CC
+        ? f.CC === filtros.CC
+        : true;
+
+        // co
+      const coincideco = filtros.CO
+        ? f.CO === filtros.CO
+        : true;
+
+        //  un
+      const coincideun = filtros.un
+        ? f.un === filtros.un
+        : true;
+
+       //  erp
+      const coincideERP = filtros.DocERP
+        ? f.DocERP?.toLowerCase().includes(filtros.DocERP.toLowerCase())
+        : true;
+
+      return coincideFecha && coincideNumero && coincideProveedor && coincideNIT && coincideItem && coincideFechaEnt && coincidecc && coincideco &&  coincideun && coincideERP ;
     });
 
     setFacturasFiltradas(filtradas);
@@ -111,7 +136,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
               <th>UN</th>
               <th>FechaCont</th>
               <th>DocERP</th>
-              <th>Obs</th>
+              <th>Deta</th>
               <th>Acciones</th>
             </tr>
           </thead>
