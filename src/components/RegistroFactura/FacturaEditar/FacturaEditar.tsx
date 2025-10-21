@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import { FacturaEditar as facturaFx } from "../../../Funcionalidades/FacturaEditar";
 import "./FacturaEditar.css";
-import { opcionescc, opcionesco, opcionesun } from "../RegistroFactura";
+import { opcionescc, opcionesco, opcionesFactura, opcionesun } from "../RegistroFactura";
 
 interface Props {
   factura: ReFactura;
@@ -33,7 +33,7 @@ const handleChange = (
   }
 
   // 🏷️ Si el campo pertenece a los select (CC, CO o un)
-  if (name === "CC" || name === "CO" || name === "un") {
+  if (name === "CC" || name === "CO" || name === "un" || name === "Items") {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -57,6 +57,7 @@ const handleChange = (
     Title: factura.Title ?? "",
     ValorAnIVA: typeof factura.ValorAnIVA === "number" ? factura.ValorAnIVA : Number(factura.ValorAnIVA) || 0,
     DetalleFac: factura.DetalleFac ?? "",
+    Items: factura.Items ?? "", //items
     CC: factura.CC ?? "", // 🆕 Centro de costo
     CO: factura.CO ?? "", // 🆕 Centro operativo
     un: factura.un ?? "", // 🆕 Unidad de negocio
@@ -78,6 +79,7 @@ const handleChange = (
       Title: formData.Title,
       ValorAnIVA: formData.ValorAnIVA,
       DetalleFac: formData.DetalleFac,
+      Items: factura.Items,
       CC: formData.CC,
       CO: formData.CO,
       un: formData.un,
@@ -133,6 +135,15 @@ const handleChange = (
           {/* <textarea name="DetalleFac" value={formData.DetalleFac} onChange={handleChange} placeholder="Detalle"></textarea> */}
 
           {/* 🆕 Campos nuevos */}
+          <label> Items:
+          <select name="Items" value={formData.Items} onChange={handleChange} required> <option value="">Seleccionar centro de costo</option>
+                {opcionesFactura.map((of) => (
+                  <option key={of.codigo} value={of.codigo}>
+                    {of.codigo} - {of.descripcion}
+                  </option>
+                ))}
+              </select></label>
+
           <label> C.C:
           <select name="CC" value={formData.CC} onChange={handleChange} required> <option value="">Seleccionar centro de costo</option>
                 {opcionescc.map((cc) => (
