@@ -57,15 +57,7 @@ export default function FacturaFiltros({
       <h3>🔍 Filtros de búsqueda</h3>
 
       <div className="filtros-grid">
-          <label>
-            Fecha de emisión
-            <input
-              type="date"
-              name="FechaEmision"
-              value={filtros.FechaEmision || ""}
-              onChange={handleChange}
-            />
-          </label>
+         
 
         <input
           type="text"
@@ -112,7 +104,7 @@ export default function FacturaFiltros({
 
         {/* 🧾 Selector de cc */}
         <select name="CC" value={filtros.CC || ""} onChange={handleChange}>
-          <option value="">Seleccionar centro cos</option>
+          <option value="">Sel centro cos</option>
           {opcionescc.map((oc) => (
             <option key={oc.codigo} value={oc.codigo}>
               {oc.codigo} - {oc.descripcion}
@@ -122,7 +114,7 @@ export default function FacturaFiltros({
 
         {/* 🧾 Selector de co */}
         <select name="CO" value={filtros.CO || ""} onChange={handleChange}>
-          <option value="">Seleccionar centro ope</option>
+          <option value="">Sel centro ope</option>
           {opcionesco.map((oco) => (
             <option key={oco.codigo} value={oco.codigo}>
               {oco.codigo} - {oco.descripcion}
@@ -132,7 +124,7 @@ export default function FacturaFiltros({
 
          {/* 🧾 Selector de un */}
         <select name="UN" value={filtros.un || ""} onChange={handleChange}>
-          <option value="">Seleccionar centro ope</option>
+          <option value="">Sel centro ope</option>
           {opcionesun.map((ou) => (
             <option key={ou.codigo} value={ou.codigo}>
               {ou.codigo} - {ou.descripcion}
@@ -141,7 +133,17 @@ export default function FacturaFiltros({
         </select>
 
 
-        <label>
+       
+
+          <input
+          type="text"
+          name="DocERP"
+          value={filtros.DocERP || ""}
+          readOnly
+          placeholder="Doc ERP"
+        />
+
+         <label>
           Fecha entrega cont
           <input
             type="date"
@@ -151,13 +153,15 @@ export default function FacturaFiltros({
           />
         </label>
 
-          <input
-          type="text"
-          name="DocERP"
-          value={filtros.DocERP || ""}
-          readOnly
-          placeholder="Doc ERP"
-        />
+        <label>
+            Fecha de emisión
+            <input
+              type="date"
+              name="FechaEmision"
+              value={filtros.FechaEmision || ""}
+              onChange={handleChange}
+            />
+          </label>
 
 
       </div>
