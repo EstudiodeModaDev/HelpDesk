@@ -4,6 +4,7 @@ import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import { FacturaEditar as facturaFx } from "../../../Funcionalidades/FacturaEditar";
 import "./FacturaEditar.css"
 
+
 // Props del componente
 interface Props {
   factura: ReFactura;
@@ -26,13 +27,13 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
   const [formData, setFormData] = useState<{
     proveedor: string;
     Title: string;
-    valor: number;
-    detalle: string;
+    ValorAnIVA: number;
+    DetalleFac: string;
   }>({
     proveedor: factura.Proveedor ?? "",
     Title: factura.Title ?? "",
-    valor: typeof factura.ValorAnIVA === "number" ? factura.ValorAnIVA : Number(factura.ValorAnIVA) || 0,
-    detalle: factura.DetalleFac ?? "",
+    ValorAnIVA: typeof factura.ValorAnIVA === "number" ? factura.ValorAnIVA : Number(factura.ValorAnIVA) || 0,
+    DetalleFac: factura.DetalleFac ?? "",
   });
 
   // Manejador de cambios: parsea 'valor' a número
@@ -57,8 +58,8 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
     const cambios: Partial<ReFactura> = {
       Proveedor: formData.proveedor,
       Title: formData.Title,
-      ValorAnIVA: formData.valor,
-      DetalleFac: formData.detalle,
+      ValorAnIVA: formData.ValorAnIVA,
+      DetalleFac: formData.DetalleFac,
       // No sobreescribimos id0 ni fechas/números a menos que quieras
     };
 
@@ -116,15 +117,15 @@ const handleEliminar = async () => {
             placeholder="NIT / Título"
           />
           <input
-            name="valor"
+            name="ValorAnIVA"
             type="number"
-            value={formData.valor}
+            value={formData.ValorAnIVA}
             onChange={handleChange}
             placeholder="Valor"
           />
           <textarea
-            name="detalle"
-            value={formData.detalle}
+            name="DetalleFac"
+            value={formData.DetalleFac}
             onChange={handleChange}
             placeholder="Detalle"
           ></textarea>
