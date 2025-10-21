@@ -62,8 +62,13 @@ const handleChange = (
     CO: factura.CO ?? "", // 🆕 Centro operativo
     un: factura.un ?? "", // 🆕 Unidad de negocio
     DocERP: factura.DocERP ?? "", // 🆕 Documento ERP
-    FechaEmision: factura.FechaEmision ?? "", // 🆕 Fecha de emisión
-    FecEntregaCont: factura.FecEntregaCont ?? "", // 🆕 Fecha de entrega contabilidad
+    FechaEmision: factura.FechaEmision
+    ? new Date(factura.FechaEmision).toISOString().split("T")[0]
+    : "", // ✅ transforma a yyyy-MM-dd // 🆕 Fecha de emisión
+    
+    FecEntregaCont: factura.FecEntregaCont
+    ? new Date(factura.FecEntregaCont).toISOString().split("T")[0]
+    : "", // ✅ igual aquí // 🆕 Fecha de entrega contabilidad
   });
 
   
