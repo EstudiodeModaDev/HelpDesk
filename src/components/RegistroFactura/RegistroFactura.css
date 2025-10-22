@@ -253,17 +253,19 @@
   grid-column: 1 / -1;
 }
 
-/* (2) Proveedor: label arriba (full), select a la izq y botón a la derecha */
+/* (2) Proveedor: label pegado al select, botón a la derecha */
 .form-group:has(#proveedor-select){
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: end;
   column-gap: 12px;
+  align-items: end; /* mantiene alineación del botón */
 }
+
+/* label con mismo espaciado que los demás campos */
 .form-group:has(#proveedor-select) > label{
-  grid-column: 1 / -1;     /* label ocupa toda la fila */
-  margin-bottom: 6px;
+  grid-column: 1 / -1;
+  margin: 0 0 6px; /* 🔹 igual que .campo label */
 }
 .form-group:has(#proveedor-select) > select{
   grid-column: 1 / 2;      /* select a la izquierda */
