@@ -663,16 +663,11 @@ export default function RegistroFactura() {
             />
             </div>
 
-
             {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}
             <div className="campo">
               <label>
                 Descripción del ítem
-                <input
-                  name="DescripItems"
-                  value={formData.DescripItems}
-                  readOnly
-                ></input>
+                <input name="DescripItems" value={formData.DescripItems} readOnly></input>
               </label>
             </div>
 

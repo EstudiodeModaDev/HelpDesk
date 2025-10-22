@@ -15,7 +15,7 @@
 
 /* ========= Contenedor ========= */
 .registro-container{
-  max-width: 1280px; /* antes 980px */
+  max-width: 1280px;
   margin: 24px auto;
   padding: 20px;
   background: var(--card);
@@ -34,7 +34,7 @@
 .registro-form{ width: 100%; }
 .form-grid{
   display: grid;
-  grid-template-columns: repeat(3, minmax(320px, 1fr)); /* más generoso */
+  grid-template-columns: repeat(3, minmax(320px, 1fr));
   gap: 16px;
 }
 @media (max-width: 1200px){
@@ -53,7 +53,7 @@
   font-size:.92rem;
   margin:0 0 6px;
   color:var(--muted);
-  font-weight: 600;
+  font-weight:600;
 }
 
 /* ========= Inputs base ========= */
@@ -86,10 +86,16 @@
   resize:vertical;
 }
 
+/* Hover / Focus SOLO en hijos directos (no inputs anidados como RS) */
+.campo > :is(input, select, textarea):hover{ border-color: var(--bd-strong); }
 .form-group > select:hover,
 #compraSelect:hover,
 #proveedor-select:hover{ border-color: var(--bd-strong); }
 
+.campo > :is(input, select, textarea):focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+}
 .form-group > select:focus,
 #compraSelect:focus,
 #proveedor-select:focus{
@@ -155,12 +161,11 @@
 .btn-nuevo-proveedor:active{
   transform: translateY(1px);
 }
-
 .form-group.mb-3{ margin-bottom:6px; }
 .form-group .btn-nuevo-proveedor{ margin-top:8px; }
 
 /* ========= React-Select (classNamePrefix="rs" + className="rs-override") ========= */
-/* Igualamos a los nativos: altura, borde, radio, foco, paddings */
+/* Control */
 .rs-override .rs__control{
   min-height: var(--input-h);
   height: var(--input-h);
@@ -168,34 +173,55 @@
   border-radius: 10px !important;
   background:#fff !important;
   box-shadow: none !important;
+  overflow: hidden; /* 👈 impide que la flecha se salga del borde */
+}
+.rs-override .rs__control:hover{
+  border-color: var(--bd-strong) !important;
+}
+.rs-override .rs__control--is-focused{
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
 }
 
-
+/* Value & padding */
 .rs-override .rs__value-container{
-  padding: 0 14px !important;
+  padding: 0 12px !important;
 }
 
-/* 🔧 Quitar halo AZUL interno del input de búsqueda de RS */
+/* Indicadores: SIN flecha custom y alineados dentro */
+.rs-override .rs__indicators{
+  width: auto;
+  padding-right: 8px;
+  justify-content: flex-end;
+}
+.rs-override .rs__indicator-separator{ display:none !important; }
+
+/* Elimina la flecha que añadíamos vía ::after */
+.rs-override .rs__indicators::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* Asegura que el caret propio no desborde */
+.rs-override .rs__dropdown-indicator{
+  padding: 0 !important;
+}
+.rs-override .rs__dropdown-indicator svg{
+  display: block; /* evita espacios inline que empujan fuera */
+}
+
+/* Quitar halo interno del input de búsqueda */
 .rs-override .rs__input input,
 .rs-override .rs__input input:focus,
 .rs-override .rs__input input:focus-visible{
   outline: none !important;
   box-shadow: none !important;
+  background: transparent;
 }
-
-/* Indicadores: ocultamos separador y dibujamos flecha estilo nativo */
-.rs-override .rs__indicator-separator{ display:none !important; }
-.rs-override .rs__indicators{
-  position: relative;
-  width: 36px;
-  justify-content: center;
-}
-.rs-override .rs__dropdown-indicator{
-  color:#6b7280 !important;
-}
-.rs-override .rs__indicators::after{
-  display: none !important;
-  content: none !important;
+/* Cubre cualquier hijo con focus accidental */
+.rs-override .rs__control *:focus{
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Menú y opciones */
@@ -233,10 +259,7 @@
 .form-group.mb-3 span[style*="red"]{ font-weight:600; }
 
 /* ====== Posicionamientos especiales ====== */
-/* (1) Seleccionar compra: fila completa */
 .form-group:has(#compraSelect){ grid-column: 1 / -1; }
-
-/* (2) Proveedor: label pegado al select, botón a la derecha */
 .form-group:has(#proveedor-select){
   grid-column: 1 / -1;
   display: grid;
@@ -254,12 +277,10 @@
   height: 44px;
 }
 
-/* (3) Otros campos por DOM */
 .campo:has(input[name="FechaEmision"]) { grid-column: auto; }
 .campo:has(input[name="NoFactura"])     { grid-column: auto; }
 .campo:has(input[name="Title"])         { grid-column: auto; }
 
-/* (4) Ítem (RS) · Descripción del ítem · Valor antes de IVA */
 .campo:has(.rs-override)                { grid-column: auto; }
 .campo:has(.rs-override){
   display: flex;
@@ -273,13 +294,9 @@
 
 .campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
 .campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
-
-/* (6) Detalle · Fecha contabilidad · Doc ERP */
 .campo:has(textarea[name="DetalleFac"]) { grid-column: auto; }
 .campo:has(input[name="FecEntregaCont"]){ grid-column: auto; }
 .campo:has(input[name="DocERP"])        { grid-column: auto; }
-
-/* (7) Observaciones: fila completa */
 .campo:has(textarea[name="Observaciones"]){ grid-column: 1 / -1; }
 
 /* Responsive: proveedor apilado */
