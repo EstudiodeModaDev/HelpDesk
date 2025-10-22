@@ -27,6 +27,7 @@ export default function TablaCompras({onClick}:Props) {
 
   return (
     <div className="tabla-tickets">
+      <h2>{"Compras Registradas"}</h2>
         <div className="filtros" style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}>
 
           <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>

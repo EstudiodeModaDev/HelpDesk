@@ -60,6 +60,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
 
   return (
     <div className="compra-form white-silo compra-wrap" data-darkreader-ignore>
+      <h2>{"Registro de Compras"}</h2>
       <form className="form-grid" onSubmit={(e) => { handleSubmit(e)}}>
         {/* Tipo */}
         <div className="field">

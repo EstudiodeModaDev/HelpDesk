@@ -49,6 +49,7 @@
   font-size:.92rem;
   margin:0 0 6px;
   color:var(--muted);
+  font-weight: 600; /* 👈 Hace las etiquetas más gruesas */
 }
 
 /* ========= Inputs base ========= */
