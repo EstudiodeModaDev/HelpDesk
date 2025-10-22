@@ -5,6 +5,7 @@ import FacturasLista from "./FacturasLista/FacturasLista";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css";
 import { useAuth } from "../../auth/authContext";
+import Select from "react-select";
 
 // 🔽 Hook existente para proveedores
 import { useProveedores } from "../../Funcionalidades/ProveedoresFactura";
@@ -416,6 +417,7 @@ const comprasService = new ComprasService(graph);
 
 
 
+
 //lo nuevo de compras 
 
 // 🧩 cargar lista de compras al iniciar
@@ -725,25 +727,42 @@ const handleProveedorSeleccionado = (id: string) => {
   </label>
 </div>
 
-            {/* 🧾 Ítem (Código + descripción automática) */}
-            <div className="campo">
-              <label>
-                Ítems
-                <select
-                  name="Items"
-                  value={formData.Items}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar código</option>--------------------------------------------------
-                  {opcionesFactura.map((op) => (
-                    <option key={op.codigo} value={op.codigo}>
-                      {op.codigo} - {op.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            {/* 🧾 Ítem (Código + descripción automática con búsqueda) */}
+<div className="campo">
+  <label>Ítem (Código + descripción)</label>
+  <Select
+  classNamePrefix="rs"
+  className="rs-override"
+  options={opcionesFactura.map((op) => ({
+    value: op.codigo,
+    label: `${op.codigo} - ${op.descripcion}`,
+  }))}
+  placeholder="Buscar ítem…"
+  isClearable
+  value={
+    formData.Items
+      ? {
+          value: formData.Items,
+          label:
+            opcionesFactura.find((op) => op.codigo === formData.Items)
+              ?.descripcion || formData.Items,
+        }
+      : null
+  }
+  onChange={(opt) => {
+    setFormData((prev) => ({
+      ...prev,
+      Items: opt?.value || "",
+      DescripItems: opt?.label?.split(" - ")[1] || "",
+    }));
+  }}
+  filterOption={(option, input) =>
+    option.label.toLowerCase().includes(input.toLowerCase())
+  }
+/>
+
+</div>
+
 
             {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}
             <div className="campo">
