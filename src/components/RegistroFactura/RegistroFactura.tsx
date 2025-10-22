@@ -760,7 +760,6 @@ const handleProveedorSeleccionado = (id: string) => {
     option.label.toLowerCase().includes(input.toLowerCase())
   }
 />
-
 </div>
 
 
@@ -791,67 +790,111 @@ const handleProveedorSeleccionado = (id: string) => {
               </label>
             </div>
 
-           {/* 🏢 Centro de Costos (C.C) */}
+{/* 🏢 Centro de Costos (C.C) */}
 <div className="campo">
-  <label>
-    Centro de Costos (C.C)
-    <select
-      name="CC"
-      value={formData.CC}
-      onChange={handleChange}
-      required
-    >
-      <option value="">Seleccionar centro de costo</option>
-      {opcionescc.map((cc) => (
-        <option key={cc.codigo} value={cc.codigo}>
-          {cc.codigo} - {cc.descripcion}
-        </option>
-      ))}
-    </select>
-  </label>
+  <label>Centro de Costos (C.C)</label>
+  <Select
+    classNamePrefix="rs"
+    className="rs-override"
+    options={opcionescc.map((cc) => ({
+      value: cc.codigo,
+      label: `${cc.codigo} - ${cc.descripcion}`,
+    }))}
+    placeholder="Buscar centro de costo…"
+    isClearable
+    value={
+      formData.CC
+        ? {
+            value: formData.CC,
+            label:
+              opcionescc.find((cc) => cc.codigo === formData.CC)
+                ?.descripcion || formData.CC,
+          }
+        : null
+    }
+    onChange={(opt) =>
+      setFormData((prev) => ({
+        ...prev,
+        CC: opt?.value || "",
+      }))
+    }
+    filterOption={(option, input) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
 </div>
 
 
-                        {/* 🏭 Centro Operativo */}
-            <div className="campo">
-              <label>
-                Centro Operativo (C.O)
-                <select
-                  name="CO"
-                  value={formData.CO}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar centro operativo</option>
-                  {opcionesco.map((co) => (
-                    <option key={co.codigo} value={co.codigo}>
-                      {co.codigo} - {co.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+
+{/* 🏭 Centro Operativo (C.O) */}
+<div className="campo">
+  <label>Centro Operativo (C.O)</label>
+  <Select
+    classNamePrefix="rs"
+    className="rs-override"
+    options={opcionesco.map((co) => ({
+      value: co.codigo,
+      label: `${co.codigo} - ${co.descripcion}`,
+    }))}
+    placeholder="Buscar centro operativo…"
+    isClearable
+    value={
+      formData.CO
+        ? {
+            value: formData.CO,
+            label:
+              opcionesco.find((co) => co.codigo === formData.CO)
+                ?.descripcion || formData.CO,
+          }
+        : null
+    }
+    onChange={(opt) =>
+      setFormData((prev) => ({
+        ...prev,
+        CO: opt?.value || "",
+      }))
+    }
+    filterOption={(option, input) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</div>
 
 
-                        {/* 🧱 Unidad de Negocio */}
-            <div className="campo">
-              <label>
-                Unidad de Negocio (U.N)
-                <select
-                  name="un"
-                  value={formData.un}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar unidad de negocio</option>
-                  {opcionesun.map((un) => (
-                    <option key={un.codigo} value={un.codigo}>
-                      {un.codigo} - {un.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+
+                        {/* 🧱 Unidad de Negocio (U.N) */}
+<div className="campo">
+  <label>Unidad de Negocio (U.N)</label>
+  <Select
+    classNamePrefix="rs"
+    className="rs-override"
+    options={opcionesun.map((un) => ({
+      value: un.codigo,
+      label: `${un.codigo} - ${un.descripcion}`,
+    }))}
+    placeholder="Buscar unidad de negocio…"
+    isClearable
+    value={
+      formData.un
+        ? {
+            value: formData.un,
+            label:
+              opcionesun.find((u) => u.codigo === formData.un)
+                ?.descripcion || formData.un,
+          }
+        : null
+    }
+    onChange={(opt) =>
+      setFormData((prev) => ({
+        ...prev,
+        un: opt?.value || "",
+      }))
+    }
+    filterOption={(option, input) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</div>
 
             {/* 🧾 Detalle */}
             <div className="campo">

@@ -135,6 +135,15 @@
   cursor: not-allowed;
 }
 
+.rs-override__control {
+  border-radius: 8px !important;
+  border-color: #ccc !important;
+}
+.rs-override__placeholder {
+  color: #888 !important;
+}
+
+
 /* 📱 Responsivo */
 @media (max-width: 1024px) {
   .form-grid {
