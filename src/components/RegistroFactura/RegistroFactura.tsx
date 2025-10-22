@@ -677,7 +677,7 @@ const handleProveedorSeleccionado = (id: string) => {
             </div>
 
 {/* 🏢 Proveedor (llenado automático; readonly para evitar conflicto) */}
-<div className="campo">
+{/* <div className="campo">
   <label>
     Proveedor
     <input
@@ -688,7 +688,7 @@ const handleProveedorSeleccionado = (id: string) => {
       readOnly
     />
   </label>
-</div>
+</div> */}
 
             {/* 🧾 NIT (Title) (llenado automático; readonly) */}
 <div className="campo">
