@@ -689,7 +689,7 @@ const handleProveedorSeleccionado = (id: string) => {
               <label>
                 No. Factura
                 <input
-                  type="number"
+                  type="text"
                   name="NoFactura"
                   value={formData.NoFactura}
                   onChange={handleChange}
