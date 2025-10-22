@@ -260,3 +260,26 @@ th:last-child,  td:last-child{  padding-right: 16px; }
     justify-content: flex-end;     /* paginación a la derecha en la segunda fila */
   }
 }
+
+/* Centra texto en encabezados y celdas */
+.table-wrap th,
+.table-wrap td{
+  text-align: center;
+  vertical-align: middle; /* centra verticalmente */
+}
+ 
+/* Si dentro del TH/TD pones contenedores (div, span, button, etc.)
+   los centramos también */
+.table-wrap th > *,
+.table-wrap td > *{
+  margin-left: auto;
+  margin-right: auto;
+}
+ 
+/* Si usas contenedores de acciones dentro de celdas, mejor inline-flex */
+.table-wrap td > div{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
