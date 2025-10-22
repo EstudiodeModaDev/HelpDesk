@@ -15,4 +15,6 @@ export interface ReFactura {
   DocERP: string;
   Observaciones: string;
   RegistradoPor: string;
+  NIT? : string;
+  
 }
