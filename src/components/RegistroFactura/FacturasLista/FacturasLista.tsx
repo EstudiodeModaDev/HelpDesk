@@ -5,19 +5,14 @@ import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import "./FacturasLista.css";
 
-/**
- * 🧾 Componente que lista todas las facturas y permite filtrarlas o editarlas.
- */
 export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   const { obtenerFacturas } = useFacturas();
 
-  // 🧱 Estados base
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [facturasFiltradas, setFacturasFiltradas] = useState<ReFactura[]>([]); // ✅ Lista filtrada
   const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
 
-  // 📦 Cargar las facturas al montar el componente
   useEffect(() => {
     const cargarFacturas = async () => {
       try {
@@ -31,7 +26,6 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     cargarFacturas();
   }, [obtenerFacturas]);
 
-  // 🧹 Limpia el mensaje luego de 3 segundos
   useEffect(() => {
     if (mensaje) {
       const timer = setTimeout(() => setMensaje(null), 3000);
@@ -39,7 +33,6 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     }
   }, [mensaje]);
 
-  // 🗓️ Formatea la fecha
   const formatearFecha = (fecha?: string) => {
     if (!fecha) return "";
     return new Date(fecha).toLocaleDateString("es-CO", {
@@ -48,11 +41,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
       year: "numeric",
     });
   };
-
-  /**
-   * 🧠 Nueva función que recibe los filtros desde FacturaFiltros
-   * y filtra la lista local sin recargar desde el servidor.
-   */
+  
   const aplicarFiltros = (filtros: Partial<ReFactura>) => {
     const filtradas = facturas.filter((f) => {
       // 📅 Filtrar por fecha si existe

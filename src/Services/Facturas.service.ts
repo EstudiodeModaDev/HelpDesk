@@ -147,7 +147,9 @@ export class FacturasService {
       : await this.graph.get<any>(url);         // 👈 path relativo
 
     const raw = Array.isArray(res?.value) ? res.value : [];
+    console.log("Raw: ", raw)
     const items = raw.map((x: any) => this.toModel(x));
+    console.log("Raw: ", items)
     const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
     return { items, nextLink };
   }
