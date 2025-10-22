@@ -76,7 +76,7 @@ export class ProveedoresFacturaService {
     return {
         Id: String(f?.id ?? f?.ID ?? f?.Id ?? ''),
         Title: f.Title,
-        Nit: f.Nit
+        Nombre: f.Nombre
     };
   }
 

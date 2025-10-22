@@ -545,8 +545,8 @@ const handleProveedorSeleccionado = (id: string) => {
   if (prov) {
     setFormData(prev => ({
       ...prev,
-      Title: prov.Title ?? "", // nombre del proveedor
-      Nit: prov.Nit ?? "",     // NIT del proveedor
+      Nombre: prov.Nombre ?? "", // nombre del proveedor
+      Nit: prov.Title ?? "",     // NIT del proveedor
     }));
   } else {
     console.warn("Proveedor seleccionado no encontrado en lista:", id);
@@ -630,7 +630,7 @@ const handleProveedorSeleccionado = (id: string) => {
       <option value="">-- Selecciona un proveedor --</option>
       {proveedores.map((p) => (
         <option key={p.Id} value={p.Id}>
-          {p.Title} — {p.Nit}
+          {p.Nombre} — {p.Title}
         </option>
       ))}
     </select>
