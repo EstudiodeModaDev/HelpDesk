@@ -114,8 +114,7 @@
 /* 🔹 Botón "Nuevo proveedor" con el mismo estilo que los otros */
 .btn-nuevo-proveedor {
   margin-top: 8px;
-  align-self: flex-start; /* evita que se expanda todo el ancho */
-  align-items: center;
+  align-self: center; /* evita que se expanda todo el ancho */
   padding: 10px 20px;
   border: none;
   border-radius: 10px;
