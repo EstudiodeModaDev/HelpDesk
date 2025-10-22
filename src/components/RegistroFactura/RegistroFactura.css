@@ -113,12 +113,12 @@
 
 /* 🔹 Botón "Nuevo proveedor" con el mismo estilo que los otros */
 .btn-nuevo-proveedor {
-  margin-top: 8px;
+  margin-top: 12px;
   align-self: center; /* evita que se expanda todo el ancho */
   padding: 10px 20px;
   border: none;
   border-radius: 10px;
-  background-color: #0078d7;
+  background-color: #a7bccc;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -126,7 +126,7 @@
 }
 
 .btn-nuevo-proveedor:hover {
-  background-color: #005fa3;
+  background-color: #5887a9;
   transform: translateY(-1px);
 }
 
