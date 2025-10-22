@@ -175,9 +175,7 @@
   background:#fff !important;
   box-shadow: none !important;
 }
-.rs-override .rs__control:hover{
-  border-color: var(--bd-strong) !important;
-}
+
 
 .rs-override .rs__value-container{
   padding: 0 14px !important;
