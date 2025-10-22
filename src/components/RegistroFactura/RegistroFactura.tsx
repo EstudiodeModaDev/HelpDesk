@@ -889,6 +889,7 @@ const handleProveedorSeleccionado = (id: string) => {
                   name="DetalleFac"
                   value={formData.DetalleFac}
                   onChange={handleChange}
+                  required
                 ></input>
               </label>
             </div>
