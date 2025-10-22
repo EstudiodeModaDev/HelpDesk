@@ -283,12 +283,18 @@
 .campo:has(.rs-override)                { grid-column: auto; }   /* Ítem (React-Select) */
 
 /* 🔹 Alinear labels de los React-Select como los inputs normales */
-.campo:has(.rs-override) > label {
-  margin-bottom: 0;          /* quita el espacio extra */
+/* 🔧 Corrección fina para que el label quede pegado al React-Select */
+.campo:has(.rs-override) {
   display: flex;
-  flex-direction: column;    /* apila label y selector */
-  gap: 0px;                  /* pequeña separación vertical */
+  flex-direction: column;
+  gap: 4px;          /* igual separación que los inputs normales */
 }
+
+.campo:has(.rs-override) > label {
+  margin-bottom: 0;  /* sin espacio adicional */
+  font-weight: 600;
+}
+
 
 .campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
 .campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
