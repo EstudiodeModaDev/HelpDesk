@@ -534,7 +534,7 @@ const handleProveedorSeleccionado = (id: string) => {
     setFormData(prev => ({
       ...prev,
       Title: "",
-      Nit: "",
+      Nombre: "",
     }));
     return;
   }
@@ -675,17 +675,16 @@ const handleProveedorSeleccionado = (id: string) => {
               </label>
             </div>
 
-            {/* 🏢 Proveedor (llenado automático; readonly para evitar conflicto) */}
+{/* 🏢 Proveedor (llenado automático; readonly para evitar conflicto) */}
 <div className="campo">
   <label>
     Proveedor
     <input
       type="text"
-      name="Proveedor"
+      name="Nombre"                // 👈 debe coincidir con formData.Nombre
       value={formData.Proveedor}
       onChange={handleChange}
-      required
-      readOnly // lo dejamos readonly porque se llena desde el select
+      readOnly
     />
   </label>
 </div>
