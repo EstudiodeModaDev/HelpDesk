@@ -283,9 +283,6 @@
 .campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
 .campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
 
-/* (5) C.C · C.O · U.N (todos son React-Select) */
-.campo:has(.rs-override) { /* ya en DOM tras Ítem; se llenan siguientes columnas */ }
-
 /* (6) Detalle · Fecha contabilidad · Doc ERP */
 .campo:has(textarea[name="DetalleFac"]) { grid-column: auto; }
 .campo:has(input[name="FecEntregaCont"]){ grid-column: auto; }
@@ -323,4 +320,28 @@
     width: 100%;
   }
 }
+
+/* === Más ancho del card === */
+.registro-container{
+  max-width: 1280px; /* antes: 980px */
+}
+
+/* === Columnas más generosas en desktop === */
+.form-grid{
+  grid-template-columns: repeat(3, minmax(320px, 1fr)); /* antes: repeat(3, 1fr) */
+  gap: 16px; /* un pelín más de respiro */
+}
+
+/* En pantallas medianas, baja un poco el mínimo para evitar overflow */
+@media (max-width: 1200px){
+  .form-grid{
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+  }
+}
+
+/* Ya tienes este breakpoint; lo dejamos igual para 1 columna en móvil */
+@media (max-width: 900px){
+  .form-grid{ grid-template-columns: 1fr; }
+}
+
 

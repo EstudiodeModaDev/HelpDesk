@@ -753,12 +753,11 @@ const handleProveedorSeleccionado = (id: string) => {
             <div className="campo">
               <label>
                 Descripción del ítem
-                <textarea
+                <input
                   name="DescripItems"
-                  rows={1}
                   value={formData.DescripItems}
                   readOnly
-                ></textarea>
+                ></input>
               </label>
             </div>
 
@@ -886,12 +885,11 @@ const handleProveedorSeleccionado = (id: string) => {
             <div className="campo">
               <label>
                 Detalle Fac
-                <textarea
+                <input
                   name="DetalleFac"
-                  rows={1}
                   value={formData.DetalleFac}
                   onChange={handleChange}
-                ></textarea>
+                ></input>
               </label>
             </div>
           
