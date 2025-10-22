@@ -178,9 +178,6 @@
 .rs-override .rs__control:hover{
   border-color: var(--bd-strong) !important;
 }
-.rs-override .rs__control--is-focused{
-  box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
-}
 
 .rs-override .rs__value-container{
   padding: 0 14px !important;
