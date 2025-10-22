@@ -115,6 +115,7 @@
 .btn-nuevo-proveedor {
   margin-top: 8px;
   align-self: flex-start; /* evita que se expanda todo el ancho */
+  align-items: center;
   padding: 10px 20px;
   border: none;
   border-radius: 10px;
