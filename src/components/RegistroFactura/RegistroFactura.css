@@ -135,14 +135,68 @@
   cursor: not-allowed;
 }
 
+/* 🎨 Estilos personalizados para react-select (misma apariencia que inputs normales) */
 .rs-override__control {
+  background-color: #f9f9f9 !important;
+  border: 1.5px solid #ccc !important;
   border-radius: 8px !important;
-  border-color: #ccc !important;
-}
-.rs-override__placeholder {
-  color: #888 !important;
+  min-height: 38px !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
+.rs-override__control:hover {
+  border-color: #999 !important;
+}
+
+.rs-override__control--is-focused {
+  border-color: #0078d7 !important;
+  background-color: #fff !important;
+  box-shadow: none !important;
+}
+
+.rs-override__value-container {
+  padding: 2px 8px !important;
+}
+
+.rs-override__input-container input {
+  font-size: 0.95rem !important;
+}
+
+.rs-override__placeholder {
+  color: #888 !important;
+  font-size: 0.95rem !important;
+}
+
+.rs-override__single-value {
+  color: #333 !important;
+  font-size: 0.95rem !important;
+}
+
+.rs-override__indicator-separator {
+  display: none !important;
+}
+
+.rs-override__menu {
+  border-radius: 8px !important;
+  border: 1px solid #ccc !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  z-index: 20 !important;
+}
+
+.rs-override__option {
+  font-size: 0.95rem !important;
+  padding: 8px 12px !important;
+}
+
+.rs-override__option--is-focused {
+  background-color: #eef6ff !important;
+}
+
+.rs-override__option--is-selected {
+  background-color: #0078d7 !important;
+  color: white !important;
+}
 
 /* 📱 Responsivo */
 @media (max-width: 1024px) {
