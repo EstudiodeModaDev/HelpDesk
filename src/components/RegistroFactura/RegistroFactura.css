@@ -135,16 +135,21 @@
   cursor: not-allowed;
 }
 
-/* 🎨 React-Select igual a inputs normales */
+/* 🎨 React-Select idéntico a los inputs normales */
 .rs-override__control {
   background-color: #f9f9f9 !important;
   border: 1.5px solid #ccc !important;
   border-radius: 8px !important;
-  min-height: 38px !important;
+  height: 40px !important;
+  min-height: 40px !important;
   box-shadow: none !important;
   transition: border-color 0.2s ease, background-color 0.2s ease;
-  padding: 0 !important;
+  font-size: 0.95rem !important;
   font-family: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: text !important;
+  padding: 0 !important;
 }
 
 .rs-override__control:hover {
@@ -159,26 +164,37 @@
 
 .rs-override__value-container {
   padding: 0 12px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 40px !important;
   font-size: 0.95rem !important;
   color: #333 !important;
-  align-items: center !important;
-  min-height: 38px !important;
+}
+
+.rs-override__input-container {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .rs-override__input-container input {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
   font-size: 0.95rem !important;
   color: #333 !important;
-  padding: 0 !important;
 }
 
 .rs-override__placeholder {
   color: #888 !important;
   font-size: 0.95rem !important;
+  margin: 0 !important;
 }
 
 .rs-override__single-value {
   color: #333 !important;
   font-size: 0.95rem !important;
+  margin: 0 !important;
 }
 
 .rs-override__indicator-separator {
@@ -186,8 +202,16 @@
 }
 
 .rs-override__indicators {
-  color: #666 !important;
-  padding-right: 8px !important;
+  padding: 0 8px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.rs-override__dropdown-indicator svg {
+  width: 18px !important;
+  height: 18px !important;
+  opacity: 0.7 !important;
 }
 
 .rs-override__menu {
@@ -214,6 +238,7 @@
   background-color: #0078d7 !important;
   color: #fff !important;
 }
+
 
 /* 📱 Responsivo */
 @media (max-width: 1024px) {
