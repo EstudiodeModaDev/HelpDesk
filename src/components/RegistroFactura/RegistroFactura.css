@@ -15,7 +15,7 @@
 
 /* ========= Contenedor ========= */
 .registro-container{
-  max-width: 980px;
+  max-width: 1280px; /* antes 980px */
   margin: 24px auto;
   padding: 20px;
   background: var(--card);
@@ -34,13 +34,17 @@
 .registro-form{ width: 100%; }
 .form-grid{
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(3, minmax(320px, 1fr)); /* más generoso */
+  gap: 16px;
 }
-.campo, .form-group{ grid-column: span 6; }
+@media (max-width: 1200px){
+  .form-grid{ grid-template-columns: repeat(3, minmax(280px, 1fr)); }
+}
 @media (max-width: 900px){
-  .campo, .form-group{ grid-column: span 12; }
+  .form-grid{ grid-template-columns: 1fr; }
 }
+
+.campo, .form-group{ grid-column: span 1; }
 
 /* ========= Etiquetas ========= */
 .campo label,
@@ -49,7 +53,7 @@
   font-size:.92rem;
   margin:0 0 6px;
   color:var(--muted);
-  font-weight: 600; /* 👈 Hace las etiquetas más gruesas */
+  font-weight: 600;
 }
 
 /* ========= Inputs base ========= */
@@ -82,15 +86,17 @@
   resize:vertical;
 }
 
-/* Hover / Focus */
-.campo :is(input, select, textarea):hover,
-.form-group select:hover,
+/* Hover / Focus (🔧 solo hijos directos para no afectar inputs anidados como react-select) */
+.campo > :is(input, select, textarea):hover{ border-color: var(--bd-strong); }
+.form-group > select:hover,
 #compraSelect:hover,
-#proveedor-select:hover{
-  border-color: var(--bd-strong);
+#proveedor-select:hover{ border-color: var(--bd-strong); }
+
+.campo > :is(input, select, textarea):focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
 }
-.campo :is(input, select, textarea):focus,
-.form-group select:focus,
+.form-group > select:focus,
 #compraSelect:focus,
 #proveedor-select:focus{
   border-color: var(--primary);
@@ -122,9 +128,10 @@
 
 /* ========= Botones ========= */
 .botones-container{
+  grid-column: 1 / -1;
   display:flex;
   gap:12px;
-  margin-top:18px;
+  margin-top:6px;
 }
 .btn-registrar,
 .btn-ver-facturas,
@@ -173,9 +180,14 @@
 }
 .rs-override .rs__control--is-focused{
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px var(--ring) !important;
+  box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
 }
 
+.rs-override .rs__value-container{
+  padding: 0 14px !important;
+}
+
+/* 🔧 Quitar halo AZUL interno del input de búsqueda de RS */
 .rs-override .rs__input input,
 .rs-override .rs__input input:focus,
 .rs-override .rs__input input:focus-visible{
@@ -183,11 +195,7 @@
   box-shadow: none !important;
 }
 
-.rs-override .rs__value-container{
-  padding: 0 14px !important;
-}
-
-/* Indicadores: ocultamos caret propio y dibujamos flecha como el nativo */
+/* Indicadores: ocultamos separador y dibujamos flecha estilo nativo */
 .rs-override .rs__indicator-separator{ display:none !important; }
 .rs-override .rs__indicators{
   position: relative;
@@ -195,7 +203,7 @@
   justify-content: center;
 }
 .rs-override .rs__dropdown-indicator{
-  color:#6b7280 !important; /* por accesibilidad */
+  color:#6b7280 !important;
 }
 .rs-override .rs__indicators::after{
   content:"";
@@ -245,20 +253,9 @@
 .form-group.mb-3 span{ font-size:.95rem; }
 .form-group.mb-3 span[style*="red"]{ font-weight:600; }
 
-/* ====== GRID: 3 columnas y posicionamiento ====== */
-.form-grid{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-/* Por defecto, cada campo ocupa 1 columna */
-.campo, .form-group { grid-column: span 1; }
-
+/* ====== Posicionamientos especiales ====== */
 /* (1) Seleccionar compra: fila completa */
-.form-group:has(#compraSelect){
-  grid-column: 1 / -1;
-}
+.form-group:has(#compraSelect){ grid-column: 1 / -1; }
 
 /* (2) Proveedor: label pegado al select, botón a la derecha */
 .form-group:has(#proveedor-select){
@@ -266,44 +263,34 @@
   display: grid;
   grid-template-columns: 1fr auto;
   column-gap: 12px;
-  align-items: end; /* mantiene alineación del botón */
+  align-items: end;
 }
-
-/* label con mismo espaciado que los demás campos */
 .form-group:has(#proveedor-select) > label{
   grid-column: 1 / -1;
-  margin: 0 0 6px; /* 🔹 igual que .campo label */
+  margin: 0 0 6px;
 }
-.form-group:has(#proveedor-select) > select{
-  grid-column: 1 / 2;      /* select a la izquierda */
-}
+.form-group:has(#proveedor-select) > select{ grid-column: 1 / 2; }
 .form-group:has(#proveedor-select) > .btn-nuevo-proveedor{
-  grid-column: 2 / 3;      /* botón a la derecha */
-  height: 44px;            /* alinea con el select */
+  grid-column: 2 / 3;
+  height: 44px;
 }
 
-/* (3) Fecha de emisión · No. Factura · NIT */
-/* Ya quedan en orden por el DOM; solo aseguramos 1 columna cada uno */
+/* (3) Otros campos por DOM */
 .campo:has(input[name="FechaEmision"]) { grid-column: auto; }
 .campo:has(input[name="NoFactura"])     { grid-column: auto; }
 .campo:has(input[name="Title"])         { grid-column: auto; }
 
 /* (4) Ítem (RS) · Descripción del ítem · Valor antes de IVA */
-.campo:has(.rs-override)                { grid-column: auto; }   /* Ítem (React-Select) */
-
-/* 🔹 Alinear labels de los React-Select como los inputs normales */
-/* 🔧 Corrección fina para que el label quede pegado al React-Select */
-.campo:has(.rs-override) {
+.campo:has(.rs-override)                { grid-column: auto; }
+.campo:has(.rs-override){
   display: flex;
   flex-direction: column;
-  gap: 4px;          /* igual separación que los inputs normales */
+  gap: 4px;
 }
-
-.campo:has(.rs-override) > label {
-  margin-bottom: 0;  /* sin espacio adicional */
+.campo:has(.rs-override) > label{
+  margin-bottom: 0;
   font-weight: 600;
 }
-
 
 .campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
 .campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
@@ -314,29 +301,16 @@
 .campo:has(input[name="DocERP"])        { grid-column: auto; }
 
 /* (7) Observaciones: fila completa */
-.campo:has(textarea[name="Observaciones"]){
-  grid-column: 1 / -1;
-}
+.campo:has(textarea[name="Observaciones"]){ grid-column: 1 / -1; }
 
-/* (8) Botones: fila completa */
-.botones-container{
-  grid-column: 1 / -1;
-  display: flex;
-  gap: 12px;
-  margin-top: 6px;
-}
-
-/* Responsive: en pantallas estrechas, una sola columna */
+/* Responsive: proveedor apilado */
 @media (max-width: 900px){
-  .form-grid{ grid-template-columns: 1fr; }
   .campo, .form-group,
   .form-group:has(#compraSelect),
   .form-group:has(#proveedor-select),
   .campo:has(textarea[name="Observaciones"]),
-  .botones-container{
-    grid-column: 1 / -1;
-  }
-  /* en móvil, el proveedor queda apilado: label, select, botón */
+  .botones-container{ grid-column: 1 / -1; }
+
   .form-group:has(#proveedor-select){
     grid-template-columns: 1fr;
     row-gap: 8px;
@@ -345,29 +319,3 @@
     width: 100%;
   }
 }
-
-/* === Más ancho del card === */
-.registro-container{
-  max-width: 1280px; /* antes: 980px */
-}
-
-/* === Columnas más generosas en desktop === */
-.form-grid{
-  grid-template-columns: repeat(3, minmax(320px, 1fr)); /* antes: repeat(3, 1fr) */
-  gap: 16px; /* un pelín más de respiro */
-}
-
-/* En pantallas medianas, baja un poco el mínimo para evitar overflow */
-@media (max-width: 1200px){
-  .form-grid{
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
-  }
-}
-
-/* Ya tienes este breakpoint; lo dejamos igual para 1 columna en móvil */
-@media (max-width: 900px){
-  .form-grid{ grid-template-columns: 1fr; }
-}
-
-
-
