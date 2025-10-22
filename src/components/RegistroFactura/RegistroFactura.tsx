@@ -514,10 +514,48 @@ const handleCompraSeleccionada = async (id: string) => {
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "valor" ? Number(value) : value,
+        [name]: name === "ValorAnIVA" ? Number(value) : value,
       }));
     }
   };
+
+
+  
+/**
+ * Cuando el usuario selecciona un proveedor desde el <select>,
+ * buscamos el objeto proveedor en la lista (proveedores) y actualizamos
+ * formData.Proveedor (nombre) y formData.Title (NIT).
+ */
+const handleProveedorSeleccionado = (id: string) => {
+  setProveedorSeleccionado(id);
+
+  // Si no hay proveedor seleccionado, limpiar campos
+  if (!id) {
+    setFormData(prev => ({
+      ...prev,
+      Title: "",
+      Nit: "",
+    }));
+    return;
+  }
+
+  // Buscar el proveedor por Id en la lista del hook
+  const prov = proveedores.find(p => String(p.Id) === String(id));
+
+  if (prov) {
+    setFormData(prev => ({
+      ...prev,
+      Title: prov.Title ?? "", // nombre del proveedor
+      Nit: prov.Nit ?? "",     // NIT del proveedor
+    }));
+  } else {
+    console.warn("Proveedor seleccionado no encontrado en lista:", id);
+  }
+};
+
+
+
+
 
   // Enviar formulario
   const handleSubmit = async (e: React.FormEvent) => {
@@ -576,36 +614,37 @@ const handleCompraSeleccionada = async (id: string) => {
             </div>
 
             {/* 🔹 Desplegable de proveedores */}
-      <div className="form-group mb-3">
-        <label htmlFor="proveedor-select">Proveedor:</label>
-        {loading ? (
-          <span>Cargando...</span>
-        ) : error ? (
-          <span style={{ color: "red" }}>{error}</span>
-        ) : (
-          <select
-            id="proveedor-select"
-            value={proveedorSeleccionado}
-            onChange={(e) => setProveedorSeleccionado(e.target.value)}
-          >
-            <option value="">-- Selecciona un proveedor --</option>
-            {proveedores.map((p) => (
-              <option key={p.Id} value={p.Id}>
-                {p.Title}  —  {p.Nit}
-              </option>
-            ))}
-          </select>
-        )}
+<div className="form-group mb-3">
+  <label htmlFor="proveedor-select">Proveedor:</label>
+  {loading ? (
+    <span>Cargando...</span>
+  ) : error ? (
+    <span style={{ color: "red" }}>{error}</span>
+  ) : (
+    <select
+      id="proveedor-select"
+      value={proveedorSeleccionado}
+      // usamos el handler nuevo que actualiza formData
+      onChange={(e) => handleProveedorSeleccionado(e.target.value)}
+    >
+      <option value="">-- Selecciona un proveedor --</option>
+      {proveedores.map((p) => (
+        <option key={p.Id} value={p.Id}>
+          {p.Title} — {p.Nit}
+        </option>
+      ))}
+    </select>
+  )}
 
-        {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
-        <button
-          type="button"
-          className="btn-nuevo-proveedor"
-          onClick={() => setIsModalOpen(true)}
-        >
-          + Nuevo proveedor
-        </button>
-      </div>
+  {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
+  <button
+    type="button"
+    className="btn-nuevo-proveedor"
+    onClick={() => setIsModalOpen(true)}
+  >
+    + Nuevo proveedor
+  </button>
+</div>
 
 
             {/* 📆 Fecha de emisión */}
@@ -636,33 +675,35 @@ const handleCompraSeleccionada = async (id: string) => {
               </label>
             </div>
 
-            {/* 🏢 Proveedor */}
-            <div className="campo">
-              <label>
-                Proveedor
-                <input
-                  type="text"
-                  name="Proveedor"
-                  value={formData.Proveedor}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
+            {/* 🏢 Proveedor (llenado automático; readonly para evitar conflicto) */}
+<div className="campo">
+  <label>
+    Proveedor
+    <input
+      type="text"
+      name="Proveedor"
+      value={formData.Proveedor}
+      onChange={handleChange}
+      required
+      readOnly // lo dejamos readonly porque se llena desde el select
+    />
+  </label>
+</div>
 
-            {/* 🧾 NIT */}
-            <div className="campo">
-              <label>
-                NIT
-                <input
-                  type="number"
-                  name="Title"
-                  value={formData.Title}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
+            {/* 🧾 NIT (Title) (llenado automático; readonly) */}
+<div className="campo">
+  <label>
+    NIT
+    <input
+      type="text"
+      name="Title"
+      value={formData.Title}
+      onChange={handleChange}
+      required
+      readOnly // lo dejamos readonly porque se llena desde el select
+    />
+  </label>
+</div>
 
             {/* 🧾 Ítem (Código + descripción automática) */}
             <div className="campo">
