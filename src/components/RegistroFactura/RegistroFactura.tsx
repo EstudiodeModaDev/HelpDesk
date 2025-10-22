@@ -620,21 +620,21 @@ const handleProveedorSeleccionado = (id: string) => {
 
             {/* relacionamiento con compras  */}
                       <div className="form-group mb-3">
-              <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
-              <select
-                id="compraSelect"
-                className="form-control"
-                value={selectedCompra}
-                onChange={(e) => handleCompraSeleccionada(e.target.value)}
-              >
-                <option value="">-- Seleccione una compra --</option>
-                {compras.map((c) => (
-                  <option key={c.Id} value={c.Id}>
-                    {c.Title} - {c.SolicitadoPor} - {c.Estado}
-                  </option>
-                ))}
-              </select>
-            </div>
+                        <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
+                        <select
+                          id="compraSelect"
+                          className="form-control"
+                          value={selectedCompra}
+                          onChange={(e) => handleCompraSeleccionada(e.target.value)}
+                        >
+                          <option value="">-- Seleccione una compra --</option>
+                          {compras.map((c) => (
+                            <option key={c.Id} value={c.Id}>
+                              {c.Title} - {c.SolicitadoPor} - {c.Estado}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
             {/* 🔹 Desplegable de proveedores */}
 <div className="form-group mb-3">
@@ -646,6 +646,7 @@ const handleProveedorSeleccionado = (id: string) => {
   ) : (
     <select
       id="proveedor-select"
+      className="form-control"
       value={proveedorSeleccionado}
       // usamos el handler nuevo que actualiza formData
       onChange={(e) => handleProveedorSeleccionado(e.target.value)}
