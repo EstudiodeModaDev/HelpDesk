@@ -220,3 +220,58 @@
 .compra-form .mb-2{ margin-bottom:.5rem; }
 .compra-form .text-sm{ font-size:.9rem; }
 .compra-form .font-semibold{ font-weight:600; }
+
+/* ======= Tipografía unificada (controles y React-Select) ======= */
+
+/* 1) Define y aplica la familia base (ajusta si usas otra: p.ej. 'Inter') */
+:root{
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Inter", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+html, body{
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 2) Fuerza que TODOS los controles hereden la misma fuente */
+.registro-container,
+.compra-form{
+  font-family: var(--font-sans);
+}
+
+.registro-container :is(input, select, textarea, button),
+.compra-form :is(input, select, textarea, button){
+  font-family: inherit;
+  font-size: .98rem;      /* mismo tamaño que definiste */
+  letter-spacing: .2px;   /* consistente con tu <h2> */
+}
+
+/* 3) Placeholders coherentes */
+.registro-container ::placeholder,
+.compra-form ::placeholder{
+  font-family: inherit;
+  color: var(--muted);
+  opacity: 1; /* evita diferencias entre navegadores */
+}
+
+/* 4) React-Select: texto, menú y opciones con la misma fuente */
+.rs-override,
+.rs-override *{
+  font-family: var(--font-sans) !important;
+}
+.rs-override .rs__option{
+  font-size: .98rem !important;
+  letter-spacing: .2px;
+}
+
+/* 5) Botones específicos de tus forms */
+.btn-registrar,
+.btn-ver-facturas,
+.btn-nuevo-proveedor,
+.compra-form .btn,
+.compra-form .btn-primary{
+  font-family: var(--font-sans);
+  font-weight: 600; /* se ve más nítido en CTAs; bájalo si lo prefieres */
+  letter-spacing: .2px;
+}
