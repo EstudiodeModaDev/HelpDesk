@@ -591,7 +591,7 @@ const handleCompraSeleccionada = async (id: string) => {
             <option value="">-- Selecciona un proveedor --</option>
             {proveedores.map((p) => (
               <option key={p.Id} value={p.Id}>
-                {p.Title} — {p.Nit}
+                {p.Title}  —  {p.Nit}
               </option>
             ))}
           </select>

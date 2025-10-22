@@ -111,6 +111,30 @@
   cursor: not-allowed;
 }
 
+/* 🔹 Botón "Nuevo proveedor" con el mismo estilo que los otros */
+.btn-nuevo-proveedor {
+  margin-top: 8px;
+  align-self: flex-start; /* evita que se expanda todo el ancho */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #0078d7;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-nuevo-proveedor:hover {
+  background-color: #005fa3;
+  transform: translateY(-1px);
+}
+
+.btn-nuevo-proveedor:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 /* 📱 Responsivo */
 @media (max-width: 1024px) {
   .form-grid {
