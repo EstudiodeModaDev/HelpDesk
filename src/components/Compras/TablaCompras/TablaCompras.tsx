@@ -134,9 +134,7 @@ export default function TablaCompras({onClick}:Props) {
               </select>
             </div>
           )}
-          <button type="button" className="btn-ver" onClick={() => onClick(true)}>
-              📄 Mostrar Facturas
-            </button>
+          <button type="button" className="btn-ver" onClick={() => onClick(false)}>📄 Registrar compra</button>
         </div>
 
       <CrearInventarioModal

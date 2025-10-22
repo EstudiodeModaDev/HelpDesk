@@ -13,7 +13,7 @@ export default function ComprasPage() {
       {!mostrarLista ? (
         <section id="compras-form" aria-labelledby="compras-form-title">
           <h2 id="compras-form-title" className="sr-only">Formulario de compras</h2>
-          <CompraFormulario submitting={false} />
+          <CompraFormulario submitting={false} onClick={setmostrarLista}  />
         </section>
       ) : (
         <section id="compras-tabla" aria-labelledby="compras-tabla-title">
