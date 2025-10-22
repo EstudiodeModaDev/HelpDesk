@@ -179,7 +179,6 @@
   border-color: var(--bd-strong) !important;
 }
 .rs-override .rs__control--is-focused{
-  border-color: var(--primary) !important;
   box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
 }
 
