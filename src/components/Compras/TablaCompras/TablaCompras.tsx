@@ -111,32 +111,41 @@ export default function TablaCompras({onClick, mostrar}:Props) {
 
           {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
           {filtered.length > 0 && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
-              <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
-                Anterior
-              </button>
-              <span>Página {pageIndex}</span>
-              <button onClick={nextPage} disabled={loading || !hasNext}>
-                Siguiente
-              </button>
-
-              <span style={{ marginLeft: 12 }}>Registris por pagina:</span>
-              <select
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-                disabled={loading}
-              >
-                {[10, 20, 50, 100].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="pager">
+              {/* Izquierda */}
+              {mostrar ? (
+          <button
+                  type="button"
+                  className="btn-ver"
+                  onClick={() => onClick(false)}
+          >
+                  📄 Ver compras registradas
+          </button>
+              ) : <span />}
+          
+              {/* Derecha */}
+          <div className="pager-right">
+          <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
+                  Anterior
+          </button>
+          <span>Página {pageIndex}</span>
+          <button onClick={nextPage} disabled={loading || !hasNext}>
+                  Siguiente
+          </button>
+          
+                <span style={{ marginLeft: 12 }}>Registros por página:</span>
+          <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  disabled={loading}
+          >
+                  {[10, 20, 50, 100].map((n) => (
+          <option key={n} value={n}>{n}</option>
+                  ))}
+          </select>
+          </div>
+          </div>
           )}
-          {mostrar && (
-            <button type="button" className="btn-ver" onClick={() => onClick(false)}>📄 Ver compras registradas</button>
-          )} 
         </div>
 
       <CrearInventarioModal
