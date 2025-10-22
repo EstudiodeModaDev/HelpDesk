@@ -159,7 +159,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={(e) => {setField("FecEntregaCont", e.target.value);}}  /></label>
           <label> Doc ERP:
           <input name="DocERP" value={formData.DocERP} onChange={(e) => {setField("DocERP", e.target.value);}}  placeholder="Documento ERP" /></label>
-          <label>Observaciones: <input name="Obs" type="text" value={formData.DetalleFac} onChange={(e) => setField("Observaciones", e.target.value)} placeholder="Observaciones de la factura" /></label>
+          <label>Observaciones: <input name="Obs" type="text" value={formData.Observaciones} onChange={(e) => setField("Observaciones", e.target.value)} placeholder="Observaciones de la factura" /></label>
 
           <div className="modal-buttons">
             <button type="submit" className="btn-guardar">✅ Guardar</button>
