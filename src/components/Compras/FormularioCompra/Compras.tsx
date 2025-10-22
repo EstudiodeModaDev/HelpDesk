@@ -13,7 +13,7 @@ import type { CCOption } from "../../../Models/CentroCostos";
 const Motivos = ["Cambio por daño", "Renovación de equipo", "Renovación de licencia"] as const;
 
 /** --- Props --- */
-type Props = {submitting?: boolean;};
+type Props = {submitting?: boolean; onClick: (valor: boolean) => void};
 
 /** --- Filtro simple para react-select --- */
 function userFilter(option: { label: string; value: string }, rawInput: string): boolean {
@@ -29,7 +29,7 @@ const Option = (props: any) => (
   </components.Option>
 );
 
-export default function CompraFormulario({submitting = false,}: Props) {
+export default function CompraFormulario({submitting = false, onClick}: Props) {
 
   const { Franquicias, CentroCostos, CentroOperativo, Compras, Tickets, Logs, Usuarios } = useGraphServices();
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(Franquicias as any);
@@ -263,6 +263,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
           </button>
         </div>
       </form>
+      <button type="button" className="btn-ver" onClick={() => onClick(true)}>📄 Registrar compra</button>
     </div>
   );
 }

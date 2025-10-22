@@ -5,8 +5,9 @@ import { useGraphServices } from "../../../graph/GrapServicesContext";
 import { useCompras } from "../../../Funcionalidades/Compras";
 import { toISODateTimeFlex } from "../../../utils/Date";
 import CrearInventarioModal from "../../Inventario/ModalInventario/ModalInventario";
+type Props = { onClick: (valor: boolean) => void, mostrar: boolean };
 
-export default function TablaCompras() {
+export default function TablaCompras({onClick, mostrar}:Props) {
     const { Compras, Tickets, Logs, Usuarios} = useGraphServices();
     const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext, openModal, setOpenModal} = useCompras(Compras, Tickets, Logs, Usuarios)
 
@@ -78,7 +79,7 @@ export default function TablaCompras() {
                   <td>{compra.CargarA}</td>
                   <td>{compra.Estado}</td>
                   <td>
-                    {['completado','completada'].includes((compra?.Estado ?? '').toLowerCase())
+                    {['completado','completada'].includes((compra?.Estado ?? '').toLowerCase()) && !compra.Title.toLocaleLowerCase().includes("contrato")
                       ? (
                         <span className="badge badge-success" aria-label="Compra completada">
                           La compra ya ha sido completada
@@ -133,6 +134,9 @@ export default function TablaCompras() {
               </select>
             </div>
           )}
+          {mostrar && (
+            <button type="button" className="btn-ver" onClick={() => onClick(false)}>📄 Ver compras registradas</button>
+          )} 
         </div>
 
       <CrearInventarioModal
