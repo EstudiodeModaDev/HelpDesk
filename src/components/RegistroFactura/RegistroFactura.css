@@ -135,7 +135,7 @@
   cursor: not-allowed;
 }
 
-/* 🎨 Estilos personalizados para react-select (misma apariencia que inputs normales) */
+/* 🎨 React-Select igual a inputs normales */
 .rs-override__control {
   background-color: #f9f9f9 !important;
   border: 1.5px solid #ccc !important;
@@ -143,10 +143,12 @@
   min-height: 38px !important;
   box-shadow: none !important;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+  padding: 0 !important;
+  font-family: inherit !important;
 }
 
 .rs-override__control:hover {
-  border-color: #999 !important;
+  border-color: #bbb !important;
 }
 
 .rs-override__control--is-focused {
@@ -156,11 +158,17 @@
 }
 
 .rs-override__value-container {
-  padding: 2px 8px !important;
+  padding: 0 12px !important;
+  font-size: 0.95rem !important;
+  color: #333 !important;
+  align-items: center !important;
+  min-height: 38px !important;
 }
 
 .rs-override__input-container input {
   font-size: 0.95rem !important;
+  color: #333 !important;
+  padding: 0 !important;
 }
 
 .rs-override__placeholder {
@@ -177,16 +185,25 @@
   display: none !important;
 }
 
+.rs-override__indicators {
+  color: #666 !important;
+  padding-right: 8px !important;
+}
+
 .rs-override__menu {
+  background-color: #fff !important;
+  border: 1.5px solid #ccc !important;
   border-radius: 8px !important;
-  border: 1px solid #ccc !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  z-index: 20 !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+  z-index: 25 !important;
+  margin-top: 4px !important;
 }
 
 .rs-override__option {
   font-size: 0.95rem !important;
   padding: 8px 12px !important;
+  color: #333 !important;
+  cursor: pointer !important;
 }
 
 .rs-override__option--is-focused {
@@ -195,7 +212,7 @@
 
 .rs-override__option--is-selected {
   background-color: #0078d7 !important;
-  color: white !important;
+  color: #fff !important;
 }
 
 /* 📱 Responsivo */
