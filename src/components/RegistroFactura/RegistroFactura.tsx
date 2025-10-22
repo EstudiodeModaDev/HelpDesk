@@ -646,7 +646,6 @@ const handleProveedorSeleccionado = (id: string) => {
   ) : (
     <select
       id="proveedor-select"
-      className="form-control"
       value={proveedorSeleccionado}
       // usamos el handler nuevo que actualiza formData
       onChange={(e) => handleProveedorSeleccionado(e.target.value)}
