@@ -458,9 +458,10 @@ export default function RegistroFactura() {
         DescripItems: seleccion ? seleccion.descripcion : "",
       }));
     } else {
+      console.log("Valor", toNumberFromEsCO(displayValor))
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "ValorAnIVA" ? toNumberFromEsCO(value) : value,
+        [name]: name === "ValorAnIVA" ? toNumberFromEsCO(displayValor) : value,
       }));
     }
   };
