@@ -6,16 +6,8 @@ import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css";
 import { useAuth } from "../../auth/authContext";
 import Select from "react-select";
-
-// 🔽 Hook existente para proveedores
 import { useProveedores } from "../../Funcionalidades/ProveedoresFactura";
 import ProveedorModal from "./ProveedorModal/ProveedorModal";
-
-
-
-
-
-//imports nuevos para traer los datos de compras
 import type { Compra } from "../../Models/Compras";
 import { ComprasService } from "../../Services/Compras.service";
 import { GraphRest } from "../../graph/GraphRest";
@@ -30,7 +22,7 @@ import { GraphRest } from "../../graph/GraphRest";
     { codigo: "SC80", descripcion: "SERVICIO DE TELEFONIA" },
   ];
 
-   // Diccionario de cc----------------------------------------------------------------------------------------------
+// Diccionario de cc----------------------------------------------------------------------------------------------
  export const opcionescc = [
         {codigo: "12111", descripcion: "PRESIDENCIA" },
         { codigo: "12112", descripcion: "BROKEN CHAINS" },
@@ -132,7 +124,6 @@ import { GraphRest } from "../../graph/GraphRest";
         { codigo: "51122", descripcion: "FRANCQUES EDM" },
         { codigo: "51123", descripcion: "BODEGAJE ZONA FRANCA" },
   ];
-
 
    // Diccionario de co----------------------------------------------------------------------------------------------
  export const opcionesco = [
@@ -393,71 +384,17 @@ import { GraphRest } from "../../graph/GraphRest";
 { codigo: "309", descripcion: "BROKEN CHAINS" },
   ];
 
-
-
-
-// 🧾 Componente principal del registro de facturas
 export default function RegistroFactura() {
-
-//nuevas const de compras
-const { getToken } = useAuth();
-const [compras, setCompras] = useState<Compra[]>([]);
-const [selectedCompra, setSelectedCompra] = useState<string>("");
-
-//proveedores
-const { proveedores, loading, error, agregarProveedor  } = useProveedores();
+  const { getToken } = useAuth();
+  const [compras, setCompras] = useState<Compra[]>([]);
+  const [selectedCompra, setSelectedCompra] = useState<string>("");
+  const { proveedores, loading, error, agregarProveedor  } = useProveedores();
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
-const [isModalOpen, setIsModalOpen] = useState(false);
-  
-
-const graph = new GraphRest(getToken);
-const comprasService = new ComprasService(graph);
-
-
-
-
-
-
-//lo nuevo de compras 
-
-// 🧩 cargar lista de compras al iniciar
-useEffect(() => {
-  const fetchCompras = async () => {
-    try {
-      // 🎯 Filtramos solo las compras con estado permitido
-      const filtro = [
-        "Pendiente por registro de inventario",
-        "Pendiente por entrega al usuario",
-        "Pendiente por registro de factura"
-      ]
-        .map(e => `fields/Estado eq '${e}'`)
-        .join(" or ");
-
-      const { items } = await comprasService.getAll({
-        filter: filtro,
-        orderby: "fields/FechaSolicitud desc", // opcional
-        top: 100,
-      });
-
-      setCompras(items);
-    } catch (error) {
-      console.error("Error cargando compras filtradas:", error);
-    }
-  };
-  fetchCompras();
-}, []);
-
-
-
-
-  // Hook que maneja la lógica de negocio
-  const { registrarFactura } = useFacturas();
-
-  // Estado para alternar entre formulario y lista
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const graph = new GraphRest(getToken);
+  const comprasService = new ComprasService(graph);
   const [mostrarLista, setMostrarLista] = useState(false);
   const {account} = useAuth()
-
-  // Estado del formulario
   const [formData, setFormData] = useState<ReFactura>({
     FechaEmision: "",
     NoFactura: "",
@@ -476,9 +413,33 @@ useEffect(() => {
     RegistradoPor: account?.name ?? "",
   });
 
- 
+  useEffect(() => {
+    const fetchCompras = async () => {
+      try {
+        // 🎯 Filtramos solo las compras con estado permitido
+        const filtro = [
+          "Pendiente por registro de inventario",
+          "Pendiente por entrega al usuario",
+          "Pendiente por registro de factura"
+        ]
+          .map(e => `fields/Estado eq '${e}'`)
+          .join(" or ");
 
-  // Cambios en los inputs
+        const { items } = await comprasService.getAll({
+          filter: filtro,
+          orderby: "fields/FechaSolicitud desc", // opcional
+          top: 100,
+        });
+
+        setCompras(items);
+      } catch (error) {
+        console.error("Error cargando compras filtradas:", error);
+      }
+    };
+    fetchCompras();
+  }, []);
+  const { registrarFactura } = useFacturas();
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -502,85 +463,70 @@ useEffect(() => {
     }
   };
 
-// 🧠 Maneja la selección de una compra relacionada
-const handleCompraSeleccionada = async (id: string) => {
-  // ✅ Actualizamos el estado local de la compra seleccionada
-  setSelectedCompra(id);
+  const handleCompraSeleccionada = async (id: string) => {
+    // ✅ Actualizamos el estado local de la compra seleccionada
+    setSelectedCompra(id);
 
-  // 🚫 Si el usuario deselecciona (elige la opción vacía), limpiamos los campos relacionados
-  if (!id) {
-    setFormData((prev) => ({
-      ...prev,
-      CC: "",            // Centro de Costos
-      CO: "",            // Centro Operativo
-      un: "",            // Unidad de Negocio
-      DetalleFac: "",    // Detalle de la factura
-      Items: "",         // Código de ítem
-      DescripItems: "",  // Descripción del ítem
-    }));
-    return;
-  }
+    // 🚫 Si el usuario deselecciona (elige la opción vacía), limpiamos los campos relacionados
+    if (!id) {
+      setFormData((prev) => ({
+        ...prev,
+        CC: "",            // Centro de Costos
+        CO: "",            // Centro Operativo
+        un: "",            // Unidad de Negocio
+        DetalleFac: "",    // Detalle de la factura
+        Items: "",         // Código de ítem
+        DescripItems: "",  // Descripción del ítem
+      }));
+      return;
+    }
 
-  try {
-    // 📦 Cargar los datos completos de la compra seleccionada
-    const compra = await comprasService.get(id);
+    try {
+      // 📦 Cargar los datos completos de la compra seleccionada
+      const compra = await comprasService.get(id);
 
-    // 🧩 Mapeo de campos comunes entre la compra y el formulario
-    setFormData((prev) => ({
-      ...prev,
-      Items: compra.CodigoItem || "",       // Código del ítem
-      DescripItems: compra.DescItem || "",  // Descripción del ítem
-      CC: compra.CCosto || "",              // Centro de Costos
-      CO: compra.CO || "",                  // Centro Operativo
-      un: compra.UN || "",                  // Unidad de Negocio
-      DetalleFac: compra.Dispositivo || "", // Detalle / Dispositivo relacionado
-    }));
-  } catch (error) {
-    console.error("❌ Error al cargar la compra seleccionada:", error);
-  }
-};
+      // 🧩 Mapeo de campos comunes entre la compra y el formulario
+      setFormData((prev) => ({
+        ...prev,
+        Items: compra.CodigoItem || "",       // Código del ítem
+        DescripItems: compra.DescItem || "",  // Descripción del ítem
+        CC: compra.CCosto || "",              // Centro de Costos
+        CO: compra.CO || "",                  // Centro Operativo
+        un: compra.UN || "",                  // Unidad de Negocio
+        DetalleFac: compra.Dispositivo || "", // Detalle / Dispositivo relacionado
+      }));
+    } catch (error) {
+      console.error("❌ Error al cargar la compra seleccionada:", error);
+    }
+  };
 
+  const handleProveedorSeleccionado = (id: string) => {
+    setProveedorSeleccionado(id);
 
+    // Si no hay proveedor seleccionado, limpiar campos
+    if (!id) {
+      setFormData(prev => ({
+        ...prev,
+        Proveedor: "", // ← campo del input en el formulario
+        Title: "",     // ← campo del input del NIT
+      }));
+      return;
+    }
 
-  
-/**
- * Cuando el usuario selecciona un proveedor desde el <select>,
- * buscamos el objeto proveedor en la lista (proveedores) y actualizamos
- * formData.Proveedor (nombre) y formData.Title (NIT).
- */
-const handleProveedorSeleccionado = (id: string) => {
-  setProveedorSeleccionado(id);
+    // Buscar el proveedor por Id en la lista del hook
+    const prov = proveedores.find(p => String(p.Id) === String(id));
 
-  // Si no hay proveedor seleccionado, limpiar campos
-  if (!id) {
-    setFormData(prev => ({
-      ...prev,
-      Proveedor: "", // ← campo del input en el formulario
-      Title: "",     // ← campo del input del NIT
-    }));
-    return;
-  }
+    if (prov) {
+      setFormData(prev => ({
+        ...prev,
+        Proveedor: prov.Nombre ?? "", // ← Nombre del proveedor  aca ya se guardan, pero el input de proveedor se quita para no ser redundantes
+        Title: prov.Title ?? "",      // ← NIT del proveedor     este si lo trae y lo llena automaticamwnte
+      }));
+    } else {
+      console.warn("Proveedor seleccionado no encontrado en lista:", id);
+    }
+  };
 
-  // Buscar el proveedor por Id en la lista del hook
-  const prov = proveedores.find(p => String(p.Id) === String(id));
-
-  if (prov) {
-    setFormData(prev => ({
-      ...prev,
-      Proveedor: prov.Nombre ?? "", // ← Nombre del proveedor  aca ya se guardan, pero el input de proveedor se quita para no ser redundantes
-      Title: prov.Title ?? "",      // ← NIT del proveedor     este si lo trae y lo llena automaticamwnte
-    }));
-  } else {
-    console.warn("Proveedor seleccionado no encontrado en lista:", id);
-  }
-};
-
-
-
-
-
-
-  // Enviar formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await registrarFactura(formData);
@@ -607,146 +553,115 @@ const handleProveedorSeleccionado = (id: string) => {
     });
   };
 
-  // Render
   return (
     <div className="registro-container">
       <h2>{mostrarLista ? "📄 Facturas Registradas" : "Registro de Facturas"}</h2>
-
-      
 
       {!mostrarLista ? (
         <form className="registro-form" onSubmit={handleSubmit}>
           <div className="form-grid">
 
             {/* relacionamiento con compras  */}
-                      <div className="form-group mb-3">
-                        <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
-                        <select
-                          id="compraSelect"
-                          className="form-control"
-                          value={selectedCompra}
-                          onChange={(e) => handleCompraSeleccionada(e.target.value)}
-                        >
-                          <option value="">-- Seleccione una compra --</option>
-                          {compras.map((c) => (
-                            <option key={c.Id} value={c.Id}>
-                              {c.Title} - {c.SolicitadoPor} - {c.Estado}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+            <div className="form-group mb-3">
+              <label htmlFor="compraSelect">Seleccionar compra relacionada:</label>
+                  <select id="compraSelect" className="form-control" value={selectedCompra} onChange={(e) => handleCompraSeleccionada(e.target.value)}>
+                    <option value="">-- Seleccione una compra --</option>
+                      {compras.map((c) => (
+                        <option key={c.Id} value={c.Id}>
+                          {c.Title} - {c.SolicitadoPor} - {c.Estado}
+                        </option>
+                      ))}
+                    </select>
+              </div>
 
             {/* 🔹 Desplegable de proveedores */}
-<div className="form-group mb-3">
-  <label htmlFor="proveedor-select">Proveedor:</label>
-  {loading ? (
-    <span>Cargando...</span>
-  ) : error ? (
-    <span style={{ color: "red" }}>{error}</span>
-  ) : (
-    <select
-      id="proveedor-select"
-      value={proveedorSeleccionado}
-      // usamos el handler nuevo que actualiza formData
-      onChange={(e) => handleProveedorSeleccionado(e.target.value)}
-    >
-      <option value="">-- Selecciona un proveedor --</option>
-      {proveedores.map((p) => (
-        <option key={p.Id} value={p.Id}>
-          {p.Nombre}
-        </option>
-      ))}
-    </select>
-  )}
+            <div className="form-group mb-3">
+              <label htmlFor="proveedor-select">Proveedor:</label>
+              {loading ? (
+                <span>Cargando...</span>
+              ) : error ? (
+                <span style={{ color: "red" }}>{error}</span>
+              ) : (
+                <select
+                  id="proveedor-select"
+                  value={proveedorSeleccionado}
+                  // usamos el handler nuevo que actualiza formData
+                  onChange={(e) => handleProveedorSeleccionado(e.target.value)}
+                >
+                  <option value="">-- Selecciona un proveedor --</option>
+                  {proveedores.map((p) => (
+                    <option key={p.Id} value={p.Id}>
+                      {p.Nombre}
+                    </option>
+                  ))}
+                </select>
+              )}
 
-  {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
-  <button
-    type="button"
-    className="btn-nuevo-proveedor"
-    onClick={() => setIsModalOpen(true)}
-  >
-    + Nuevo proveedor
-  </button>
-</div>
-
+              {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
+              <button
+                type="button"
+                className="btn-nuevo-proveedor"
+                onClick={() => setIsModalOpen(true)}
+              >
+                + Nuevo proveedor
+              </button>
+            </div>
 
             {/* 📆 Fecha de emisión */}
             <div className="campo">
-              <label>
-                Fecha de emisión
-                <input
-                  type="date"
-                  name="FechaEmision"
-                  value={formData.FechaEmision}
-                  onChange={handleChange}
-                  required
-                />
+              <label> Fecha de emisión
+                <input type="date" name="FechaEmision" value={formData.FechaEmision} onChange={handleChange} required/>
               </label>
             </div>
 
             {/* 🔢 Número de factura */}
             <div className="campo">
-              <label>
-                No. Factura
-                <input
-                  type="text"
-                  name="NoFactura"
-                  value={formData.NoFactura}
-                  onChange={handleChange}
-                  required
-                />
+              <label> No. Factura
+                <input type="text" name="NoFactura" value={formData.NoFactura} onChange={handleChange} required/>
               </label>
             </div>
 
             {/* 🧾 NIT (Title) (llenado automático; readonly) */}
-<div className="campo">
-  <label>
-    NIT
-    <input
-      type="text"
-      name="Title"
-      value={formData.Title}
-      onChange={handleChange}
-      required
-      readOnly // lo dejamos readonly porque se llena desde el select
-    />
-  </label>
-</div>
+            <div className="campo">
+              <label> NIT 
+                <input type="text" name="Title" value={formData.Title} onChange={handleChange} required readOnly/>
+              </label>
+            </div>
 
             {/* 🧾 Ítem (Código + descripción automática con búsqueda) */}
-<div className="campo">
-  <label>Ítem (Código + descripción)</label>
-  <Select
-  classNamePrefix="rs"
-  className="rs-override"
-  options={opcionesFactura.map((op) => ({
-    value: op.codigo,
-    label: `${op.codigo} - ${op.descripcion}`,
-  }))}
-  placeholder="Buscar ítem…"
-  isClearable
-  value={
-    formData.Items
-      ? {
-          value: formData.Items,
-          label:
-            opcionesFactura.find((op) => op.codigo === formData.Items)
-              ?.descripcion || formData.Items,
-        }
-      : null
-  }
-  onChange={(opt) => {
-    setFormData((prev) => ({
-      ...prev,
-      Items: opt?.value || "",
-      DescripItems: opt?.label?.split(" - ")[1] || "",
-    }));
-  }}
-  filterOption={(option, input) =>
-    option.label.toLowerCase().includes(input.toLowerCase())
-  }
-/>
-</div>
+            <div className="campo">
+              <label>Ítem (Código + descripción)</label>
+              <Select
+              classNamePrefix="rs"
+              className="rs-override"
+              options={opcionesFactura.map((op) => ({
+                value: op.codigo,
+                label: `${op.codigo} - ${op.descripcion}`,
+              }))}
+              placeholder="Buscar ítem…"
+              isClearable
+              value={
+                formData.Items
+                  ? {
+                      value: formData.Items,
+                      label:
+                        opcionesFactura.find((op) => op.codigo === formData.Items)
+                          ?.descripcion || formData.Items,
+                    }
+                  : null
+              }
+              onChange={(opt) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  Items: opt?.value || "",
+                  DescripItems: opt?.label?.split(" - ")[1] || "",
+                }));
+              }}
+              filterOption={(option, input) =>
+                option.label.toLowerCase().includes(input.toLowerCase())
+              }
+            />
+            </div>
 
 
             {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}

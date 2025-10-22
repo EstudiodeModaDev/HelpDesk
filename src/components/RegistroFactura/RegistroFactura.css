@@ -176,6 +176,13 @@
   box-shadow: 0 0 0 4px var(--ring) !important;
 }
 
+.rs-override .rs__input input,
+.rs-override .rs__input input:focus,
+.rs-override .rs__input input:focus-visible{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .rs-override .rs__value-container{
   padding: 0 14px !important;
 }

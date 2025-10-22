@@ -151,7 +151,8 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
                     {un.codigo} - {un.descripcion}
                   </option>
                 ))}
-            </select></label>
+            </select>
+          </label>
           
           <label> Fecha de Emisión:
           <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={(e) => {setField("FechaEmision", e.target.value);}}  /></label>
