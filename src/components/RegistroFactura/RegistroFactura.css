@@ -281,6 +281,15 @@
 
 /* (4) Ítem (RS) · Descripción del ítem · Valor antes de IVA */
 .campo:has(.rs-override)                { grid-column: auto; }   /* Ítem (React-Select) */
+
+/* 🔹 Alinear labels de los React-Select como los inputs normales */
+.campo:has(.rs-override) > label {
+  margin-bottom: 0;          /* quita el espacio extra */
+  display: flex;
+  flex-direction: column;    /* apila label y selector */
+  gap: 4px;                  /* pequeña separación vertical */
+}
+
 .campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
 .campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
 
