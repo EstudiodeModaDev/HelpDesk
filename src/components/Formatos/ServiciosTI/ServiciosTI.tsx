@@ -20,19 +20,9 @@ type Props = {
   ciudades?: string[];
 };
 
-export default function SolicitudUsuarioForm({
-  onSubmit,
-  ciudades = ["Medellín", "Bogotá", "Cali", "Barranquilla", "Otra"],
-}: Props) {
-  const {
-    form,
-    sending,
-    error,
-    requiredOk,
-    onChange,
-    onToggleServicio,
-    submit,
-  } = useSolicitudUsuarioForm(onSubmit);
+export default function SolicitudUsuarioForm({onSubmit, ciudades = ["Medellín", "Bogotá", "Cali", "Barranquilla", "Otra"],}: Props) {
+  const {form, sending, error, requiredOk,
+    onChange, onToggleServicio, submit,} = useSolicitudUsuarioForm(onSubmit);
 
   return (
     <section className="su-scope su-card" role="region" aria-labelledby="su_titulo">
@@ -46,7 +36,7 @@ export default function SolicitudUsuarioForm({
           <div className="su-field">
             <label>* Contratación:</label>
             <select value={form.contratacion} onChange={onChange("contratacion")} required>
-              <option value="">Seleccione…</option>
+              <option value="">Seleccione...</option>
               <option value="Directo">Reemplazo</option>
               <option value="Cargo nuevo">Cargo nuevo</option>
               <option value="Temporal">Temporal</option>

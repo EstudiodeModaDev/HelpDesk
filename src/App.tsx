@@ -58,8 +58,8 @@ const NAVS_ADMIN: MenuItem[] = [
       },
       {
         id: 'cesar', label: 'Cesar', icon: '', children: [
-          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <RegistroFactura/>},
           { id: 'compras', label: 'Compras', icon: '💰', to: <ComprasPage/>},
+          { id: 'facturas', label: 'Facturas', icon: '🧾', to: <RegistroFactura/>},
         ]
       },
     ]
