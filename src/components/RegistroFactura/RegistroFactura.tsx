@@ -5,6 +5,7 @@ import FacturasLista from "./FacturasLista/FacturasLista";
 import type { ReFactura } from "../../Models/RegistroFacturaInterface";
 import "./RegistroFactura.css";
 import { useAuth } from "../../auth/authContext";
+import Select from "react-select";
 
 // 🔽 Hook existente para proveedores
 import { useProveedores } from "../../Funcionalidades/ProveedoresFactura";
@@ -416,6 +417,7 @@ const comprasService = new ComprasService(graph);
 
 
 
+
 //lo nuevo de compras 
 
 // 🧩 cargar lista de compras al iniciar
@@ -446,26 +448,7 @@ useEffect(() => {
 }, []);
 
 
-// 🧠 cuando el usuario selecciona una compra
-const handleCompraSeleccionada = async (id: string) => {
-  setSelectedCompra(id);
-  if (!id) return;
-  try {
-    const compra = await comprasService.get(id);
-    // 🔄 Mapeo de campos comunes
-    setFormData((prev) => ({
-      ...prev,
-      Items: compra.CodigoItem || prev.Items,
-      DescripItems: compra.DescItem || prev.DescripItems || "", // no existe en Compra
-      CC: compra.CCosto || prev.CC,
-      CO: compra.CO || prev.CO,
-      un: compra.UN || prev.un,
-      DetalleFac: compra.Dispositivo || prev.DetalleFac,
-    }));
-  } catch (error) {
-    console.error("Error al cargar la compra seleccionada:", error);
-  }
-};
+
 
   // Hook que maneja la lógica de negocio
   const { registrarFactura } = useFacturas();
@@ -514,10 +497,88 @@ const handleCompraSeleccionada = async (id: string) => {
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "valor" ? Number(value) : value,
+        [name]: name === "ValorAnIVA" ? Number(value) : value,
       }));
     }
   };
+
+// 🧠 Maneja la selección de una compra relacionada
+const handleCompraSeleccionada = async (id: string) => {
+  // ✅ Actualizamos el estado local de la compra seleccionada
+  setSelectedCompra(id);
+
+  // 🚫 Si el usuario deselecciona (elige la opción vacía), limpiamos los campos relacionados
+  if (!id) {
+    setFormData((prev) => ({
+      ...prev,
+      CC: "",            // Centro de Costos
+      CO: "",            // Centro Operativo
+      un: "",            // Unidad de Negocio
+      DetalleFac: "",    // Detalle de la factura
+      Items: "",         // Código de ítem
+      DescripItems: "",  // Descripción del ítem
+    }));
+    return;
+  }
+
+  try {
+    // 📦 Cargar los datos completos de la compra seleccionada
+    const compra = await comprasService.get(id);
+
+    // 🧩 Mapeo de campos comunes entre la compra y el formulario
+    setFormData((prev) => ({
+      ...prev,
+      Items: compra.CodigoItem || "",       // Código del ítem
+      DescripItems: compra.DescItem || "",  // Descripción del ítem
+      CC: compra.CCosto || "",              // Centro de Costos
+      CO: compra.CO || "",                  // Centro Operativo
+      un: compra.UN || "",                  // Unidad de Negocio
+      DetalleFac: compra.Dispositivo || "", // Detalle / Dispositivo relacionado
+    }));
+  } catch (error) {
+    console.error("❌ Error al cargar la compra seleccionada:", error);
+  }
+};
+
+
+
+  
+/**
+ * Cuando el usuario selecciona un proveedor desde el <select>,
+ * buscamos el objeto proveedor en la lista (proveedores) y actualizamos
+ * formData.Proveedor (nombre) y formData.Title (NIT).
+ */
+const handleProveedorSeleccionado = (id: string) => {
+  setProveedorSeleccionado(id);
+
+  // Si no hay proveedor seleccionado, limpiar campos
+  if (!id) {
+    setFormData(prev => ({
+      ...prev,
+      Proveedor: "", // ← campo del input en el formulario
+      Title: "",     // ← campo del input del NIT
+    }));
+    return;
+  }
+
+  // Buscar el proveedor por Id en la lista del hook
+  const prov = proveedores.find(p => String(p.Id) === String(id));
+
+  if (prov) {
+    setFormData(prev => ({
+      ...prev,
+      Proveedor: prov.Nombre ?? "", // ← Nombre del proveedor  aca ya se guardan, pero el input de proveedor se quita para no ser redundantes
+      Title: prov.Title ?? "",      // ← NIT del proveedor     este si lo trae y lo llena automaticamwnte
+    }));
+  } else {
+    console.warn("Proveedor seleccionado no encontrado en lista:", id);
+  }
+};
+
+
+
+
+
 
   // Enviar formulario
   const handleSubmit = async (e: React.FormEvent) => {
@@ -576,36 +637,37 @@ const handleCompraSeleccionada = async (id: string) => {
             </div>
 
             {/* 🔹 Desplegable de proveedores */}
-      <div className="form-group mb-3">
-        <label htmlFor="proveedor-select">Proveedor:</label>
-        {loading ? (
-          <span>Cargando...</span>
-        ) : error ? (
-          <span style={{ color: "red" }}>{error}</span>
-        ) : (
-          <select
-            id="proveedor-select"
-            value={proveedorSeleccionado}
-            onChange={(e) => setProveedorSeleccionado(e.target.value)}
-          >
-            <option value="">-- Selecciona un proveedor --</option>
-            {proveedores.map((p) => (
-              <option key={p.Id} value={p.Id}>
-                {p.Title} — {p.Nit}
-              </option>
-            ))}
-          </select>
-        )}
+<div className="form-group mb-3">
+  <label htmlFor="proveedor-select">Proveedor:</label>
+  {loading ? (
+    <span>Cargando...</span>
+  ) : error ? (
+    <span style={{ color: "red" }}>{error}</span>
+  ) : (
+    <select
+      id="proveedor-select"
+      value={proveedorSeleccionado}
+      // usamos el handler nuevo que actualiza formData
+      onChange={(e) => handleProveedorSeleccionado(e.target.value)}
+    >
+      <option value="">-- Selecciona un proveedor --</option>
+      {proveedores.map((p) => (
+        <option key={p.Id} value={p.Id}>
+          {p.Nombre}
+        </option>
+      ))}
+    </select>
+  )}
 
-        {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
-        <button
-          type="button"
-          className="btn-nuevo-proveedor"
-          onClick={() => setIsModalOpen(true)}
-        >
-          + Nuevo proveedor
-        </button>
-      </div>
+  {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
+  <button
+    type="button"
+    className="btn-nuevo-proveedor"
+    onClick={() => setIsModalOpen(true)}
+  >
+    + Nuevo proveedor
+  </button>
+</div>
 
 
             {/* 📆 Fecha de emisión */}
@@ -636,53 +698,56 @@ const handleCompraSeleccionada = async (id: string) => {
               </label>
             </div>
 
-            {/* 🏢 Proveedor */}
-            <div className="campo">
-              <label>
-                Proveedor
-                <input
-                  type="text"
-                  name="Proveedor"
-                  value={formData.Proveedor}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
+            {/* 🧾 NIT (Title) (llenado automático; readonly) */}
+<div className="campo">
+  <label>
+    NIT
+    <input
+      type="text"
+      name="Title"
+      value={formData.Title}
+      onChange={handleChange}
+      required
+      readOnly // lo dejamos readonly porque se llena desde el select
+    />
+  </label>
+</div>
 
-            {/* 🧾 NIT */}
-            <div className="campo">
-              <label>
-                NIT
-                <input
-                  type="number"
-                  name="Title"
-                  value={formData.Title}
-                  onChange={handleChange}
-                  required
-                />
-              </label>
-            </div>
+            {/* 🧾 Ítem (Código + descripción automática con búsqueda) */}
+<div className="campo">
+  <label>Ítem (Código + descripción)</label>
+  <Select
+  classNamePrefix="rs"
+  className="rs-override"
+  options={opcionesFactura.map((op) => ({
+    value: op.codigo,
+    label: `${op.codigo} - ${op.descripcion}`,
+  }))}
+  placeholder="Buscar ítem…"
+  isClearable
+  value={
+    formData.Items
+      ? {
+          value: formData.Items,
+          label:
+            opcionesFactura.find((op) => op.codigo === formData.Items)
+              ?.descripcion || formData.Items,
+        }
+      : null
+  }
+  onChange={(opt) => {
+    setFormData((prev) => ({
+      ...prev,
+      Items: opt?.value || "",
+      DescripItems: opt?.label?.split(" - ")[1] || "",
+    }));
+  }}
+  filterOption={(option, input) =>
+    option.label.toLowerCase().includes(input.toLowerCase())
+  }
+/>
+</div>
 
-            {/* 🧾 Ítem (Código + descripción automática) */}
-            <div className="campo">
-              <label>
-                Ítems
-                <select
-                  name="Items"
-                  value={formData.Items}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar código</option>--------------------------------------------------
-                  {opcionesFactura.map((op) => (
-                    <option key={op.codigo} value={op.codigo}>
-                      {op.codigo} - {op.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
 
             {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}
             <div className="campo">
@@ -711,67 +776,111 @@ const handleCompraSeleccionada = async (id: string) => {
               </label>
             </div>
 
-           {/* 🏢 Centro de Costos (C.C) */}
+{/* 🏢 Centro de Costos (C.C) */}
 <div className="campo">
-  <label>
-    Centro de Costos (C.C)
-    <select
-      name="CC"
-      value={formData.CC}
-      onChange={handleChange}
-      required
-    >
-      <option value="">Seleccionar centro de costo</option>
-      {opcionescc.map((cc) => (
-        <option key={cc.codigo} value={cc.codigo}>
-          {cc.codigo} - {cc.descripcion}
-        </option>
-      ))}
-    </select>
-  </label>
+  <label>Centro de Costos (C.C)</label>
+  <Select
+    classNamePrefix="rs"
+    className="rs-override"
+    options={opcionescc.map((cc) => ({
+      value: cc.codigo,
+      label: `${cc.codigo} - ${cc.descripcion}`,
+    }))}
+    placeholder="Buscar centro de costo…"
+    isClearable
+    value={
+      formData.CC
+        ? {
+            value: formData.CC,
+            label:
+              opcionescc.find((cc) => cc.codigo === formData.CC)
+                ?.descripcion || formData.CC,
+          }
+        : null
+    }
+    onChange={(opt) =>
+      setFormData((prev) => ({
+        ...prev,
+        CC: opt?.value || "",
+      }))
+    }
+    filterOption={(option, input) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
 </div>
 
 
-                        {/* 🏭 Centro Operativo */}
-            <div className="campo">
-              <label>
-                Centro Operativo (C.O)
-                <select
-                  name="CO"
-                  value={formData.CO}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar centro operativo</option>
-                  {opcionesco.map((co) => (
-                    <option key={co.codigo} value={co.codigo}>
-                      {co.codigo} - {co.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+
+{/* 🏭 Centro Operativo (C.O) */}
+<div className="campo">
+  <label>Centro Operativo (C.O)</label>
+  <Select
+    classNamePrefix="rs"
+    className="rs-override"
+    options={opcionesco.map((co) => ({
+      value: co.codigo,
+      label: `${co.codigo} - ${co.descripcion}`,
+    }))}
+    placeholder="Buscar centro operativo…"
+    isClearable
+    value={
+      formData.CO
+        ? {
+            value: formData.CO,
+            label:
+              opcionesco.find((co) => co.codigo === formData.CO)
+                ?.descripcion || formData.CO,
+          }
+        : null
+    }
+    onChange={(opt) =>
+      setFormData((prev) => ({
+        ...prev,
+        CO: opt?.value || "",
+      }))
+    }
+    filterOption={(option, input) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</div>
 
 
-                        {/* 🧱 Unidad de Negocio */}
-            <div className="campo">
-              <label>
-                Unidad de Negocio (U.N)
-                <select
-                  name="un"
-                  value={formData.un}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar unidad de negocio</option>
-                  {opcionesun.map((un) => (
-                    <option key={un.codigo} value={un.codigo}>
-                      {un.codigo} - {un.descripcion}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+
+                        {/* 🧱 Unidad de Negocio (U.N) */}
+<div className="campo">
+  <label>Unidad de Negocio (U.N)</label>
+  <Select
+    classNamePrefix="rs"
+    className="rs-override"
+    options={opcionesun.map((un) => ({
+      value: un.codigo,
+      label: `${un.codigo} - ${un.descripcion}`,
+    }))}
+    placeholder="Buscar unidad de negocio…"
+    isClearable
+    value={
+      formData.un
+        ? {
+            value: formData.un,
+            label:
+              opcionesun.find((u) => u.codigo === formData.un)
+                ?.descripcion || formData.un,
+          }
+        : null
+    }
+    onChange={(opt) =>
+      setFormData((prev) => ({
+        ...prev,
+        un: opt?.value || "",
+      }))
+    }
+    filterOption={(option, input) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</div>
 
             {/* 🧾 Detalle */}
             <div className="campo">

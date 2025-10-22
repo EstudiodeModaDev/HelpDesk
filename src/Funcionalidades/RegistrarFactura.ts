@@ -23,6 +23,7 @@ export function useFacturas() {
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
 
   // 🟢 Función para obtener todas las facturas registradas
   const obtenerFacturas = useCallback(async () => {

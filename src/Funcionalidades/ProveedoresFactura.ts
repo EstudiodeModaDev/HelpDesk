@@ -47,7 +47,7 @@ export const useProveedores = () => {
   };
 
   // ✅ Nuevo método: agregar proveedor
-  const agregarProveedor = async (proveedor: { Title: string; Nit: string }) => {
+  const agregarProveedor = async (proveedor: { Title: string; Nombre: string }) => {
     try {
       const graph = new GraphRest(getToken);
       const service = new ProveedoresFacturaService(graph);

@@ -4,7 +4,7 @@ import "./ProveedorModal.css";
 interface ProveedorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (proveedor: { Title: string; Nit: string }) => Promise<void>;
+  onSave: (proveedor: { Title: string; Nombre: string }) => Promise<void>;
 }
 
 const ProveedorModal: React.FC<ProveedorModalProps> = ({ isOpen, onClose, onSave }) => {
@@ -26,7 +26,7 @@ const ProveedorModal: React.FC<ProveedorModalProps> = ({ isOpen, onClose, onSave
 
     try {
       setLoading(true);
-      await onSave({ Title: nombre, Nit: nit });
+      await onSave({ Title: nit, Nombre: nombre });
       setNombre("");
       setNit("");
       onClose();
