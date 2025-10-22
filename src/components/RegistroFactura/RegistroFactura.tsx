@@ -11,6 +11,7 @@ import ProveedorModal from "./ProveedorModal/ProveedorModal";
 import type { Compra } from "../../Models/Compras";
 import { ComprasService } from "../../Services/Compras.service";
 import { GraphRest } from "../../graph/GraphRest";
+import { formatPesosEsCO, toNumberFromEsCO } from "../../utils/Number";
 
 
  // Diccionario de opciones----------------------------------------------------------------------------------------------
@@ -412,6 +413,7 @@ export default function RegistroFactura() {
     Observaciones: "",
     RegistradoPor: account?.name ?? "",
   });
+  const [displayValor, setDisplayValor] = React.useState("");
 
   useEffect(() => {
     const fetchCompras = async () => {
@@ -458,7 +460,7 @@ export default function RegistroFactura() {
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "ValorAnIVA" ? Number(value) : value,
+        [name]: name === "ValorAnIVA" ? toNumberFromEsCO(value) : value,
       }));
     }
   };
@@ -675,121 +677,120 @@ export default function RegistroFactura() {
             <div className="campo">
               <label>
                 Valor antes iva (en pesos)
-                <input
-                  type="number"
-                  name="ValorAnIVA"
-                  placeholder="Ej: $100000"
-                  value={formData.ValorAnIVA || ""}
-                  onChange={handleChange}
+                <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={displayValor}
+                  onChange={(e) => {const f = formatPesosEsCO(e.target.value); setDisplayValor(f); handleChange;}}
+                  onBlur={(e) => {
+                    // fuerza formateo final (opcional: fija 2 decimales)
+                    const f = formatPesosEsCO(e.target.value);
+                    setDisplayValor(f);
+                  }}
                 />
               </label>
             </div>
 
-{/* 🏢 Centro de Costos (C.C) */}
-<div className="campo">
-  <label>Centro de Costos (C.C)</label>
-  <Select
-    classNamePrefix="rs"
-    className="rs-override"
-    options={opcionescc.map((cc) => ({
-      value: cc.codigo,
-      label: `${cc.codigo} - ${cc.descripcion}`,
-    }))}
-    placeholder="Buscar centro de costo…"
-    isClearable
-    value={
-      formData.CC
-        ? {
-            value: formData.CC,
-            label:
-              opcionescc.find((cc) => cc.codigo === formData.CC)
-                ?.descripcion || formData.CC,
-          }
-        : null
-    }
-    onChange={(opt) =>
-      setFormData((prev) => ({
-        ...prev,
-        CC: opt?.value || "",
-      }))
-    }
-    filterOption={(option, input) =>
-      option.label.toLowerCase().includes(input.toLowerCase())
-    }
-  />
-</div>
+            {/* 🏢 Centro de Costos (C.C) */}
+            <div className="campo">
+              <label>Centro de Costos (C.C)</label>
+              <Select
+                classNamePrefix="rs"
+                className="rs-override"
+                options={opcionescc.map((cc) => ({
+                  value: cc.codigo,
+                  label: `${cc.codigo} - ${cc.descripcion}`,
+                }))}
+                placeholder="Buscar centro de costo…"
+                isClearable
+                value={
+                  formData.CC
+                    ? {
+                        value: formData.CC,
+                        label:
+                          opcionescc.find((cc) => cc.codigo === formData.CC)
+                            ?.descripcion || formData.CC,
+                      }
+                    : null
+                }
+                onChange={(opt) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    CC: opt?.value || "",
+                  }))
+                }
+                filterOption={(option, input) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+              />
+            </div>
+
+            {/* 🏭 Centro Operativo (C.O) */}
+            <div className="campo">
+              <label>Centro Operativo (C.O)</label>
+              <Select
+                classNamePrefix="rs"
+                className="rs-override"
+                options={opcionesco.map((co) => ({
+                  value: co.codigo,
+                  label: `${co.codigo} - ${co.descripcion}`,
+                }))}
+                placeholder="Buscar centro operativo…"
+                isClearable
+                value={
+                  formData.CO
+                    ? {
+                        value: formData.CO,
+                        label:
+                          opcionesco.find((co) => co.codigo === formData.CO)
+                            ?.descripcion || formData.CO,
+                      }
+                    : null
+                }
+                onChange={(opt) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    CO: opt?.value || "",
+                  }))
+                }
+                filterOption={(option, input) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+              />
+            </div>
 
 
 
-{/* 🏭 Centro Operativo (C.O) */}
-<div className="campo">
-  <label>Centro Operativo (C.O)</label>
-  <Select
-    classNamePrefix="rs"
-    className="rs-override"
-    options={opcionesco.map((co) => ({
-      value: co.codigo,
-      label: `${co.codigo} - ${co.descripcion}`,
-    }))}
-    placeholder="Buscar centro operativo…"
-    isClearable
-    value={
-      formData.CO
-        ? {
-            value: formData.CO,
-            label:
-              opcionesco.find((co) => co.codigo === formData.CO)
-                ?.descripcion || formData.CO,
-          }
-        : null
-    }
-    onChange={(opt) =>
-      setFormData((prev) => ({
-        ...prev,
-        CO: opt?.value || "",
-      }))
-    }
-    filterOption={(option, input) =>
-      option.label.toLowerCase().includes(input.toLowerCase())
-    }
-  />
-</div>
-
-
-
-                        {/* 🧱 Unidad de Negocio (U.N) */}
-<div className="campo">
-  <label>Unidad de Negocio (U.N)</label>
-  <Select
-    classNamePrefix="rs"
-    className="rs-override"
-    options={opcionesun.map((un) => ({
-      value: un.codigo,
-      label: `${un.codigo} - ${un.descripcion}`,
-    }))}
-    placeholder="Buscar unidad de negocio…"
-    isClearable
-    value={
-      formData.un
-        ? {
-            value: formData.un,
-            label:
-              opcionesun.find((u) => u.codigo === formData.un)
-                ?.descripcion || formData.un,
-          }
-        : null
-    }
-    onChange={(opt) =>
-      setFormData((prev) => ({
-        ...prev,
-        un: opt?.value || "",
-      }))
-    }
-    filterOption={(option, input) =>
-      option.label.toLowerCase().includes(input.toLowerCase())
-    }
-  />
-</div>
+            {/* 🧱 Unidad de Negocio (U.N) */}
+            <div className="campo">
+              <label>Unidad de Negocio (U.N)</label>
+              <Select
+                classNamePrefix="rs"
+                className="rs-override"
+                options={opcionesun.map((un) => ({
+                  value: un.codigo,
+                  label: `${un.codigo} - ${un.descripcion}`,
+                }))}
+                placeholder="Buscar unidad de negocio…"
+                isClearable
+                value={
+                  formData.un
+                    ? {
+                        value: formData.un,
+                        label:
+                          opcionesun.find((u) => u.codigo === formData.un)
+                            ?.descripcion || formData.un,
+                      }
+                    : null
+                }
+                onChange={(opt) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    un: opt?.value || "",
+                  }))
+                }
+                filterOption={(option, input) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+              />
+            </div>
 
             {/* 🧾 Detalle */}
             <div className="campo">
