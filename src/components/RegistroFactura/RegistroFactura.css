@@ -1,238 +1,86 @@
-/* ========= Tokens base ========= */
-:root{
-  --ink:#0f172a;
-  --muted:#6b7280;
-  --bg:#ffffff;
-  --card:#ffffff;
-  --bd:#e5e7eb;
-  --bd-strong:#d1d5db;
-  --primary:#2563eb;
-  --ring:rgba(37,99,235,.35);
-  --radius:12px;
-  --shadow:0 8px 22px rgba(2,6,23,.06);
-  --input-h:44px;
-}
-
-/* ========= Contenedor ========= */
-.registro-container{
-  max-width: 980px;
-  margin: 24px auto;
-  padding: 20px;
-  background: var(--card);
-  border: 1px solid var(--bd);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  color: var(--ink);
-}
-.registro-container > h2{
-  margin: 0 0 16px;
-  font-size: 1.4rem;
-  letter-spacing: .2px;
-}
-
-/* ========= Form & grid ========= */
-.registro-form{ width: 100%; }
+/* ====== GRID: 3 columnas y posicionamiento ====== */
 .form-grid{
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(12, 1fr);
-}
-.campo, .form-group{ grid-column: span 6; }
-@media (max-width: 900px){
-  .campo, .form-group{ grid-column: span 12; }
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
-/* ========= Etiquetas ========= */
-.campo label,
-.form-group > label{
-  display:block;
-  font-size:.92rem;
-  margin:0 0 6px;
-  color:var(--muted);
+/* Por defecto, cada campo ocupa 1 columna */
+.campo, .form-group { grid-column: span 1; }
+
+/* (1) Seleccionar compra: fila completa */
+.form-group:has(#compraSelect){
+  grid-column: 1 / -1;
 }
 
-/* ========= Inputs base ========= */
-.campo input[type="text"],
-.campo input[type="number"],
-.campo input[type="date"],
-.campo textarea,
-.campo select,
-.form-group select,
-#compraSelect,
-#proveedor-select{
-  width:100%;
-  height:var(--input-h);
-  padding:0 14px;
-  border:1px solid var(--bd);
-  border-radius:10px;
-  background:#fff;
-  color:var(--ink);
-  outline:none;
-  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  box-sizing:border-box;
-  font-size:.98rem;
+/* (2) Proveedor: label arriba (full), select a la izq y botón a la derecha */
+.form-group:has(#proveedor-select){
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  column-gap: 12px;
+}
+.form-group:has(#proveedor-select) > label{
+  grid-column: 1 / -1;     /* label ocupa toda la fila */
+  margin-bottom: 6px;
+}
+.form-group:has(#proveedor-select) > select{
+  grid-column: 1 / 2;      /* select a la izquierda */
+}
+.form-group:has(#proveedor-select) > .btn-nuevo-proveedor{
+  grid-column: 2 / 3;      /* botón a la derecha */
+  height: 44px;            /* alinea con el select */
 }
 
-/* Textarea */
-.campo textarea{
-  min-height:72px;
-  padding-top:10px;
-  padding-bottom:10px;
-  resize:vertical;
+/* (3) Fecha de emisión · No. Factura · NIT */
+/* Ya quedan en orden por el DOM; solo aseguramos 1 columna cada uno */
+.campo:has(input[name="FechaEmision"]) { grid-column: auto; }
+.campo:has(input[name="NoFactura"])     { grid-column: auto; }
+.campo:has(input[name="Title"])         { grid-column: auto; }
+
+/* (4) Ítem (RS) · Descripción del ítem · Valor antes de IVA */
+.campo:has(.rs-override)                { grid-column: auto; }   /* Ítem (React-Select) */
+.campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
+.campo:has(input[name="ValorAnIVA"])    { grid-column: auto; }
+
+/* (5) C.C · C.O · U.N (todos son React-Select) */
+.campo:has(.rs-override) { /* ya en DOM tras Ítem; se llenan siguientes columnas */ }
+
+/* (6) Detalle · Fecha contabilidad · Doc ERP */
+.campo:has(textarea[name="DetalleFac"]) { grid-column: auto; }
+.campo:has(input[name="FecEntregaCont"]){ grid-column: auto; }
+.campo:has(input[name="DocERP"])        { grid-column: auto; }
+
+/* (7) Observaciones: fila completa */
+.campo:has(textarea[name="Observaciones"]){
+  grid-column: 1 / -1;
 }
 
-/* Hover / Focus */
-.campo :is(input, select, textarea):hover,
-.form-group select:hover,
-#compraSelect:hover,
-#proveedor-select:hover{
-  border-color: var(--bd-strong);
-}
-.campo :is(input, select, textarea):focus,
-.form-group select:focus,
-#compraSelect:focus,
-#proveedor-select:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--ring);
-}
-
-/* Disabled */
-.campo :is(input, select, textarea):disabled{
-  background:#f9fafb;
-  color:#9ca3af;
-  cursor:not-allowed;
-}
-
-/* ========= Flecha select nativo ========= */
-.campo select,
-.form-group select,
-#compraSelect,
-#proveedor-select{
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  appearance:none;
-  padding-right:40px;
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  background-size:18px 18px;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-}
-
-/* ========= Botones ========= */
+/* (8) Botones: fila completa */
 .botones-container{
-  display:flex;
-  gap:12px;
-  margin-top:18px;
-}
-.btn-registrar,
-.btn-ver-facturas,
-.btn-nuevo-proveedor{
-  height:42px;
-  padding:0 14px;
-  border-radius:10px;
-  border:1px solid var(--bd);
-  background:#f8fafc;
-  color:var(--ink);
-  cursor:pointer;
-  transition:transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
-}
-.btn-registrar{
-  background:var(--primary);
-  color:#fff;
-  border-color:var(--primary);
-}
-.btn-registrar:hover{ filter:brightness(1.05); }
-.btn-ver-facturas:hover,
-.btn-nuevo-proveedor:hover{
-  background:#eef2ff;
-  border-color:var(--bd-strong);
-}
-.btn-registrar:active,
-.btn-ver-facturas:active,
-.btn-nuevo-proveedor:active{
-  transform: translateY(1px);
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
 }
 
-.form-group.mb-3{ margin-bottom:6px; }
-.form-group .btn-nuevo-proveedor{ margin-top:8px; }
-
-/* ========= React-Select (classNamePrefix="rs" + className="rs-override") ========= */
-/* Igualamos a los nativos: altura, borde, radio, foco, paddings */
-.rs-override .rs__control{
-  min-height: var(--input-h);
-  height: var(--input-h);
-  border: 1px solid var(--bd) !important;
-  border-radius: 10px !important;
-  background:#fff !important;
-  box-shadow: none !important;
+/* Responsive: en pantallas estrechas, una sola columna */
+@media (max-width: 900px){
+  .form-grid{ grid-template-columns: 1fr; }
+  .campo, .form-group,
+  .form-group:has(#compraSelect),
+  .form-group:has(#proveedor-select),
+  .campo:has(textarea[name="Observaciones"]),
+  .botones-container{
+    grid-column: 1 / -1;
+  }
+  /* en móvil, el proveedor queda apilado: label, select, botón */
+  .form-group:has(#proveedor-select){
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+  .form-group:has(#proveedor-select) > .btn-nuevo-proveedor{
+    width: 100%;
+  }
 }
-.rs-override .rs__control:hover{
-  border-color: var(--bd-strong) !important;
-}
-.rs-override .rs__control--is-focused{
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px var(--ring) !important;
-}
-
-.rs-override .rs__value-container{
-  padding: 0 14px !important;
-}
-
-/* Indicadores: ocultamos caret propio y dibujamos flecha como el nativo */
-.rs-override .rs__indicator-separator{ display:none !important; }
-.rs-override .rs__indicators{
-  position: relative;
-  width: 36px;
-  justify-content: center;
-}
-.rs-override .rs__dropdown-indicator{
-  color:#6b7280 !important; /* por accesibilidad */
-}
-.rs-override .rs__indicators::after{
-  content:"";
-  position:absolute;
-  right:10px;
-  width:18px;
-  height:18px;
-  pointer-events:none;
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:18px 18px;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-}
-
-/* Menú y opciones */
-.rs-override .rs__menu{
-  border:1px solid var(--bd);
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  margin-top:6px;
-}
-.rs-override .rs__menu-list{
-  padding:6px 0 !important;
-  max-height:280px;
-}
-.rs-override .rs__option{
-  padding:10px 14px !important;
-  font-size:.98rem;
-}
-.rs-override .rs__option--is-focused{
-  background:#f3f4f6 !important;
-}
-.rs-override .rs__option--is-selected{
-  background:#eef2ff !important;
-  color:var(--ink) !important;
-  font-weight:600;
-}
-
-/* Placeholder / texto */
-.rs-override .rs__placeholder{ color: var(--muted) !important; }
-.rs-override .rs__single-value{ color: var(--ink) !important; }
-.rs-override .rs__input-container input{ color: var(--ink) !important; }
-
-/* ========= Pequeños estados de carga/error del bloque proveedor ========= */
-.form-group.mb-3 span{ font-size:.95rem; }
-.form-group.mb-3 span[style*="red"]{ font-weight:600; }
