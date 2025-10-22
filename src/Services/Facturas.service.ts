@@ -82,7 +82,7 @@ export class FacturasService {
       CC: f.CC ?? "",
       CO: f.CO ?? "",
       un: f.un ?? "",
-      DetalleFac: f.Detalle ?? "",
+      DetalleFac: f.DetalleFac ?? "",
       FecEntregaCont: f.FecEntregaCont ?? "",
       DocERP: f.DocERP ?? "",
       Observaciones: f.Observaciones ?? "",
@@ -147,9 +147,7 @@ export class FacturasService {
       : await this.graph.get<any>(url);         // 👈 path relativo
 
     const raw = Array.isArray(res?.value) ? res.value : [];
-    console.log("Raw: ", raw)
     const items = raw.map((x: any) => this.toModel(x));
-    console.log("Raw: ", items)
     const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
     return { items, nextLink };
   }
