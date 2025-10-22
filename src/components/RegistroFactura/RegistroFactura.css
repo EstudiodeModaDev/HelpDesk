@@ -86,16 +86,10 @@
   resize:vertical;
 }
 
-/* Hover / Focus (🔧 solo hijos directos para no afectar inputs anidados como react-select) */
-.campo > :is(input, select, textarea):hover{ border-color: var(--bd-strong); }
 .form-group > select:hover,
 #compraSelect:hover,
 #proveedor-select:hover{ border-color: var(--bd-strong); }
 
-.campo > :is(input, select, textarea):focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--ring);
-}
 .form-group > select:focus,
 #compraSelect:focus,
 #proveedor-select:focus{
