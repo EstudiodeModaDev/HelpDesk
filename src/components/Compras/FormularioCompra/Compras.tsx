@@ -104,6 +104,7 @@ export default function CompraFormulario({submitting = false,}: Props) {
 
         {/*Tipificacion*/}
         <div className="field">
+          <label className="label">Tipo de Item</label>
           <select name="Items" value={state.codigoItem} onChange={(e) => {const codigo = e.target.value;
                                                                     setField("codigoItem", codigo); 
                                                                     const item = Items.find(i => String(i.codigo) === String(codigo));
