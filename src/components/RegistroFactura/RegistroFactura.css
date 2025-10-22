@@ -287,7 +287,7 @@
   margin-bottom: 0;          /* quita el espacio extra */
   display: flex;
   flex-direction: column;    /* apila label y selector */
-  gap: 4px;                  /* pequeña separación vertical */
+  gap: 2px;                  /* pequeña separación vertical */
 }
 
 .campo:has(textarea[name="DescripItems"]){ grid-column: auto; }
