@@ -48,3 +48,11 @@
 .tabla-facturas td:nth-child(13) {
   width: 180px; /* Deta / Observaciones */
 }
+
+.one-line-ellipsis{
+  display:inline-block;        /* o block */
+  max-width: 220px;            /* pon el ancho que necesites */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

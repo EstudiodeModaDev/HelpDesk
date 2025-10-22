@@ -4,6 +4,7 @@ import FacturaEditar from "../FacturaEditar/FacturaEditar";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
 import "./FacturasLista.css";
+import { truncateNoCutGraphemes } from "../../../utils/Commons";
 
 export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   const { obtenerFacturas } = useFacturas();
@@ -152,7 +153,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{factura.un}</td>
                   <td>{formatearFecha(factura.FecEntregaCont)}</td>
                   <td>{factura.DocERP}</td>
-                  <td>{factura.DetalleFac}</td>
+                  <td><span className="one-line-ellipsis" title={factura.DetalleFac}>{truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}</span></td>
                   <td>{factura.Observaciones}</td>
                   <td>
                     <button

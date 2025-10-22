@@ -130,3 +130,18 @@ export function fileToBasePA64(file: File): Promise<string> {
     fr.onerror = reject;
   });
 }
+
+export function truncateNoCutGraphemes(s: string, max: number, suffix = "...") {
+  const seg = new Intl.Segmenter("es", { granularity: "grapheme" });
+  const graphemes = Array.from(seg.segment(s), x => x.segment);
+  if (graphemes.length <= max) return s;
+
+  const upTo = graphemes.slice(0, max).join("");
+
+  // busca el último separador de palabra antes del límite
+  const m = upTo.match(/[\s\p{P}]+(?=[^\s\p{P}]*$)/u);
+  const cutAt = m ? upTo.length - m[0].length : upTo.length;
+
+  const safe = upTo.slice(0, cutAt).replace(/[.,;:!?\s]+$/u, "");
+  return safe + suffix;
+}
