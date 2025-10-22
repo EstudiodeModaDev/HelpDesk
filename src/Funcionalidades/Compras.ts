@@ -199,6 +199,7 @@ export function useCompras(ComprasSvc: ComprasService, TicketsSvc: TicketsServic
   }, [ComprasSvc, buildFilter]);
 
   const ticketEntrega = async (tipo: string, solicitante: string, Correosolicitante: string, entrega: string) => {
+    if(tipo === "Contrato") return
     try {
       const apertura = new Date();
       const solucion = calcularFechaSolucion(apertura, 56, holidays);
