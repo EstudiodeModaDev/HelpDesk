@@ -18,7 +18,7 @@ export default function ComprasPage() {
       ) : (
         <section id="compras-tabla" aria-labelledby="compras-tabla-title">
           <h2 id="compras-tabla-title" className="sr-only">Tabla de solicitudes de compra</h2>
-          <TablaCompras onClick={setmostrarLista}/>
+          <TablaCompras onClick={setmostrarLista} mostrar={true}/>
         </section>
       )}
     </div>

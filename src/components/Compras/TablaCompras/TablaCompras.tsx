@@ -5,9 +5,9 @@ import { useGraphServices } from "../../../graph/GrapServicesContext";
 import { useCompras } from "../../../Funcionalidades/Compras";
 import { toISODateTimeFlex } from "../../../utils/Date";
 import CrearInventarioModal from "../../Inventario/ModalInventario/ModalInventario";
-type Props = { onClick: (valor: boolean) => void };
+type Props = { onClick: (valor: boolean) => void, mostrar: boolean };
 
-export default function TablaCompras({onClick}:Props) {
+export default function TablaCompras({onClick, mostrar}:Props) {
     const { Compras, Tickets, Logs, Usuarios} = useGraphServices();
     const {rows, range, loading, error, applyRange, setRange, reloadAll, pageIndex, nextPage, hasNext, pageSize, setPageSize, handleNext, openModal, setOpenModal} = useCompras(Compras, Tickets, Logs, Usuarios)
 
@@ -134,7 +134,9 @@ export default function TablaCompras({onClick}:Props) {
               </select>
             </div>
           )}
-          <button type="button" className="btn-ver" onClick={() => onClick(false)}>📄 Registrar compra</button>
+          {mostrar && (
+            <button type="button" className="btn-ver" onClick={() => onClick(false)}>📄 Ver compras registradas</button>
+          )} 
         </div>
 
       <CrearInventarioModal
