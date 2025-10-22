@@ -208,3 +208,28 @@ th:last-child,  td:last-child{  padding-right: 16px; }
   cursor:pointer;
   transition:transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
 }
+/* Centrar encabezados y celdas */
+.table-wrap table th,
+.table-wrap table td{
+  text-align: center;
+}
+ 
+/* Asegura centrado vertical (por si hay varias líneas o botones) */
+.table-wrap tbody td{
+  vertical-align: middle;
+}
+ 
+/* Centrar el contenedor de acciones (donde tienes dos botones) */
+.table-wrap td > div{
+  display: inline-flex;      /* se centra como contenido en la celda */
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+ 
+/* Si usas badges dentro de la celda, que no se peguen a la izquierda */
+.table-wrap .badge{
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
