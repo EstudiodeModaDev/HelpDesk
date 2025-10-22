@@ -903,7 +903,7 @@ const handleProveedorSeleccionado = (id: string) => {
                   name="FecEntregaCont"
                   value={formData.FecEntregaCont}
                   onChange={handleChange}
-                  required
+                  
                 />
               </label>
             </div>
@@ -918,7 +918,7 @@ const handleProveedorSeleccionado = (id: string) => {
                 name="DocERP"
                 value={formData.DocERP}
                 onChange={handleChange}
-                required
+                
               />
             </label>
           </div>
