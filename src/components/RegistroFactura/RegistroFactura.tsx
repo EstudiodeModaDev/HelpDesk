@@ -533,8 +533,8 @@ const handleProveedorSeleccionado = (id: string) => {
   if (!id) {
     setFormData(prev => ({
       ...prev,
-      Title: "",
-      Nombre: "",
+      Proveedor: "", // ← campo del input en el formulario
+      Title: "",     // ← campo del input del NIT
     }));
     return;
   }
@@ -545,13 +545,14 @@ const handleProveedorSeleccionado = (id: string) => {
   if (prov) {
     setFormData(prev => ({
       ...prev,
-      Nombre: prov.Nombre ?? "", // nombre del proveedor
-      Nit: prov.Title ?? "",     // NIT del proveedor
+      Proveedor: prov.Nombre ?? "", // ← Nombre del proveedor
+      Title: prov.Title ?? "",      // ← NIT del proveedor
     }));
   } else {
     console.warn("Proveedor seleccionado no encontrado en lista:", id);
   }
 };
+
 
 
 
