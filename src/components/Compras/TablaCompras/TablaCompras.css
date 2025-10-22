@@ -189,3 +189,15 @@ th:last-child,  td:last-child{  padding-right: 16px; }
     row-gap: 6px;
   }
 }
+
+
+.btn-ver{
+  height:42px;
+  padding:0 14px;
+  border-radius:10px;
+  border:1px solid var(--bd);
+  background:#f8fafc;
+  color:var(--ink);
+  cursor:pointer;
+  transition:transform .05s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
+}
