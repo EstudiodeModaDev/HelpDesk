@@ -446,26 +446,7 @@ useEffect(() => {
 }, []);
 
 
-// 🧠 cuando el usuario selecciona una compra
-const handleCompraSeleccionada = async (id: string) => {
-  setSelectedCompra(id);
-  if (!id) return;
-  try {
-    const compra = await comprasService.get(id);
-    // 🔄 Mapeo de campos comunes
-    setFormData((prev) => ({
-      ...prev,
-      Items: compra.CodigoItem || prev.Items,
-      DescripItems: compra.DescItem || prev.DescripItems || "", // no existe en Compra
-      CC: compra.CCosto || prev.CC,
-      CO: compra.CO || prev.CO,
-      un: compra.UN || prev.un,
-      DetalleFac: compra.Dispositivo || prev.DetalleFac,
-    }));
-  } catch (error) {
-    console.error("Error al cargar la compra seleccionada:", error);
-  }
-};
+
 
   // Hook que maneja la lógica de negocio
   const { registrarFactura } = useFacturas();
@@ -518,6 +499,45 @@ const handleCompraSeleccionada = async (id: string) => {
       }));
     }
   };
+
+// 🧠 Maneja la selección de una compra relacionada
+const handleCompraSeleccionada = async (id: string) => {
+  // ✅ Actualizamos el estado local de la compra seleccionada
+  setSelectedCompra(id);
+
+  // 🚫 Si el usuario deselecciona (elige la opción vacía), limpiamos los campos relacionados
+  if (!id) {
+    setFormData((prev) => ({
+      ...prev,
+      CC: "",            // Centro de Costos
+      CO: "",            // Centro Operativo
+      un: "",            // Unidad de Negocio
+      DetalleFac: "",    // Detalle de la factura
+      Items: "",         // Código de ítem
+      DescripItems: "",  // Descripción del ítem
+    }));
+    return;
+  }
+
+  try {
+    // 📦 Cargar los datos completos de la compra seleccionada
+    const compra = await comprasService.get(id);
+
+    // 🧩 Mapeo de campos comunes entre la compra y el formulario
+    setFormData((prev) => ({
+      ...prev,
+      Items: compra.CodigoItem || "",       // Código del ítem
+      DescripItems: compra.DescItem || "",  // Descripción del ítem
+      CC: compra.CCosto || "",              // Centro de Costos
+      CO: compra.CO || "",                  // Centro Operativo
+      un: compra.UN || "",                  // Unidad de Negocio
+      DetalleFac: compra.Dispositivo || "", // Detalle / Dispositivo relacionado
+    }));
+  } catch (error) {
+    console.error("❌ Error al cargar la compra seleccionada:", error);
+  }
+};
+
 
 
   
