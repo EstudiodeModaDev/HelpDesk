@@ -25,6 +25,13 @@
   color: var(--ink);
 }
 
+.compra-form > h2 {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  letter-spacing: .2px;
+}
+
+
 /* ========= Grid de formulario (3 columnas) ========= */
 .compra-form .form-grid{
   display: grid;
