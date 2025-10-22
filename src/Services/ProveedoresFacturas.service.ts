@@ -164,7 +164,7 @@ export class ProveedoresFacturaService {
       throw e;
     }
   }
-    async add(proveedor: { Title: string; Nit: string }) {
+    async add(proveedor: { Title: string; Nombre: string }) {
     await this.ensureIds();
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
