@@ -18,16 +18,16 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
     proveedor: factura.Proveedor ?? "",
     Title: factura.Title ?? "",
     ValorAnIVA: typeof factura.ValorAnIVA === "number" ? factura.ValorAnIVA : Number(factura.ValorAnIVA) || 0,
-    DetalleFac: factura.DetalleFac ?? "",
-    Items: factura.Items ?? "", //items
+    DetalleFac: factura.DetalleFac,
+    Items: factura.Items ?? "",
     CC: factura.CC ?? "", 
     Observaciones: factura.Observaciones,
-    CO: factura.CO ?? "", // 🆕 Centro operativo
-    un: factura.un ?? "", // 🆕 Unidad de negocio
-    DocERP: factura.DocERP ?? "", // 🆕 Documento ERP
+    CO: factura.CO ?? "",
+    un: factura.un ?? "", 
+    DocERP: factura.DocERP ?? "", 
     FechaEmision: factura.FechaEmision
     ? new Date(factura.FechaEmision).toISOString().split("T")[0]
-    : "", // ✅ transforma a yyyy-MM-dd // 🆕 Fecha de emisión
+    : "",
     
     FecEntregaCont: factura.FecEntregaCont
     ? new Date(factura.FecEntregaCont).toISOString().split("T")[0]
@@ -90,10 +90,22 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
         <h3>✏️ Editar Factura #{factura.NoFactura}</h3>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <label> Proveedor: <input name="proveedor" value={formData.proveedor} onChange={(e) => setField("Proveedor", e.target.value)} placeholder="Proveedor" /></label>
-          <label> NIT: <input name="Title" value={formData.Title} onChange={(e) => setField("Title", e.target.value)} placeholder="NIT / Título" /></label>
-          <label> Valor Antes del IVA: <input name="ValorAnIVA" type="number" value={formData.ValorAnIVA} onChange={(e) => setField("ValorAnIVA", Number(e.target.value))} placeholder="Valor" /></label>
-          <label> Detalle de la factura: <input name="DetalleFac" type="number" value={formData.DetalleFac} onChange={(e) => setField("DetalleFac", e.target.value)} placeholder="Detalle de la factura" /></label>
+          <label> Proveedor: 
+            <input name="proveedor" value={formData.proveedor} onChange={(e) => setField("Proveedor", e.target.value)} placeholder="Proveedor" />
+          </label>
+
+          <label> NIT: 
+            <input name="Title" value={formData.Title} onChange={(e) => setField("Title", e.target.value)} placeholder="NIT / Título" />
+          </label>
+
+          <label> Valor Antes del IVA: 
+            <input name="ValorAnIVA" type="number" value={formData.ValorAnIVA} onChange={(e) => setField("ValorAnIVA", Number(e.target.value))} placeholder="Valor" />
+          </label>
+
+          <label> Detalle de la factura: 
+            <input name="DetalleFac" type="text" value={formData.DetalleFac} onChange={(e) => setField("DetalleFac", e.target.value)} placeholder="Detalle de la factura" />
+          </label>
+
           <label>Ítems:
             <select name="Items" value={formData.Items} onChange={(e) => {
                                                         const codigo = e.target.value;
@@ -111,22 +123,27 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
               ))}
             </select>
           </label>
+
           <label> C.C:
-          <select name="CC" value={formData.CC} onChange={(e) => {setField("CC", e.target.value);}} required> <option value="">Seleccionar centro de costo</option>
-                {opcionescc.map((cc) => (
-                  <option key={cc.codigo} value={cc.codigo}>
-                    {cc.codigo} - {cc.descripcion}
-                  </option>
-                ))}
-          </select></label>
+            <select name="CC" value={formData.CC} onChange={(e) => {setField("CC", e.target.value);}} required> <option value="">Seleccionar centro de costo</option>
+                  {opcionescc.map((cc) => (
+                    <option key={cc.codigo} value={cc.codigo}>
+                      {cc.codigo} - {cc.descripcion}
+                    </option>
+                  ))}
+            </select>
+          </label>
+
           <label> C.O:
-          <select name="CO" value={formData.CO} onChange={(e) => {setField("CO", e.target.value);}}  required> <option value="">Seleccionar centro operativo</option>
-                {opcionesco.map((co) => (
-                  <option key={co.codigo} value={co.codigo}>
-                    {co.codigo} - {co.descripcion}
-                  </option>
-                ))}
-          </select></label>
+            <select name="CO" value={formData.CO} onChange={(e) => {setField("CO", e.target.value);}}  required> <option value="">Seleccionar centro operativo</option>
+                  {opcionesco.map((co) => (
+                    <option key={co.codigo} value={co.codigo}>
+                      {co.codigo} - {co.descripcion}
+                    </option>
+                  ))}
+            </select>
+          </label>
+          
           <label> U.N:
           <select name="UN" value={formData.un} onChange={(e) => {setField("un", e.target.value);}}  required> <option value="">Seleccionar unidad de negocio</option>
                 {opcionesun.map((un) => (
@@ -134,7 +151,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
                     {un.codigo} - {un.descripcion}
                   </option>
                 ))}
-              </select></label>
+            </select></label>
           
           <label> Fecha de Emisión:
           <input name="FechaEmision" type="date" value={formData.FechaEmision} onChange={(e) => {setField("FechaEmision", e.target.value);}}  /></label>
@@ -142,6 +159,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           <input name="FechaEntregaConta" type="date" value={formData.FecEntregaCont} onChange={(e) => {setField("FecEntregaCont", e.target.value);}}  /></label>
           <label> Doc ERP:
           <input name="DocERP" value={formData.DocERP} onChange={(e) => {setField("DocERP", e.target.value);}}  placeholder="Documento ERP" /></label>
+          <label>Observaciones: <input name="Obs" type="text" value={formData.DetalleFac} onChange={(e) => setField("Observaciones", e.target.value)} placeholder="Observaciones de la factura" /></label>
 
           <div className="modal-buttons">
             <button type="submit" className="btn-guardar">✅ Guardar</button>
