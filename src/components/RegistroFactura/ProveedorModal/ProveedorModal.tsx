@@ -26,7 +26,7 @@ const ProveedorModal: React.FC<ProveedorModalProps> = ({ isOpen, onClose, onSave
 
     try {
       setLoading(true);
-      await onSave({ Title: nit, Nombre: nit });
+      await onSave({ Title: nit, Nombre: nombre });
       setNombre("");
       setNit("");
       onClose();
