@@ -526,13 +526,10 @@ export default function RegistroFactura() {
 
   function validate(): boolean {
     const e: Record<string, string> = {};
-    if (!formData.CC)             e.CC = "C. Costos Requerido.";
-    if (!formData.CO)             e.CO = "CO Requerido.";
     if (!formData.Proveedor)      e.Proveedor  = "Proveedor Requerido.";
     if (!formData.FechaEmision)   e.FechaEmision = "Seleccione fecha de emision.";
     if (!formData.Items)          e.Items              = "Seleccione item.";
     if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
-    if (!formData.un)             e.un          = "Requerida.";
     if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
     if (!formData.DetalleFac)     e.DetalleFact          = "Requerida.";
 
