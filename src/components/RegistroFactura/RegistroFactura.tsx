@@ -414,6 +414,7 @@ export default function RegistroFactura() {
     RegistradoPor: account?.name ?? "",
   });
   const [displayValor, setDisplayValor] = React.useState("");
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchCompras = async () => {
@@ -523,7 +524,24 @@ export default function RegistroFactura() {
     }
   };
 
+  function validate(): boolean {
+    const e: Record<string, string> = {};
+    if (!formData.CC)             e.CC = "C. Costos Requerido.";
+    if (!formData.CO)             e.CO = "CO Requerido.";
+    if (!formData.Proveedor)      e.Proveedor  = "Proveedor Requerido.";
+    if (!formData.FechaEmision)   e.FechaEmision = "Seleccione fecha de emision.";
+    if (!formData.Items)          e.Items              = "Seleccione item.";
+    if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
+    if (!formData.un)             e.un          = "Requerida.";
+    if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
+    if (!formData.DetalleFac)     e.DetalleFact          = "Requerida.";
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
+    if(!(validate())) return
     e.preventDefault();
     await registrarFactura(formData);
 
@@ -572,18 +590,15 @@ export default function RegistroFactura() {
 
             {/* 🔹 Desplegable de proveedores */}
             <div className="form-group mb-3">
+
+            <div> 
               <label htmlFor="proveedor-select">Proveedor:</label>
               {loading ? (
                 <span>Cargando...</span>
               ) : error ? (
                 <span style={{ color: "red" }}>{error}</span>
               ) : (
-                <select
-                  id="proveedor-select"
-                  value={proveedorSeleccionado}
-                  // usamos el handler nuevo que actualiza formData
-                  onChange={(e) => handleProveedorSeleccionado(e.target.value)}
-                >
+                <select id="proveedor-select" value={proveedorSeleccionado} onChange={(e) => handleProveedorSeleccionado(e.target.value)}>
                   <option value="">-- Selecciona un proveedor --</option>
                   {proveedores.map((p) => (
                     <option key={p.Id} value={p.Id}>
@@ -592,13 +607,12 @@ export default function RegistroFactura() {
                   ))}
                 </select>
               )}
+              <small className="error">{errors.Proveedor}</small>
+            </div>
+              
 
               {/* 🔹 Botón para abrir modal (se implementará más adelante) */}
-              <button
-                type="button"
-                className="btn-nuevo-proveedor"
-                onClick={() => setIsModalOpen(true)}
-              >
+              <button type="button" className="btn-nuevo-proveedor" onClick={() => setIsModalOpen(true)}>
                 + Nuevo proveedor
               </button>
             </div>
@@ -607,6 +621,7 @@ export default function RegistroFactura() {
             <div className="campo">
               <label> Fecha de emisión
                 <input type="date" name="FechaEmision" value={formData.FechaEmision} onChange={handleChange} required/>
+                <small className="error">{errors.FechaEmision }</small>
               </label>
             </div>
 
@@ -621,6 +636,7 @@ export default function RegistroFactura() {
             <div className="campo">
               <label> NIT 
                 <input type="text" name="Title" value={formData.Title} onChange={handleChange} required readOnly/>
+                <small className="error">{errors.Proveedor }</small>
               </label>
             </div>
 
@@ -628,35 +644,36 @@ export default function RegistroFactura() {
             <div className="campo">
               <label>Ítem (Código + descripción)</label>
               <Select
-              classNamePrefix="rs"
-              className="rs-override"
-              options={opcionesFactura.map((op) => ({
-                value: op.codigo,
-                label: `${op.codigo} - ${op.descripcion}`,
-              }))}
-              placeholder="Buscar ítem…"
-              isClearable
-              value={
-                formData.Items
-                  ? {
-                      value: formData.Items,
-                      label:
-                        opcionesFactura.find((op) => op.codigo === formData.Items)
-                          ?.descripcion || formData.Items,
-                    }
-                  : null
-              }
-              onChange={(opt) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  Items: opt?.value || "",
-                  DescripItems: opt?.label?.split(" - ")[1] || "",
-                }));
-              }}
-              filterOption={(option, input) =>
-                option.label.toLowerCase().includes(input.toLowerCase())
-              }
-            />
+                classNamePrefix="rs"
+                className="rs-override"
+                options={opcionesFactura.map((op) => ({
+                  value: op.codigo,
+                  label: `${op.codigo} - ${op.descripcion}`,
+                }))}
+                placeholder="Buscar ítem…"
+                isClearable
+                value={
+                  formData.Items
+                    ? {
+                        value: formData.Items,
+                        label:
+                          opcionesFactura.find((op) => op.codigo === formData.Items)
+                            ?.descripcion || formData.Items,
+                      }
+                    : null
+                }
+                onChange={(opt) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    Items: opt?.value || "",
+                    DescripItems: opt?.label?.split(" - ")[1] || "",
+                  }));
+                }}
+                filterOption={(option, input) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+              />
+              <small className="error">{errors.Items }</small>
             </div>
 
             {/* 📝 Descripción del ítem (solo lectura, se llena automático) */}
@@ -664,6 +681,7 @@ export default function RegistroFactura() {
               <label>
                 Descripción del ítem
                 <input name="DescripItems" value={formData.DescripItems} readOnly></input>
+                <small className="error">{errors.Items }</small>
               </label>
             </div>
 
@@ -689,6 +707,7 @@ export default function RegistroFactura() {
                           );
                         }}
                       />
+                      <small className="error">{errors.ValorAnIVA }</small>
               </label>
             </div>
 
@@ -724,6 +743,7 @@ export default function RegistroFactura() {
                   option.label.toLowerCase().includes(input.toLowerCase())
                 }
               />
+              <small className="error">{errors.CC }</small>
             </div>
 
             {/* 🏭 Centro Operativo (C.O) */}
@@ -758,6 +778,7 @@ export default function RegistroFactura() {
                   option.label.toLowerCase().includes(input.toLowerCase())
                 }
               />
+              <small className="error">{errors.CO }</small>
             </div>
 
             {/* 🧱 Unidad de Negocio (U.N) */}
@@ -792,6 +813,7 @@ export default function RegistroFactura() {
                   option.label.toLowerCase().includes(input.toLowerCase())
                 }
               />
+              <small className="error">{errors.un }</small>
             </div>
 
             {/* 🧾 Detalle */}
@@ -811,8 +833,7 @@ export default function RegistroFactura() {
             {/* 📎 Documento ERP */}
             <div className="campo">
               <label> Documento ERP
-                <input type="text" name="DocERP" value={formData.DocERP} onChange={handleChange}
-/>
+                <input type="text" name="DocERP" value={formData.DocERP} onChange={handleChange}/>
               </label>
             </div>
           </div>
