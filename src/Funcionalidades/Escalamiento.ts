@@ -11,8 +11,6 @@ import type { Escalamiento, } from "../Models/FlujosPA";
 import type { InternetTiendasService } from "../Services/InternetTiendas.service";
 import type { FormEscalamientoStateErrors } from "../Models/nuevoTicket";
 
-const normLower = (s?: string | null) =>
-  String(s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
 const normUpper = (s?: string | null) =>
   String(s ?? "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase().trim();
 

@@ -5,10 +5,6 @@ import type { ReFactura } from "../Models/RegistroFacturaInterface";
 
 import { useAuth } from "../auth/authContext";
 import { FacturasService } from "../Services/Facturas.service";
-import { sortByPath } from "../utils/Commons";
-
-// 🎯 Estado y acciones disponibles para este módulo
-
 
 // 🧩 Hook que encapsula toda la lógica de facturas
 export function useFacturas() {
@@ -32,10 +28,11 @@ export function useFacturas() {
     setError(null);
     try {
       const lista = await service.getAll({orderby: "createdDateTime desc"});
-      const ordenadas = [...lista.items].sort(sortByPath("Created", "date", "desc"));
-      console.log(lista.items)
-      setFacturas(ordenadas);
-      return ordenadas;
+      console.log("Desordenada", lista.items)
+      const listaOrdenada = lista.items.sort((a, b) => a.Created!.localeCompare(b.Created!));
+      console.log(listaOrdenada)
+      setFacturas(listaOrdenada);
+      return listaOrdenada;
     } catch (err: any) {
       console.error("Error al obtener facturas:", err);
       setError(err?.message ?? "Error desconocido al cargar facturas");
