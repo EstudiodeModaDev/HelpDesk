@@ -11,7 +11,7 @@ import ProveedorModal from "./ProveedorModal/ProveedorModal";
 import type { Compra } from "../../Models/Compras";
 import { ComprasService } from "../../Services/Compras.service";
 import { GraphRest } from "../../graph/GraphRest";
-import { formatPesosEsCO } from "../../utils/Number";
+import { formatPesosEsCO, toNumberFromEsCO } from "../../utils/Number";
 
 
  // Diccionario de opciones----------------------------------------------------------------------------------------------
@@ -459,7 +459,7 @@ export default function RegistroFactura() {
         DescripItems: seleccion ? seleccion.descripcion : "",
       }));
     } else {
-      console.log("Valor", saveValor)
+      console.log("Valor a guardar", saveValor)
       setFormData((prev) => ({
         ...prev,
         [name]: name === "ValorAnIVA" ? saveValor : value,
@@ -679,7 +679,8 @@ export default function RegistroFactura() {
             <div className="campo">
               <label>
                 Valor antes iva (en pesos)
-                <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} onChange={(e) => {const f = formatPesosEsCO(e.target.value); setDisplayValor(f); setSaveValor(Number(f)); handleChange;}}/>
+                <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} 
+                  onChange={(e) => {const f = formatPesosEsCO(e.target.value); setDisplayValor(f); setSaveValor(toNumberFromEsCO(f)); handleChange(e);}}/>
               </label>
             </div>
 
