@@ -29,7 +29,7 @@ export default function UsuariosPanel() {
           return texto.includes(q);
         });
       }, [franquicias, search]);
-      
+
     const filteredAdmin = React.useMemo(() => {
         const q = search.trim().toLowerCase();
         if (!q) return administradores;
@@ -68,13 +68,19 @@ export default function UsuariosPanel() {
 
         <div className="users-table-wrap">
             <table className="users-table">
+                <colgroup>
+                    <col style={{ width: "44%" }} />
+                    <col style={{ width: "36%" }} />
+                    <col style={{ width: "16%" }} />
+                    <col style={{ width: "4%" }} />
+                </colgroup>
                 <thead>
-                <tr>
-                    <th style={{ width: "44%" }}>Nombre</th>
-                    <th style={{ width: "36%" }}>Correo</th>
-                    <th style={{ width: "16%" }}>{mostrar === "Franquicias" ? "Contacto" : "Rol"}</th>
-                    <th style={{ width: "4%" }} aria-label="Acciones"/>
-                </tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>{mostrar === "Franquicias" ? "Contacto" : "Rol"}</th>
+                        <th>Acciones</th> {/* pon texto o &nbsp; para asegurar la columna */}
+                    </tr>
                 </thead>
 
                 <tbody>
@@ -146,8 +152,8 @@ export default function UsuariosPanel() {
                     </td>
                     </tr>
                 )}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
         </div>
     </section>
     );

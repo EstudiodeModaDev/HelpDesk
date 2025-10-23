@@ -92,8 +92,10 @@
   border: 1px solid var(--bd);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  max-height: 62vh;     /* scroll aquí */
   overflow: auto;
 }
+
 
 /* tbody scrollable, thead sticky */
 .users-table{
@@ -109,20 +111,10 @@
   color: #e8eef8;
   padding: 10px 12px;
   text-align: center;
-  z-index: 1;
 }
-.users-table tbody{
-  display: table;
-  max-height: 62vh;            /* hace scroll solo el cuerpo */
-  overflow: auto;
-}
-.users-table thead, .users-table tbody tr{
-  display: table;
-  width: 100%;
-  table-layout: fixed;         /* columnas fijas como en la captura */
-}
+
 .users-table tbody td{
-  border-top: 2px solid #2f2f2f; /* líneas oscuras como screenshot */
+  border-top: 2px solid #2f2f2f;
   padding: 14px 12px;
   vertical-align: middle;
   text-align: center;
@@ -177,9 +169,9 @@
   .users-table tbody{ max-height: 58vh; }
 }
 
-.users-table tbody td{
-  border-top: 2px solid #2f2f2f;
-  padding: 14px 12px;
-  vertical-align: middle;
+.users-table td:last-child,
+.users-table th:last-child{
   text-align: center;
+  white-space: nowrap;
 }
+.icon-btn.danger{ width: 40px; height: 40px; }
