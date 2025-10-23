@@ -5,6 +5,7 @@ import "./DistribucionFactura.css";
 // 🔽 Hook para traer los proveedores
 import { useProveedores } from "../../../Funcionalidades/ProveedoresFactura";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
+import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
 
 export default function DistribucionFactura() {
   // 🧩 Hook de proveedores
@@ -111,12 +112,61 @@ export default function DistribucionFactura() {
     formData.ImpColorCalle,
   ]);
 
-  // 💾 Guardar datos
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("📊 Datos de distribución guardados:", formData);
-    alert("Distribución de factura guardada correctamente ✅");
-  };
+  // 💾 Guardar datos (enviar a SharePoint)
+// ✅ Función para manejar el envío del formulario
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    // 🧠 Instanciamos el servicio usando el Graph global
+    const graph = (window as any).graphInstance;
+    const service = new DistribucionFacturaService(graph);
+
+    // ⚠️ Validación básica de campos requeridos
+    if (!formData.Proveedor || !formData.Title) {
+      alert("Por favor selecciona un proveedor antes de guardar.");
+      return;
+    }
+
+    // 🧩 Creamos el objeto a enviar (eliminamos el Id si existe)
+    const record = { ...formData };
+    delete (record as any).Id;
+
+    console.log("📤 Enviando distribución a SharePoint:", record);
+
+    // 🟢 Intentamos crear la distribución
+    const created = await service.create(record);
+
+    console.log("✅ Registro creado correctamente:", created);
+    alert("✅ Distribución de factura guardada con éxito");
+
+    // ♻️ Limpiamos los campos del formulario
+    setProveedorSeleccionado("");
+    setFormData({
+      Proveedor: "",
+      Title: "",
+      CargoFijo: 0,
+      CosToImp: 0,
+      ValorAnIVA: 0,
+      ImpBnCedi: 0,
+      ImpBnPalms: 0,
+      ImpColorPalms: 0,
+      ImpBnCalle: 0,
+      ImpColorCalle: 0,
+      CosTotMarNacionales: 0,
+      CosTotMarImpor: 0,
+      CosTotMarCEDI: 0,
+      CosTotMarServAdmin: 0,
+    });
+
+  } catch (error: any) {
+    // 🚨 Capturamos y mostramos cualquier error
+    console.error("❌ Error al guardar la distribución:", error);
+    alert("⚠️ Ocurrió un error al guardar la distribución. Revisa la consola para más detalles.");
+  }
+};
+
+
 
   return (
     <div className="distribucion-container">
