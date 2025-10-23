@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+
+
 import { useAuth } from '../auth/authContext'; // asegúrate del case correcto
 import { GraphRest } from './GraphRest';
 import { SociedadesService } from '../Services/Sociedades.service';
@@ -26,6 +28,7 @@ import { COService } from '../Services/COCostos.service';
 import { ComprasService } from '../Services/Compras.service';
 import { TareasService } from '../Services/Tareas.service';
 import { InventarioService } from '../Services/Inventario.service';
+import { DistribucionFacturaService } from '../Services/DistribucionFactura.service';
 
 // ================== Tipos ==================
 export type GraphSiteConfig = {
@@ -56,6 +59,7 @@ export type GraphSiteConfig = {
     Compras: string;
     Tareas: string;
     Inventario: string;
+    DistribucionFactura: string; // ✅ nuevo campo
   };
 };
 
@@ -123,7 +127,8 @@ const DEFAULT_CONFIG: GraphSiteConfig = {
     CentroOperativo: "CentrosOperativos",
     Compras: "Compras",
     Tareas: "Recordatorios",
-    Inventario: "Inventario"
+    Inventario: "Inventario",
+    DistribucionFactura: "DistribucionFactura", // ✅ nuevo campo
   },
 };
 
@@ -162,6 +167,7 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
         Compras:                        config?.lists?.Compras                  ?? base.lists.Compras,
         Tareas:                         config?.lists?.Tareas                   ?? base.lists.Tareas,
         Inventario:                     config?.lists?.Inventario               ?? base.lists.Inventario,
+        DistribucionFactura:            config?.lists?.DistribucionFactura      ?? base.lists.DistribucionFactura,
       },
     };
   }, [config]);
@@ -198,9 +204,11 @@ export const GraphServicesProvider: React.FC<ProviderProps> = ({ children, confi
     const Compras                   = new ComprasService(graph, hostname, sitePath, lists.Compras)
     const Tareas                    = new TareasService(graph, hostname, sitePath, lists.Tareas)
     const Inventario                = new InventarioService(graph, hostname, sitePath, lists.Inventario)
+    const DistribucionFactura       = new DistribucionFacturaService(graph, hostname, sitePath, lists.DistribucionFactura);
+
 
     return {graph, Sociedades, Proveedores, Plantillas, Internet, CasosHijosRequeridos, ActasEntrega, Anuncios, Articulos, Usuarios, Logs, Tickets, Categorias, Franquicias, SubCategorias,
-        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario};
+        InternetTiendas, Facturas, ItemFactura, ProveedoresFactura,Item, CentroCostos, CentroOperativo, Compras, Tareas, Inventario, DistribucionFactura};
   }, [graph, cfg]);
 
   return (
