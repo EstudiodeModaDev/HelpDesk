@@ -11,13 +11,34 @@ export default function UsuariosPanel() {
 
     const [search, setSearch] = React.useState("");
     const [mostrar, setMostrar] = React.useState<string>("Tecnicos");
-    
+
+    const filteredTecnicos = React.useMemo(() => {
+        const q = search.trim().toLowerCase();
+        if (!q) return tecnicos;
+        return tecnicos.filter((t) => {
+          const texto = `${t.Title ?? ""} ${t.Correo ?? ""}`.toLowerCase();
+          return texto.includes(q);
+        });
+      }, [tecnicos, search]);
+
+    const filteredFranquicias = React.useMemo(() => {
+        const q = search.trim().toLowerCase();
+        if (!q) return franquicias;
+        return franquicias.filter((t) => {
+          const texto = `${t.Title ?? ""} ${t.Correo ?? ""}`.toLowerCase();
+          return texto.includes(q);
+        });
+      }, [franquicias, search]);
       
-
-    const handleChangeMostrar = (val: string) => {
-        setMostrar(val);
-    };
-
+    const filteredAdmin = React.useMemo(() => {
+        const q = search.trim().toLowerCase();
+        if (!q) return administradores;
+        return administradores.filter((t) => {
+          const texto = `${t.Title ?? ""} ${t.Correo ?? ""}`.toLowerCase();
+          return texto.includes(q);
+        });
+      }, [administradores, search]);
+     
     return (
     <section className="users-page" aria-label="Gestión de usuarios">
         <header className="users-header">
@@ -27,7 +48,7 @@ export default function UsuariosPanel() {
             <input className="users-search" placeholder="Buscar Usuario" value={search} onChange={(e) => setSearch(e.target.value)}/>
 
             <div className="users-select-wrap">
-                <select className="users-select" value={mostrar} onChange={(e) => handleChangeMostrar(e.target.value)} aria-label="Filtrar por franquicia">
+                <select className="users-select" value={mostrar} onChange={(e) => setMostrar(e.target.value)} aria-label="Filtrar por franquicia">
                     <option value="Franquicias">Franquicias</option>
                     <option value="Tecnicos">Resolutores</option>
                     <option value="Admin">Administradores</option>
@@ -57,7 +78,7 @@ export default function UsuariosPanel() {
                 </thead>
 
                 <tbody>
-                {mostrar === "Tecnicos" && tecnicos.map((u) => (
+                {mostrar === "Tecnicos" && filteredTecnicos.map((u) => (
                     <tr key={u.Id}>
                         <td><div className="cell-name">{u.Title}</div></td>
 
@@ -77,7 +98,7 @@ export default function UsuariosPanel() {
                         </td>
                     </tr>
                 ))}
-                {mostrar === "Admin" && administradores.map((u) => (
+                {mostrar === "Admin" && filteredAdmin.map((u) => (
                     <tr key={u.Id}>
                         <td><div className="cell-name">{u.Title}</div></td>
 
@@ -97,7 +118,7 @@ export default function UsuariosPanel() {
                         </td>
                     </tr>
                 ))}
-                {mostrar === "Franquicias" && franquicias.map((u) => (
+                {mostrar === "Franquicias" && filteredFranquicias.map((u) => (
                     <tr key={u.Id}>
                         <td><div className="cell-name">{u.Title}</div></td>
 
