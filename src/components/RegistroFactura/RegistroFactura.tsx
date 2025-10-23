@@ -414,7 +414,6 @@ export default function RegistroFactura() {
     RegistradoPor: account?.name ?? "",
   });
   const [displayValor, setDisplayValor] = React.useState("");
-  const [saveValor, setSaveValor] = React.useState<Number>(0);
 
   useEffect(() => {
     const fetchCompras = async () => {
@@ -443,8 +442,9 @@ export default function RegistroFactura() {
   }, []);
   const { registrarFactura } = useFacturas();
 
-  const handleChange = (e: React.ChangeEvent< HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
     if (name === "Items") {
       const seleccion = opcionesFactura.find((o) => o.codigo === value);
       setFormData((prev) => ({
@@ -453,10 +453,9 @@ export default function RegistroFactura() {
         DescripItems: seleccion ? seleccion.descripcion : "",
       }));
     } else {
-      console.log("Valor a guardar", saveValor)
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "ValorAnIVA" ? saveValor : value,
+        [name]: toNumberFromEsCO(value),
       }));
     }
   };
@@ -679,7 +678,6 @@ export default function RegistroFactura() {
                           const f = formatPesosEsCO(raw); 
                           const num = toNumberFromEsCO(f);
                           setDisplayValor(f);
-                          setSaveValor(num);
                           handleChange({target: { name: "ValorAnIVA", value: String(num) }, } as unknown as React.ChangeEvent<HTMLInputElement>);
                         }}
                         onBlur={() => {
