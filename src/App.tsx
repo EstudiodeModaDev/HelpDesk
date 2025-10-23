@@ -20,6 +20,7 @@ import NuevoTicketUsuarioForm from './components/NuevoTicketUsuario/NuevoTicketF
 import RegistroFactura from './components/RegistroFactura/RegistroFactura';
 import InfoPage from './components/Info/Informacion';
 import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
+import UsuariosPanel from './components/Usuarios/Usuarios';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 
@@ -45,7 +46,7 @@ const NAVS_ADMIN: MenuItem[] = [
   { id: 'admin', label: 'Administración', icon: '⚙️', children: [
        { id: 'anuncios',    label: 'Anuncios', to: <RegistroFactura/>},
        { id: 'plantillas',  label: 'Plantillas', to: <CrearPlantilla/>},
-       { id: 'usuarios',    label: 'Usuarios', to: <RegistroFactura/>},
+       { id: 'usuarios',    label: 'Usuarios', to: <UsuariosPanel/>},
     ]
   },
   {
