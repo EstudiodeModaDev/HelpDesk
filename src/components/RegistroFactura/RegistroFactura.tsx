@@ -413,7 +413,8 @@ export default function RegistroFactura() {
     Observaciones: "",
     RegistradoPor: account?.name ?? "",
   });
-  const [displayValor, setDisplayValor] = React.useState<Number>();
+  const [displayValor, setDisplayValor] = React.useState("");
+  const [saveValor, setSaveValor] = React.useState<Number>(0);
 
   useEffect(() => {
     const fetchCompras = async () => {
@@ -458,10 +459,10 @@ export default function RegistroFactura() {
         DescripItems: seleccion ? seleccion.descripcion : "",
       }));
     } else {
-      console.log("Valor", displayValor)
+      console.log("Valor", saveValor)
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "ValorAnIVA" ? displayValor : value,
+        [name]: name === "ValorAnIVA" ? saveValor : value,
       }));
     }
   };
@@ -678,7 +679,7 @@ export default function RegistroFactura() {
             <div className="campo">
               <label>
                 Valor antes iva (en pesos)
-                <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} onChange={(e) => {const f = formatPesosEsCO(e.target.value); setDisplayValor(Number(f)); handleChange;}}/>
+                <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} onChange={(e) => {const f = formatPesosEsCO(e.target.value); setDisplayValor(f); setSaveValor(Number(f)); handleChange;}}/>
               </label>
             </div>
 
