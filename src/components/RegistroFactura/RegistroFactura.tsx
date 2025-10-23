@@ -542,7 +542,7 @@ export default function RegistroFactura() {
       CO: "",
       un: "",
       DetalleFac: "",
-      FecEntregaCont: "",
+      FecEntregaCont: null,
       DocERP: "",
       Observaciones: "",
       RegistradoPor: account?.name ?? "",
@@ -804,7 +804,7 @@ export default function RegistroFactura() {
             {/* 📦 Fecha de entrega contabilidad */}
             <div className="campo">
               <label>Fecha de entrega contabilidad
-                <input type="date" name="FecEntregaCont" value={formData.FecEntregaCont} onChange={handleChange}/>
+                <input type="date" name="FecEntregaCont" value={formData.FecEntregaCont ?? ""} onChange={handleChange}/>
               </label>
             </div>
 

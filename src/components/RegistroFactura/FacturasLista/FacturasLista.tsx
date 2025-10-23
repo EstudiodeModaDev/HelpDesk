@@ -151,7 +151,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{factura.CC}</td>
                   <td>{factura.CO}</td>
                   <td>{factura.un}</td>
-                  <td>{formatearFecha(factura.FecEntregaCont)}</td>
+                  <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
                   <td>{factura.DocERP}</td>
                   <td><span className="one-line-ellipsis" title={factura.DetalleFac}>{truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}</span></td>
                   <td>{factura.Observaciones}</td>
