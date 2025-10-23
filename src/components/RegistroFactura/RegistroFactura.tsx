@@ -443,14 +443,8 @@ export default function RegistroFactura() {
   }, []);
   const { registrarFactura } = useFacturas();
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent< HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    // Si cambia el ítem, también actualiza automáticamente la descripción
     if (name === "Items") {
       const seleccion = opcionesFactura.find((o) => o.codigo === value);
       setFormData((prev) => ({
@@ -680,7 +674,24 @@ export default function RegistroFactura() {
               <label>
                 Valor antes iva (en pesos)
                 <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Ej: 100.000,00" value={String(displayValor)} 
-                  onChange={(e) => {const f = formatPesosEsCO(e.target.value); setDisplayValor(f); setSaveValor(toNumberFromEsCO(f)); handleChange(e);}}/>
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          const f = formatPesosEsCO(raw); 
+                          const num = toNumberFromEsCO(f);
+                          setDisplayValor(f);
+                          setSaveValor(num);
+                          handleChange({target: { name: "ValorAnIVA", value: String(num) }, } as unknown as React.ChangeEvent<HTMLInputElement>);
+                        }}
+                        onBlur={() => {
+                          const num = toNumberFromEsCO(displayValor);
+                          setDisplayValor(
+                            new Intl.NumberFormat("es-CO", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }).format(Number.isFinite(num) ? num : 0)
+                          );
+                        }}
+                      />
               </label>
             </div>
 
