@@ -113,34 +113,34 @@ export default function DistribucionFactura() {
   ]);
 
   // 💾 Guardar datos (enviar a SharePoint)
+// ✅ Función para manejar el envío del formulario
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-    // ✅ Instanciamos el servicio (usando el Graph global)
-    const graph = (window as any).graphInstance; // 👈 asegúrate que esto exista en tu entorno
+    // 🧠 Instanciamos el servicio usando el Graph global
+    const graph = (window as any).graphInstance;
     const service = new DistribucionFacturaService(graph);
 
-    // 🔍 Validar que el proveedor esté seleccionado
+    // ⚠️ Validación básica de campos requeridos
     if (!formData.Proveedor || !formData.Title) {
       alert("Por favor selecciona un proveedor antes de guardar.");
       return;
     }
 
-    // 🔧 Crear el objeto a enviar (omitimos Id)
+    // 🧩 Creamos el objeto a enviar (eliminamos el Id si existe)
     const record = { ...formData };
     delete (record as any).Id;
 
     console.log("📤 Enviando distribución a SharePoint:", record);
 
-    // 🟢 Llamada al servicio para crear la distribución
+    // 🟢 Intentamos crear la distribución
     const created = await service.create(record);
 
     console.log("✅ Registro creado correctamente:", created);
+    alert("✅ Distribución de factura guardada con éxito");
 
-    alert("Distribución de factura guardada correctamente ✅");
-
-    // ♻️ Limpiar formulario (opcional)
+    // ♻️ Limpiamos los campos del formulario
     setProveedorSeleccionado("");
     setFormData({
       Proveedor: "",
@@ -158,11 +158,14 @@ const handleSubmit = async (e: React.FormEvent) => {
       CosTotMarCEDI: 0,
       CosTotMarServAdmin: 0,
     });
+
   } catch (error: any) {
+    // 🚨 Capturamos y mostramos cualquier error
     console.error("❌ Error al guardar la distribución:", error);
-    alert("Ocurrió un error al guardar la distribución. Revisa la consola.");
+    alert("⚠️ Ocurrió un error al guardar la distribución. Revisa la consola para más detalles.");
   }
 };
+
 
 
   return (
