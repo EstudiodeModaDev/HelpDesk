@@ -525,8 +525,6 @@ export default function RegistroFactura() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(!(formData.CC && formData.CO && formData.DescripItems && formData.DetalleFac && formData.FechaEmision && formData.FechaEmision && formData.Items && formData.NIT && formData.Proveedor)) return
-
     await registrarFactura(formData);
 
     alert("✅ Factura registrada con éxito");
