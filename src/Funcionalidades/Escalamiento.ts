@@ -90,9 +90,8 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
 
         if (tiendaSel) {
             const compNorm = normUpper((tiendaSel as any).Compa_x00f1__x00ed_a);
-            const Companias = await SociedadesSvc.getAll({filter: `fields/id eq '${String(compNorm)}'`,top: 1});
-            const comp = (Companias ?? []).find((s: Sociedades) => normUpper(s.Title) === compNorm) ?? null;
-            setCompania(comp);
+            const sociedades = await SociedadesSvc.get(compNorm)
+            setCompania(sociedades);
 
             //Setear state
             setState({
@@ -101,10 +100,10 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
                 centroComercial: infoInternet?.Centro_x0020_Comercial ?? "",
                 ciudad: infoInternet?.Title ?? "",
                 descripcion: "",
-                empresa: infoInternet?.Compa_x00f1__x00ed_a ?? "",
+                empresa: sociedades?.Title ?? "",
                 identificador: infoInternet?.IDENTIFICADOR ?? "",
                 local: infoInternet?.Local ?? "",
-                nit: compania?.Nit ?? "",
+                nit: sociedades?.Nit ?? "",
                 nombre: account?.username ?? "",
                 proveedor: infoInternet?.PROVEEDOR ?? "",
                 telefono: "313 745 3700/319 254 9920",
