@@ -213,6 +213,27 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
     return () => { cancelled = true; };
   }, [usuariosSvc]);
 
+  const deleteUser = React.useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.delete(id);
+      if (cancelled) return;
+
+      console.log(res)
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error eliminado usuarios");
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
   React.useEffect(() => {
     let cancel = false;
     (async () => {
@@ -231,15 +252,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const hasNext = !!nextLink;
 
   return {
-    usuarios,
-    UseruserOptions,
-    loading,
-    error,
-    pageSize, setPageSize,
-    pageIndex,
-    hasNext,
-    nextLink,
-    refreshUsuers,
-    tecnicos, administradores
+    usuarios, UseruserOptions, loading, error, pageSize, pageIndex, hasNext, nextLink, tecnicos, administradores,
+    refreshUsuers, deleteUser, setPageSize,
   };
 }

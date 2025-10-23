@@ -3,10 +3,11 @@ import { useUsuarios } from "../../Funcionalidades/Usuarios";
 import { useGraphServices } from "../../graph/GrapServicesContext";
 import "./Usuarios.css"
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
+import { useConfirm } from "../ModalDelete/ConfirmProvider";
 
 export default function UsuariosPanel() {
     const { Usuarios, Franquicias } = useGraphServices();
-    const { administradores, tecnicos, loading} = useUsuarios(Usuarios)   
+    const { administradores, tecnicos, loading, deleteUser} = useUsuarios(Usuarios)   
     const { franquicias, loading: loadingFranq} = useFranquicias(Franquicias);
 
     const [search, setSearch] = React.useState("");
@@ -38,6 +39,26 @@ export default function UsuariosPanel() {
           return texto.includes(q);
         });
       }, [administradores, search]);
+    
+    const confirm = useConfirm();
+    
+    async function handleDelete(t: { Id: string; Title?: string }) {
+        const ok = await confirm({
+            title: "Eliminar tarea",
+            message: (
+            <>
+                ¿Seguro que deseas eliminar <b>{t.Title ?? "esta tarea"}</b>?<br />
+                <small>Esta acción no se puede deshacer.</small>
+            </>
+            ),
+            confirmText: "Eliminar",
+            cancelText: "Cancelar",
+            destructive: true,
+        });
+        if (!ok) return;
+
+        await deleteUser(t.Id);
+    }
      
     return (
     <section className="users-page" aria-label="Gestión de usuarios">
@@ -93,7 +114,7 @@ export default function UsuariosPanel() {
                         <td>{u.Rol || "—"}</td>
                         
                         <td className="cell-actions">
-                            <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`} /*onClick={() => onEliminar?.(u.id)}*/>
+                            <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`}  onClick={() => handleDelete({ Id: String(u.Id ?? ""), Title: u.Title })}>
                             <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
                                 <polyline points="3 6 5 6 21 6" />
                                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
@@ -113,7 +134,7 @@ export default function UsuariosPanel() {
                         <td>{u.Rol || "—"}</td>
                         
                         <td className="cell-actions">
-                            <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`} /*onClick={() => onEliminar?.(u.id)}*/>
+                            <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`} onClick={() => handleDelete({ Id: String(u.Id ?? ""), Title: u.Title })}>
                             <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
                                 <polyline points="3 6 5 6 21 6" />
                                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
@@ -133,7 +154,7 @@ export default function UsuariosPanel() {
                         <td>{u.Celular || "—"}</td>
                         
                         <td className="cell-actions">
-                            <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`} /*onClick={() => onEliminar?.(u.id)}*/>
+                            <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`} onClick={() => handleDelete({ Id: String(u.Id ?? ""), Title: u.Title })}>
                             <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
                                 <polyline points="3 6 5 6 21 6" />
                                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
