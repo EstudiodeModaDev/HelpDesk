@@ -86,14 +86,13 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-        const correoNorm = normLower(correoSolicitante);
-        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
+        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${correoSolicitante}''`,top: 1});
         const tiendaSel = Tiendas[0]
         setInfoInternet(tiendaSel)
 
         if (tiendaSel) {
             const compNorm = normUpper((tiendaSel as any).Compa_x00f1__x00ed_a);
-            const Companias = await SociedadesSvc.getAll({filter: `fields/CORREO eq '${String(correoNorm).replace(/'/g, "''")}'`,top: 1});
+            const Companias = await SociedadesSvc.getAll({filter: `fields/id eq '${String(compNorm)}'`,top: 1});
             const comp = (Companias ?? []).find((s: Sociedades) => normUpper(s.Title) === compNorm) ?? null;
             setCompania(comp);
 
@@ -128,7 +127,6 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-             // Busca la tienda por CORREO (usa top:1 si esperas único resultado)
             const tiendas = await IntTiendasSvc.getAll({filter: `(fields/CORREO eq '${term}' or fields/Tienda eq '${term}' or fields/IDENTIFICADOR eq '${term}')`, top: 1, });
 
             const tiendaSel = tiendas?.[0] ?? null;

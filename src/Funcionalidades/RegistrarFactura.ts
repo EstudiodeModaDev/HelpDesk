@@ -35,7 +35,7 @@ export function useFacturas() {
       const ordenadas = [...lista.items].sort(sortByPath("Created", "date", "desc"));
       console.log(lista.items)
       setFacturas(ordenadas);
-      return lista.items;
+      return ordenadas;
     } catch (err: any) {
       console.error("Error al obtener facturas:", err);
       setError(err?.message ?? "Error desconocido al cargar facturas");
