@@ -114,7 +114,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         <table className="tabla-facturas">
           <thead>
             <tr>
-              <th>Num</th>
+              <th>ID</th>
               <th>FechaEmi</th>
               <th>N°Fac</th>
               <th>Proveedor</th>
@@ -154,7 +154,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
                   <td>{factura.DocERP}</td>
                   <td><span className="one-line-ellipsis" title={factura.DetalleFac}>{truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}</span></td>
-                  <td>{factura.Observaciones}</td>
+                  <td><span className="one-line-ellipsis" title={factura.Observaciones}>{truncateNoCutGraphemes(factura.Observaciones ?? "", 20)}</span></td>
                   <td>
                     <button
                       className="btn-editar"
