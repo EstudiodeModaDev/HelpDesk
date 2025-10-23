@@ -5,7 +5,8 @@ import "./DistribucionFactura.css";
 // 🔽 Hook para traer los proveedores
 import { useProveedores } from "../../../Funcionalidades/ProveedoresFactura";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
-import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
+import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
+// import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
 
 export default function DistribucionFactura() {
   // 🧩 Hook de proveedores
@@ -13,6 +14,9 @@ export default function DistribucionFactura() {
 
   // 🧠 Estados del componente
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
+
+  //estados de la funcionalidad
+  const { registrarDistribucion } = useDistribucionFactura();
 
   const [formData, setFormData] = useState<DistribucionFacturaData>({
     Proveedor: "",
@@ -118,29 +122,24 @@ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-    // 🧠 Instanciamos el servicio usando el Graph global
-    const graph = (window as any).graphInstance;
-    const service = new DistribucionFacturaService(graph);
-
-    // ⚠️ Validación básica de campos requeridos
+    // ⚠️ Validar que se haya seleccionado un proveedor
     if (!formData.Proveedor || !formData.Title) {
-      alert("Por favor selecciona un proveedor antes de guardar.");
+      alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
       return;
     }
 
-    // 🧩 Creamos el objeto a enviar (eliminamos el Id si existe)
+    // 🧩 Preparamos el registro (eliminamos el Id si existe)
     const record = { ...formData };
     delete (record as any).Id;
 
     console.log("📤 Enviando distribución a SharePoint:", record);
 
-    // 🟢 Intentamos crear la distribución
-    const created = await service.create(record);
+    // 🟢 Registrar la distribución (usa el hook useDistribucionFactura)
+    await registrarDistribucion(record);
 
-    console.log("✅ Registro creado correctamente:", created);
     alert("✅ Distribución de factura guardada con éxito");
 
-    // ♻️ Limpiamos los campos del formulario
+    // ♻️ Limpiar formulario y proveedor seleccionado
     setProveedorSeleccionado("");
     setFormData({
       Proveedor: "",
@@ -160,11 +159,11 @@ const handleSubmit = async (e: React.FormEvent) => {
     });
 
   } catch (error: any) {
-    // 🚨 Capturamos y mostramos cualquier error
     console.error("❌ Error al guardar la distribución:", error);
     alert("⚠️ Ocurrió un error al guardar la distribución. Revisa la consola para más detalles.");
   }
 };
+
 
 
 
