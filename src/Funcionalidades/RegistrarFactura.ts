@@ -5,6 +5,7 @@ import type { ReFactura } from "../Models/RegistroFacturaInterface";
 
 import { useAuth } from "../auth/authContext";
 import { FacturasService } from "../Services/Facturas.service";
+import { sortByPath } from "../utils/Commons";
 
 // 🎯 Estado y acciones disponibles para este módulo
 
@@ -31,7 +32,9 @@ export function useFacturas() {
     setError(null);
     try {
       const lista = await service.getAll({orderby: "createdDateTime desc"});
-      setFacturas(lista.items);
+      const ordenadas = [...lista.items].sort(sortByPath("createdDateTime", "date", "desc"));
+      console.log(lista.items)
+      setFacturas(ordenadas);
       return lista.items;
     } catch (err: any) {
       console.error("Error al obtener facturas:", err);

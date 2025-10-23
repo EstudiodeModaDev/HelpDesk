@@ -16,5 +16,6 @@ export interface ReFactura {
   Observaciones: string;
   RegistradoPor: string;
   NIT? : string;
+  Created?: string
   
 }
