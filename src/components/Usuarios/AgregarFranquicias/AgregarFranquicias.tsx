@@ -36,7 +36,7 @@ export default function NuevaFranquicia({ onCancel, modal = true, open }: Props)
         <h2 id="nt-title">Nueva Franquicia</h2>
       </header>
 
-      <form className="nt-form" onSubmit={(e) => {e.preventDefault(); addFranquicia()}} noValidate>
+      <form className="nt-form" onSubmit={(e) => {e.preventDefault(); addFranquicia(); onCancel()}} noValidate>
         <div className="nt-field">
           <label htmlFor="nt-nombre" className="nt-label">Nombre Completo</label>
           <input

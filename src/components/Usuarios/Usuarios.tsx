@@ -181,7 +181,7 @@ export default function UsuariosPanel() {
             </div>
         
             {(mostrar === "Tecnico" || mostrar==="Administrador" ) &&<NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />}
-            {mostrar === "Franquicia" && <NuevaFranquicia modal open={modalAgregar} onCancel={() => setModalAgregar(false)}/>}
+            {mostrar === "Franquicias" && <NuevaFranquicia modal open={modalAgregar} onCancel={() => setModalAgregar(false)}/>}
 
         </section>
     );

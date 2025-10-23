@@ -41,7 +41,7 @@ export default function NuevoTecnico({ onCancel, tipo, modal = true, open }: Pro
         <h2 id="nt-title">Nuevo {tipo}</h2>
       </header>
 
-      <form className="nt-form" onSubmit={(e) => {e.preventDefault(); addUser()}} noValidate>
+      <form className="nt-form" onSubmit={(e) => {e.preventDefault(); addUser(); onCancel()}} noValidate>
         <div className="nt-field">
           <label htmlFor="nt-nombre" className="nt-label">Nombre Completo</label>
           <input

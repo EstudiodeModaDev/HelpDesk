@@ -269,7 +269,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
         setError(e?.message ?? "Error eliminado usuarios");
       }
     } finally {
-      if (!cancelled) setLoading(false);
+      if (!cancelled) setSubmitting(false);
     }
 
     return () => { cancelled = true; };
