@@ -84,7 +84,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${correoSolicitante}''`,top: 1});
+        const Tiendas = await IntTiendasSvc.getAll({filter: `fields/CORREO eq '${correoSolicitante}'`,top: 1});
         const tiendaSel = Tiendas[0]
         setInfoInternet(tiendaSel)
 
