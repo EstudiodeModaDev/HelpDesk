@@ -30,7 +30,7 @@ export function useFacturas() {
     setLoading(true);
     setError(null);
     try {
-      const lista = await service.getAll();
+      const lista = await service.getAll({orderby: "fields/Created desc"});
       setFacturas(lista.items);
       return lista.items;
     } catch (err: any) {

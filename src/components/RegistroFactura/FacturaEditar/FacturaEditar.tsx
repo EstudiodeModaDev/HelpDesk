@@ -34,25 +34,25 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
     : "", 
     
   });
+  
   const setField = <K extends keyof ReFactura>(k: K, v: ReFactura[K]) => setFormData((s) => ({ ...s, [k]: v }));
 
   const handleSubmit = async (e: React.FormEvent) => { e.preventDefault();
 
-    // 🆕 Incluimos los nuevos campos en el objeto de cambios
-    const cambios: Partial<ReFactura> = {
-      Proveedor: formData.proveedor,
-      Title: formData.Title,
-      ValorAnIVA: formData.ValorAnIVA,
-      DetalleFac: formData.DetalleFac,
-      Items: formData.Items,
-      CC: formData.CC,
-      CO: formData.CO,
-      un: formData.un,
-      DocERP: formData.DocERP,
-      FechaEmision: formData.FechaEmision,
-      FecEntregaCont: formData.FecEntregaCont,
-      Observaciones: formData.Observaciones
-    };
+  const cambios: Partial<ReFactura> = {
+    Proveedor: formData.proveedor,
+    Title: formData.Title,
+    ValorAnIVA: formData.ValorAnIVA,
+    DetalleFac: formData.DetalleFac,
+    Items: formData.Items,
+    CC: formData.CC,
+    CO: formData.CO,
+    un: formData.un,
+    DocERP: formData.DocERP,
+    FechaEmision: formData.FechaEmision,
+    FecEntregaCont: formData.FecEntregaCont,
+    Observaciones: formData.Observaciones
+  };
 
     const id = factura.id0;
     if (id == null) {
@@ -95,7 +95,7 @@ export default function FacturaEditarCompo({ factura, onClose, onEliminar, onGua
           </label>
 
           <label> NIT: 
-            <input name="Title" value={formData.Title} onChange={(e) => setField("Title", e.target.value)} placeholder="NIT / Título" />
+            <input name="Title" value={formData.Title} onChange={(e) => setField("Title", e.target.value)} placeholder="NIT" />
           </label>
 
           <label> Valor Antes del IVA: 

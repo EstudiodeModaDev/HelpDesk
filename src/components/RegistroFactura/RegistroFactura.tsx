@@ -532,7 +532,6 @@ export default function RegistroFactura() {
     if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
     if (!formData.ValorAnIVA)     e.ValorAnIVA          = "Requerida.";
     if (!formData.DetalleFac)     e.DetalleFact          = "Requerida.";
-
     setErrors(e);
     return Object.keys(e).length === 0;
   }
