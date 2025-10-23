@@ -103,3 +103,35 @@
   .nt-actions{ grid-auto-flow: row; justify-content: stretch; }
   .nt-btn{ width: 100%; min-width: 0; }
 }
+
+/* ===== Modal dentro del mismo componente ===== */
+.nt-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(2,6,23,.55);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: nt-fade .15s ease-out;
+}
+
+.nt-modal{
+  width: min(840px, 100%);
+  animation: nt-pop .18s ease-out;
+}
+
+/* Afinar la card cuando es modal */
+.nt-modal .nt-card{
+  margin: 0;
+  max-width: unset;
+}
+
+/* Animaciones */
+@keyframes nt-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes nt-pop  { from { transform: translateY(6px) scale(.98); opacity:.98 } to { transform:none; opacity:1 } }
+
+/* Soporte móvil */
+@media (max-width: 640px){
+  .nt-overlay{ padding: 12px; }
+}
