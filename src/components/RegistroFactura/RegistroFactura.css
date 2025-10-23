@@ -15,7 +15,7 @@
 
 /* ========= Contenedor ========= */
 .registro-container{
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 24px auto;
   padding: 20px;
   background: var(--card);
