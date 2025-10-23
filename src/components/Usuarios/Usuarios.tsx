@@ -81,7 +81,7 @@ export default function UsuariosPanel() {
                 </span>
                 </div>
 
-                <button type="button" className="icon-btn" title="Agregar" aria-label="Agregar usuario">
+                <button type="button" className="icon-btn" title="Agregar" aria-label="Agregar usuario" onClick={() => setModalAgregar(true)}>
                     <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
                         <path d="M12 5v14M5 12h14" />
                     </svg>
@@ -179,7 +179,7 @@ export default function UsuariosPanel() {
                 </table>
             </div>
         
-        <NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />
+            {(mostrar === "Tecnico" || mostrar==="Admin" ) &&<NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />}
 
         </section>
     );
