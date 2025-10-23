@@ -197,7 +197,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
 
     let cancelled = false;
     try {
-      const res = await usuariosSvc.getAll({filter: `Rol eq 'Administrador'`});
+      const res = await usuariosSvc.getAll({filter: `fields/Rol eq 'Administrador'`});
       if (cancelled) return;
 
       setAdmins(res);

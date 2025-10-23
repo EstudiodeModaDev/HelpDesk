@@ -5,7 +5,7 @@ import "./Usuarios.css"
 
 export default function UsuariosPanel() {
     const { Usuarios } = useGraphServices();
-    const { /*administradores,*/ tecnicos, loading} = useUsuarios(Usuarios)   
+    const { administradores, tecnicos, loading} = useUsuarios(Usuarios)   
     const [search, setSearch] = React.useState("");
     const [mostrar, setMostrar] = React.useState<string>("Tecnicos");
 
@@ -47,12 +47,32 @@ export default function UsuariosPanel() {
                 <th style={{ width: "44%" }}>Nombre</th>
                 <th style={{ width: "36%" }}>Correo</th>
                 <th style={{ width: "16%" }}>{mostrar === "Franquicias" ? "Contacto" : "Rol"}</th>
-                <th style={{ width: "4%" }} aria-label="Acciones" />
+                <th style={{ width: "4%" }} aria-label="Acciones">Acciones</th>
             </tr>
             </thead>
 
             <tbody>
             {mostrar === "Tecnicos" && tecnicos.map((u) => (
+                <tr key={u.Id}>
+                    <td><div className="cell-name">{u.Title}</div></td>
+
+                    <td><div className="cell-name">{u.Correo}</div></td>
+                    
+                    <td>{u.Rol || "—"}</td>
+                    
+                    <td className="cell-actions">
+                        <button type="button" className="icon-btn danger" title="Eliminar" aria-label={`Eliminar ${u.Title}`} /*onClick={() => onEliminar?.(u.id)}*/>
+                        <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                        </svg>
+                        </button>
+                    </td>
+                </tr>
+            ))}
+            {mostrar === "Admin" && administradores.map((u) => (
                 <tr key={u.Id}>
                     <td><div className="cell-name">{u.Title}</div></td>
 
