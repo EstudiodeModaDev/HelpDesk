@@ -174,7 +174,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
 
     let cancelled = false;
     try {
-      const res = await usuariosSvc.getAll({filter: `Rol eq 'Tecnico'`});
+      const res = await usuariosSvc.getAll({filter: `fields/Rol eq 'Tecnico'`});
       if (cancelled) return;
 
       setTecnicos(res);
