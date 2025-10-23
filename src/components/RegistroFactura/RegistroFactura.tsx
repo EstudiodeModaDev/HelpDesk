@@ -455,11 +455,10 @@ export default function RegistroFactura() {
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: toNumberFromEsCO(value),
+        [name]: name === "ValorAnIVA" ? toNumberFromEsCO(value) : value,
       }));
     }
   };
-
   const handleCompraSeleccionada = async (id: string) => {
     // ✅ Actualizamos el estado local de la compra seleccionada
     setSelectedCompra(id);
