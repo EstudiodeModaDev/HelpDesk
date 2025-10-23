@@ -1,5 +1,5 @@
 export type Franquicias = {
-    Id: string;
+    Id?: string;
     Title: string; //Nombre de la franquicia
     Ciudad: string;
     Correo: string;
@@ -7,3 +7,5 @@ export type Franquicias = {
     Jefe_x0020_de_x0020_zona: string; 
     Celular: string;
 };
+
+  export type FormFranquinciasError = Partial<Record<keyof Franquicias, string>>;

@@ -5,6 +5,7 @@ import "./Usuarios.css"
 import { useFranquicias } from "../../Funcionalidades/Franquicias";
 import { useConfirm } from "../ModalDelete/ConfirmProvider";
 import NuevoTecnico from "./AgregarUsuarios/AgregarUsuarios";
+import NuevaFranquicia from "./AgregarFranquicias/AgregarFranquicias";
 
 export default function UsuariosPanel() {
     const { Usuarios, Franquicias } = useGraphServices();
@@ -179,7 +180,8 @@ export default function UsuariosPanel() {
                 </table>
             </div>
         
-            {(mostrar === "Tecnicos" || mostrar==="Admin" ) &&<NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />}
+            {(mostrar === "Tecnico" || mostrar==="Administrador" ) &&<NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />}
+            {mostrar === "Franquicia" && <NuevaFranquicia modal open={modalAgregar} onCancel={() => setModalAgregar(false)}/>}
 
         </section>
     );
