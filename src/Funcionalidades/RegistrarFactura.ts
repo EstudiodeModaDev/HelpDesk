@@ -2,14 +2,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
-
 import { useAuth } from "../auth/authContext";
 import { FacturasService } from "../Services/Facturas.service";
 
-// 🎯 Estado y acciones disponibles para este módulo
+const toMs = (v: string | number | Date | null | undefined) =>
+  v == null ? -Infinity : new Date(v).getTime();
 
-
-// 🧩 Hook que encapsula toda la lógica de facturas
 export function useFacturas() {
   // Traemos el GraphRest desde el contexto global (ya autenticado)
   const { graph } = useGraphServices();
@@ -30,9 +28,13 @@ export function useFacturas() {
     setLoading(true);
     setError(null);
     try {
-      const lista = await service.getAll();
-      setFacturas(lista.items);
-      return lista.items;
+      const lista = await service.getAll({orderby: "createdDateTime desc"});
+      console.log("Desordenada", lista.items)
+      const listaOrdenada = lista.items.sort((a, b) => toMs(b.Created!) - toMs(a.Created!)); // Descendente
+
+      console.log(listaOrdenada)
+      setFacturas(listaOrdenada);
+      return listaOrdenada;
     } catch (err: any) {
       console.error("Error al obtener facturas:", err);
       setError(err?.message ?? "Error desconocido al cargar facturas");

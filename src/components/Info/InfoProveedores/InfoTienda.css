@@ -145,6 +145,7 @@
   border-bottom: 1px solid var(--it-border);
   padding: .75rem 1rem;
   vertical-align: top;
+  text-align: center;
 }
 
 /* Valor vacío/N/A: estilo sutil (opcional, detectado por texto) */

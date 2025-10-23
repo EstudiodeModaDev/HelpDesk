@@ -90,6 +90,8 @@ export function useIsAdmin(email?: string | null) {
 
 export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const [usuarios, setUsuarios] = React.useState<UsuariosSP[]>([]);
+  const [tecnicos, setTecnicos] = React.useState<UsuariosSP[]>([]);
+  const [administradores, setAdmins] = React.useState<UsuariosSP[]>([]);
   const [UseruserOptions, setUserOptions] = React.useState<UserOption[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -131,7 +133,6 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
   }, []);
 
   // --- loader principal ---
-
   const loadUsuarios = React.useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -167,14 +168,82 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
     return () => { cancelled = true; };
   }, [usuariosSvc, /* pageSize, */ mapRowToUsuario, mapUsuariosToOptions]);
 
+  const loadTecnicos = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.getAll({filter: `fields/Rol eq 'Tecnico'`});
+      if (cancelled) return;
+
+      setTecnicos(res);
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error cargando usuarios");
+        setUsuarios([]);
+        setUserOptions([]);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
+  const loadAdmins = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.getAll({filter: `fields/Rol eq 'Administrador'`});
+      if (cancelled) return;
+
+      setAdmins(res);
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error cargando usuarios");
+        setAdmins([]);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
+  const deleteUser = React.useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    let cancelled = false;
+    try {
+      const res = await usuariosSvc.delete(id);
+      if (cancelled) return;
+
+      console.log(res)
+    } catch (e: any) {
+      if (!cancelled) {
+        setError(e?.message ?? "Error eliminado usuarios");
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+
+    return () => { cancelled = true; };
+  }, [usuariosSvc]);
+
   React.useEffect(() => {
     let cancel = false;
     (async () => {
       if (cancel) return;
       await loadUsuarios();
+      await loadTecnicos();
+      await loadAdmins();
     })();
     return () => { cancel = true; };
-  }, [loadUsuarios]);
+  }, [loadUsuarios, loadTecnicos, loadAdmins]);
 
   const refreshUsuers = React.useCallback(async () => {
     await loadUsuarios();
@@ -183,14 +252,7 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
   const hasNext = !!nextLink;
 
   return {
-    usuarios,
-    UseruserOptions,
-    loading,
-    error,
-    pageSize, setPageSize,
-    pageIndex,
-    hasNext,
-    nextLink,
-    refreshUsuers,
+    usuarios, UseruserOptions, loading, error, pageSize, pageIndex, hasNext, nextLink, tecnicos, administradores,
+    refreshUsuers, deleteUser, setPageSize,
   };
 }

@@ -145,3 +145,49 @@ export function truncateNoCutGraphemes(s: string, max: number, suffix = "...") {
   const safe = upTo.slice(0, cutAt).replace(/[.,;:!?\s]+$/u, "");
   return safe + suffix;
 }
+
+const getByPath = (obj: any, path: string) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
+
+export const sortByPath = (
+  path: string,
+  type: string = "string",
+  dir: string = "asc",
+  nulls: string = "last"
+) => {
+  const dirMul = dir === "asc" ? 1 : -1;
+  const nullMul = nulls === "first" ? -1 : 1;
+
+  return (a: any, b: any) => {
+    let va = getByPath(a, path);
+    let vb = getByPath(b, path);
+
+    const aNull = va == null || va === "";
+    const bNull = vb == null || vb === "";
+    if (aNull && bNull) return 0;
+    if (aNull) return nullMul;
+    if (bNull) return -nullMul;
+
+    if (type === "date") {
+      const ta = new Date(va).getTime();
+      const tb = new Date(vb).getTime();
+      return (ta - tb) * dirMul;
+    }
+
+    if (type === "number") {
+      const na = Number(va);
+      const nb = Number(vb);
+      // NaN al final siempre
+      const aNaN = Number.isNaN(na);
+      const bNaN = Number.isNaN(nb);
+      if (aNaN && bNaN) return 0;
+      if (aNaN) return 1;
+      if (bNaN) return -1;
+      return (na - nb) * dirMul;
+    }
+
+    // string
+    const sa = String(va);
+    const sb = String(vb);
+    return sa.localeCompare(sb, "es", { sensitivity: "base", numeric: true }) * dirMul;
+  };
+};
