@@ -79,7 +79,7 @@ export default function UsuariosPanel() {
                         <th>Nombre</th>
                         <th>Correo</th>
                         <th>{mostrar === "Franquicias" ? "Contacto" : "Rol"}</th>
-                        <th>Acciones</th> {/* pon texto o &nbsp; para asegurar la columna */}
+                        <th> </th> {/* pon texto o &nbsp; para asegurar la columna */}
                     </tr>
                 </thead>
 
