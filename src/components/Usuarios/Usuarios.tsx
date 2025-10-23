@@ -73,8 +73,8 @@ export default function UsuariosPanel() {
                 <div className="users-select-wrap">
                     <select className="users-select" value={mostrar} onChange={(e) => setMostrar(e.target.value)} aria-label="Filtrar por franquicia">
                         <option value="Franquicias">Franquicias</option>
-                        <option value="Tecnicos">Resolutores</option>
-                        <option value="Admin">Administradores</option>
+                        <option value="Tecnico">Resolutores</option>
+                        <option value="Administrador">Administradores</option>
                     </select>
                 <span className="select-caret" aria-hidden>
                     ▾
@@ -107,7 +107,7 @@ export default function UsuariosPanel() {
                     </thead>
 
                     <tbody>
-                        {mostrar === "Tecnicos" && filteredTecnicos.map((u) => (
+                        {mostrar === "Tecnico" && filteredTecnicos.map((u) => (
                             <tr key={u.Id}>
                                 <td><div className="cell-name">{u.Title}</div></td>
 
@@ -127,7 +127,7 @@ export default function UsuariosPanel() {
                                 </td>
                             </tr>
                         ))}
-                        {mostrar === "Admin" && filteredAdmin.map((u) => (
+                        {mostrar === "Administrador" && filteredAdmin.map((u) => (
                             <tr key={u.Id}>
                                 <td><div className="cell-name">{u.Title}</div></td>
 
@@ -179,7 +179,7 @@ export default function UsuariosPanel() {
                 </table>
             </div>
         
-            {(mostrar === "Tecnico" || mostrar==="Admin" ) &&<NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />}
+            {(mostrar === "Tecnicos" || mostrar==="Admin" ) &&<NuevoTecnico modal tipo={mostrar} open={modalAgregar} onCancel={() => setModalAgregar(false)} />}
 
         </section>
     );

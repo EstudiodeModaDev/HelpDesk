@@ -38,10 +38,10 @@ export default function NuevoTecnico({ onCancel, tipo, modal = true, open }: Pro
   const content = (
     <div className="nt-card" ref={cardRef} onClick={(e) => e.stopPropagation()}>
       <header className="nt-header">
-        <h2 id="nt-title">Nuevo Técnico</h2>
+        <h2 id="nt-title">Nuevo {tipo}</h2>
       </header>
 
-      <form className="nt-form" onSubmit={addUser} noValidate>
+      <form className="nt-form" onSubmit={(e) => {e.preventDefault(); addUser()}} noValidate>
         <div className="nt-field">
           <label htmlFor="nt-nombre" className="nt-label">Nombre Completo</label>
           <input
