@@ -43,7 +43,7 @@ export default function RegistroFactura() {
     Observaciones: "",
     RegistradoPor: account?.name ?? "",
   });
-  const [displayValor, setDisplayValor] = React.useState<Number>();
+  const [displayValor, setDisplayValor] = React.useState<Number>(0);
   const { CentroCostos, CentroOperativo } = useGraphServices();
   const { ccOptions, loading: loadingCC} = useCentroCostos(CentroCostos as any);
   const { COOptions, loading: loadingCO, UNOptions} = useCO(CentroOperativo as any);
