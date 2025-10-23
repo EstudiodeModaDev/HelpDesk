@@ -2,11 +2,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
-
 import { useAuth } from "../auth/authContext";
 import { FacturasService } from "../Services/Facturas.service";
 
-// 🧩 Hook que encapsula toda la lógica de facturas
+const toMs = (v: string | number | Date | null | undefined) =>
+  v == null ? -Infinity : new Date(v).getTime();
+
 export function useFacturas() {
   // Traemos el GraphRest desde el contexto global (ya autenticado)
   const { graph } = useGraphServices();
@@ -29,7 +30,8 @@ export function useFacturas() {
     try {
       const lista = await service.getAll({orderby: "createdDateTime desc"});
       console.log("Desordenada", lista.items)
-      const listaOrdenada = lista.items.sort((a, b) => a.Created!.localeCompare(b.Created!));
+      const listaOrdenada = lista.items.sort((a, b) => toMs(b.Created!) - toMs(a.Created!)); // Descendente
+
       console.log(listaOrdenada)
       setFacturas(listaOrdenada);
       return listaOrdenada;
