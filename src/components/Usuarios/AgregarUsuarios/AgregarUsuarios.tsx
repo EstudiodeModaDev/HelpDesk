@@ -1,5 +1,5 @@
 import * as React from "react";
-import "./NuevoTecnico.css";
+import "./NuevoUsuario.css";
 import { useGraphServices } from "../../../graph/GrapServicesContext";
 import { useUsuarios } from "../../../Funcionalidades/Usuarios";
 
