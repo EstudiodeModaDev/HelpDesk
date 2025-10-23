@@ -1,6 +1,7 @@
 import React from "react";
 import { useUsuarios } from "../../Funcionalidades/Usuarios";
 import { useGraphServices } from "../../graph/GrapServicesContext";
+import "./Usuarios.css"
 
 export default function UsuariosPanel() {
     const { Usuarios } = useGraphServices();
