@@ -32,7 +32,7 @@ export function useFacturas() {
     setError(null);
     try {
       const lista = await service.getAll({orderby: "createdDateTime desc"});
-      const ordenadas = [...lista.items].sort(sortByPath("Created", "string", "desc"));
+      const ordenadas = [...lista.items].sort(sortByPath("Created", "date", "desc"));
       console.log(lista.items)
       setFacturas(ordenadas);
       return lista.items;
