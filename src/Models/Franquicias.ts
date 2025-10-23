@@ -4,5 +4,6 @@ export type Franquicias = {
     Ciudad: string;
     Correo: string;
     Direccion: string;
-    Jefe_x0020_de_x0020_zona: string; //Jefe de zona
+    Jefe_x0020_de_x0020_zona: string; 
+    Celular: string;
 };
