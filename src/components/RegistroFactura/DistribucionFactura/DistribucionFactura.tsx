@@ -162,34 +162,36 @@ export default function DistribucionFactura() {
 
       <form className="distribucion-form" onSubmit={handleSubmit}>
         <div className="form-grid">
-          {/* 🔹 Select de proveedores */}
-          <div className="form-group">
-            <label htmlFor="proveedor-select">Proveedor:</label>
-            {loading ? (
-              <span>Cargando...</span>
-            ) : error ? (
-              <span style={{ color: "red" }}>{error}</span>
-            ) : (
-              <select
-                id="proveedor-select"
-                value={proveedorSeleccionado}
-                onChange={(e) => handleProveedorSeleccionado(e.target.value)}
-              >
-                <option value="">-- Selecciona un proveedor --</option>
-                {proveedores.map((p) => (
-                  <option key={p.Id} value={p.Id}>
-                    {p.Nombre}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+          {/* 🔹 Proveedor y NIT en la misma línea */}
+<div className="form-row">
+  <div className="form-group">
+    <label htmlFor="proveedor-select">Proveedor:</label>
+    {loading ? (
+      <span>Cargando...</span>
+    ) : error ? (
+      <span style={{ color: "red" }}>{error}</span>
+    ) : (
+      <select
+        id="proveedor-select"
+        value={proveedorSeleccionado}
+        onChange={(e) => handleProveedorSeleccionado(e.target.value)}
+      >
+        <option value="">-- Selecciona un proveedor --</option>
+        {proveedores.map((p) => (
+          <option key={p.Id} value={p.Id}>
+            {p.Nombre}
+          </option>
+        ))}
+      </select>
+    )}
+  </div>
 
-          {/* Campo NIT */}
-          <div className="form-group">
-            <label htmlFor="nit">NIT:</label>
-            <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
-          </div>
+  <div className="form-group">
+    <label htmlFor="nit">NIT:</label>
+    <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
+  </div>
+</div>
+
 
           {/* Campo Cargo Fijo */}
           <div className="form-group">
@@ -206,7 +208,7 @@ export default function DistribucionFactura() {
 
           {/* Campo CosToImp */}
           <div className="form-group">
-            <label htmlFor="CosToImp">Costo de Impresión:</label>
+            <label htmlFor="CosToImp">Costo total de Impresión:</label>
             <input
               type="text"
               id="CosToImp"
@@ -231,7 +233,7 @@ export default function DistribucionFactura() {
 
           {/* Campos Impresiones */}
           <div className="form-group">
-            <label htmlFor="ImpBnCedi">Imp B/N CEDI</label>
+            <label htmlFor="ImpBnCedi">Impresiones B/N CEDI</label>
             <input
               type="text"
               id="ImpBnCedi"
@@ -242,7 +244,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpBnPalms">Imp B/N Palms</label>
+            <label htmlFor="ImpBnPalms">Impresiones B/N Palms</label>
             <input
               type="text"
               id="ImpBnPalms"
@@ -253,7 +255,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpColorPalms">Imp Color Palms</label>
+            <label htmlFor="ImpColorPalms">Impresiones Color Palms</label>
             <input
               type="text"
               id="ImpColorPalms"
@@ -264,7 +266,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpBnCalle">Imp B/N Calle</label>
+            <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
             <input
               type="text"
               id="ImpBnCalle"
@@ -275,7 +277,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpColorCalle">Imp Color Calle</label>
+            <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
             <input
               type="text"
               id="ImpColorCalle"
@@ -287,7 +289,7 @@ export default function DistribucionFactura() {
 
           {/* Campos automáticos de costos totales */}
           <div className="form-group">
-            <label htmlFor="CosTotCEDI">Costo Total CEDI</label>
+            <label htmlFor="CosTotCEDI">Costo Total del CEDI</label>
             <input
               type="text"
               id="CosTotCEDI"
@@ -298,7 +300,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarNacionales">Costo Total Nacionales</label>
+            <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales</label>
             <input
               type="text"
               id="CosTotMarNacionales"
@@ -309,7 +311,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarImpor">Costo Total Importaciones</label>
+            <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones</label>
             <input
               type="text"
               id="CosTotMarImpor"
@@ -321,7 +323,7 @@ export default function DistribucionFactura() {
 
           <div className="form-group">
             <label htmlFor="CosTotServAdmin">
-              Costo Total Servicios Administrativos
+              Costo Total de Servicios Administrativos
             </label>
             <input
               type="text"

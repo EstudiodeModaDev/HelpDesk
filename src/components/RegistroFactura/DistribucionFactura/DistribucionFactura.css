@@ -149,3 +149,22 @@
     grid-column: 1 / -1;
   }
 }
+
+/* ========= Fila especial para proveedor y NIT ========= */
+.form-row {
+  display: flex;
+  gap: 16px;
+  grid-column: span 2;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Responsive: apilar los campos en pantallas pequeñas */
+@media (max-width: 900px) {
+  .form-row {
+    flex-direction: column;
+    grid-column: 1 / -1;
+  }
+}
