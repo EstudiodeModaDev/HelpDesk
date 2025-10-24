@@ -7,6 +7,7 @@ export default function HomeDashboard() {
         <iframe
           title="Informe Helpdesk Power BI"
           src="https://app.powerbi.com/view?r=eyJrIjoiNGMxNGM3NTEtOWJlNC00ZTAzLThjYWQtYjlhODAzMTI2YjVjIiwidCI6ImNkNDhlY2Q5LTdlMTUtNGY0Yi05N2Q5LWVjODEzZWU0MmIyYyIsImMiOjR9"
+          allowFullScreen
         />
       </div>
     </div>
