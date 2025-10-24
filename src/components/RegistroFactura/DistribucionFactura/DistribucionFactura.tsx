@@ -34,7 +34,8 @@ export default function DistribucionFactura() {
   const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
   const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
   const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
-  //const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
+  const [displayImpresionesColorCalle, setdisplayImpresionesColorCalle] = React.useState("");
+  const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
   //const [displayTotalMarcasNacionales, setdisplayTotalMarcasNacionales] = React.useState("");
   //const [displayTotalMarcasImportadas, setDisplayMarcasImportadas] = React.useState("");
   //const [displayServiciosAdministrativos, setdisplayServiciosAdministrativos] = React.useState("");
@@ -55,15 +56,6 @@ export default function DistribucionFactura() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value === "" ? 0 : parseFloat(value),
-    }));
-  };
-
   useEffect(() => {
     const {CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle,} = formData;
 
@@ -76,6 +68,7 @@ export default function DistribucionFactura() {
 
     setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)))
     setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)))
+    setdisplayTotalCedi(formatPesosEsCO(String(CosTotCEDI)))
 
     setFormData((prev) => ({
       ...prev,
@@ -327,13 +320,30 @@ export default function DistribucionFactura() {
 
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
-            <input type="number" id="ImpColorCalle" name="ImpColorCalle" value={formData.ImpColorCalle} onChange={handleChange}/>
+            <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesColorCalle)}  
+              onChange={(e) => {
+                const raw = e.target.value;
+                const f = formatPesosEsCO(raw);
+                const num = toNumberFromEsCO(f);
+                setdisplayImpresionesColorCalle(f);
+                setField("ImpColorCalle", num)
+              }}
+              onBlur={() => {
+                const num = toNumberFromEsCO(displayImpresionesColorCalle);
+                setdisplayImpresionesColorCalle(
+                  new Intl.NumberFormat("es-CO", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  }).format(Number.isFinite(num) ? num : 0)
+                );
+              }}/>
           </div>
 
           {/* Campos automáticos de costos totales */}
           <div className="form-group">
-            <label htmlFor="CosTotCEDI">Costo Total del CEDI-Automatico</label>
+            <label htmlFor="CosTotCEDI">Costo Total del CEDI</label>
             <input type="number" id="CosTotCEDI" name="CosTotCEDI" value={formData.CosTotCEDI.toFixed(2)} readOnly/>
+            <input type="text" inputMode="numeric" name="CosTotCEDI" placeholder="Se llenara automaticamente" value={String(displayTotalCedi)} readOnly/>
           </div>
 
           <div className="form-group">
