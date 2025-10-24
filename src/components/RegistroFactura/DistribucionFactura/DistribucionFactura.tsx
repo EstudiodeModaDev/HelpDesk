@@ -212,7 +212,7 @@ export default function DistribucionFactura() {
               type="number"
               id="CosToImp"
               name="CosToImp"
-              value={formData.CosToImp.toFixed(2)}
+              value={formData.CosToImp}
               onChange={handleChange}
             />
           </div>
@@ -236,7 +236,7 @@ export default function DistribucionFactura() {
               type="number"
               id="ImpBnCedi"
               name="ImpBnCedi"
-              value={formData.ImpBnCedi.toFixed(2)}
+              value={formData.ImpBnCedi}
               onChange={handleChange}
             />
           </div>
@@ -247,7 +247,7 @@ export default function DistribucionFactura() {
               type="number"
               id="ImpBnPalms"
               name="ImpBnPalms"
-              value={formData.ImpBnPalms.toFixed(2)}
+              value={formData.ImpBnPalms}
               onChange={handleChange}
             />
           </div>
@@ -258,7 +258,7 @@ export default function DistribucionFactura() {
               type="number"
               id="ImpColorPalms"
               name="ImpColorPalms"
-              value={formData.ImpColorPalms.toFixed(2)}
+              value={formData.ImpColorPalms}
               onChange={handleChange}
             />
           </div>
@@ -269,7 +269,7 @@ export default function DistribucionFactura() {
               type="number"
               id="ImpBnCalle"
               name="ImpBnCalle"
-              value={formData.ImpBnCalle.toFixed(2)}
+              value={formData.ImpBnCalle}
               onChange={handleChange}
             />
           </div>
@@ -280,7 +280,7 @@ export default function DistribucionFactura() {
               type="number"
               id="ImpColorCalle"
               name="ImpColorCalle"
-              value={formData.ImpColorCalle.toFixed(2)}
+              value={formData.ImpColorCalle}
               onChange={handleChange}
             />
           </div>
