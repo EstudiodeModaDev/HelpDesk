@@ -1,12 +1,24 @@
-.content--withSidebar{
-  grid-area: content;
-  background: transparent;
-  display: flex;       /* o grid, da igual para el caso */
-  min-height: 0;       /* CLAVE: permite que el hijo tome el 1fr completo */
+.dashboard-container{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  padding: 0;           /* sin márgenes alrededor */
+  min-height: 0;        /* para que el iframe no colapse */
 }
 
-/* (Opcional) si ya no usas header, elimina su fila de la grilla */
-.layout--withSidebar.no-header{
-  grid-template-rows: 1fr;
-  grid-template-areas: "sidebar content";
+.dashboard-card{
+  flex: 1 1 auto;
+  min-height: 0;        /* evita colapso en contenedores flex/grid */
+  border: 1px solid rgba(255,255,255,.22);  /* solo contorno, sin fondo */
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.06);
+  overflow: hidden;     /* recorta el iframe a los bordes redondeados */
+}
+
+/* El iframe debe ocupar todo */
+.dashboard-card iframe{
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
