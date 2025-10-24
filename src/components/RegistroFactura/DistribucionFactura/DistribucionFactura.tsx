@@ -197,10 +197,10 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="CargoFijo">Cargo Fijo:</label>
             <input
-              type="text"
+              type="number"
               id="CargoFijo"
               name="CargoFijo"
-              value={formData.CargoFijo.toFixed(2)}
+              value={formData.CargoFijo}
               onChange={handleChange}
             />
           </div>
@@ -209,7 +209,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="CosToImp">Costo total de Impresión:</label>
             <input
-              type="text"
+              type="number"
               id="CosToImp"
               name="CosToImp"
               value={formData.CosToImp.toFixed(2)}
@@ -221,7 +221,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ValorAnIVA">Valor antes de IVA-Automatico:</label>
             <input
-              type="text"
+              type="number"
               id="ValorAnIVA"
               name="ValorAnIVA"
               value={formData.ValorAnIVA.toFixed(2)}
@@ -233,7 +233,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ImpBnCedi">Impresiones B/N CEDI</label>
             <input
-              type="text"
+              type="number"
               id="ImpBnCedi"
               name="ImpBnCedi"
               value={formData.ImpBnCedi.toFixed(2)}
@@ -244,7 +244,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ImpBnPalms">Impresiones B/N Palms</label>
             <input
-              type="text"
+              type="number"
               id="ImpBnPalms"
               name="ImpBnPalms"
               value={formData.ImpBnPalms.toFixed(2)}
@@ -255,7 +255,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ImpColorPalms">Impresiones Color Palms</label>
             <input
-              type="text"
+              type="number"
               id="ImpColorPalms"
               name="ImpColorPalms"
               value={formData.ImpColorPalms.toFixed(2)}
@@ -266,7 +266,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
             <input
-              type="text"
+              type="number"
               id="ImpBnCalle"
               name="ImpBnCalle"
               value={formData.ImpBnCalle.toFixed(2)}
@@ -277,7 +277,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
             <input
-              type="text"
+              type="number"
               id="ImpColorCalle"
               name="ImpColorCalle"
               value={formData.ImpColorCalle.toFixed(2)}
@@ -289,7 +289,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="CosTotCEDI">Costo Total del CEDI-Automatico</label>
             <input
-              type="text"
+              type="number"
               id="CosTotCEDI"
               name="CosTotCEDI"
               value={formData.CosTotCEDI.toFixed(2)}
@@ -300,7 +300,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales-Automatico</label>
             <input
-              type="text"
+              type="number"
               id="CosTotMarNacionales"
               name="CosTotMarNacionales"
               value={formData.CosTotMarNacionales.toFixed(2)}
@@ -311,7 +311,7 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones-Automatico</label>
             <input
-              type="text"
+              type="number"
               id="CosTotMarImpor"
               name="CosTotMarImpor"
               value={formData.CosTotMarImpor.toFixed(2)}
@@ -324,7 +324,7 @@ export default function DistribucionFactura() {
               Costo Total de Servicios Administrativos-Automatico
             </label>
             <input
-              type="text"
+              type="number"
               id="CosTotServAdmin"
               name="CosTotServAdmin"
               value={formData.CosTotServAdmin.toFixed(2)}
