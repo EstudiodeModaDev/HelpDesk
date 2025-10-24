@@ -229,6 +229,7 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
 
   return (
     <aside className="sidebar" aria-label="Navegación principal">
+
       <div className="sidebar__header">
         <div style={{fontWeight:800, display:'flex', alignItems:'center', gap:8}}>
           <span>🟢</span> <span>Soporte Técnico</span>
@@ -329,24 +330,26 @@ function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => 
     <div className="page layout layout--withSidebar">
       <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
 
-      <main className="page layout layout--withSidebar no-header">
-        {selectedItem?.to ?? (
-          <>  
-            {selected === 'cajpos' && (
-              services?.Usuarios
-                ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
-                : <div>Cargando servicios…</div>
-            )}
+      <main className="content content--withSidebar">
+        <div className="content__inner">
+          {selectedItem?.to ?? (
+            <>  
+              {selected === 'cajpos' && (
+                services?.Usuarios
+                  ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
+                  : <div>Cargando servicios…</div>
+              )}
 
-            {/* (Opcionales) Otros renders explícitos si quieres soportar ambos esquemas */}
-            {selected === 'home' && <Home />}
-            {selected === 'ticketform' && <NuevoTicketForm />}
-            {selected === 'ticketTable' && <TablaTickets />}
-            {selected === 'task' && <TareasPage />}
-            {selected === 'formatos' && <Formatos />}
-            {selected === 'info' && <InfoPage />}
-          </>
-        )}
+              {/* (Opcionales) Otros renders explícitos si quieres soportar ambos esquemas */}
+              {selected === 'home' && <Home />}
+              {selected === 'ticketform' && <NuevoTicketForm />}
+              {selected === 'ticketTable' && <TablaTickets />}
+              {selected === 'task' && <TareasPage />}
+              {selected === 'formatos' && <Formatos />}
+              {selected === 'info' && <InfoPage />}
+            </>
+          )}
+        </div>
       </main>
     </div>
   );
