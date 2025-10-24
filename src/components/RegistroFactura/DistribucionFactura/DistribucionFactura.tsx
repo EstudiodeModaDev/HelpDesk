@@ -283,8 +283,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpColorPalms">Impresiones Color Palms</label>
-            <input type="number" id="ImpColorPalms" name="ImpColorPalms" value={formData.ImpColorPalms} onChange={handleChange}/>
+            <label htmlFor="ImpColorPalms">Impresiones Color 35 Palms</label>
             <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesColorPalms)}  
               onChange={(e) => {
                 const raw = e.target.value;
