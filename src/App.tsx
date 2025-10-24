@@ -1,4 +1,3 @@
-// src/App.tsx
 import * as React from 'react';
 import './App.css';
 
@@ -23,8 +22,6 @@ import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
 import UsuariosPanel from './components/Usuarios/Usuarios';
 
 /* ---------------------- ROLES & NAVS ---------------------- */
-
-// Roles de la aplicación
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
 
 export type MenuItem = {
@@ -35,7 +32,6 @@ export type MenuItem = {
   children?: MenuItem[];  // subitems si es carpeta
 };
 
-/* Árbol de navegación con nivel intermedio "Siesa" */
 const NAVS_ADMIN: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
@@ -173,13 +169,8 @@ function HeaderBar(props: {
   );
 }
 
-/* ---------------------- UI: Sidebar (anidado) ---------------------- */
-function Sidebar(props: {
-  navs: readonly MenuItem[];
-  selected: string;
-  onSelect: (k: string) => void;
-}) {
-  const { navs, selected, onSelect } = props;
+function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: (k: string) => void; user: User; role: string;}) {
+  const { navs, selected, onSelect, user, role } = props;
   const [open, setOpen] = React.useState<Record<string, boolean>>({});
 
   // abre la rama que contiene el seleccionado
@@ -238,11 +229,27 @@ function Sidebar(props: {
 
   return (
     <aside className="sidebar" aria-label="Navegación principal">
-      <div className="sidebar__header">Menú</div>
+      {/* Título y subtítulo dentro del sidebar (como en la captura) */}
+      <div className="sidebar__header">
+        <div style={{fontWeight:800, display:'flex', alignItems:'center', gap:8}}>
+          <span>🟢</span> <span>Soporte Técnico</span>
+        </div>
+        <div style={{opacity:.8, fontSize:12, marginTop:4}}>Estamos aquí para ayudarte</div>
+      </div>
+
       <nav className="sidebar__nav" role="navigation">
         {renderTree(navs)}
       </nav>
-      <div className="sidebar__footer"><small>Estudio de moda</small></div>
+
+      {/* Footer perfil */}
+      <div className="sidebar__footer">
+        <div className="sb-prof__avatar">{user?.displayName ? user.displayName[0] : 'U'}</div>
+        <div className="sb-prof__info">
+          <div className="sb-prof__name">Mi perfil</div>
+          <div className="sb-prof__mail">{user?.mail || 'usuario@empresa.com'}</div>
+          <div className="sb-prof__mail" aria-hidden="true">{role}</div>
+        </div>
+      </div>
     </aside>
   );
 }
@@ -307,30 +314,13 @@ function Shell() {
   );
 }
 
-/* ---------------------- LoggedApp: nav por rol ---------------------- */
-function LoggedApp({
-  user,
-  actionLabel,
-  onAuthClick,
-}: {
-  user: User;
-  actionLabel: string;
-  onAuthClick: () => void;
-}) {
-  const { role } = useUserRoleFromSP(user!.mail); // 'Administrador' | 'Técnico' | 'Usuario'
+function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => void;}) {
+  const { role } = useUserRoleFromSP(user!.mail); 
   const navs = getNavsForRole(role);
 
-  // ❗️Servicios Graph aquí (ya estamos dentro de GraphServicesProvider)
-  const services = useGraphServices() as {
-    Tickets: TicketsService;
-    Usuarios: UsuariosSPService;
-    Logs: LogService;
-  };
-
-  // selecciona la primera hoja del menú por rol
+  const services = useGraphServices() as { Tickets: TicketsService;  Usuarios: UsuariosSPService; Logs: LogService;};
   const [selected, setSelected] = React.useState<string>(firstLeafId(navs));
 
-  // si cambia rol/menú y el seleccionado ya no existe, caer en la primera hoja
   React.useEffect(() => {
     if (!hasNav(navs, selected)) setSelected(firstLeafId(navs));
   }, [role, navs, selected]);
@@ -340,13 +330,7 @@ function LoggedApp({
   return (
     <div className="page layout layout--withSidebar">
       {/* Sidebar SIEMPRE visible */}
-      <Sidebar navs={navs} selected={selected} onSelect={setSelected} />
-
-      <HeaderBar
-        user={user}
-        role={role}
-        onPrimaryAction={{ label: actionLabel, onClick: onAuthClick, disabled: false }}
-      />
+      <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
 
       <main className="content content--withSidebar">
         {/* Render genérico cuando la hoja ya trae `to` */}
