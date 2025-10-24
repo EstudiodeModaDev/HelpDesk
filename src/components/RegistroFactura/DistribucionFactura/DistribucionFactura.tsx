@@ -1,22 +1,15 @@
 // src/components/DistribucionFactura/DistribucionFactura.tsx
 import React, { useState, useEffect } from "react";
 import "./DistribucionFactura.css";
-
-// 🔽 Hook para traer los proveedores
 import { useProveedores } from "../../../Funcionalidades/ProveedoresFactura";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
-// import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
 
 export default function DistribucionFactura() {
-  // 🧩 Hook de proveedores
   const { proveedores, loading, error } = useProveedores();
-
-  // 🧠 Estados del componente
-  const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
-
-  //estados de la funcionalidad
   const { registrarDistribucion } = useDistribucionFactura();
+
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
 
   const [formData, setFormData] = useState<DistribucionFacturaData>({
     Proveedor: "",
@@ -38,45 +31,31 @@ export default function DistribucionFactura() {
   // 🔹 Maneja selección de proveedor
   const handleProveedorSeleccionado = (id: string) => {
     setProveedorSeleccionado(id);
-
-    // Si no hay proveedor seleccionado, limpiar campos
     if (!id) {
-      setFormData((prev) => ({
-        ...prev,
-        Proveedor: "",
-        Title: "",
-      }));
+      setFormData((prev) => ({ ...prev, Proveedor: "", Title: "" }));
       return;
     }
-
-    // Buscar el proveedor en la lista
     const prov = proveedores.find((p) => String(p.Id) === String(id));
-
     if (prov) {
       setFormData((prev) => ({
         ...prev,
         Proveedor: prov.Nombre ?? "",
         Title: prov.Title ?? "",
       }));
-    } else {
-      console.warn("Proveedor seleccionado no encontrado en lista:", id);
     }
   };
 
-  // 🔹 Maneja cambios numéricos
+  // 🔹 Cambios numéricos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    // Validar solo números (permitiendo decimales)
     if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value === "" ? 0 : parseFloat(value),
     }));
   };
 
-  // 🧮 Recalcular campos automáticos cuando cambien dependencias
+  // 🧮 Cálculos automáticos
   useEffect(() => {
     const {
       CargoFijo,
@@ -88,16 +67,12 @@ export default function DistribucionFactura() {
       ImpColorCalle,
     } = formData;
 
-    // Calcular ValorAnIVA
     const ValorAnIVA = CargoFijo + CosToImp;
-
-    // Calcular costos automáticos
     const CosTotCEDI = CargoFijo / 4 + ImpBnCedi;
     const promedioOtros =
       (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
     const otrosCostos = CargoFijo / 4 + promedioOtros;
 
-    // Actualizar el estado con los valores calculados
     setFormData((prev) => ({
       ...prev,
       ValorAnIVA,
@@ -117,55 +92,69 @@ export default function DistribucionFactura() {
   ]);
 
   // 💾 Guardar datos (enviar a SharePoint)
-// ✅ Función para manejar el envío del formulario
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    // ⚠️ Validar que se haya seleccionado un proveedor
-    if (!formData.Proveedor || !formData.Title) {
-      alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
-      return;
+    try {
+      if (!formData.Proveedor || !formData.Title) {
+        alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
+        return;
+      }
+
+      // ⚠️ Validación de costos de impresión
+      const sumaCostos =
+        formData.CosTotCEDI +
+        formData.CosTotMarNacionales +
+        formData.CosTotMarImpor +
+        formData.CosTotServAdmin;
+
+      // Permitimos una pequeña diferencia por redondeo
+      const diferencia = Math.abs(sumaCostos - formData.CosToImp);
+
+      if (diferencia > 0.01) {
+        alert(
+          `⚠️ Los costos de impresión no coinciden.\n\nCosto de impresión declarado: ${formData.CosToImp.toFixed(
+            2
+          )}\nSuma de costos calculados: ${sumaCostos.toFixed(
+            2
+          )}\n\nPor favor revisa los valores.`
+        );
+        return;
+      }
+
+      const record = { ...formData };
+      delete (record as any).Id;
+
+      console.log("📤 Enviando distribución a SharePoint:", record);
+      await registrarDistribucion(record);
+
+      alert("✅ Distribución de factura guardada con éxito");
+
+      // ♻️ Reset
+      setProveedorSeleccionado("");
+      setFormData({
+        Proveedor: "",
+        Title: "",
+        CargoFijo: 0,
+        CosToImp: 0,
+        ValorAnIVA: 0,
+        ImpBnCedi: 0,
+        ImpBnPalms: 0,
+        ImpColorPalms: 0,
+        ImpBnCalle: 0,
+        ImpColorCalle: 0,
+        CosTotMarNacionales: 0,
+        CosTotMarImpor: 0,
+        CosTotCEDI: 0,
+        CosTotServAdmin: 0,
+      });
+    } catch (error: any) {
+      console.error("❌ Error al guardar la distribución:", error);
+      alert(
+        "⚠️ Ocurrió un error al guardar la distribución. Revisa la consola para más detalles."
+      );
     }
-
-    // 🧩 Preparamos el registro (eliminamos el Id si existe)
-    const record = { ...formData };
-    delete (record as any).Id;
-
-    console.log("📤 Enviando distribución a SharePoint:", record);
-
-    // 🟢 Registrar la distribución (usa el hook useDistribucionFactura)
-    await registrarDistribucion(record);
-
-    alert("✅ Distribución de factura guardada con éxito");
-
-    // ♻️ Limpiar formulario y proveedor seleccionado
-    setProveedorSeleccionado("");
-    setFormData({
-      Proveedor: "",
-      Title: "",
-      CargoFijo: 0,
-      CosToImp: 0,
-      ValorAnIVA: 0,
-      ImpBnCedi: 0,
-      ImpBnPalms: 0,
-      ImpColorPalms: 0,
-      ImpBnCalle: 0,
-      ImpColorCalle: 0,
-      CosTotMarNacionales: 0,
-      CosTotMarImpor: 0,
-      CosTotCEDI: 0,
-      CosTotServAdmin: 0,
-    });
-
-  } catch (error: any) {
-    console.error("❌ Error al guardar la distribución:", error);
-    alert("⚠️ Ocurrió un error al guardar la distribución. Revisa la consola para más detalles.");
-  }
-};
-
-
-
+  };
 
   return (
     <div className="distribucion-container">
@@ -199,13 +188,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           {/* Campo NIT */}
           <div className="form-group">
             <label htmlFor="nit">NIT:</label>
-            <input
-              type="text"
-              id="nit"
-              name="Title"
-              value={formData.Title}
-              readOnly
-            />
+            <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
           </div>
 
           {/* Campo Cargo Fijo */}
@@ -234,7 +217,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             />
           </div>
 
-          {/* ValorAnIVA (automático) */}
+          {/* ValorAnIVA */}
           <div className="form-group">
             <label htmlFor="ValorAnIVA">Valor antes de IVA:</label>
             <input
