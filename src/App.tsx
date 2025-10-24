@@ -229,7 +229,6 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
 
   return (
     <aside className="sidebar" aria-label="Navegación principal">
-      {/* Título y subtítulo dentro del sidebar (como en la captura) */}
       <div className="sidebar__header">
         <div style={{fontWeight:800, display:'flex', alignItems:'center', gap:8}}>
           <span>🟢</span> <span>Soporte Técnico</span>
@@ -245,7 +244,6 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
       <div className="sidebar__footer">
         <div className="sb-prof__avatar">{user?.displayName ? user.displayName[0] : 'U'}</div>
         <div className="sb-prof__info">
-          <div className="sb-prof__name">Mi perfil</div>
           <div className="sb-prof__mail">{user?.mail || 'usuario@empresa.com'}</div>
           <div className="sb-prof__mail" aria-hidden="true">{role}</div>
         </div>
@@ -329,14 +327,11 @@ function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => 
 
   return (
     <div className="page layout layout--withSidebar">
-      {/* Sidebar SIEMPRE visible */}
       <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
 
       <main className="content content--withSidebar">
-        {/* Render genérico cuando la hoja ya trae `to` */}
         {selectedItem?.to ?? (
-          <>
-            {/* Fallbacks por id, útil para hojas que requieren inyectar servicios */}
+          <>  
             {selected === 'cajpos' && (
               services?.Usuarios
                 ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
