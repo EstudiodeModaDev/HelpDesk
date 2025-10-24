@@ -31,7 +31,7 @@ export default function DistribucionFactura() {
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
   const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
   const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
-  //const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
+  const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
   //const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
   //const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
   //const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
@@ -262,8 +262,25 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpBnPalms">Impresiones B/N Palms</label>
+            <label htmlFor="ImpBnPalms">Impresiones B/N 35 Palms</label>
             <input type="number" id="ImpBnPalms" name="ImpBnPalms" value={formData.ImpBnPalms} onChange={handleChange}/>
+            <input type="text" inputMode="numeric" name="ImpBnPalms" placeholder="Ej: 100.000" value={String(displayImpresionesBNPalms)}  
+              onChange={(e) => {
+                const raw = e.target.value;
+                const f = formatPesosEsCO(raw);
+                const num = toNumberFromEsCO(f);
+                setdisplayImpresionesBNPalms(f);
+                setField("ImpBnPalms", num)
+              }}
+              onBlur={() => {
+                const num = toNumberFromEsCO(displayImpresionesBNPalms);
+                setdisplayImpresionesBNPalms(
+                  new Intl.NumberFormat("es-CO", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  }).format(Number.isFinite(num) ? num : 0)
+                );
+              }}/>
           </div>
 
           <div className="form-group">
