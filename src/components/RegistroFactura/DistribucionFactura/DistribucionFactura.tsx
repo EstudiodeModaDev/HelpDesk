@@ -4,13 +4,13 @@ import "./DistribucionFactura.css";
 import { useProveedores } from "../../../Funcionalidades/ProveedoresFactura";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
+import { formatPesosEsCO, toNumberFromEsCO } from "../../../utils/Number";
 
 export default function DistribucionFactura() {
   const { proveedores, loading, error } = useProveedores();
   const { registrarDistribucion } = useDistribucionFactura();
 
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
-
   const [formData, setFormData] = useState<DistribucionFacturaData>({
     Proveedor: "",
     Title: "",
@@ -27,8 +27,18 @@ export default function DistribucionFactura() {
     CosTotCEDI: 0,
     CosTotServAdmin: 0,
   });
+  const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
+  //const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
+  //const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
+  //const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
+  //const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
+  //const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
+  //const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
+  //const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
+  //const [displayTotalMarcasNacionales, setdisplayTotalMarcasNacionales] = React.useState("");
+  //const [displayTotalMarcasImportadas, setDisplayMarcasImportadas] = React.useState("");
+  //const [displayServiciosAdministrativos, setdisplayServiciosAdministrativos] = React.useState("");
 
-  // 🔹 Maneja selección de proveedor
   const handleProveedorSeleccionado = (id: string) => {
     setProveedorSeleccionado(id);
     if (!id) {
@@ -45,7 +55,6 @@ export default function DistribucionFactura() {
     }
   };
 
-  // 🔹 Cambios numéricos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
@@ -55,7 +64,6 @@ export default function DistribucionFactura() {
     }));
   };
 
-  // 🧮 Cálculos automáticos
   useEffect(() => {
     const {
       CargoFijo,
@@ -91,7 +99,6 @@ export default function DistribucionFactura() {
     formData.ImpColorCalle,
   ]);
 
-  // 💾 Guardar datos (enviar a SharePoint)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -156,6 +163,8 @@ export default function DistribucionFactura() {
     }
   };
 
+  const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) => setFormData((s) => ({ ...s, [k]: v }));
+
   return (
     <div className="distribucion-container">
       <h2>📦 Distribución de Factura</h2>
@@ -163,173 +172,112 @@ export default function DistribucionFactura() {
       <form className="distribucion-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           {/* 🔹 Proveedor y NIT en la misma línea */}
-<div className="form-row">
-  <div className="form-group">
-    <label htmlFor="proveedor-select">Proveedor:</label>
-    {loading ? (
-      <span>Cargando...</span>
-    ) : error ? (
-      <span style={{ color: "red" }}>{error}</span>
-    ) : (
-      <select
-        id="proveedor-select"
-        value={proveedorSeleccionado}
-        onChange={(e) => handleProveedorSeleccionado(e.target.value)}
-      >
-        <option value="">-- Selecciona un proveedor --</option>
-        {proveedores.map((p) => (
-          <option key={p.Id} value={p.Id}>
-            {p.Nombre}
-          </option>
-        ))}
-      </select>
-    )}
-  </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="proveedor-select">Proveedor:</label>
+              {loading ? (
+                <span>Cargando...</span>
+              ) : error ? (
+                <span style={{ color: "red" }}>{error}</span>
+              ) : (
+                <select id="proveedor-select" value={proveedorSeleccionado} onChange={(e) => handleProveedorSeleccionado(e.target.value)}>
+                  <option value="">-- Selecciona un proveedor --</option>
+                  {proveedores.map((p) => (
+                    <option key={p.Id} value={p.Id}>
+                      {p.Nombre}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
 
-  <div className="form-group">
-    <label htmlFor="nit">NIT:</label>
-    <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
-  </div>
-</div>
-
+            <div className="form-group">
+              <label htmlFor="nit">NIT:</label>
+              <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
+            </div>
+          </div>
 
           {/* Campo Cargo Fijo */}
           <div className="form-group">
             <label htmlFor="CargoFijo">Cargo Fijo:</label>
-            <input
-              type="number"
-              id="CargoFijo"
-              name="CargoFijo"
-              value={formData.CargoFijo}
-              onChange={handleChange}
-            />
+            <input type="text" inputMode="numeric" name="CargoFijo" placeholder="Ej: 100.000,00" value={String(displayCargoFijo)}  
+              onChange={(e) => {
+                const raw = e.target.value;
+                const f = formatPesosEsCO(raw);
+                const num = toNumberFromEsCO(f);
+                setdisplayCargoFijo(f);
+                setField("CargoFijo", num)
+              }}
+              onBlur={() => {
+                const num = toNumberFromEsCO(displayCargoFijo);
+                setdisplayCargoFijo(
+                  new Intl.NumberFormat("es-CO", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  }).format(Number.isFinite(num) ? num : 0)
+                );
+              }}/>
           </div>
 
           {/* Campo CosToImp */}
           <div className="form-group">
             <label htmlFor="CosToImp">Costo total de Impresión:</label>
-            <input
-              type="number"
-              id="CosToImp"
-              name="CosToImp"
-              value={formData.CosToImp}
-              onChange={handleChange}
-            />
+            <input type="number" id="CosToImp" name="CosToImp" value={formData.CosToImp} onChange={handleChange}/>
           </div>
 
           {/* ValorAnIVA */}
           <div className="form-group">
             <label htmlFor="ValorAnIVA">Valor antes de IVA-Automatico:</label>
-            <input
-              type="number"
-              id="ValorAnIVA"
-              name="ValorAnIVA"
-              value={formData.ValorAnIVA.toFixed(2)}
-              readOnly
-            />
+            <input type="number" id="ValorAnIVA" name="ValorAnIVA" value={formData.ValorAnIVA.toFixed(2)} readOnly/>
           </div>
 
           {/* Campos Impresiones */}
           <div className="form-group">
             <label htmlFor="ImpBnCedi">Impresiones B/N CEDI</label>
-            <input
-              type="number"
-              id="ImpBnCedi"
-              name="ImpBnCedi"
-              value={formData.ImpBnCedi}
-              onChange={handleChange}
-            />
+            <input type="number" id="ImpBnCedi" name="ImpBnCedi" value={formData.ImpBnCedi} onChange={handleChange}/>
           </div>
 
           <div className="form-group">
             <label htmlFor="ImpBnPalms">Impresiones B/N Palms</label>
-            <input
-              type="number"
-              id="ImpBnPalms"
-              name="ImpBnPalms"
-              value={formData.ImpBnPalms}
-              onChange={handleChange}
-            />
+            <input type="number" id="ImpBnPalms" name="ImpBnPalms" value={formData.ImpBnPalms} onChange={handleChange}/>
           </div>
 
           <div className="form-group">
             <label htmlFor="ImpColorPalms">Impresiones Color Palms</label>
-            <input
-              type="number"
-              id="ImpColorPalms"
-              name="ImpColorPalms"
-              value={formData.ImpColorPalms}
-              onChange={handleChange}
-            />
+            <input type="number" id="ImpColorPalms" name="ImpColorPalms" value={formData.ImpColorPalms} onChange={handleChange}/>
           </div>
 
           <div className="form-group">
             <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
-            <input
-              type="number"
-              id="ImpBnCalle"
-              name="ImpBnCalle"
-              value={formData.ImpBnCalle}
-              onChange={handleChange}
-            />
+            <input type="number" id="ImpBnCalle" name="ImpBnCalle" value={formData.ImpBnCalle} onChange={handleChange}/>
           </div>
 
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
-            <input
-              type="number"
-              id="ImpColorCalle"
-              name="ImpColorCalle"
-              value={formData.ImpColorCalle}
-              onChange={handleChange}
-            />
+            <input type="number" id="ImpColorCalle" name="ImpColorCalle" value={formData.ImpColorCalle} onChange={handleChange}/>
           </div>
 
           {/* Campos automáticos de costos totales */}
           <div className="form-group">
             <label htmlFor="CosTotCEDI">Costo Total del CEDI-Automatico</label>
-            <input
-              type="number"
-              id="CosTotCEDI"
-              name="CosTotCEDI"
-              value={formData.CosTotCEDI.toFixed(2)}
-              readOnly
-            />
+            <input type="number" id="CosTotCEDI" name="CosTotCEDI" value={formData.CosTotCEDI.toFixed(2)} readOnly/>
           </div>
 
           <div className="form-group">
             <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales-Automatico</label>
-            <input
-              type="number"
-              id="CosTotMarNacionales"
-              name="CosTotMarNacionales"
-              value={formData.CosTotMarNacionales.toFixed(2)}
-              readOnly
-            />
+            <input type="number" id="CosTotMarNacionales" name="CosTotMarNacionales" value={formData.CosTotMarNacionales.toFixed(2)} readOnly/>
           </div>
 
           <div className="form-group">
             <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones-Automatico</label>
-            <input
-              type="number"
-              id="CosTotMarImpor"
-              name="CosTotMarImpor"
-              value={formData.CosTotMarImpor.toFixed(2)}
-              readOnly
-            />
+            <input type="number" id="CosTotMarImpor" name="CosTotMarImpor" value={formData.CosTotMarImpor.toFixed(2)} readOnly/>
           </div>
 
           <div className="form-group">
             <label htmlFor="CosTotServAdmin">
               Costo Total de Servicios Administrativos-Automatico
             </label>
-            <input
-              type="number"
-              id="CosTotServAdmin"
-              name="CosTotServAdmin"
-              value={formData.CosTotServAdmin.toFixed(2)}
-              readOnly
-            />
+            <input type="number" id="CosTotServAdmin" name="CosTotServAdmin" value={formData.CosTotServAdmin.toFixed(2)} readOnly/>
           </div>
         </div>
 
