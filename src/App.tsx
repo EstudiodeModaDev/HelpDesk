@@ -344,7 +344,7 @@ function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => 
                     : <div>Cargando servicios…</div>
                 )}
 
-                {selected === 'home' && <Home />}               
+                {selected === 'home' && <div className="page page--fluid"><Home /></div>}               
                 {selected === 'ticketform' && <NuevoTicketForm />}
                 {selected === 'ticketTable' && <TablaTickets />}
                 {selected === 'task' && <TareasPage />}
