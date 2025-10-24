@@ -32,7 +32,7 @@ export default function DistribucionFactura() {
     CosTotMarNacionales: 0,
     CosTotMarImpor: 0,
     CosTotCEDI: 0,
-    CosTotMarServAdmin: 0,
+    CosTotServAdmin: 0,
   });
 
   // 🔹 Maneja selección de proveedor
@@ -104,7 +104,7 @@ export default function DistribucionFactura() {
       CosTotCEDI,
       CosTotMarNacionales: otrosCostos,
       CosTotMarImpor: otrosCostos,
-      CosTotMarServAdmin: otrosCostos,
+      CosTotServAdmin: otrosCostos,
     }));
   }, [
     formData.CargoFijo,
@@ -155,7 +155,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       CosTotMarNacionales: 0,
       CosTotMarImpor: 0,
       CosTotCEDI: 0,
-      CosTotMarServAdmin: 0,
+      CosTotServAdmin: 0,
     });
 
   } catch (error: any) {
@@ -337,14 +337,14 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarServAdmin">
+            <label htmlFor="CosTotServAdmin">
               Costo Total Servicios Administrativos
             </label>
             <input
               type="text"
-              id="CosTotMarServAdmin"
-              name="CosTotMarServAdmin"
-              value={formData.CosTotMarServAdmin.toFixed(2)}
+              id="CosTotServAdmin"
+              name="CosTotServAdmin"
+              value={formData.CosTotServAdmin.toFixed(2)}
               readOnly
             />
           </div>

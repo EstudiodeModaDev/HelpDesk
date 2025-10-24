@@ -100,7 +100,7 @@ export class DistribucionFacturaService {
     CosTotMarNacionales: f?.CosTotMarNacionales ?? '',
     CosTotMarImpor: f?.CosTotMarImpor ?? '',
     CosTotCEDI: f?.CosTotCEDI ?? '',
-    CosTotMarServAdmin: f?.CosTotMarServAdmin ?? '',
+    CosTotServAdmin: f?.CosTotServAdmin ?? '',
     };
   }
 

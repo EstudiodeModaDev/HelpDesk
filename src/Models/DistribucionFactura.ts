@@ -13,5 +13,5 @@ export interface DistribucionFacturaData {
   CosTotMarNacionales: number;
   CosTotMarImpor: number;
   CosTotCEDI: number;
-  CosTotMarServAdmin: number;
+  CosTotServAdmin: number;
 }
