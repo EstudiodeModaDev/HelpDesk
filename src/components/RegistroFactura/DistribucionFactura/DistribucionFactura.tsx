@@ -69,15 +69,16 @@ export default function DistribucionFactura() {
 
     const ValorAnIVA = CargoFijo + CosToImp;
     const CosTotCEDI = CargoFijo / 4 + ImpBnCedi;
-    const promedioOtros =
-      (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
+    const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
     const otrosCostos = CargoFijo / 4 + promedioOtros;
+    const costoTotalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpColorPalms
 
-    setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)))
+    setdisplayCostoTotalImpresion(String(costoTotalImpresion))
     setFormData((prev) => ({
       ...prev,
       ValorAnIVA,
       CosTotCEDI,
+      CosToImp: costoTotalImpresion,
       CosTotMarNacionales: otrosCostos,
       CosTotMarImpor: otrosCostos,
       CosTotServAdmin: otrosCostos,
