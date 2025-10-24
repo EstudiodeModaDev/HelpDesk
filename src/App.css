@@ -209,11 +209,9 @@
 /* 3) Wrappers internos: ocupar todo el panel, nada de shrink */
 .page-viewport{
   width: 100%;
-  min-height: calc(100dvh - 32px);
   display: grid;
   place-items: stretch;
   min-width: 0;           /* evita min-content */
-  min-height: 0;
 }
 
 .page{
