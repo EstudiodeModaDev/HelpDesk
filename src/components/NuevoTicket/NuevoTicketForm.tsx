@@ -300,61 +300,62 @@ export default function NuevoTicketForm() {
         </div>
 
         {/* Categoría / Subcategoría / Artículo */}
-        <div className="tf-field">
-          <label className="tf-label">Categoría</label>
-          <Select
-            classNamePrefix="rs"
-            options={catOptions}
-            value={catValue}
-            onChange={onCategoriaChange}
-            isDisabled={disabledCats}
-            placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
-            filterOption={makeFilter()}
-            isClearable
-          />
-          {errors.categoria && <small className="error">{errors.categoria}</small>}
-        </div>
+        <div className="tf-row tf-row--cats tf-col-2">
+          <div className="tf-field">
+            <label className="tf-label">Categoría</label>
+            <Select
+              classNamePrefix="rs"
+              options={catOptions}
+              value={catValue}
+              onChange={onCategoriaChange}
+              isDisabled={disabledCats}
+              placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
+              filterOption={makeFilter()}
+              isClearable
+            />
+            {errors.categoria && <small className="error">{errors.categoria}</small>}
+          </div>
 
-        <div className="tf-field">
-          <label className="tf-label">Subcategoría</label>
-          <Select
-            classNamePrefix="rs"
-            options={subcatOptions}
-            value={subcatValue}
-            onChange={onSubcategoriaChange}
-            isDisabled={disabledSubs}
-            placeholder={
-              catId == null
-                ? "Seleccione una categoría primero"
-                : loadingCatalogos
-                ? "Cargando subcategorías..."
-                : "Seleccione una subcategoría"
-            }
-            filterOption={makeFilter()}
-            isClearable
-          />
-          {errors.subcategoria && <small className="error">{errors.subcategoria}</small>}
-        </div>
+          <div className="tf-field">
+            <label className="tf-label">Subcategoría</label>
+            <Select
+              classNamePrefix="rs"
+              options={subcatOptions}
+              value={subcatValue}
+              onChange={onSubcategoriaChange}
+              isDisabled={disabledSubs}
+              placeholder={
+                catId == null
+                  ? "Seleccione una categoría primero"
+                  : loadingCatalogos
+                  ? "Cargando subcategorías..."
+                  : "Seleccione una subcategoría"
+              }
+              filterOption={makeFilter()}
+              isClearable
+            />
+            {errors.subcategoria && <small className="error">{errors.subcategoria}</small>}
+          </div>
 
-        <div className="tf-field tf-col-2">
-          <label className="tf-label">Artículo</label>
-          <Select
-            classNamePrefix="rs"
-            options={artOptions}
-            value={artValue}
-            onChange={onArticuloChange}
-            isDisabled={disabledArts}
-            placeholder={
-              subcatId == null
-                ? "Seleccione una subcategoría primero"
-                : loadingCatalogos
-                ? "Cargando artículos..."
-                : "Seleccione un artículo"
-            }
-            filterOption={makeFilter()}
-            isClearable
-          />
-          {/* Si quieres mostrar error de artículo obligatorio, vuelve a validarlo en el hook */}
+          <div className="tf-field">
+            <label className="tf-label">Artículo</label>
+            <Select
+              classNamePrefix="rs"
+              options={artOptions}
+              value={artValue}
+              onChange={onArticuloChange}
+              isDisabled={disabledArts}
+              placeholder={
+                subcatId == null
+                  ? "Seleccione una subcategoría primero"
+                  : loadingCatalogos
+                  ? "Cargando artículos..."
+                  : "Seleccione un artículo"
+              }
+              filterOption={makeFilter()}
+              isClearable
+            />
+          </div>
         </div>
 
         {/* Archivo */}

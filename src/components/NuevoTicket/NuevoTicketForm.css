@@ -171,3 +171,58 @@
   .tf-grid { grid-template-columns: 1fr; }
   .tf-col-2 { grid-column: 1 / -1; }
 }
+
+/* ENSANCHAR el contenedor del formulario */
+.ticket-form {
+  width: 100%;
+  max-width: none;                         /* quitamos tope de 900px */
+  margin: 24px auto;
+}
+.ticket-form.ticket-form--xl{
+  /* más ancho pero sensible al viewport */
+  width: clamp(1200px, 84vw, 1400px);
+}
+
+/* Grid del formulario (2 columnas fluidas) */
+.tf-grid{
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: var(--tf-gap);
+}
+
+/* FILA ESPECIAL: 3 columnas para categorías */
+.tf-row--cats{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: var(--tf-gap);
+}
+
+/* Asegurar que los campos se estiren y no "achiquen" */
+.tf-field{ min-width: 0; }
+.tf-input{ width: 100%; min-width: 0; }
+
+/* react-select: que ocupe 100% y un poco más alto para que respire */
+.rs__control{
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 44px;                        /* +alto */
+  font-size: 15px;
+}
+.rs__single-value{ font-size: 15px; }
+.rs__placeholder{ font-size: 15px !important; }
+
+/* Inputs nativos un poco más altos también */
+.tf-input{
+  padding: 12px 14px;
+  font-size: 15px;
+}
+
+/* Responsive: en pantallas pequeñas, la fila de 3 baja a 1 */
+@media (max-width: 980px){
+  .ticket-form.ticket-form--xl{ width: 100%; }
+}
+@media (max-width: 900px){
+  .tf-grid{ grid-template-columns: 1fr; }
+  .tf-col-2{ grid-column: 1 / -1; }
+  .tf-row--cats{ grid-template-columns: 1fr; }
+}
