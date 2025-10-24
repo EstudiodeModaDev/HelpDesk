@@ -33,7 +33,7 @@ export default function DistribucionFactura() {
   const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
   const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
   const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
-  //const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
+  const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
   //const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
   //const [displayTotalMarcasNacionales, setdisplayTotalMarcasNacionales] = React.useState("");
   //const [displayTotalMarcasImportadas, setDisplayMarcasImportadas] = React.useState("");
@@ -67,10 +67,11 @@ export default function DistribucionFactura() {
   useEffect(() => {
     const {CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle,} = formData;
 
+    const cargoFijo3 = CargoFijo - (CargoFijo / 3)
     const ValorAnIVA = CargoFijo + CosToImp;
-    const CosTotCEDI = CargoFijo / 4 + ImpBnCedi;
+    const CosTotCEDI =  (CargoFijo/3) + ImpBnCedi;
     const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
-    const otrosCostos = CargoFijo / 4 + promedioOtros;
+    const otrosCostos = (cargoFijo3/3) + promedioOtros;
     const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms
 
     setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)))
@@ -305,7 +306,23 @@ export default function DistribucionFactura() {
 
           <div className="form-group">
             <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
-            <input type="number" id="ImpBnCalle" name="ImpBnCalle" value={formData.ImpBnCalle} onChange={handleChange}/>
+            <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesBNCalle)}  
+              onChange={(e) => {
+                const raw = e.target.value;
+                const f = formatPesosEsCO(raw);
+                const num = toNumberFromEsCO(f);
+                setdisplayImpresionesBNCalle(f);
+                setField("ImpColorPalms", num)
+              }}
+              onBlur={() => {
+                const num = toNumberFromEsCO(displayImpresionesBNCalle);
+                setdisplayImpresionesBNCalle(
+                  new Intl.NumberFormat("es-CO", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  }).format(Number.isFinite(num) ? num : 0)
+                );
+              }}/>
           </div>
 
           <div className="form-group">
