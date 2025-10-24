@@ -1,54 +1,65 @@
+/* =================== Tokens =================== */
 :root{
-  --sb-bg:#176d72;        /* teal oscuro */
+  --sb-bg:#176d72;
   --sb-bg-2:#1e7e83;
   --sb-pill:rgba(255,255,255,0.12);
   --sb-hover:rgba(255,255,255,0.08);
   --sb-text:#eaf6f6;
   --sb-muted:#bfe4e4;
   --sb-shadow:0 10px 30px rgba(0,0,0,.15);
-  --radius-3xl:20px;
+
+  --page-pad:16px;              /* padding del layout */
+  --radius-3xl:28px;
 }
 
-/* Layout general */
+/* =================== Layout base (SIN header) =================== */
 .layout{
   min-height:100dvh;
   background:linear-gradient(180deg,#c2f1ec 0%,#d5fbf5 100%);
 }
+
 .layout--withSidebar{
   display:grid;
-  grid-template-columns:280px 1fr;     /* ancho sidebar */
-  grid-template-rows:64px 1fr;
-  grid-template-areas:
-    "sidebar header"
-    "sidebar content";
+  grid-template-columns:280px 1fr;      /* ancho del sidebar + contenido */
+  grid-template-rows:1fr;               /* SIN fila de header */
+  grid-template-areas:"sidebar content";
   gap:16px;
-  padding:16px;
+  padding:var(--page-pad);
 }
 
-/* Sidebar */
+/* =================== Sidebar =================== */
 .sidebar{
   grid-area:sidebar;
-  display:flex; flex-direction:column;
+  display:flex;
+  flex-direction:column;
   background:var(--sb-bg);
-  border-radius:28px;                  /* redondeado como en la captura */
+  border-radius:var(--radius-3xl);
   box-shadow:var(--sb-shadow);
   color:var(--sb-text);
   padding:14px;
-  position:sticky; top:16px;
-  height:calc(100dvh - 32px);
+  position:sticky;
+  top:var(--page-pad);
+  height:calc(100dvh - (var(--page-pad) * 2));
 }
+
 .sidebar__header{
-  font-weight:700; letter-spacing:.3px; opacity:.9;
+  font-weight:700;
+  letter-spacing:.3px;
+  opacity:.9;
   padding:8px 10px 14px 10px;
 }
+
 .sidebar__nav{
-  overflow:auto; padding:4px; flex:1;
+  overflow:auto;
+  padding:4px;
+  flex:1;
   scrollbar-width:thin;
   scrollbar-color:var(--sb-hover) transparent;
 }
 .sidebar__nav::-webkit-scrollbar{ width:8px; }
 .sidebar__nav::-webkit-scrollbar-thumb{
-  background:var(--sb-hover); border-radius:999px;
+  background:var(--sb-hover);
+  border-radius:999px;
 }
 
 .sb-ul{ list-style:none; margin:0; padding:0; }
@@ -78,7 +89,7 @@
 .caret{ margin-right:6px; opacity:.8; transition:transform .2s ease; }
 .caret.rot{ transform:rotate(90deg); }
 
-/* Footer/profilito */
+/* Footer del perfil */
 .sidebar__footer{
   background:rgba(255,255,255,0.06);
   border-radius:14px;
@@ -95,49 +106,84 @@
 .sb-prof__name{ font-weight:700; color:var(--sb-text); font-size:14px; }
 .sb-prof__mail{ font-size:12px; opacity:.9; }
 
-/* Header + content (por si usas estas clases) */
-.headerRow{
-  grid-area:header;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 12px;
-}
-.brand h1{ margin:0; font-size:18px; color:#0f3d3f; }
-.userCluster{ display:flex; align-items:center; gap:10px; }
-.avatar{ width:32px; height:32px; border-radius:999px; background:#0ea5a5; display:grid; place-items:center; color:white; font-weight:700; }
-.userInfo{ line-height:1.1; }
-.userName{ font-weight:700; }
-.userMail{ font-size:12px; opacity:.7; }
-.btn-logout{
-  margin-left:8px; border:0; padding:8px 10px; border-radius:10px;
-  background:#0f766e; color:white; cursor:pointer;
-}
-
+/* =================== Content (pantalla completa) =================== */
 .content--withSidebar{
   grid-area:content;
-  background:transparent;
+  min-height:0;           /* permite que sus hijos usen el alto disponible */
+  display:grid;
 }
 
-/* Responsive */
+/* Lienzo que ocupa TODO el panel del contenido */
+.page-viewport{
+  /* alto del viewport del contenido,
+     restando el padding superior/inferior del layout */
+  min-height:calc(100dvh - (var(--page-pad) * 2));
+  width:100%;
+  display:grid;
+}
+
+/* Por defecto: centra el contenido si no “llena” */
+.page{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;     /* centra */
+  overflow:hidden;        /* recorta bordes de vistas internas si hace falta */
+  padding:0;              /* sin márgenes adicionales */
+}
+
+/* Variación fluida: el hijo se estira a 100% (p.ej. Power BI) */
+.page--fluid{
+  place-items:stretch;    /* estira al máximo */
+}
+
+/* Hijo directo en fluid: ocupa todo */
+.page--fluid > *{
+  width:100%;
+  height:100%;
+}
+
+/* Ifames comunes en vistas fluidas (Power BI, mapas…) */
+.page--fluid iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+/* =================== Formularios y tarjetas comunes =================== */
+/* Deja que los formularios se vean bien centrados cuando no llenan */
+.page > form,
+.page > .form-wrapper,
+.page > .card,
+.page > .panel{
+  margin:0;
+}
+
+/* Inputs por si el fondo del content es transparente */
+.content--withSidebar input,
+.content--withSidebar select,
+.content--withSidebar textarea{
+  background:#ffffff;
+  border:1px solid #e6eef0;
+  border-radius:12px;
+}
+
+/* =================== Responsivo =================== */
 @media (max-width:960px){
   .layout--withSidebar{
-    grid-template-columns:1fr;
-    grid-template-rows:auto auto 1fr;
+    grid-template-columns:1fr;             /* sidebar arriba, contenido abajo */
+    grid-template-rows:auto 1fr;
     grid-template-areas:
-      "header"
       "sidebar"
       "content";
   }
-  .sidebar{ height:auto; position:relative; }
-}
-
-.content--withSidebar{
-  grid-area: content;
-  background: transparent;
-  display: flex;       /* o grid, da igual para el caso */
-  min-height: 0;       /* CLAVE: permite que el hijo tome el 1fr completo */
-}
-
-.layout--withSidebar.no-header{
-  grid-template-rows: 1fr;
-  grid-template-areas: "sidebar content";
+  .sidebar{
+    position:relative;
+    top:auto;
+    height:auto;
+  }
+  .page-viewport{
+    min-height:calc(100dvh - (var(--page-pad))); /* un poco más flexible en móvil */
+  }
 }
