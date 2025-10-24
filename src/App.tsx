@@ -326,34 +326,31 @@ function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => 
 
   const selectedItem = React.useMemo(() => findItemById(navs, selected), [navs, selected]);
 
-  // Qué vistas deben ir “estiradas”? (añade ids aquí si quieres más)
-  const isFluid = selected === 'home';
-
   return (
     <div className="page layout layout--withSidebar">
       <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
-        <main className="content content--withSidebar">
-          <div className="page-viewport">
-            <div className={`page ${isFluid ? 'page--fluid' : ''}`}>
-              {selectedItem?.to ?? (
-                <>
-                  {selected === 'cajpos' && (
-                    services?.Usuarios
-                      ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
-                      : <div>Cargando servicios…</div>
-                  )}
+      <main className="content content--withSidebar">
+        <div className="page-viewport">
+          <div className="page page--fluid center-all">
+            {selectedItem?.to ?? (
+              <>
+                {selected === 'cajpos' && (
+                  services?.Usuarios
+                    ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
+                    : <div>Cargando servicios…</div>
+                )}
 
-                  {selected === 'home' && <Home />}   
-                  {selected === 'ticketform' && <NuevoTicketForm />}
-                  {selected === 'ticketTable' && <TablaTickets />}
-                  {selected === 'task' && <TareasPage />}
-                  {selected === 'formatos' && <Formatos />}
-                  {selected === 'info' && <InfoPage />}
-                </>
-              )}
-            </div>
+                {selected === 'home' && <Home />}
+                {selected === 'ticketform' && <NuevoTicketForm />}
+                {selected === 'ticketTable' && <TablaTickets />}
+                {selected === 'task' && <TareasPage />}
+                {selected === 'formatos' && <Formatos />}
+                {selected === 'info' && <InfoPage />}
+              </>
+            )}
           </div>
-        </main>
+        </div>
+      </main>
     </div>
   );
 }

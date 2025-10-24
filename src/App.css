@@ -15,15 +15,6 @@
   background:linear-gradient(180deg,#c2f1ec 0%,#d5fbf5 100%);
 }
 
-.layout--withSidebar{
-  display:grid;
-  grid-template-columns:280px 1fr;     
-  grid-template-rows:1fr;               
-  grid-template-areas:"sidebar content";
-  gap:16px;
-  padding:var(--page-pad);
-}
-
 .sidebar{
   grid-area:sidebar;
   display:flex;
@@ -120,39 +111,23 @@
   align-items: stretch;
 }
 
-.page-viewport{
-  min-height: calc(100dvh - (var(--page-pad) * 2));
-  width: 100%;
-  display: grid;
-  min-width: 0; /* clave para evitar tamaños intrínsecos raros */
-}
-
-.page{
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  min-width: 0;
-  min-height: 0;
-}
-
 .page--fluid{
-  place-items: stretch;
+  place-items:stretch;
 }
 
 .page--fluid > *{
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  display:grid;              /* para poder centrar su contenido interno */
 }
 
 .page--fluid iframe{
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
 }
 
 .page > form,
@@ -186,4 +161,37 @@
   .page-viewport{
     min-height:calc(100dvh - (var(--page-pad))); /* un poco más flexible en móvil */
   }
+}
+
+.layout--withSidebar{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  grid-template-rows:1fr;
+  grid-template-areas:"sidebar content";
+  gap:16px;
+  padding:16px;
+  grid-area:content;
+  min-height:0;  
+  align-items:stretch;
+}
+
+.page-viewport{
+  width:100%;
+  min-height:calc(100dvh - 32px);
+  display:grid;
+  min-width:0; 
+}
+
+.page{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;        /* centrado por defecto */
+  min-width:0;
+  min-height:0;
+  overflow:auto;             /* permite scroll cuando el contenido lo requiere */
+}
+
+.center-all > *{
+  place-items:center;        /* centra dentro del componente */
 }
