@@ -66,6 +66,8 @@ export default function DistribucionFactura() {
     const otrosCostos = (cargoFijo3/3) + promedioOtros;
     const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms
 
+    console.log("Total impresion", totalImpresion)
+
     setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)))
     setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)))
     setdisplayTotalCedi(formatPesosEsCO(String(CosTotCEDI)))
@@ -268,7 +270,7 @@ export default function DistribucionFactura() {
                 setField("ImpColorPalms", num)
               }}
               onBlur={() => {
-                const num = toNumberFromEsCO(displayImpresionesColorPalms);
+                const num = toNumberFromEsCO(displayImpresionesBNPalms);
                 setdisplayImpresionesColorPalms(
                   new Intl.NumberFormat("es-CO", {
                   minimumFractionDigits: 2,
