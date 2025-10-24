@@ -2,7 +2,7 @@ import './HomeDashboard.css';
 
 export default function HomeDashboard() {
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container vh-fill">
       <div className="dashboard-card" role="region" aria-label="Informe Helpdesk Power BI">
         <iframe
           title="Informe Helpdesk Power BI"
