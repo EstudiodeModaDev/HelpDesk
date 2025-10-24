@@ -12,8 +12,7 @@ export function useDistribucionFactura() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🟢 Obtener todas las distribuciones guardadas
- // 🟢 Obtener todas las distribuciones guardadas
+ // Obtener todas las distribuciones guardadas
 const obtenerDistribuciones = useCallback(async () => {
   setLoading(true);
   setError(null);
