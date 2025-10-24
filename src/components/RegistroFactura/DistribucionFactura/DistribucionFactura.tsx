@@ -202,7 +202,6 @@ export default function DistribucionFactura() {
               name="CargoFijo"
               value={formData.CargoFijo.toFixed(2)}
               onChange={handleChange}
-              placeholder="Ingrese solo números"
             />
           </div>
 
@@ -215,13 +214,12 @@ export default function DistribucionFactura() {
               name="CosToImp"
               value={formData.CosToImp.toFixed(2)}
               onChange={handleChange}
-              placeholder="Ingrese solo números"
             />
           </div>
 
           {/* ValorAnIVA */}
           <div className="form-group">
-            <label htmlFor="ValorAnIVA">Valor antes de IVA:</label>
+            <label htmlFor="ValorAnIVA">Valor antes de IVA-Automatico:</label>
             <input
               type="text"
               id="ValorAnIVA"
@@ -289,7 +287,7 @@ export default function DistribucionFactura() {
 
           {/* Campos automáticos de costos totales */}
           <div className="form-group">
-            <label htmlFor="CosTotCEDI">Costo Total del CEDI</label>
+            <label htmlFor="CosTotCEDI">Costo Total del CEDI-Automatico</label>
             <input
               type="text"
               id="CosTotCEDI"
@@ -300,7 +298,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales</label>
+            <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales-Automatico</label>
             <input
               type="text"
               id="CosTotMarNacionales"
@@ -311,7 +309,7 @@ export default function DistribucionFactura() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones</label>
+            <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones-Automatico</label>
             <input
               type="text"
               id="CosTotMarImpor"
@@ -323,7 +321,7 @@ export default function DistribucionFactura() {
 
           <div className="form-group">
             <label htmlFor="CosTotServAdmin">
-              Costo Total de Servicios Administrativos
+              Costo Total de Servicios Administrativos-Automatico
             </label>
             <input
               type="text"
