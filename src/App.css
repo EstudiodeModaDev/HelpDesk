@@ -129,3 +129,15 @@
   }
   .sidebar{ height:auto; position:relative; }
 }
+
+.content--withSidebar{
+  grid-area: content;
+  background: transparent;
+  display: flex;       /* o grid, da igual para el caso */
+  min-height: 0;       /* CLAVE: permite que el hijo tome el 1fr completo */
+}
+
+.layout--withSidebar.no-header{
+  grid-template-rows: 1fr;
+  grid-template-areas: "sidebar content";
+}
