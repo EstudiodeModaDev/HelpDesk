@@ -13,23 +13,25 @@ export function useDistribucionFactura() {
   const [error, setError] = useState<string | null>(null);
 
   // 🟢 Obtener todas las distribuciones guardadas
-  const obtenerDistribuciones = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const lista = await service.getAll({ orderby: "createdDateTime desc" });
-      console.log("📋 Distribuciones obtenidas:", lista.items);
-      setDistribuciones(lista.items);
-      return lista.items;
-    } catch (err: any) {
-      console.error("❌ Error al obtener distribuciones:", err);
-      setError(err?.message ?? "Error al cargar las distribuciones");
-      setDistribuciones([]);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, [service]);
+ // 🟢 Obtener todas las distribuciones guardadas
+const obtenerDistribuciones = useCallback(async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    const lista = await service.getAll({ orderby: "createdDateTime desc" });
+    console.log("📋 Distribuciones obtenidas:", lista);
+    setDistribuciones(lista);
+    return lista;
+  } catch (err: any) {
+    console.error("❌ Error al obtener distribuciones:", err);
+    setError(err?.message ?? "Error al cargar las distribuciones");
+    setDistribuciones([]);
+    return [];
+  } finally {
+    setLoading(false);
+  }
+}, [service]);
+
 
   // 🟢 Registrar una nueva distribución
   const registrarDistribucion = useCallback(async (data: Omit<DistribucionFacturaData, "id0">) => {
