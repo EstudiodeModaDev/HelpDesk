@@ -24,6 +24,7 @@
   box-shadow:var(--sb-shadow);
   color:var(--sb-text);
   padding:14px;
+  padding-bottom: 5px;
   position:sticky;
   top:var(--page-pad);
   height:calc(100dvh - (var(--page-pad) * 2));
@@ -244,3 +245,38 @@
 .center-all > *{
   place-items:center;        /* centra dentro del componente */
 }
+
+/* 1) Que el documento NO scrollee; el scroll vivirá en el panel derecho */
+html, body{ height:100%; overflow:hidden; }
+
+/* 2) La grilla ocupa todo y permite que el área de contenido gestione el scroll */
+.layout--withSidebar{
+  grid-template-columns: 280px minmax(0, 1fr);
+  height:100%;
+}
+
+/* 3) El panel derecho es el ÚNICO contenedor con scroll */
+.content--withSidebar{
+  grid-area: content;
+  min-height: 0;            /* importante para que el 1fr funcione */
+  overflow: auto;           /* << único scroll */
+  display: block;           /* no necesitamos grid aquí */
+}
+
+/* 4) Quitar scroll interno de estas capas */
+.page-viewport,
+.page{
+  height: auto;
+  min-height: 0;
+  overflow: visible;        /* << sin scroll aquí */
+}
+
+/* 5) Sidebar sigue sticky y puede tener scroll propio si es alto */
+.sidebar{
+  height: calc(100dvh - 32px);
+  overflow: auto;           /* su propio scroll, independiente del contenido */
+}
+
+/* (opcional) Compactar el margen/padding final del formulario para no empujar el scroll */
+.ticket-form{ margin: 16px auto 12px; padding-bottom: 12px; }
+.tf-actions{ margin-top: 8px; padding-top: 8px; }
