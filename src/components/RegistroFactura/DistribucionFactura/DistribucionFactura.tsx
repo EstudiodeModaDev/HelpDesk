@@ -29,7 +29,7 @@ export default function DistribucionFactura() {
   });
   const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
-  const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
+  //const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
   //const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
   //const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
   //const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
@@ -65,23 +65,24 @@ export default function DistribucionFactura() {
   };
 
   useEffect(() => {
-    const {CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle} = formData;
+    const {CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle,} = formData;
 
     const ValorAnIVA = CargoFijo + CosToImp;
     const CosTotCEDI = CargoFijo / 4 + ImpBnCedi;
     const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
     const otrosCostos = CargoFijo / 4 + promedioOtros;
-    const costoTotalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpColorPalms
+    const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms
 
-    setdisplayCostoTotalImpresion(String(costoTotalImpresion))
+    setdisplayCostoTotalImpresion(String(totalImpresion))
+
     setFormData((prev) => ({
       ...prev,
       ValorAnIVA,
       CosTotCEDI,
-      CosToImp: costoTotalImpresion,
       CosTotMarNacionales: otrosCostos,
       CosTotMarImpor: otrosCostos,
       CosTotServAdmin: otrosCostos,
+      CosToImp: totalImpresion
     }));
   }, [formData.CargoFijo, formData.CosToImp, formData.ImpBnCedi, formData.ImpBnPalms, formData.ImpColorPalms, formData.ImpBnCalle, formData.ImpColorCalle,]);
 
@@ -208,7 +209,7 @@ export default function DistribucionFactura() {
           {/* Campo CosToImp */}
           <div className="form-group">
             <label htmlFor="CosToImp">Costo total de Impresión:</label>
-            <input type="text" inputMode="numeric" name="CargoFijo" placeholder="Ej: 100.000,00" value={String(displayCostoTotalImpresion)}  
+            <input type="text" inputMode="numeric" name="CosToImp" placeholder="Se llenara automaticamente" value={String(displayCostoTotalImpresion)}  
               onChange={(e) => {
                 const raw = e.target.value;
                 const f = formatPesosEsCO(raw);
@@ -217,23 +218,8 @@ export default function DistribucionFactura() {
                 setField("CosToImp", num)
               }}
               onBlur={() => {
-                const num = toNumberFromEsCO(displayCargoFijo);
+                const num = toNumberFromEsCO(displayCostoTotalImpresion);
                 setdisplayCostoTotalImpresion(
-                  new Intl.NumberFormat("es-CO", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  }).format(Number.isFinite(num) ? num : 0)
-                );
-              }}/>
-          </div>
-
-          {/* ValorAnIVA */}
-          <div className="form-group">
-            <label htmlFor="ValorAnIVA">Valor antes de IVA:</label>
-            <input type="text" inputMode="numeric" name="CargoFijo" placeholder="Ej: 100.000,00" value={String(displayValorAntesIva)}  
-              onBlur={() => {
-                const num = toNumberFromEsCO(displayCargoFijo);
-                setdisplayValorAntesIva(
                   new Intl.NumberFormat("es-CO", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -241,6 +227,12 @@ export default function DistribucionFactura() {
                 );
               }}
               readOnly/>
+          </div>
+
+          {/* ValorAnIVA */}
+          <div className="form-group">
+            <label htmlFor="ValorAnIVA">Valor antes de IVA-Automatico:</label>
+            <input type="number" id="ValorAnIVA" name="ValorAnIVA" value={formData.ValorAnIVA.toFixed(2)} readOnly/>
           </div>
 
           {/* Campos Impresiones */}
