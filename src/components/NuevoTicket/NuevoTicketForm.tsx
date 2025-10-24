@@ -183,7 +183,7 @@ export default function NuevoTicketForm() {
   const disabledArts = submitting || loadingCatalogos
 
   return (
-    <div className="ticket-form" data-force-light>
+    <div className="ticket-form ticket-form--xl" data-force-light>
       <h2 className="tf-title">Nuevo Ticket</h2>
 
       <form onSubmit={handleSubmit} noValidate className="tf-grid">
