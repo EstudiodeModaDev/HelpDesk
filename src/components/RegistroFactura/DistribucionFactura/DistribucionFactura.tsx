@@ -200,7 +200,7 @@ export default function DistribucionFactura() {
               type="text"
               id="CargoFijo"
               name="CargoFijo"
-              value={formData.CargoFijo}
+              value={formData.CargoFijo.toFixed(2)}
               onChange={handleChange}
               placeholder="Ingrese solo números"
             />
@@ -213,7 +213,7 @@ export default function DistribucionFactura() {
               type="text"
               id="CosToImp"
               name="CosToImp"
-              value={formData.CosToImp}
+              value={formData.CosToImp.toFixed(2)}
               onChange={handleChange}
               placeholder="Ingrese solo números"
             />
@@ -238,7 +238,7 @@ export default function DistribucionFactura() {
               type="text"
               id="ImpBnCedi"
               name="ImpBnCedi"
-              value={formData.ImpBnCedi}
+              value={formData.ImpBnCedi.toFixed(2)}
               onChange={handleChange}
             />
           </div>
@@ -249,7 +249,7 @@ export default function DistribucionFactura() {
               type="text"
               id="ImpBnPalms"
               name="ImpBnPalms"
-              value={formData.ImpBnPalms}
+              value={formData.ImpBnPalms.toFixed(2)}
               onChange={handleChange}
             />
           </div>
@@ -260,7 +260,7 @@ export default function DistribucionFactura() {
               type="text"
               id="ImpColorPalms"
               name="ImpColorPalms"
-              value={formData.ImpColorPalms}
+              value={formData.ImpColorPalms.toFixed(2)}
               onChange={handleChange}
             />
           </div>
@@ -271,7 +271,7 @@ export default function DistribucionFactura() {
               type="text"
               id="ImpBnCalle"
               name="ImpBnCalle"
-              value={formData.ImpBnCalle}
+              value={formData.ImpBnCalle.toFixed(2)}
               onChange={handleChange}
             />
           </div>
@@ -282,7 +282,7 @@ export default function DistribucionFactura() {
               type="text"
               id="ImpColorCalle"
               name="ImpColorCalle"
-              value={formData.ImpColorCalle}
+              value={formData.ImpColorCalle.toFixed(2)}
               onChange={handleChange}
             />
           </div>
