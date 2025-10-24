@@ -2,8 +2,8 @@
   height: 100%;
   width: 100%;
   display: flex;
-  padding: 0;           /* sin márgenes alrededor */
-  min-height: 0;        /* para que el iframe no colapse */
+  padding: 0;           
+  min-height: 0;        
 }
 
 .dashboard-card{
@@ -12,7 +12,8 @@
   border: 1px solid rgba(255,255,255,.22);  /* solo contorno, sin fondo */
   border-radius: 16px;
   box-shadow: 0 4px 14px rgba(0,0,0,.06);
-  overflow: hidden;     /* recorta el iframe a los bordes redondeados */
+  overflow: hidden;     
+  width: 100%;
 }
 
 /* El iframe debe ocupar todo */
