@@ -114,11 +114,11 @@
 .btn-guardar {
   grid-column: 1 / -1;
   height: 48px;
-  margin-top: 20px;
-  padding: 10px 20px;
+  margin: 20px 7px 0; /* 20px arriba, 7px a los lados */
+  padding: 0 20px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(135deg, #2563eb, #1e40af); /* Azul degradado */
+  background: linear-gradient(135deg, #2563eb, #1e40af);
   color: #fff;
   font-size: 16px;
   font-weight: 500;
@@ -127,6 +127,7 @@
   transition: all 0.25s ease;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
+
 
 .btn-guardar:hover {
   transform: translateY(-1px);
