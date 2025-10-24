@@ -29,7 +29,7 @@ export default function DistribucionFactura() {
   });
   const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
-  //const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
+  const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
   //const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
   //const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
   //const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
@@ -73,7 +73,8 @@ export default function DistribucionFactura() {
     const otrosCostos = CargoFijo / 4 + promedioOtros;
     const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms
 
-    setdisplayCostoTotalImpresion(String(totalImpresion))
+    setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)))
+    setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)))
 
     setFormData((prev) => ({
       ...prev,
@@ -231,8 +232,25 @@ export default function DistribucionFactura() {
 
           {/* ValorAnIVA */}
           <div className="form-group">
-            <label htmlFor="ValorAnIVA">Valor antes de IVA-Automatico:</label>
-            <input type="number" id="ValorAnIVA" name="ValorAnIVA" value={formData.ValorAnIVA.toFixed(2)} readOnly/>
+            <label htmlFor="ValorAnIVA">Valor antes de IVA:</label>
+            <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Se llenara automaticamente" value={String(displayValorAntesIva)}  
+              onChange={(e) => {
+                const raw = e.target.value;
+                const f = formatPesosEsCO(raw);
+                const num = toNumberFromEsCO(f);
+                setdisplayValorAntesIva(f);
+                setField("ValorAnIVA", num)
+              }}
+              onBlur={() => {
+                const num = toNumberFromEsCO(displayValorAntesIva);
+                setdisplayValorAntesIva(
+                  new Intl.NumberFormat("es-CO", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  }).format(Number.isFinite(num) ? num : 0)
+                );
+              }}
+              readOnly/>
           </div>
 
           {/* Campos Impresiones */}
