@@ -326,7 +326,7 @@ export default function NuevoTicketForm() {
               isDisabled={disabledSubs}
               placeholder={
                 catId == null
-                  ? "Seleccione una categoría primero"
+                  ? "Seleccione una subcategoría"
                   : loadingCatalogos
                   ? "Cargando subcategorías..."
                   : "Seleccione una subcategoría"
@@ -347,7 +347,7 @@ export default function NuevoTicketForm() {
               isDisabled={disabledArts}
               placeholder={
                 subcatId == null
-                  ? "Seleccione una subcategoría primero"
+                  ? "Seleccione un artículo"
                   : loadingCatalogos
                   ? "Cargando artículos..."
                   : "Seleccione un artículo"

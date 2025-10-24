@@ -27,8 +27,8 @@
   color: var(--tf-fg);
   border: 1px solid var(--tf-border);
   border-radius: var(--tf-radius);
-  padding: 28px;
-  margin: 24px auto;
+  padding: 20px 24px 12px;
+  margin: 16px auto;
   box-shadow: 0 8px 24px rgba(0,0,0,0.06);
   width: 100%;
   max-width: 900px; /* valor por defecto */
