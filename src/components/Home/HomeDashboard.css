@@ -1,0 +1,12 @@
+.content--withSidebar{
+  grid-area: content;
+  background: transparent;
+  display: flex;       /* o grid, da igual para el caso */
+  min-height: 0;       /* CLAVE: permite que el hijo tome el 1fr completo */
+}
+
+/* (Opcional) si ya no usas header, elimina su fila de la grilla */
+.layout--withSidebar.no-header{
+  grid-template-rows: 1fr;
+  grid-template-areas: "sidebar content";
+}

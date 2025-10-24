@@ -329,7 +329,7 @@ function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => 
     <div className="page layout layout--withSidebar">
       <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
 
-      <main className="content content--withSidebar">
+      <main className="page layout layout--withSidebar no-header">
         {selectedItem?.to ?? (
           <>  
             {selected === 'cajpos' && (
