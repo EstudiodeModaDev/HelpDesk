@@ -36,7 +36,7 @@ export default function DistribucionFactura() {
   const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
   const [displayImpresionesColorCalle, setdisplayImpresionesColorCalle] = React.useState("");
   const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
-  //const [displayTotalMarcasNacionales, setdisplayTotalMarcasNacionales] = React.useState("");
+  const [displayTotalOtrasMarcas, setDisplayTotalOtrasMarcas] = React.useState("");
   //const [displayTotalMarcasImportadas, setDisplayMarcasImportadas] = React.useState("");
   //const [displayServiciosAdministrativos, setdisplayServiciosAdministrativos] = React.useState("");
 
@@ -69,6 +69,7 @@ export default function DistribucionFactura() {
     setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)))
     setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)))
     setdisplayTotalCedi(formatPesosEsCO(String(CosTotCEDI)))
+    setDisplayTotalOtrasMarcas(formatPesosEsCO(String(otrosCostos)))
 
     setFormData((prev) => ({
       ...prev,
@@ -204,33 +205,13 @@ export default function DistribucionFactura() {
           {/* Campo CosToImp */}
           <div className="form-group">
             <label htmlFor="CosToImp">Costo total de Impresión:</label>
-            <input type="text" inputMode="numeric" name="CosToImp" placeholder="Se llenara automaticamente" value={String(displayCostoTotalImpresion)}  
-              onBlur={() => {
-                const num = toNumberFromEsCO(displayCostoTotalImpresion);
-                setdisplayCostoTotalImpresion(
-                  new Intl.NumberFormat("es-CO", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  }).format(Number.isFinite(num) ? num : 0)
-                );
-              }}
-              readOnly/>
+            <input type="text" inputMode="numeric" name="CosToImp" placeholder="Se llenara automaticamente" value={String(displayCostoTotalImpresion)} readOnly/>
           </div>
 
           {/* ValorAnIVA */}
           <div className="form-group">
             <label htmlFor="ValorAnIVA">Valor antes de IVA:</label>
-            <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Se llenara automaticamente" value={String(displayValorAntesIva)}  
-              onBlur={() => {
-                const num = toNumberFromEsCO(displayValorAntesIva);
-                setdisplayValorAntesIva(
-                  new Intl.NumberFormat("es-CO", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  }).format(Number.isFinite(num) ? num : 0)
-                );
-              }}
-              readOnly/>
+            <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Se llenara automaticamente" value={String(displayValorAntesIva)} readOnly/>
           </div>
 
           {/* Campos Impresiones */}
@@ -342,25 +323,22 @@ export default function DistribucionFactura() {
           {/* Campos automáticos de costos totales */}
           <div className="form-group">
             <label htmlFor="CosTotCEDI">Costo Total del CEDI</label>
-            <input type="number" id="CosTotCEDI" name="CosTotCEDI" value={formData.CosTotCEDI.toFixed(2)} readOnly/>
             <input type="text" inputMode="numeric" name="CosTotCEDI" placeholder="Se llenara automaticamente" value={String(displayTotalCedi)} readOnly/>
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales-Automatico</label>
-            <input type="number" id="CosTotMarNacionales" name="CosTotMarNacionales" value={formData.CosTotMarNacionales.toFixed(2)} readOnly/>
+            <label htmlFor="CosTotMarNacionales">Costo Total Marcas Nacionales</label>
+            <input type="text" inputMode="numeric" name="CosTotMarNacionales" placeholder="Se llenara automaticamente" value={String(displayTotalOtrasMarcas)} readOnly/>
           </div>
 
           <div className="form-group">
             <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones-Automatico</label>
-            <input type="number" id="CosTotMarImpor" name="CosTotMarImpor" value={formData.CosTotMarImpor.toFixed(2)} readOnly/>
+            <input type="text" inputMode="numeric" name="CosTotMarImpor" placeholder="Se llenara automaticamente" value={String(displayTotalOtrasMarcas)} readOnly/>
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotServAdmin">
-              Costo Total de Servicios Administrativos-Automatico
-            </label>
-            <input type="number" id="CosTotServAdmin" name="CosTotServAdmin" value={formData.CosTotServAdmin.toFixed(2)} readOnly/>
+            <label htmlFor="CosTotServAdmin">Costo Total de Servicios Administrativos-Automatico</label>
+             <input type="text" inputMode="numeric" name="CosTotServAdmin" placeholder="Se llenara automaticamente" value={String(displayTotalOtrasMarcas)} readOnly/>
           </div>
         </div>
 
