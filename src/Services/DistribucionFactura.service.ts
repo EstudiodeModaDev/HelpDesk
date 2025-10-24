@@ -99,7 +99,7 @@ export class DistribucionFacturaService {
     ImpColorCalle: f?.ImpColorCalle ?? '',
     CosTotMarNacionales: f?.CosTotMarNacionales ?? '',
     CosTotMarImpor: f?.CosTotMarImpor ?? '',
-    CosTotMarCEDI: f?.CosTotMarCEDI ?? '',
+    CosTotCedi: f?.CosTotCedi ?? '',
     CosTotMarServAdmin: f?.CosTotMarServAdmin ?? '',
     };
   }

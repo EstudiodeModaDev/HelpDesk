@@ -31,7 +31,7 @@ export default function DistribucionFactura() {
     ImpColorCalle: 0,
     CosTotMarNacionales: 0,
     CosTotMarImpor: 0,
-    CosTotMarCEDI: 0,
+    CosTotCedi: 0,
     CosTotMarServAdmin: 0,
   });
 
@@ -92,7 +92,7 @@ export default function DistribucionFactura() {
     const ValorAnIVA = CargoFijo + CosToImp;
 
     // Calcular costos automáticos
-    const CosTotMarCEDI = CargoFijo / 4 + ImpBnCedi;
+    const CosTotCedi = CargoFijo / 4 + ImpBnCedi;
     const promedioOtros =
       (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
     const otrosCostos = CargoFijo / 4 + promedioOtros;
@@ -101,7 +101,7 @@ export default function DistribucionFactura() {
     setFormData((prev) => ({
       ...prev,
       ValorAnIVA,
-      CosTotMarCEDI,
+      CosTotCedi,
       CosTotMarNacionales: otrosCostos,
       CosTotMarImpor: otrosCostos,
       CosTotMarServAdmin: otrosCostos,
@@ -154,7 +154,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       ImpColorCalle: 0,
       CosTotMarNacionales: 0,
       CosTotMarImpor: 0,
-      CosTotMarCEDI: 0,
+      CosTotCedi: 0,
       CosTotMarServAdmin: 0,
     });
 
@@ -304,12 +304,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Campos automáticos de costos totales */}
           <div className="form-group">
-            <label htmlFor="CosTotMarCEDI">Costo Total CEDI</label>
+            <label htmlFor="CosTotCedi">Costo Total CEDI</label>
             <input
               type="text"
-              id="CosTotMarCEDI"
-              name="CosTotMarCEDI"
-              value={formData.CosTotMarCEDI.toFixed(2)}
+              id="CosTotCedi"
+              name="CosTotCedi"
+              value={formData.CosTotCedi.toFixed(2)}
               readOnly
             />
           </div>
