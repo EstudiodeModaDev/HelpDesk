@@ -242,7 +242,6 @@ export default function DistribucionFactura() {
           {/* Campos Impresiones */}
           <div className="form-group">
             <label htmlFor="ImpBnCedi">Impresiones B/N CEDI</label>
-            <input type="number" id="ImpBnCedi" name="ImpBnCedi" value={formData.ImpBnCedi} onChange={handleChange}/>
             <input type="text" inputMode="numeric" name="ImpBnCedi" placeholder="Ej: 100.000" value={String(displayImpresionesBNCedi)}  
               onChange={(e) => {
                 const raw = e.target.value;
