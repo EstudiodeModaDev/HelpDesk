@@ -1,15 +1,23 @@
-export const formatPesosEsCO = (raw: string) => {
-  // deja solo dígitos y una coma decimal
-  const cleaned = raw
-    .replace(/[^\d,]/g, "")     // solo dígitos y coma
-    .replace(/,(?=.*,)/g, "");  // deja solo la primera coma
+export const toNumberFromEsCO = (formatted: string) => Number(formatted.replace(/\./g, "").replace(",", "."));
 
-  const [ent, dec] = cleaned.split(",");
-  const withThousands = (ent || "")
-    .replace(/^0+(?=\d)/, "")               // quita ceros a la izquierda (si quieres)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, "."); // puntos de miles
-
-  return dec !== undefined ? `${withThousands},${dec.slice(0,2)}` : withThousands;
+// Convierte cadenas en número, aceptando ".", "," y miles estilo es-CO
+const toNumberEs = (v: unknown): number => {
+  if (typeof v === "number") return isFinite(v) ? v : 0;
+  const s = String(v ?? "").trim();
+  if (!s) return 0;
+  const normalized = s.replace(/\./g, "").replace(",", ".");
+  const n = Number(normalized);
+  return isFinite(n) ? n : 0;
 };
 
-export const toNumberFromEsCO = (formatted: string) => Number(formatted.replace(/\./g, "").replace(",", "."));
+// Formatea en es-CO (puntos de miles, coma decimal)
+export const formatPesosEsCO = (value: number | string, decimals = 2) => {
+  const n = typeof value === "number" ? value : toNumberEs(value);
+  // si no hay parte decimal, no obligues dos decimales
+  const hasDecimals = Math.abs(n % 1) > 0;
+  return new Intl.NumberFormat("es-CO", {
+    minimumFractionDigits: hasDecimals ? decimals : 0,
+    maximumFractionDigits: decimals,
+  }).format(n);
+};
+
