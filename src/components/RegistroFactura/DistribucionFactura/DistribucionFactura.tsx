@@ -30,7 +30,7 @@ export default function DistribucionFactura() {
   const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
   const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
-  //const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
+  const [displayImpresionesBNCedi, setdisplayImpresionesBNCedi] = React.useState("");
   //const [displayImpresionesBNPalms, setdisplayImpresionesBNPalms] = React.useState("");
   //const [displayImpresionesColorPalms, setdisplayImpresionesColorPalms] = React.useState("");
   //const [displayImpresionesBNCalle, setdisplayImpresionesBNCalle] = React.useState("");
@@ -211,13 +211,6 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="CosToImp">Costo total de Impresión:</label>
             <input type="text" inputMode="numeric" name="CosToImp" placeholder="Se llenara automaticamente" value={String(displayCostoTotalImpresion)}  
-              onChange={(e) => {
-                const raw = e.target.value;
-                const f = formatPesosEsCO(raw);
-                const num = toNumberFromEsCO(f);
-                setdisplayCostoTotalImpresion(f);
-                setField("CosToImp", num)
-              }}
               onBlur={() => {
                 const num = toNumberFromEsCO(displayCostoTotalImpresion);
                 setdisplayCostoTotalImpresion(
@@ -234,13 +227,6 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ValorAnIVA">Valor antes de IVA:</label>
             <input type="text" inputMode="numeric" name="ValorAnIVA" placeholder="Se llenara automaticamente" value={String(displayValorAntesIva)}  
-              onChange={(e) => {
-                const raw = e.target.value;
-                const f = formatPesosEsCO(raw);
-                const num = toNumberFromEsCO(f);
-                setdisplayValorAntesIva(f);
-                setField("ValorAnIVA", num)
-              }}
               onBlur={() => {
                 const num = toNumberFromEsCO(displayValorAntesIva);
                 setdisplayValorAntesIva(
@@ -257,6 +243,23 @@ export default function DistribucionFactura() {
           <div className="form-group">
             <label htmlFor="ImpBnCedi">Impresiones B/N CEDI</label>
             <input type="number" id="ImpBnCedi" name="ImpBnCedi" value={formData.ImpBnCedi} onChange={handleChange}/>
+            <input type="text" inputMode="numeric" name="ImpBnCedi" placeholder="Ej: 100.000" value={String(displayImpresionesBNCedi)}  
+              onChange={(e) => {
+                const raw = e.target.value;
+                const f = formatPesosEsCO(raw);
+                const num = toNumberFromEsCO(f);
+                setdisplayImpresionesBNCedi(f);
+                setField("ImpBnCedi", num)
+              }}
+              onBlur={() => {
+                const num = toNumberFromEsCO(displayImpresionesBNCedi);
+                setdisplayImpresionesBNCedi(
+                  new Intl.NumberFormat("es-CO", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  }).format(Number.isFinite(num) ? num : 0)
+                );
+              }}/>
           </div>
 
           <div className="form-group">
