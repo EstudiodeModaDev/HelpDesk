@@ -332,29 +332,28 @@ function LoggedApp({user}: {user: User; actionLabel: string; onAuthClick: () => 
   return (
     <div className="page layout layout--withSidebar">
       <Sidebar navs={navs} selected={selected} onSelect={setSelected} user={user} role={role} />
+        <main className="content content--withSidebar">
+          <div className="page-viewport">
+            <div className={`page ${isFluid ? 'page--fluid' : ''}`}>
+              {selectedItem?.to ?? (
+                <>
+                  {selected === 'cajpos' && (
+                    services?.Usuarios
+                      ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
+                      : <div>Cargando servicios…</div>
+                  )}
 
-      <main className="content content--withSidebar">
-        <div className="page-viewport">
-          <div className={`page ${isFluid ? 'page--fluid' : ''}`}>
-            {selectedItem?.to ?? (
-              <>
-                {selected === 'cajpos' && (
-                  services?.Usuarios
-                    ? <CajerosPOSForm services={{ Tickets: services.Tickets, Logs: services.Logs }} />
-                    : <div>Cargando servicios…</div>
-                )}
-
-                {selected === 'home' && <div className="page page--fluid"><Home /></div>}               
-                {selected === 'ticketform' && <NuevoTicketForm />}
-                {selected === 'ticketTable' && <TablaTickets />}
-                {selected === 'task' && <TareasPage />}
-                {selected === 'formatos' && <Formatos />}
-                {selected === 'info' && <InfoPage />}
-              </>
-            )}
+                  {selected === 'home' && <Home />}   
+                  {selected === 'ticketform' && <NuevoTicketForm />}
+                  {selected === 'ticketTable' && <TablaTickets />}
+                  {selected === 'task' && <TareasPage />}
+                  {selected === 'formatos' && <Formatos />}
+                  {selected === 'info' && <InfoPage />}
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
     </div>
   );
 }
