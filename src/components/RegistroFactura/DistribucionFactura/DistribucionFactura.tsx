@@ -5,12 +5,21 @@ import { useProveedores } from "../../../Funcionalidades/ProveedoresFactura";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
 import { formatPesosEsCO, toNumberFromEsCO } from "../../../utils/Number";
+import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
+
+// import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
+
 
 export default function DistribucionFactura() {
   const { proveedores, loading, error } = useProveedores();
   const { registrarDistribucion } = useDistribucionFactura();
 
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
+
+
+const { registrarFactura } = useFacturas();
+
+
 
   // ✅ Estado base con todos los campos (incluidos los ocultos)
   const [formData, setFormData] = useState<DistribucionFacturaData>({
@@ -117,74 +126,131 @@ export default function DistribucionFactura() {
   ]);
 
 
-  // 🧾 Guardar registro único
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ // 🧾 Guardar registro único + generar 4 facturas relacionadas
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      if (!formData.Proveedor || !formData.Title) {
-        alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
-        return;
-      }
-
-      const sumaCostos =
-        formData.ImpBnCedi +
-        formData.ImpBnPalms +
-        formData.ImpColorPalms +
-        formData.ImpBnCalle +
-        formData.ImpColorCalle;
-      const diferencia = Math.abs(sumaCostos - formData.CosToImp);
-
-      if (diferencia > 0.01) {
-        alert(
-          `⚠️ Los costos de impresión no coinciden.\n\nCosto declarado: ${formData.CosToImp.toFixed(
-            2
-          )}\nSuma de costos: ${sumaCostos.toFixed(2)}`
-        );
-        return;
-      }
-
-      const record = { ...formData };
-      delete (record as any).Id;
-
-      console.log("📤 Enviando distribución a SharePoint:", record);
-      await registrarDistribucion(record);
-      alert("✅ Distribución de factura guardada con éxito");
-
-      // ♻️ Reset
-      setProveedorSeleccionado("");
-      setFormData({
-        Proveedor: "",
-        Title: "",
-        CargoFijo: 0,
-        CosToImp: 0,
-        ValorAnIVA: 0,
-        ImpBnCedi: 0,
-        ImpBnPalms: 0,
-        ImpColorPalms: 0,
-        ImpBnCalle: 0,
-        ImpColorCalle: 0,
-        CosTotMarNacionales: 0,
-        CosTotMarImpor: 0,
-        CosTotCEDI: 0,
-        CosTotServAdmin: 0,
-        FechaEmision: "",
-        NoFactura: "",
-        Items: "SC70",
-        DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
-        CCmn: "22111 - DIRECCION MARCAS NACIONALES + CSC",
-        CCmi: "21111 - DIRECCION MARCAS IMPORTADAS",
-        CCcedi: "31311 - CEDI",
-        CCsa: "31611 - SERVICIOS ADMINISTRATIVOS",
-        CO: "001 - FABRICA",
-        un: "601 - GENERAL",
-        DetalleFac: "Detalle de impresiones en el mes actual",
-      });
-    } catch (error: any) {
-      console.error("❌ Error al guardar la distribución:", error);
-      alert("⚠️ Ocurrió un error al guardar la distribución.");
+  try {
+    if (!formData.Proveedor || !formData.Title) {
+      alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
+      return;
     }
-  };
+
+    // Validación de costos de impresión
+    const sumaCostos =
+      formData.ImpBnCedi +
+      formData.ImpBnPalms +
+      formData.ImpColorPalms +
+      formData.ImpBnCalle +
+      formData.ImpColorCalle;
+    const diferencia = Math.abs(sumaCostos - formData.CosToImp);
+
+    if (diferencia > 0.01) {
+      alert(
+        `⚠️ Los costos de impresión no coinciden.\n\nCosto declarado: ${formData.CosToImp.toFixed(
+          2
+        )}\nSuma de costos: ${sumaCostos.toFixed(2)}`
+      );
+      return;
+    }
+
+    // ---------- 1️⃣ Guardar registro principal en Distribuciones ----------
+    const record = { ...formData };
+    delete (record as any).Id;
+
+    console.log("📤 Enviando distribución a SharePoint:", record);
+    await registrarDistribucion(record);
+    console.log("✅ Distribución guardada correctamente");
+
+    // ---------- 2️⃣ Generar los 4 registros en la lista Facturas ----------
+    const facturasData = [
+      {
+        ...formData,
+        CC: formData.CCmn,
+        ValorAnIVA: formData.CosTotMarNacionales,
+        FecEntregaCont:  null,
+          DocERP:  "",
+          Observaciones:  "",
+          RegistradoPor: "Sistema",
+      },
+      {
+        ...formData,
+        CC: formData.CCmi,
+        ValorAnIVA: formData.CosTotMarImpor,
+        FecEntregaCont:  null,
+          DocERP:  "",
+          Observaciones:  "",
+          RegistradoPor: "Sistema",
+      },
+      {
+        ...formData,
+        CC: formData.CCcedi,
+        ValorAnIVA: formData.CosTotCEDI,
+        FecEntregaCont:  null,
+          DocERP:  "",
+          Observaciones:  "",
+          RegistradoPor: "Sistema",
+      },
+      {
+        ...formData,
+        CC: formData.CCsa,
+        ValorAnIVA: formData.CosTotServAdmin,
+        FecEntregaCont:  null,
+          DocERP:  "",
+          Observaciones:  "",
+          RegistradoPor: "Sistema",
+      },
+    ];
+
+    console.log("📦 Facturas a crear en SharePoint:", facturasData);
+
+    // Usa el hook existente useFacturas
+    for (const factura of facturasData) {
+      try {
+        await registrarFactura(factura);
+        console.log(`✅ Factura registrada para CC: ${factura.CC}`);
+      } catch (err) {
+        console.error(`❌ Error registrando factura para ${factura.CC}`, err);
+      }
+    }
+
+    alert("✅ Distribución y facturas relacionadas guardadas con éxito.");
+
+    // ---------- 3️⃣ Reset del formulario ----------
+    setProveedorSeleccionado("");
+    setFormData({
+      Proveedor: "",
+      Title: "",
+      CargoFijo: 0,
+      CosToImp: 0,
+      ValorAnIVA: 0,
+      ImpBnCedi: 0,
+      ImpBnPalms: 0,
+      ImpColorPalms: 0,
+      ImpBnCalle: 0,
+      ImpColorCalle: 0,
+      CosTotMarNacionales: 0,
+      CosTotMarImpor: 0,
+      CosTotCEDI: 0,
+      CosTotServAdmin: 0,
+      FechaEmision: "",
+      NoFactura: "",
+      Items: "SC70",
+      DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
+      CCmn: "22111 - DIRECCION MARCAS NACIONALES + CSC",
+      CCmi: "21111 - DIRECCION MARCAS IMPORTADAS",
+      CCcedi: "31311 - CEDI",
+      CCsa: "31611 - SERVICIOS ADMINISTRATIVOS",
+      CO: "001 - FABRICA",
+      un: "601 - GENERAL",
+      DetalleFac: "Detalle de impresiones en el mes actual",
+    });
+  } catch (error: any) {
+    console.error("❌ Error al guardar la distribución:", error);
+    alert("⚠️ Ocurrió un error al guardar la distribución o las facturas.");
+  }
+};
+
 
   const setField = <K extends keyof DistribucionFacturaData>(
     k: K,
