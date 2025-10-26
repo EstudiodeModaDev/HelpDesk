@@ -136,13 +136,14 @@ const handleSubmit = async (e: React.FormEvent) => {
       return;
     }
 
-    // Validación de costos de impresión
+    // ---------- 🔍 Validación de costos ----------
     const sumaCostos =
       formData.ImpBnCedi +
       formData.ImpBnPalms +
       formData.ImpColorPalms +
       formData.ImpBnCalle +
       formData.ImpColorCalle;
+
     const diferencia = Math.abs(sumaCostos - formData.CosToImp);
 
     if (diferencia > 0.01) {
@@ -162,61 +163,92 @@ const handleSubmit = async (e: React.FormEvent) => {
     await registrarDistribucion(record);
     console.log("✅ Distribución guardada correctamente");
 
+    // ---------- 🧹 Función para limpiar campos no deseados ----------
+    const camposExcluidos = [
+      "CargoFijo",
+      "CosToImp",
+      "ImpBnCedi",
+      "ImpBnPalms",
+      "ImpColorPalms",
+      "ImpBnCalle",
+      "ImpColorCalle",
+      "CosTotMarNacionales",
+      "CosTotMarImpor",
+      "CosTotCEDI",
+      "CosTotServAdmin",
+      "CCmn",
+      "CCmi",
+      "CCcedi",
+      "CCsa",
+    ];
+
+    const limpiarCampos = (obj: any) => {
+      const copia = { ...obj };
+      camposExcluidos.forEach((campo) => delete copia[campo]);
+      return copia;
+    };
+
     // ---------- 2️⃣ Generar los 4 registros en la lista Facturas ----------
     const facturasData = [
       {
         ...formData,
         CC: formData.CCmn,
         ValorAnIVA: formData.CosTotMarNacionales,
-        FecEntregaCont:  null,
-          DocERP:  "",
-          Observaciones:  "",
-          RegistradoPor: "Sistema",
+        CostoTotal: formData.CosTotMarNacionales,
+        FecEntregaCont: null,
+        DocERP: "",
+        Observaciones: "",
+        RegistradoPor: "Sistema",
       },
       {
         ...formData,
         CC: formData.CCmi,
         ValorAnIVA: formData.CosTotMarImpor,
-        FecEntregaCont:  null,
-          DocERP:  "",
-          Observaciones:  "",
-          RegistradoPor: "Sistema",
+        CostoTotal: formData.CosTotMarImpor,
+        FecEntregaCont: null,
+        DocERP: "",
+        Observaciones: "",
+        RegistradoPor: "Sistema",
       },
       {
         ...formData,
         CC: formData.CCcedi,
         ValorAnIVA: formData.CosTotCEDI,
-        FecEntregaCont:  null,
-          DocERP:  "",
-          Observaciones:  "",
-          RegistradoPor: "Sistema",
+        CostoTotal: formData.CosTotCEDI,
+        FecEntregaCont: null,
+        DocERP: "",
+        Observaciones: "",
+        RegistradoPor: "Sistema",
       },
       {
         ...formData,
         CC: formData.CCsa,
         ValorAnIVA: formData.CosTotServAdmin,
-        FecEntregaCont:  null,
-          DocERP:  "",
-          Observaciones:  "",
-          RegistradoPor: "Sistema",
+        CostoTotal: formData.CosTotServAdmin,
+        FecEntregaCont: null,
+        DocERP: "",
+        Observaciones: "",
+        RegistradoPor: "Sistema",
       },
     ];
 
     console.log("📦 Facturas a crear en SharePoint:", facturasData);
 
-    // Usa el hook existente useFacturas
+    // ---------- 3️⃣ Envío de las 4 facturas ----------
     for (const factura of facturasData) {
+      const facturaLimpia = limpiarCampos(factura);
       try {
-        await registrarFactura(factura);
-        console.log(`✅ Factura registrada para CC: ${factura.CC}`);
+        console.log("📤 Registrando factura:", facturaLimpia.CC);
+        await registrarFactura(facturaLimpia);
+        console.log(`✅ Factura registrada para CC: ${facturaLimpia.CC}`);
       } catch (err) {
-        console.error(`❌ Error registrando factura para ${factura.CC}`, err);
+        console.error(`❌ Error registrando factura para ${facturaLimpia.CC}`, err);
       }
     }
 
     alert("✅ Distribución y facturas relacionadas guardadas con éxito.");
 
-    // ---------- 3️⃣ Reset del formulario ----------
+    // ---------- 4️⃣ Reset del formulario ----------
     setProveedorSeleccionado("");
     setFormData({
       Proveedor: "",
@@ -250,6 +282,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     alert("⚠️ Ocurrió un error al guardar la distribución o las facturas.");
   }
 };
+
 
 
   const setField = <K extends keyof DistribucionFacturaData>(
