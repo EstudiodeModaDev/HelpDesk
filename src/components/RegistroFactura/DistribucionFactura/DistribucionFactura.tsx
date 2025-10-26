@@ -128,10 +128,11 @@ export default function DistribucionFactura() {
       }
 
       const sumaCostos =
-        formData.CosTotCEDI +
-        formData.CosTotMarNacionales +
-        formData.CosTotMarImpor +
-        formData.CosTotServAdmin;
+        formData.ImpBnCedi +
+        formData.ImpBnPalms +
+        formData.ImpColorPalms +
+        formData.ImpBnCalle +
+        formData.ImpColorCalle;
       const diferencia = Math.abs(sumaCostos - formData.CosToImp);
 
       if (diferencia > 0.01) {
