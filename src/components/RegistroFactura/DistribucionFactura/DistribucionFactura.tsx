@@ -33,10 +33,10 @@ export default function DistribucionFactura() {
     // 🔸 Campos ocultos (no visibles en el formulario)
     Items: "SC70",
     DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
-    CC: "22111 - DIRECCION MARCAS NACIONALES + CSC",
-    CC2: "21111 - DIRECCION MARCAS IMPORTADAS",
-    CC3: "31311 - CEDI",
-    CC4: "31611 - SERVICIOS ADMINISTRATIVOS",
+    CCmn: "22111 - DIRECCION MARCAS NACIONALES + CSC",
+    CCmi: "21111 - DIRECCION MARCAS IMPORTADAS",
+    CCcedi: "31311 - CEDI",
+    CCsa: "31611 - SERVICIOS ADMINISTRATIVOS",
     CO: "001 - FABRICA",
     un: "601 - GENERAL",
     DetalleFac: "Detalle de impresiones en el mes actual",
@@ -116,7 +116,7 @@ export default function DistribucionFactura() {
     formData.ImpColorCalle,
   ]);
 
-  
+
   // 🧾 Guardar registro único
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,10 +171,10 @@ export default function DistribucionFactura() {
         NoFactura: "",
         Items: "SC70",
         DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
-        CC: "22111 - DIRECCION MARCAS NACIONALES + CSC",
-        CC2: "21111 - DIRECCION MARCAS IMPORTADAS",
-        CC3: "31311 - CEDI",
-        CC4: "31611 - SERVICIOS ADMINISTRATIVOS",
+        CCmn: "22111 - DIRECCION MARCAS NACIONALES + CSC",
+        CCmi: "21111 - DIRECCION MARCAS IMPORTADAS",
+        CCcedi: "31311 - CEDI",
+        CCsa: "31611 - SERVICIOS ADMINISTRATIVOS",
         CO: "001 - FABRICA",
         un: "601 - GENERAL",
         DetalleFac: "Detalle de impresiones en el mes actual",

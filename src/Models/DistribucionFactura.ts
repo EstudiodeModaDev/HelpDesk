@@ -18,10 +18,10 @@ export interface DistribucionFacturaData {
   NoFactura: string;
   Items: string;
   DescripItems?: string;
-  CC: string;   
-  CC2: string;
-  CC3: string;
-  CC4: string;
+  CCmn: string;   
+  CCmi: string;
+  CCcedi: string;
+  CCsa: string;
   CO: string;  
   un: string;  
   DetalleFac?: string ;
