@@ -83,26 +83,39 @@ export class DistribucionFacturaService {
   // 🔄 Mapeo entre SharePoint y el modelo local
   // ----------------------------------------------------------
 
-  private toModel(item: any): DistribucionFacturaData {
-    const f = item?.fields ?? {};
-    return {
+ private toModel(item: any): DistribucionFacturaData {
+  const f = item?.fields ?? {};
+
+  return {
     Id: String(f?.id ?? f?.ID ?? f?.Id ?? ''),
     Proveedor: f?.Proveedor ?? '',
     Title: f?.Title ?? '',
-    CargoFijo: f?.CargoFijo ?? '',
-    CosToImp: f?.CosToImp ?? '',
-    ValorAnIVA: f?.ValorAnIVA ?? '',
-    ImpBnCedi: f?.ImpBnCedi ?? '',
-    ImpBnPalms: f?.ImpBnPalms ?? '',
-    ImpColorPalms: f?.ImpColorPalms ?? '',
-    ImpBnCalle: f?.ImpBnCalle ?? '',
-    ImpColorCalle: f?.ImpColorCalle ?? '',
-    CosTotMarNacionales: f?.CosTotMarNacionales ?? '',
-    CosTotMarImpor: f?.CosTotMarImpor ?? '',
-    CosTotCEDI: f?.CosTotCEDI ?? '',
-    CosTotServAdmin: f?.CosTotServAdmin ?? '',
-    };
-  }
+    CargoFijo: Number(f?.CargoFijo ?? 0),
+    CosToImp: Number(f?.CosToImp ?? 0),
+    ValorAnIVA: Number(f?.ValorAnIVA ?? 0),
+    ImpBnCedi: Number(f?.ImpBnCedi ?? 0),
+    ImpBnPalms: Number(f?.ImpBnPalms ?? 0),
+    ImpColorPalms: Number(f?.ImpColorPalms ?? 0),
+    ImpBnCalle: Number(f?.ImpBnCalle ?? 0),
+    ImpColorCalle: Number(f?.ImpColorCalle ?? 0),
+    CosTotMarNacionales: Number(f?.CosTotMarNacionales ?? 0),
+    CosTotMarImpor: Number(f?.CosTotMarImpor ?? 0),
+    CosTotCEDI: Number(f?.CosTotCEDI ?? 0),
+    CosTotServAdmin: Number(f?.CosTotServAdmin ?? 0),
+    FechaEmision: f?.FechaEmision ?? '',
+    NoFactura: f?.NoFactura ?? '',
+    Items: f?.Items ?? '',
+    DescripItems: f?.DescripItems ?? '',
+    CC: f?.CC ?? '',
+    CC2: f?.CC2 ?? '',
+    CC3: f?.CC3 ?? '',
+    CC4: f?.CC4 ?? '',
+    CO: f?.CO ?? '',
+    un: f?.un ?? '',
+    DetalleFac: f?.DetalleFac ?? ''
+  };
+}
+
 
   // ----------------------------------------------------------
   // ⚙️ CRUD (Create, Read, Update, Delete)

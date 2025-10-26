@@ -11,6 +11,8 @@ export default function DistribucionFactura() {
   const { registrarDistribucion } = useDistribucionFactura();
 
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
+
+  // ✅ Estado base con los nuevos campos incluidos
   const [formData, setFormData] = useState<DistribucionFacturaData>({
     Proveedor: "",
     Title: "",
@@ -26,7 +28,20 @@ export default function DistribucionFactura() {
     CosTotMarImpor: 0,
     CosTotCEDI: 0,
     CosTotServAdmin: 0,
+    FechaEmision: "",
+    NoFactura: "",
+    Items: "SC70",
+    DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
+    CC: "22111 - DIRECCION MARCAS NACIONALES + CSC",
+    CC2: "21111 - DIRECCION MARCAS IMPORTADAS",
+    CC3: "31311 - CEDI",
+    CC4: "31611 - SERVICIOS ADMINISTRATIVOS",
+    CO: "001 - FABRICA",
+    un: "601 - GENERAL",
+    DetalleFac: "Detalle de impresiones en el mes actual",
   });
+
+  // 🔢 Estados visuales para los campos numéricos (formateo)
   const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
   const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
@@ -37,9 +52,8 @@ export default function DistribucionFactura() {
   const [displayImpresionesColorCalle, setdisplayImpresionesColorCalle] = React.useState("");
   const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
   const [displayTotalOtrasMarcas, setDisplayTotalOtrasMarcas] = React.useState("");
-  //const [displayTotalMarcasImportadas, setDisplayMarcasImportadas] = React.useState("");
-  //const [displayServiciosAdministrativos, setdisplayServiciosAdministrativos] = React.useState("");
 
+  // 🔹 Selección del proveedor
   const handleProveedorSeleccionado = (id: string) => {
     setProveedorSeleccionado(id);
     if (!id) {
@@ -56,22 +70,31 @@ export default function DistribucionFactura() {
     }
   };
 
+  // 🧮 Efecto para cálculos automáticos
   useEffect(() => {
-    const {CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle,} = formData;
+    const {
+      CargoFijo,
+      CosToImp,
+      ImpBnCedi,
+      ImpBnPalms,
+      ImpColorPalms,
+      ImpBnCalle,
+      ImpColorCalle,
+    } = formData;
 
-    const cargoFijo3 = CargoFijo - (CargoFijo / 3)
+    const cargoFijo3 = CargoFijo - CargoFijo / 3;
     const ValorAnIVA = CargoFijo + CosToImp;
-    const CosTotCEDI =  (CargoFijo/3) + ImpBnCedi;
-    const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
-    const otrosCostos = (cargoFijo3/3) + promedioOtros;
-    const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms
+    const CosTotCEDI = CargoFijo / 3 + ImpBnCedi;
+    const promedioOtros =
+      (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
+    const otrosCostos = cargoFijo3 / 3 + promedioOtros;
+    const totalImpresion =
+      ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms;
 
-    console.log("Total impresion", totalImpresion)
-
-    setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)))
-    setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)))
-    setdisplayTotalCedi(formatPesosEsCO(String(CosTotCEDI)))
-    setDisplayTotalOtrasMarcas(formatPesosEsCO(String(otrosCostos)))
+    setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)));
+    setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)));
+    setdisplayTotalCedi(formatPesosEsCO(String(CosTotCEDI)));
+    setDisplayTotalOtrasMarcas(formatPesosEsCO(String(otrosCostos)));
 
     setFormData((prev) => ({
       ...prev,
@@ -80,10 +103,19 @@ export default function DistribucionFactura() {
       CosTotMarNacionales: otrosCostos,
       CosTotMarImpor: otrosCostos,
       CosTotServAdmin: otrosCostos,
-      CosToImp: totalImpresion
+      CosToImp: totalImpresion,
     }));
-  }, [formData.CargoFijo, formData.CosToImp, formData.ImpBnCedi, formData.ImpBnPalms, formData.ImpColorPalms, formData.ImpBnCalle, formData.ImpColorCalle,]);
+  }, [
+    formData.CargoFijo,
+    formData.CosToImp,
+    formData.ImpBnCedi,
+    formData.ImpBnPalms,
+    formData.ImpColorPalms,
+    formData.ImpBnCalle,
+    formData.ImpColorCalle,
+  ]);
 
+  // 🧾 Guardar registro único (sin generar aún los 4)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -93,23 +125,18 @@ export default function DistribucionFactura() {
         return;
       }
 
-      // ⚠️ Validación de costos de impresión
       const sumaCostos =
         formData.CosTotCEDI +
         formData.CosTotMarNacionales +
         formData.CosTotMarImpor +
         formData.CosTotServAdmin;
-
-      // Permitimos una pequeña diferencia por redondeo
       const diferencia = Math.abs(sumaCostos - formData.CosToImp);
 
       if (diferencia > 0.01) {
         alert(
-          `⚠️ Los costos de impresión no coinciden.\n\nCosto de impresión declarado: ${formData.CosToImp.toFixed(
+          `⚠️ Los costos de impresión no coinciden.\n\nCosto declarado: ${formData.CosToImp.toFixed(
             2
-          )}\nSuma de costos calculados: ${sumaCostos.toFixed(
-            2
-          )}\n\nPor favor revisa los valores.`
+          )}\nSuma de costos: ${sumaCostos.toFixed(2)}`
         );
         return;
       }
@@ -119,7 +146,6 @@ export default function DistribucionFactura() {
 
       console.log("📤 Enviando distribución a SharePoint:", record);
       await registrarDistribucion(record);
-
       alert("✅ Distribución de factura guardada con éxito");
 
       // ♻️ Reset
@@ -139,16 +165,28 @@ export default function DistribucionFactura() {
         CosTotMarImpor: 0,
         CosTotCEDI: 0,
         CosTotServAdmin: 0,
+        FechaEmision: "",
+        NoFactura: "",
+        Items: "SC70",
+        DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
+        CC: "22111 - DIRECCION MARCAS NACIONALES + CSC",
+        CC2: "21111 - DIRECCION MARCAS IMPORTADAS",
+        CC3: "31311 - CEDI",
+        CC4: "31611 - SERVICIOS ADMINISTRATIVOS",
+        CO: "001 - FABRICA",
+        un: "601 - GENERAL",
+        DetalleFac: "Detalle de impresiones en el mes actual",
       });
     } catch (error: any) {
       console.error("❌ Error al guardar la distribución:", error);
-      alert(
-        "⚠️ Ocurrió un error al guardar la distribución. Revisa la consola para más detalles."
-      );
+      alert("⚠️ Ocurrió un error al guardar la distribución.");
     }
   };
 
-  const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) => setFormData((s) => ({ ...s, [k]: v }));
+  const setField = <K extends keyof DistribucionFacturaData>(
+    k: K,
+    v: DistribucionFacturaData[K]
+  ) => setFormData((s) => ({ ...s, [k]: v }));
 
   return (
     <div className="distribucion-container">
@@ -156,7 +194,7 @@ export default function DistribucionFactura() {
 
       <form className="distribucion-form" onSubmit={handleSubmit}>
         <div className="form-grid">
-          {/* 🔹 Proveedor y NIT en la misma línea */}
+          {/* Proveedor y NIT */}
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="proveedor-select">Proveedor:</label>
@@ -165,7 +203,11 @@ export default function DistribucionFactura() {
               ) : error ? (
                 <span style={{ color: "red" }}>{error}</span>
               ) : (
-                <select id="proveedor-select" value={proveedorSeleccionado} onChange={(e) => handleProveedorSeleccionado(e.target.value)}>
+                <select
+                  id="proveedor-select"
+                  value={proveedorSeleccionado}
+                  onChange={(e) => handleProveedorSeleccionado(e.target.value)}
+                >
                   <option value="">-- Selecciona un proveedor --</option>
                   {proveedores.map((p) => (
                     <option key={p.Id} value={p.Id}>
@@ -180,6 +222,85 @@ export default function DistribucionFactura() {
               <label htmlFor="nit">NIT:</label>
               <input type="text" id="nit" name="Title" value={formData.Title} readOnly />
             </div>
+          </div>
+
+          {/* NUEVOS CAMPOS */}
+          {/* Fecha de Emisión */}
+          <div className="form-group">
+            <label htmlFor="FechaEmision">Fecha de Emisión:</label>
+            <input
+              type="date"
+              id="FechaEmision"
+              name="FechaEmision"
+              value={formData.FechaEmision}
+              onChange={(e) => setField("FechaEmision", e.target.value)}
+            />
+          </div>
+
+          {/* NoFactura */}
+          <div className="form-group">
+            <label htmlFor="NoFactura">Número de Factura:</label>
+            <input
+              type="text"
+              id="NoFactura"
+              name="NoFactura"
+              placeholder="Ej: FAC-1234"
+              value={formData.NoFactura}
+              onChange={(e) => setField("NoFactura", e.target.value)}
+            />
+          </div>
+
+          {/* Items y descripción */}
+          <div className="form-row">
+            <div className="form-group">
+              <label>Items:</label>
+              <input type="text" value={formData.Items} readOnly />
+            </div>
+            <div className="form-group">
+              <label>Descripción Items:</label>
+              <input type="text" value={formData.DescripItems} readOnly />
+            </div>
+          </div>
+
+          {/* CCs predefinidos */}
+          <div className="form-row">
+            <div className="form-group">
+              <label>CC1:</label>
+              <input type="text" value={formData.CC} readOnly />
+            </div>
+            <div className="form-group">
+              <label>CC2:</label>
+              <input type="text" value={formData.CC2} readOnly />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>CC3:</label>
+              <input type="text" value={formData.CC3} readOnly />
+            </div>
+            <div className="form-group">
+              <label>CC4:</label>
+              <input type="text" value={formData.CC4} readOnly />
+            </div>
+          </div>
+
+          {/* CO y UN */}
+          <div className="form-row">
+            <div className="form-group">
+              <label>CO:</label>
+              <input type="text" value={formData.CO} readOnly />
+            </div>
+            <div className="form-group">
+              <label>UN:</label>
+              <input type="text" value={formData.un} readOnly />
+            </div>
+          </div>
+
+          {/* Detalle Factura */}
+          <div className="form-group">
+            <label>Detalle de Factura:</label>
+            <input type="text" value={formData.DetalleFac} readOnly />
           </div>
 
           {/* Campo Cargo Fijo */}

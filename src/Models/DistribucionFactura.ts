@@ -14,4 +14,15 @@ export interface DistribucionFacturaData {
   CosTotMarImpor: number;
   CosTotCEDI: number;
   CosTotServAdmin: number;
+  FechaEmision: string;
+  NoFactura: string;
+  Items: string;
+  DescripItems?: string;
+  CC: string;   
+  CC2: string;
+  CC3: string;
+  CC4: string;
+  CO: string;  
+  un: string;  
+  DetalleFac?: string ;
 }
