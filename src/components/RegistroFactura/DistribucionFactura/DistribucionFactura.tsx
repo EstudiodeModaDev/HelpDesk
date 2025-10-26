@@ -12,7 +12,7 @@ export default function DistribucionFactura() {
 
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
 
-  // ✅ Estado base con los nuevos campos incluidos
+  // ✅ Estado base con todos los campos (incluidos los ocultos)
   const [formData, setFormData] = useState<DistribucionFacturaData>({
     Proveedor: "",
     Title: "",
@@ -30,6 +30,7 @@ export default function DistribucionFactura() {
     CosTotServAdmin: 0,
     FechaEmision: "",
     NoFactura: "",
+    // 🔸 Campos ocultos (no visibles en el formulario)
     Items: "SC70",
     DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
     CC: "22111 - DIRECCION MARCAS NACIONALES + CSC",
@@ -41,7 +42,7 @@ export default function DistribucionFactura() {
     DetalleFac: "Detalle de impresiones en el mes actual",
   });
 
-  // 🔢 Estados visuales para los campos numéricos (formateo)
+  // 🔢 Estados visuales para los campos numéricos (solo formateo)
   const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
   const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
@@ -53,7 +54,7 @@ export default function DistribucionFactura() {
   const [displayTotalCedi, setdisplayTotalCedi] = React.useState("");
   const [displayTotalOtrasMarcas, setDisplayTotalOtrasMarcas] = React.useState("");
 
-  // 🔹 Selección del proveedor
+  // 🔹 Selección de proveedor
   const handleProveedorSeleccionado = (id: string) => {
     setProveedorSeleccionado(id);
     if (!id) {
@@ -115,7 +116,8 @@ export default function DistribucionFactura() {
     formData.ImpColorCalle,
   ]);
 
-  // 🧾 Guardar registro único (sin generar aún los 4)
+  
+  // 🧾 Guardar registro único
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -224,7 +226,6 @@ export default function DistribucionFactura() {
             </div>
           </div>
 
-          {/* NUEVOS CAMPOS */}
           {/* Fecha de Emisión */}
           <div className="form-group">
             <label htmlFor="FechaEmision">Fecha de Emisión:</label>
@@ -250,58 +251,6 @@ export default function DistribucionFactura() {
             />
           </div>
 
-          {/* Items y descripción */}
-          <div className="form-row">
-            <div className="form-group">
-              <label>Items:</label>
-              <input type="text" value={formData.Items} readOnly />
-            </div>
-            <div className="form-group">
-              <label>Descripción Items:</label>
-              <input type="text" value={formData.DescripItems} readOnly />
-            </div>
-          </div>
-
-          {/* CCs predefinidos */}
-          <div className="form-row">
-            <div className="form-group">
-              <label>CC1:</label>
-              <input type="text" value={formData.CC} readOnly />
-            </div>
-            <div className="form-group">
-              <label>CC2:</label>
-              <input type="text" value={formData.CC2} readOnly />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>CC3:</label>
-              <input type="text" value={formData.CC3} readOnly />
-            </div>
-            <div className="form-group">
-              <label>CC4:</label>
-              <input type="text" value={formData.CC4} readOnly />
-            </div>
-          </div>
-
-          {/* CO y UN */}
-          <div className="form-row">
-            <div className="form-group">
-              <label>CO:</label>
-              <input type="text" value={formData.CO} readOnly />
-            </div>
-            <div className="form-group">
-              <label>UN:</label>
-              <input type="text" value={formData.un} readOnly />
-            </div>
-          </div>
-
-          {/* Detalle Factura */}
-          <div className="form-group">
-            <label>Detalle de Factura:</label>
-            <input type="text" value={formData.DetalleFac} readOnly />
-          </div>
 
           {/* Campo Cargo Fijo */}
           <div className="form-group">
