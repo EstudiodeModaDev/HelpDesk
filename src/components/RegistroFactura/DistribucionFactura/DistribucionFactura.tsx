@@ -180,6 +180,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       "CCmi",
       "CCcedi",
       "CCsa",
+      "CostoTotal",
     ];
 
     const limpiarCampos = (obj: any) => {
@@ -194,7 +195,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         ...formData,
         CC: formData.CCmn,
         ValorAnIVA: formData.CosTotMarNacionales,
-        CostoTotal: formData.CosTotMarNacionales,
         FecEntregaCont: null,
         DocERP: "",
         Observaciones: "",
@@ -204,7 +204,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         ...formData,
         CC: formData.CCmi,
         ValorAnIVA: formData.CosTotMarImpor,
-        CostoTotal: formData.CosTotMarImpor,
         FecEntregaCont: null,
         DocERP: "",
         Observaciones: "",
@@ -214,7 +213,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         ...formData,
         CC: formData.CCcedi,
         ValorAnIVA: formData.CosTotCEDI,
-        CostoTotal: formData.CosTotCEDI,
         FecEntregaCont: null,
         DocERP: "",
         Observaciones: "",
@@ -224,7 +222,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         ...formData,
         CC: formData.CCsa,
         ValorAnIVA: formData.CosTotServAdmin,
-        CostoTotal: formData.CosTotServAdmin,
         FecEntregaCont: null,
         DocERP: "",
         Observaciones: "",
