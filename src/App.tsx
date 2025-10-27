@@ -20,7 +20,7 @@ import RegistroFactura from './components/RegistroFactura/RegistroFactura';
 import InfoPage from './components/Info/Informacion';
 import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
 import UsuariosPanel from './components/Usuarios/Usuarios';
-import HomeIcon from "./assets/homeIcon.svg"
+import HomeIcon from "./assets/home.svg"
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
