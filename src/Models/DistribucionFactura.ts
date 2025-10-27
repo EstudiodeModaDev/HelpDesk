@@ -25,4 +25,5 @@ export interface DistribucionFacturaData {
   CO: string;  
   un: string;  
   DetalleFac?: string ;
+  IdDistribuida?: string
 }
