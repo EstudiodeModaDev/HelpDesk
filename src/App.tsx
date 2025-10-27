@@ -1,6 +1,5 @@
 import * as React from 'react';
 import './App.css';
-
 import Home from './components/Home/Home';
 import NuevoTicketForm from './components/NuevoTicket/NuevoTicketForm';
 import TablaTickets from './components/Tickets/Tickets';
@@ -21,6 +20,7 @@ import InfoPage from './components/Info/Informacion';
 import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
 import UsuariosPanel from './components/Usuarios/Usuarios';
 import HomeIcon from "./assets/home.svg"
+import addIcon from "./assets/add.svg"
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
@@ -35,7 +35,7 @@ export type MenuItem = {
 
 const NAVS_ADMIN: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
-  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
+  { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketForm/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
@@ -66,7 +66,7 @@ const NAVS_ADMIN: MenuItem[] = [
 
 const NAVS_TECNICO: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
-  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
+  { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketForm/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
@@ -90,7 +90,7 @@ const NAVS_TECNICO: MenuItem[] = [
 const NAVS_USUARIO: MenuItem[] = [  
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
-  { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketUsuarioForm/> },
+  { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm/> },
 ];
 
 function getNavsForRole(role: Role | string) {
