@@ -10,6 +10,19 @@ import DistribucionesLista from "./DistribucionesLista"; // ✅ Importamos la li
 import { useAuth } from "../../../auth/authContext";
 
 export default function DistribucionFactura() {
+
+  // Obtener mes actual en español
+const meses = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+const fecha = new Date();
+const mesActual = meses[fecha.getMonth()]; // getMonth() devuelve 0-11
+
+// Construir mensaje predeterminado
+const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
+
+
   const { proveedores, loading, error } = useProveedores();
   const { registrarDistribucion } = useDistribucionFactura();
   const { registrarFactura } = useFacturas();
@@ -44,7 +57,7 @@ export default function DistribucionFactura() {
     CCsa: "31611",
     CO: "001",
     un: "601",
-    DetalleFac: "Detalle de impresiones en el mes actual",
+    DetalleFac: mensajePredeterminado,
   });
 
   // 🔢 Estados visuales para los campos numéricos
