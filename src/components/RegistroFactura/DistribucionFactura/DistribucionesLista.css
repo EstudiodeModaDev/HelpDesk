@@ -1,0 +1,162 @@
+/* ================================
+   🎨 ESTILOS LISTA DE DISTRIBUCIONES
+   ================================ */
+
+/* 🧩 Contenedor principal */
+.distribuciones-lista-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 🧭 Cabecera */
+.distribuciones-lista-container h4 {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Botón de volver */
+.btn.btn-secondary {
+  background-color: #f6f7f9;
+  border: 1px solid #ccc;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn.btn-secondary:hover {
+  background-color: #e8e9ec;
+}
+
+/* ================================
+   🧾 TABLA SCROLLABLE
+   ================================ */
+
+/* Contenedor de la tabla con scroll vertical y horizontal */
+.tabla-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto; /* 👈 permite scroll horizontal si el contenido no cabe */
+  max-height: 60vh;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Tabla base */
+.tabla-facturas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  table-layout: fixed; /* 👈 fuerza ancho fijo por columna */
+  min-width: 1200px; /* 👈 evita que se aplaste demasiado */
+  background-color: #fff;
+}
+
+.tabla-facturas th,
+.tabla-facturas td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 14px;
+  word-wrap: break-word; /* 👈 asegura que el texto se ajuste */
+  white-space: normal;
+  width: 100px;
+}
+
+/* Cabecera */
+.tabla-facturas thead {
+  background-color: #f8f9fb;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.tabla-facturas th {
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* Filas */
+.tabla-facturas tbody tr:hover {
+  background-color: #f6f7f9;
+  transition: background 0.2s ease-in-out;
+}
+
+/* Anchos específicos */
+.tabla-facturas th:nth-child(1),
+.tabla-facturas td:nth-child(1) {
+  width: 160px; /* Proveedor */
+}
+
+.tabla-facturas th:nth-child(2),
+.tabla-facturas td:nth-child(2) {
+  width: 200px; /* Título */
+}
+
+.tabla-facturas th:nth-child(3),
+.tabla-facturas td:nth-child(3) {
+  width: 100px; /* N° Factura */
+}
+
+.tabla-facturas th:nth-child(4),
+.tabla-facturas td:nth-child(4) {
+  width: 120px; /* Fecha Emisión */
+}
+
+.tabla-facturas th:nth-child(10),
+.tabla-facturas td:nth-child(10) {
+  width: 240px; /* Detalle */
+  text-align: left;
+}
+
+/* ======= Texto con puntos suspensivos ======= */
+.one-line-ellipsis {
+  display: inline-block;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabla-facturas td .one-line-ellipsis {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ======= Columna Acciones fija y compacta ======= */
+.tabla-facturas th:last-child,
+.tabla-facturas td:last-child {
+  width: 64px;          /* ancho suficiente para 1 botón */
+  white-space: nowrap;  /* que no salte de línea */
+  text-align: center;
+}
+
+/* ======= Botón editar compacto ======= */
+.btn-editar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #f6f7f9;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.2s ease-in-out;
+}
+
+.btn-editar:hover {
+  background-color: #e2e3e7;
+}

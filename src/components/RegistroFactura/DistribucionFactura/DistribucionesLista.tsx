@@ -1,6 +1,7 @@
 // src/components/DistribucionFactura/DistribucionesLista.tsx
 import React from "react";
 import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
+import "./DistribucionesLista.css"
 
 interface DistribucionesListaProps {
   onVolver: () => void;
