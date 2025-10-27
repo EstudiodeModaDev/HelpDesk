@@ -128,7 +128,7 @@ export default function DistribucionFactura() {
         formData.ImpColorCalle;
       const diferencia = Math.abs(sumaCostos - formData.CosToImp);
 
-      if (diferencia > 0.01) {
+      if (diferencia > 0.1) {
         alert(`⚠️ Los costos de impresión no coinciden.`);
         return;
       }

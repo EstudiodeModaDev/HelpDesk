@@ -2,11 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGraphServices } from "../graph/GrapServicesContext";
 import type { DistribucionFacturaData } from "../Models/DistribucionFactura";
 import { DistribucionFacturaService } from "../Services/DistribucionFactura.service";
+import { useAuth } from "../auth/authContext";
 
 // 🧠 Hook principal para manejar la lógica de distribución de facturas
 export function useDistribucionFactura() {
   const { graph } = useGraphServices();
   const service = useMemo(() => new DistribucionFacturaService(graph), [graph]);
+  const { account } = useAuth();
+    account?.name
 
   const [distribuciones, setDistribuciones] = useState<DistribucionFacturaData[]>([]);
   const [loading, setLoading] = useState(false);

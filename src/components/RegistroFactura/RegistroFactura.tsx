@@ -402,6 +402,11 @@ export default function RegistroFactura() {
   const [mostrarLista, setMostrarLista] = useState(false);
   const [mostrarDistribucion, setMostrarDistribucion] = useState(false);
   const {account} = useAuth()
+
+  //conector
+  
+
+
   const [formData, setFormData] = useState<ReFactura>({
     FechaEmision: "",
     NoFactura: "",
@@ -578,9 +583,24 @@ return (
         <button type="button" className="btn-volver" onClick={() => setMostrarDistribucion(false)}>
           🔙 Volver al registro de factura
         </button>
-        <button type="button" className="btn-volver" onClick={() => handleConector()}>
-          Prueba conector
-        </button>
+        <button
+  type="button"
+  className="btn-volver"
+  onClick={async () => {
+    const InitialDate = prompt("📅 Ingresa la fecha inicial (formato: AAAA-MM-DD):");
+    const FinalDate = prompt("📅 Ingresa la fecha final (formato: AAAA-MM-DD):");
+
+    if (!InitialDate || !FinalDate) {
+      alert("⚠️ Debes ingresar ambas fechas.");
+      return;
+    }
+
+    await handleConector(InitialDate, FinalDate);
+  }}
+>
+  Prueba conector
+</button>
+
         <DistribucionFactura />
       </>
     ) : (
