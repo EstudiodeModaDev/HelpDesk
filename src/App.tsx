@@ -21,7 +21,7 @@ import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
 import UsuariosPanel from './components/Usuarios/Usuarios';
 import HomeIcon from "./assets/home.svg"
 import addIcon from "./assets/add.svg"
-
+import seeTickets from "./assets/tickets.svg"
 /* ---------------------- ROLES & NAVS ---------------------- */
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
 
@@ -36,7 +36,7 @@ export type MenuItem = {
 const NAVS_ADMIN: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketForm/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
+  { id: 'ticketTable', label: 'Ver Tickets',  icon:  <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
@@ -67,7 +67,7 @@ const NAVS_ADMIN: MenuItem[] = [
 const NAVS_TECNICO: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketForm/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
+  { id: 'ticketTable', label: 'Ver Tickets',  icon:  <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
   { id: 'admin', label: 'Administración', icon: '⚙️', children: [
@@ -89,7 +89,7 @@ const NAVS_TECNICO: MenuItem[] = [
 
 const NAVS_USUARIO: MenuItem[] = [  
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
+  { id: 'ticketTable', label: 'Ver Tickets',  icon:  <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm/> },
 ];
 
