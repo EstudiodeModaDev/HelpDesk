@@ -162,10 +162,12 @@ export default function DistribucionFactura() {
       ];
 
       const limpiarCampos = (obj: any) => {
-        const copia = { ...obj };
-        camposExcluidos.forEach((campo) => delete copia[campo]);
-        return copia;
-      };
+  const copia = { ...obj };
+  camposExcluidos.forEach((campo) => delete copia[campo]);
+  // Asegurarse que RegistradoPor siempre quede
+  copia.RegistradoPor = obj.RegistradoPor ?? account?.name ?? "";
+  return copia;
+};
 
       // 🔹 Facturas relacionadas
      const facturasData = [
