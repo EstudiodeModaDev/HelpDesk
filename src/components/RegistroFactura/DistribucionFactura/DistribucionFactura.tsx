@@ -112,10 +112,12 @@ export default function DistribucionFactura() {
     formData.ImpColorCalle,
   ]);
 
+  const { account } = useAuth(); // <-- aquí asegúrate de tenerlo
+
   // 🧾 Guardar registro único + generar 4 facturas relacionadas
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { account } = useAuth(); // <-- aquí asegúrate de tenerlo
+    
     try {
       if (!formData.Proveedor || !formData.Title) {
         alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
