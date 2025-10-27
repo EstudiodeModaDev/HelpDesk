@@ -353,7 +353,7 @@ if (mostrarLista) {
                 setField("ImpColorPalms", num)
               }}
               onBlur={() => {
-                const num = toNumberFromEsCO(displayImpresionesBNPalms);
+                const num = toNumberFromEsCO(displayImpresionesColorPalms);
                 setdisplayImpresionesColorPalms(
                   new Intl.NumberFormat("es-CO", {
                   minimumFractionDigits: 2,
