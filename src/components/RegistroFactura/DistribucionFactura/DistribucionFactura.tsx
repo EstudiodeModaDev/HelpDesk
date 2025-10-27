@@ -42,12 +42,12 @@ const { registrarFactura } = useFacturas();
     // 🔸 Campos ocultos (no visibles en el formulario)
     Items: "SC70",
     DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
-    CCmn: "22111 - DIRECCION MARCAS NACIONALES + CSC",
-    CCmi: "21111 - DIRECCION MARCAS IMPORTADAS",
-    CCcedi: "31311 - CEDI",
-    CCsa: "31611 - SERVICIOS ADMINISTRATIVOS",
-    CO: "001 - FABRICA",
-    un: "601 - GENERAL",
+    CCmn: "22111",
+    CCmi: "21111",
+    CCcedi: "31311",
+    CCsa: "31611",
+    CO: "001",
+    un: "601",
     DetalleFac: "Detalle de impresiones en el mes actual",
   });
 
