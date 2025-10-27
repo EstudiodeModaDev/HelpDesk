@@ -20,6 +20,7 @@ import RegistroFactura from './components/RegistroFactura/RegistroFactura';
 import InfoPage from './components/Info/Informacion';
 import CrearPlantilla from './components/NuevaPlantilla/NuevaPlantilla';
 import UsuariosPanel from './components/Usuarios/Usuarios';
+import HomeIcon from "./assets/homeIcon.svg"
 
 /* ---------------------- ROLES & NAVS ---------------------- */
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
@@ -28,12 +29,12 @@ export type MenuItem = {
   id: string;
   label: string;
   icon?: React.ReactNode;
-  to?: React.ReactNode;   // componente a renderizar si es hoja (opcional)
-  children?: MenuItem[];  // subitems si es carpeta
+  to?: React.ReactNode;   
+  children?: MenuItem[];  
 };
 
 const NAVS_ADMIN: MenuItem[] = [
-  { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
+  { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
@@ -64,7 +65,7 @@ const NAVS_ADMIN: MenuItem[] = [
 ];
 
 const NAVS_TECNICO: MenuItem[] = [
-  { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
+  { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketForm/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
@@ -86,8 +87,8 @@ const NAVS_TECNICO: MenuItem[] = [
   },
 ];
 
-const NAVS_USUARIO: MenuItem[] = [
-  { id: 'home',        label: 'Home',         icon: '🏠', to: <Home/> },
+const NAVS_USUARIO: MenuItem[] = [  
+  { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketTable', label: 'Ver Tickets',  icon: '👁️', to: <TablaTickets/>},
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: '➕', to: <NuevoTicketUsuarioForm/> },
 ];
@@ -201,7 +202,11 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
                 aria-expanded={expanded}
               >
                 <span className={`caret ${expanded ? 'rot' : ''}`}>▸</span>
-                <span className="sideItem__icon" aria-hidden="true">{n.icon ?? '•'}</span>
+                <span className="sb-icon-wrap" aria-hidden>
+                  {typeof n.icon === 'string'
+                    ? <span className="sb-emoji">{n.icon}</span>
+                    : n.icon /* JSX de tu SVG */}
+                </span>
                 <span className="sideItem__label">{n.label}</span>
               </button>
               {expanded && renderTree(n.children!, depth + 1)}

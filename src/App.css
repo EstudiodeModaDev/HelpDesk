@@ -246,3 +246,24 @@
   place-items:center;        /* centra dentro del componente */
 }
 
+.sb-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-right: .5rem;
+  flex-shrink: 0;
+}
+
+.sb-icon {        /* para los SVG */
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.sb-emoji {       /* para los emojis */
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+
