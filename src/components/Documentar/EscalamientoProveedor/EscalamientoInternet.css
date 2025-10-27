@@ -234,3 +234,17 @@
 
 /* 8) Cinturón de seguridad contra overflow por gradientes/sticky/etc */
 .esc-form{ max-width: 100%; overflow-x: hidden; }
+
+/* Gana a cualquier .ticket-form form oscuro */
+.ticket-form .esc-form > form.esc-card,
+.ticket-form .esc-form form.esc-card{
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(30,41,59,0.08) !important;
+}
+
+/* Si algún wrapper del Acta tiene fondo oscuro, blanquear solo ese nivel */
+.ticket-form .esc-form { background: #fff !important; }
+.ticket-form .esc-form .esc-card > * { background: transparent !important; }
