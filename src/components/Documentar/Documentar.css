@@ -198,7 +198,6 @@ button[disabled]{ opacity: .6; cursor: not-allowed; box-shadow: none; }
   }
 }
 
-/* ================== EXTRA (OPCIONAL) ================== */
 /* Mantener acciones visibles cuando el contenido es largo */
 .ticket-form .tf-actions{
   position: sticky;
@@ -206,4 +205,30 @@ button[disabled]{ opacity: .6; cursor: not-allowed; box-shadow: none; }
   background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 28%);
   padding-top: 16px;
   margin-top: 8px;
+}
+
+/* 1) Haz que la tarjeta se ESTIRE dentro de padres flex/grid centrados */
+.ticket-form{
+  width: 100%;
+  max-width: none !important;   /* anula max-width heredados */
+  margin: 0 !important;         /* evita centrado por auto margins */
+  flex: 1 1 auto;               /* si el padre es flex */
+  align-self: stretch;          /* grid/flex: ocupar eje cruzado */
+  justify-self: stretch;        /* grid: ocupar eje principal */
+}
+
+/* 2) El form interior también sin límites */
+.ticket-form .tf-grid,
+.ticket-form form{
+  width: 100%;
+  max-width: none !important;
+}
+
+/* 3) (Opcional) Variante "full-bleed" para saltarte contenedores con padding/max-width */
+.ticket-form--bleed{
+  width: 100vw;
+  margin-left: calc(50% - 50vw) !important;  /* sale del contenedor centrado */
+  margin-right: calc(50% - 50vw) !important;
+  border-left: none; border-right: none;     /* opcional: sin borde laterales */
+  border-radius: 0;                          /* opcional: sin radios laterales */
 }

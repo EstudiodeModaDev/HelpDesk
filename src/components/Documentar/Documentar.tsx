@@ -45,7 +45,7 @@ export default function Documentar({ ticket, tipo, onDone }: { ticket: Ticket; t
   };
 
   return (
-    <div className="ticket-form">
+    <div className="ticket-form ticket-form--bleed">
       <h2 className="tf-title">
         {showEscalar
           ? "Escalamiento internet"
