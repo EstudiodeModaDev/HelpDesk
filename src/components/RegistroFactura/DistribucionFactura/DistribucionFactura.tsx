@@ -213,9 +213,6 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     }
   };
 
-
-
-
   const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) => setFormData((s) => ({ ...s, [k]: v }));
 
   if (mostrarLista) {
@@ -270,13 +267,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
           {/* Fecha de Emisión */}
           <div className="form-group">
             <label htmlFor="FechaEmision">Fecha de Emisión:</label>
-            <input
-              type="date"
-              id="FechaEmision"
-              name="FechaEmision"
-              value={formData.FechaEmision}
-              onChange={(e) => setField("FechaEmision", e.target.value)}
-            />
+            <input type="date" id="FechaEmision" name="FechaEmision" value={formData.FechaEmision} onChange={(e) => setField("FechaEmision", e.target.value)}/>
           </div>
 
           {/* NoFactura */}
