@@ -10,8 +10,7 @@
 }
 
 /* Neutraliza dark global */
-.dark .tabla-tickets[data-force-light],
-.dark .tabla-tickets[data-force-light] *{
+.dark .tabla-tickets[data-force-light], .dark .tabla-tickets[data-force-light] *{
   color-scheme: light !important;
 }
 
@@ -30,10 +29,16 @@
 
 .tabla-tickets{ background: transparent; color: var(--tbl-text); line-height: 1.35; }
 
-/* mismo ancho + centrado (lo recuperamos) */
+.tabla-tickets{
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important; 
+  align-items: stretch !important;
+  gap: 10px !important;                   
+}
+
 .tabla-tickets > .filtros, .tabla-tickets > .table-wrap, .tabla-tickets .table-wrap + div{
   width: min(100%, var(--tbl-max));
-  /*margin-inline: auto;*/                 /* <-- lo que faltaba */
 }
 
 /* === 3) Barra de filtros === */
@@ -53,9 +58,7 @@
   box-shadow: 0 8px 24px rgba(0,0,0,.06) !important;
 }
 
-.tabla-tickets input,
-.tabla-tickets select,
-.tabla-tickets button{
+.tabla-tickets input, .tabla-tickets select, .tabla-tickets button{
   background-color: #ffffff !important;
   color: #111827 !important;
   border: 1px solid #e5e7eb !important;
@@ -64,14 +67,12 @@
 }
 
 .tabla-tickets input::placeholder{ color: var(--tbl-muted); }
-.tabla-tickets input:focus,
-.tabla-tickets select:focus,
-.tabla-tickets button:focus{
+
+.tabla-tickets input:focus, .tabla-tickets select:focus, .tabla-tickets button:focus{
   outline: 0; border-color: var(--tbl-focus);
   box-shadow: 0 0 0 3px rgba(37,99,235,.25);
 }
 
-/* === 4) Tabla === */
 .table-wrap{
   border: 1px solid var(--tbl-border);
   border-radius: 12px;
