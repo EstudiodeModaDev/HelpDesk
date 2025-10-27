@@ -393,6 +393,11 @@ import { formatPesosEsCO, toNumberFromEsCO } from "../../utils/Number";
 export default function RegistroFactura() {
   const { getToken } = useAuth();
   const [compras, setCompras] = useState<Compra[]>([]);
+
+  const [mostrarFechas, setMostrarFechas] = useState(false);
+  const [initialDate, setInitialDate] = useState("");
+  const [finalDate, setFinalDate] = useState("");
+
   const [selectedCompra, setSelectedCompra] = useState<string>("");
   const { proveedores, loading, error, agregarProveedor  } = useProveedores();
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
@@ -579,27 +584,76 @@ return (
   <div className="registro-container">
     {/* ✅ Si se pide mostrar el formulario de Distribución, lo mostramos */}
     {mostrarDistribucion ? (
-      <>
-        <button type="button" className="btn-volver" onClick={() => setMostrarDistribucion(false)}>
-          🔙 Volver al registro de factura
-        </button>
+     <>
+      <button
+        type="button"
+        className="btn-volver"
+        onClick={() => setMostrarDistribucion(false)}
+      >
+        🔙 Volver al registro de factura
+      </button>
+
+      {/* 🔹 Bloque para el conector con selectores de fecha */}
+      {!mostrarFechas ? (
         <button
-  type="button"
-  className="btn-volver"
-  onClick={async () => {
-    const InitialDate = prompt("📅 Ingresa la fecha inicial (formato: AAAA-MM-DD):");
-    const FinalDate = prompt("📅 Ingresa la fecha final (formato: AAAA-MM-DD):");
+          type="button"
+          className="btn-volver"
+          onClick={() => setMostrarFechas(true)}
+        >
+          📅 Prueba conector
+        </button>
+      ) : (
+        <div className="selector-fechas-container">
+          <label className="selector-label">
+            Fecha inicial:
+            <input
+              type="date"
+              value={initialDate}
+              onChange={(e) => setInitialDate(e.target.value)}
+            />
+          </label>
 
-    if (!InitialDate || !FinalDate) {
-      alert("⚠️ Debes ingresar ambas fechas.");
-      return;
-    }
+          <label className="selector-label">
+            Fecha final:
+            <input
+              type="date"
+              value={finalDate}
+              onChange={(e) => setFinalDate(e.target.value)}
+            />
+          </label>
 
-    await handleConector(InitialDate, FinalDate);
-  }}
->
-  Prueba conector
-</button>
+          <div className="selector-botones">
+            <button
+              type="button"
+              className="btn-volver"
+              onClick={async () => {
+                if (!initialDate || !finalDate) {
+                  alert("⚠️ Debes seleccionar ambas fechas.");
+                  return;
+                }
+                await handleConector(initialDate, finalDate);
+                setMostrarFechas(false);
+                setInitialDate("");
+                setFinalDate("");
+              }}
+            >
+              ✅ Ejecutar conector
+            </button>
+
+            <button
+              type="button"
+              className="btn-cancelar"
+              onClick={() => {
+                setMostrarFechas(false);
+                setInitialDate("");
+                setFinalDate("");
+              }}
+            >
+              ❌ Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
         <DistribucionFactura />
       </>
