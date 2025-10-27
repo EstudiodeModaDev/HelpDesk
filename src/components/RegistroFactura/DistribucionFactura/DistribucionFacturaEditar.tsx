@@ -84,29 +84,36 @@ export default function DistribucionFacturaEditar({
       await serviceDist.update(String(distribucion.Id), cambiosDist);
 
       // 🔹 Intentar actualizar también en Facturas (si existe vínculo)
-        try {
-        // Buscar por el número ORIGINAL de la distribución
-        const posiblesFacturas = await serviceFact.getAll({
-            filter: `fields/NoFactura eq '${distribucion.NoFactura}'`,
-        });
+      // 🔹 Intentar actualizar también en Facturas (si existen vínculos)
+try {
+  const posiblesFacturas = await serviceFact.getAll({
+    filter: `fields/NoFactura eq '${formData.NoFactura}'`,
+  });
 
-        const facturaRelacionada = posiblesFacturas.items?.[0];
+  const facturasRelacionadas = posiblesFacturas.items || [];
 
-        if (facturaRelacionada?.id0 != null) {
-            const cambiosFactura = limpiarDatos({
-            FechaEmision: formData.FechaEmision || null,
-            NoFactura: formData.NoFactura, // <- nuevo número
-            // CargoFijo: Number(formData.CargoFijo),
-            });
+  if (facturasRelacionadas.length > 0) {
+    const cambiosFactura = limpiarDatos({
+      FechaEmision: formData.FechaEmision || null,
+      NoFactura: formData.NoFactura,
+      // Solo los campos que existan en la lista Facturas
+    });
 
-            await serviceFact.update(String(facturaRelacionada.id0), cambiosFactura);
-            console.log(`✅ Factura actualizada: ${formData.NoFactura}`);
-        } else {
-            console.warn("⚠️ No se encontró factura relacionada con el número original.");
-        }
-        } catch (err) {
-        console.warn("⚠️ Error al intentar actualizar factura relacionada:", err);
-        }
+    // 🔁 Actualizar todas las facturas relacionadas
+    for (const factura of facturasRelacionadas) {
+      if (factura.id0 != null) {
+        await serviceFact.update(String(factura.id0), cambiosFactura);
+      }
+    }
+
+    console.log(`✅ ${facturasRelacionadas.length} factura(s) actualizadas correctamente.`);
+  } else {
+    console.warn("⚠️ No se encontraron facturas relacionadas con ese número.");
+  }
+} catch (err) {
+  console.warn("⚠️ Error al intentar actualizar facturas relacionadas:", err);
+}
+
 
 
       onGuardar?.();
