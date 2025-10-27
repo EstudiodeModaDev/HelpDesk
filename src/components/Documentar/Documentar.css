@@ -232,3 +232,53 @@ button[disabled]{ opacity: .6; cursor: not-allowed; box-shadow: none; }
   border-left: none; border-right: none;     /* opcional: sin borde laterales */
   border-radius: 0;                          /* opcional: sin radios laterales */
 }
+
+/* ocupar todo el ancho disponible del CONTENEDOR (sin salirse) */
+.ticket-form{
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  flex: 1 1 auto;         /* si el padre es flex */
+  align-self: stretch;     /* si el padre es grid/flex */
+  justify-self: stretch;   /* si el padre es grid */
+  overflow-x: hidden;      /* cinturón de seguridad */
+}
+
+/* nada por dentro debería forzar más ancho que el 100% */
+.ticket-form *{
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* el form interno también sin límites */
+.ticket-form form,
+.ticket-form .tf-grid{
+  width: 100%;
+  max-width: 100% !important;
+  min-width: 0;
+}
+
+/* sticky con ancho seguro (evita que el gradiente cree overflow) */
+.ticket-form .tf-actions{
+  position: sticky;
+  inset-inline: 0;       /* left:0; right:0 en LTR/RTL */
+  max-width: 100%;
+  overflow: hidden;
+  /* Si aún ves desborde, baja o elimina el gradiente: */
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 28%);
+}
+
+/* Por si el wrapper global añade padding lateral, evita la barra horizontal */
+html, body, #root { overflow-x: hidden; }
+
+/* ocupa de borde a borde del viewport MENOS el gutter del layout */
+.ticket-form--edge{
+  /* define --gutter con el mismo padding que tenga el contenedor padre */
+  inline-size: min(100%, calc(100dvw - var(--gutter, 16px) * 2));
+  margin-inline: calc(var(--gutter, 16px) * -1);
+  max-inline-size: 100dvw;
+  box-sizing: border-box;
+  border-radius: 0;                /* opcional */
+  border-left: none; border-right: none; /* opcional */
+}
