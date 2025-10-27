@@ -1,3 +1,4 @@
+// src/components/DistribucionFactura/DistribucionFacturaEditar.tsx
 import React, { useState } from "react";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
@@ -40,6 +41,22 @@ export default function DistribucionFacturaEditar({
     v: typeof formData[K]
   ) => setFormData((s) => ({ ...s, [k]: v }));
 
+  // ✅ Limpia los datos antes de enviarlos al servicio
+  const limpiarDatos = (obj: Record<string, any>) => {
+    const limpio: Record<string, any> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (v === undefined) continue;
+      if (v === "") {
+        limpio[k] = null;
+      } else if (typeof v === "number" && isNaN(v)) {
+        limpio[k] = 0;
+      } else {
+        limpio[k] = v;
+      }
+    }
+    return limpio;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -50,9 +67,9 @@ export default function DistribucionFacturaEditar({
     }
 
     try {
-      // 🔹 Actualizar en DistribuciónFactura
-      const cambiosDist: Partial<DistribucionFacturaData> = {
-        FechaEmision: formData.FechaEmision,
+      // 🔹 Preparar cambios y limpiar datos
+      const cambiosDist = limpiarDatos({
+        FechaEmision: formData.FechaEmision || null,
         NoFactura: formData.NoFactura,
         CargoFijo: Number(formData.CargoFijo),
         ImpBnCedi: Number(formData.ImpBnCedi),
@@ -60,9 +77,11 @@ export default function DistribucionFacturaEditar({
         ImpColorPalms: Number(formData.ImpColorPalms),
         ImpBnCalle: Number(formData.ImpBnCalle),
         ImpColorCalle: Number(formData.ImpColorCalle),
-      };
+      });
 
-      await serviceDist.update(distribucion.Id, cambiosDist);
+      console.log("📦 Enviando datos limpios a SharePoint:", cambiosDist);
+
+      await serviceDist.update(String(distribucion.Id), cambiosDist);
 
       // 🔹 Intentar actualizar también en Facturas (si existe vínculo)
       try {
@@ -73,16 +92,19 @@ export default function DistribucionFacturaEditar({
         const facturaRelacionada = posiblesFacturas.items?.[0];
 
         if (facturaRelacionada?.id0 != null) {
-          const cambiosFactura = {
-            FechaEmision: formData.FechaEmision,
+          const cambiosFactura = limpiarDatos({
+            FechaEmision: formData.FechaEmision || null,
             NoFactura: formData.NoFactura,
             CargoFijo: Number(formData.CargoFijo),
-          };
+          });
           await serviceFact.update(String(facturaRelacionada.id0), cambiosFactura);
+        } else {
+          console.warn("⚠️ No se encontró factura relacionada con ese número.");
         }
       } catch (err) {
         console.warn(
-          "⚠️ No se encontró factura relacionada, solo se actualizó la distribución."
+          "⚠️ Error al intentar actualizar factura relacionada:",
+          err
         );
       }
 
@@ -107,8 +129,8 @@ export default function DistribucionFacturaEditar({
     if (!confirmar) return;
 
     try {
-      await serviceDist.delete(distribucion.Id);
-      onEliminar?.(distribucion.Id);
+      await serviceDist.delete(String(distribucion.Id));
+      onEliminar?.(String(distribucion.Id));
       onClose();
     } catch (err) {
       console.error("❌ Error al eliminar distribución:", err);
@@ -203,18 +225,10 @@ export default function DistribucionFacturaEditar({
             <button type="submit" className="btn-guardar">
               ✅ Guardar
             </button>
-            <button
-              type="button"
-              className="btn-cancelar"
-              onClick={onClose}
-            >
+            <button type="button" className="btn-cancelar" onClick={onClose}>
               ❌ Cancelar
             </button>
-            <button
-              type="button"
-              className="btn-eliminar"
-              onClick={handleEliminar}
-            >
+            <button type="button" className="btn-eliminar" onClick={handleEliminar}>
               🗑️ Eliminar
             </button>
           </div>
