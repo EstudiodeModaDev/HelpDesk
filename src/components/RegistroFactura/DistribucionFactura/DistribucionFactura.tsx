@@ -90,7 +90,6 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
   };
 
   // 🧮 Efecto para cálculos automáticos
-
   useEffect(() => {
     const parse = (v: unknown) =>
     typeof v === "number"
@@ -135,73 +134,75 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
   // 🧾 Guardar registro único + generar 4 facturas relacionadas
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      // 1) Validaciones
       if (!formData.Proveedor || !formData.Title) {
-        alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
+        alert("⚠️ Por favor selecciona un proveedor y un título antes de guardar.");
         return;
       }
 
       const sumaCostos =
-        formData.ImpBnCedi +
-        formData.ImpBnPalms +
-        formData.ImpColorPalms +
-        formData.ImpBnCalle +
-        formData.ImpColorCalle;
-      const diferencia = Math.abs(sumaCostos - formData.CosToImp);
+        (formData.ImpBnCedi ?? 0) +
+        (formData.ImpBnPalms ?? 0) +
+        (formData.ImpColorPalms ?? 0) +
+        (formData.ImpBnCalle ?? 0) +
+        (formData.ImpColorCalle ?? 0);
 
+      const diferencia = Math.abs(sumaCostos - (formData.CosToImp ?? 0));
       if (diferencia > 0.1) {
-        alert(`⚠️ Los costos de impresión no coinciden.`);
+        alert("⚠️ Los costos de impresión no coinciden con el total (CosToImp).");
         return;
       }
 
-      const record = { ...formData };
-      delete (record as any).Id;
+      // 2) Helpers
+      const EXCLUIR_EN_FACTURA = [
+        "CargoFijo","CosToImp","ImpBnCedi","ImpBnPalms","ImpColorPalms","ImpBnCalle","ImpColorCalle",
+        "CosTotMarNacionales","CosTotMarImpor","CosTotCEDI","CosTotServAdmin",
+        "CCmn","CCmi","CCcedi","CCsa","CostoTotal","Id"
+      ] as const;
 
-      console.log("📤 Enviando distribución:", record);
-
-     const distribuida= await registrarDistribucion(record);
-
-      // 🔹 Campos excluidos
-      const camposExcluidos = [
-        "CargoFijo",
-        "CosToImp",
-        "ImpBnCedi",
-        "ImpBnPalms",
-        "ImpColorPalms",
-        "ImpBnCalle",
-        "ImpColorCalle",
-        "CosTotMarNacionales",
-        "CosTotMarImpor",
-        "CosTotCEDI",
-        "CosTotServAdmin",
-        "CCmn",
-        "CCmi",
-        "CCcedi",
-        "CCsa",
-        "CostoTotal",
-      ];
-
-      const limpiarCampos = (obj: any) => {
-        const copia = { ...obj };
-        camposExcluidos.forEach((campo) => delete copia[campo]);
-        // Asegurarse que RegistradoPor siempre quede
-        copia.RegistradoPor = obj.RegistradoPor ?? account?.name ?? "";
+      const toFacturaBase = (src: any) => {
+        const copia = { ...src };
+        EXCLUIR_EN_FACTURA.forEach((k) => delete (copia as any)[k]);
+        copia.RegistradoPor = src.RegistradoPor ?? account?.name ?? "";
+        copia.FechaEmision = null
         return copia;
       };
 
-      // 🔹 Facturas relacionadas
-     const facturasData = [
-        { ...formData, CC: formData.CCmn, ValorAnIVA: formData.CosTotMarNacionales, RegistradoPor: account?.name ?? "" },
-        { ...formData, CC: formData.CCmi, ValorAnIVA: formData.CosTotMarImpor, RegistradoPor: account?.name ?? "" },
-        { ...formData, CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI, RegistradoPor: account?.name ?? "" },
-        { ...formData, CC: formData.CCsa, ValorAnIVA: formData.CosTotServAdmin, RegistradoPor: account?.name ?? "" },
+      const partidas = [
+        { CC: formData.CCmn,   ValorAnIVA: formData.CosTotMarNacionales },
+        { CC: formData.CCmi,   ValorAnIVA: formData.CosTotMarImpor },
+        { CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI },
+        { CC: formData.CCsa,   ValorAnIVA: formData.CosTotServAdmin },
       ];
 
-      for (const factura of facturasData) {
-        setFormData({...formData, IdDistribuida:distribuida.Id})
+      // 3) Primero: crear DISTRIBUCIÓN y capturar su Id
+      const distribucion = { ...formData };
+      delete (distribucion as any).Id;
 
-        await registrarFactura(limpiarCampos(factura));
+      const res = await registrarDistribucion(distribucion);
+      const distribucionId = (res && (res.Id)) ?? res; 
+
+      if (distribucionId === undefined || distribucionId === null) {
+        console.error("No se recibió Id de la distribución:", res);
+        alert("⚠️ No se pudo obtener el Id de la distribución creada.");
+        return;
+      }
+
+      // 4) Luego: crear UNA FACTURA por cada CO/CC, ligando IdDistribucion
+      for (const p of partidas) {
+        const { CC, ValorAnIVA } = p;
+        if (!CC || ValorAnIVA == null || Number(ValorAnIVA) === 0) continue;
+
+        const factura = {
+          ...toFacturaBase(formData),
+          CC,
+          ValorAnIVA,
+          IdDistribucion: distribucionId, // <-- vínculo aquí
+        };
+
+        await registrarFactura(factura);
       }
 
       alert("✅ Distribución y facturas guardadas con éxito.");
@@ -211,6 +212,9 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       alert("⚠️ Ocurrió un error al guardar.");
     }
   };
+
+
+
 
   const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) => setFormData((s) => ({ ...s, [k]: v }));
 
