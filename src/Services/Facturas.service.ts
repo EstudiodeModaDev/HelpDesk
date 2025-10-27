@@ -87,7 +87,8 @@ export class FacturasService {
       DocERP: f.DocERP ?? "",
       Observaciones: f.Observaciones ?? "",
       RegistradoPor: f.RegistradoPor ?? "",
-      Created: f.Created ?? f.created ?? item.created ?? item.Created
+      Created: f.Created ?? f.created ?? item.created ?? item.Created,
+      IdDistribuida: f.IdDistribuida ?? "",
     };
   }
 

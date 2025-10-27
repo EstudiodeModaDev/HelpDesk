@@ -159,7 +159,8 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       delete (record as any).Id;
 
       console.log("📤 Enviando distribución:", record);
-      await registrarDistribucion(record);
+
+     const distribuida= await registrarDistribucion(record);
 
       // 🔹 Campos excluidos
       const camposExcluidos = [
@@ -198,6 +199,8 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       ];
 
       for (const factura of facturasData) {
+        setFormData({...formData, IdDistribuida:distribuida.Id})
+
         await registrarFactura(limpiarCampos(factura));
       }
 
