@@ -29,7 +29,6 @@
 ========================================================= */
 .ticket-form {
   width: 100%;
-  max-width: 900px;          /* tamaño cómodo por defecto */
   min-width: 0;
   margin: 24px auto;
   padding: 20px 24px 12px;
@@ -65,11 +64,11 @@ main {
 = GRID LAYOUT DEL FORMULARIO
   - 2 columnas fluidas por defecto, utilidades comunes
 ========================================================= */
-.tf-grid {
+.tf-grid{
+  --cell-min: 360px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
   gap: var(--tf-gap);
-  --cell-min: 360px;
 }
 
 /* Campo que ocupa ambas columnas */
@@ -79,7 +78,7 @@ main {
 .tf-row--cats {
   --cell-min: 280px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--cell-min), 1fr));
   gap: var(--tf-gap);
 }
 
