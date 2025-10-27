@@ -42,10 +42,10 @@ export default function TablaTickets() {
   }, [rows, search]);
 
   return (
-    <div className="tabla-tickets">
+    <div className="tabla-tickets" data-force-light>
 
       {!ticketSeleccionado && (
-        <div className="filtros" style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}>
+        <div className="filtros">
 
           <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
 
@@ -140,7 +140,7 @@ export default function TablaTickets() {
 
           {/* Paginación servidor: Anterior = volver a primera página (loadFirstPage), Siguiente = nextLink */}
           {filtered.length > 0 && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+            <div>
               <button onClick={reloadAll} disabled={loading || pageIndex <= 1}>
                 Anterior
               </button>

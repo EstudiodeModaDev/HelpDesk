@@ -66,6 +66,46 @@
   align-items: center;
 }
 
+.tabla-tickets[data-force-light],
+.tabla-tickets[data-force-light] * {
+  color-scheme: light !important;
+}
+
+.dark .tabla-tickets[data-force-light],
+.dark .tabla-tickets[data-force-light] * {
+  color-scheme: light !important;
+}
+
+.tabla-tickets[data-force-light] input,
+.tabla-tickets[data-force-light] select,
+.tabla-tickets[data-force-light] button {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;       /* corta sombras oscuras globales */
+  filter: none !important;
+}
+
+.tabla-tickets[data-force-light] > .filtros {
+  background: #ffffff !important;    /* si la quieres transparente, cambia a transparent */
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06) !important;
+  padding: 8px !important;
+}
+
+.tabla-tickets[data-force-light] .table-wrap {
+  background: transparent !important;
+  border-color: #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+.tabla-tickets[data-force-light] thead th {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
 .tabla-tickets .filtros input[type="text"],
 .tabla-tickets .filtros input[type="date"],
 .tabla-tickets .filtros select,
@@ -203,4 +243,53 @@
    ========================================================= */
 @media (prefers-color-scheme: dark){
   .tabla-tickets{ color-scheme: light !important; }
+}
+
+.tabla-tickets[data-force-light] tbody tr:nth-child(odd)  { background: #ffffff !important; }
+.tabla-tickets[data-force-light] tbody tr:nth-child(even) { background: #f7f8fb !important; }
+.tabla-tickets[data-force-light] tbody tr:hover           { background: #eef2ff !important; }
+
+/* Paginación: evita barra/strip oscuro del “footer” */
+.tabla-tickets[data-force-light] .table-wrap + div,
+.tabla-tickets[data-force-light] .tabla-paginacion {
+  background: transparent !important;   /* o #fff si prefieres tarjeta */
+  color: #111827 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* Botones/select de paginación en claro */
+.tabla-tickets[data-force-light] .table-wrap + div button,
+.tabla-tickets[data-force-light] .tabla-paginacion button,
+.tabla-tickets[data-force-light] .table-wrap + div select,
+.tabla-tickets[data-force-light] .tabla-paginacion select {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+/* Date picker: icono claro (algunos temas lo invierten en dark) */
+.tabla-tickets[data-force-light] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Autocompletado Chrome en claro */
+.tabla-tickets[data-force-light] input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* (Opcional) si algún global usa backdrop-filter o mix-blend-mode */
+.tabla-tickets[data-force-light] .filtros,
+.tabla-tickets[data-force-light] .table-wrap,
+.tabla-tickets[data-force-light] .table-wrap + div {
+  backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Refuerzo contra prefers-color-scheme */
+@media (prefers-color-scheme: dark){
+  .tabla-tickets[data-force-light] { color-scheme: light !important; }
 }
