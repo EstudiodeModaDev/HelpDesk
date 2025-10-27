@@ -96,7 +96,7 @@ export default function DistribucionFacturaEditar({
             const cambiosFactura = limpiarDatos({
             FechaEmision: formData.FechaEmision || null,
             NoFactura: formData.NoFactura, // <- nuevo número
-            CargoFijo: Number(formData.CargoFijo),
+            // CargoFijo: Number(formData.CargoFijo),
             });
 
             await serviceFact.update(String(facturaRelacionada.id0), cambiosFactura);
