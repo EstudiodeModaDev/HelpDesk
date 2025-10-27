@@ -84,7 +84,8 @@ export default function DistribucionFactura() {
     const CosTotCEDI = CargoFijo / 3 + ImpBnCedi;
     const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
     const otrosCostos = cargoFijo3 / 3 + promedioOtros;
-    const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms;
+    const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpColorPalms;
+
 
     setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)));
     setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)));
@@ -353,7 +354,7 @@ if (mostrarLista) {
                 setField("ImpColorPalms", num)
               }}
               onBlur={() => {
-                const num = toNumberFromEsCO(displayImpresionesBNPalms);
+                const num = toNumberFromEsCO(displayImpresionesColorPalms);
                 setdisplayImpresionesColorPalms(
                   new Intl.NumberFormat("es-CO", {
                   minimumFractionDigits: 2,
@@ -364,25 +365,32 @@ if (mostrarLista) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
-            <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesBNCalle)}  
-              onChange={(e) => {
-                const raw = e.target.value;
-                const f = formatPesosEsCO(raw);
-                const num = toNumberFromEsCO(f);
-                setdisplayImpresionesBNCalle(f);
-                setField("ImpColorPalms", num)
-              }}
-              onBlur={() => {
-                const num = toNumberFromEsCO(displayImpresionesBNCalle);
-                setdisplayImpresionesBNCalle(
-                  new Intl.NumberFormat("es-CO", {
+          <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            name="ImpBnCalle"  // ✅ CORRECTO
+            placeholder="Ej: 100.000"
+            value={String(displayImpresionesBNCalle)}  
+            onChange={(e) => {
+              const raw = e.target.value;
+              const f = formatPesosEsCO(raw);
+              const num = toNumberFromEsCO(f);
+              setdisplayImpresionesBNCalle(f);
+              setField("ImpBnCalle", num);  // ✅ CORRECTO
+            }}
+            onBlur={() => {
+              const num = toNumberFromEsCO(displayImpresionesBNCalle);
+              setdisplayImpresionesBNCalle(
+                new Intl.NumberFormat("es-CO", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  }).format(Number.isFinite(num) ? num : 0)
-                );
-              }}/>
-          </div>
+                }).format(Number.isFinite(num) ? num : 0)
+              );
+            }}
+          />
+        </div>
+
 
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
