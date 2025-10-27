@@ -68,10 +68,10 @@ export function useFacturas() {
     void obtenerFacturas();
   }, [obtenerFacturas]);
 
-  const handleConector = async (/*InitialDate: string, finalDate: string,*/) => {
+  const handleConector = async (InitialDate: string, finalDate: string,) => {
     
     try {
-      await notifyFlow.invoke<conectorFacturas, any>({InitialDate: "2025-01-01", FinalDate: "2025-11-01", user: account?.username ?? "" });
+      await notifyFlow.invoke<conectorFacturas, any>({InitialDate: InitialDate, FinalDate: finalDate, user: account?.username ?? "" });
 
     } catch (err) {
         console.error("Ha ocurrido un error descargando el conector:", err);
