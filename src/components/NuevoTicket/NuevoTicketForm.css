@@ -40,7 +40,7 @@
   width: clamp(1040px, 74vw, 1280px);
 }
 
-@media (min-width: 1600px){
+@media (min-width: 1200px){
   .ticket-form--xl { width: 12000; }
 }
 
