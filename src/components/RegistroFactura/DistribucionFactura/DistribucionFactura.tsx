@@ -6,20 +6,15 @@ import type { DistribucionFacturaData } from "../../../Models/DistribucionFactur
 import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
 import { formatPesosEsCO, toNumberFromEsCO } from "../../../utils/Number";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
-
-// import { useFacturas } from "../../Funcionalidades/RegistrarFactura";
-
+import DistribucionesLista from "./DistribucionesLista"; // ✅ Importamos la lista
 
 export default function DistribucionFactura() {
   const { proveedores, loading, error } = useProveedores();
   const { registrarDistribucion } = useDistribucionFactura();
+  const { registrarFactura } = useFacturas();
 
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<string>("");
-
-
-const { registrarFactura } = useFacturas();
-
-
+  const [mostrarLista, setMostrarLista] = useState(false); // ✅ alternar entre vista formulario / lista
 
   // ✅ Estado base con todos los campos (incluidos los ocultos)
   const [formData, setFormData] = useState<DistribucionFacturaData>({
@@ -51,7 +46,7 @@ const { registrarFactura } = useFacturas();
     DetalleFac: "Detalle de impresiones en el mes actual",
   });
 
-  // 🔢 Estados visuales para los campos numéricos (solo formateo)
+  // 🔢 Estados visuales para los campos numéricos
   const [displayCargoFijo, setdisplayCargoFijo] = React.useState("");
   const [displayCostoTotalImpresion, setdisplayCostoTotalImpresion] = React.useState("");
   const [displayValorAntesIva, setdisplayValorAntesIva] = React.useState("");
@@ -82,24 +77,14 @@ const { registrarFactura } = useFacturas();
 
   // 🧮 Efecto para cálculos automáticos
   useEffect(() => {
-    const {
-      CargoFijo,
-      CosToImp,
-      ImpBnCedi,
-      ImpBnPalms,
-      ImpColorPalms,
-      ImpBnCalle,
-      ImpColorCalle,
-    } = formData;
+    const { CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle } = formData;
 
     const cargoFijo3 = CargoFijo - CargoFijo / 3;
     const ValorAnIVA = CargoFijo + CosToImp;
     const CosTotCEDI = CargoFijo / 3 + ImpBnCedi;
-    const promedioOtros =
-      (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
+    const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
     const otrosCostos = cargoFijo3 / 3 + promedioOtros;
-    const totalImpresion =
-      ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms;
+    const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpBnPalms;
 
     setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)));
     setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)));
@@ -125,172 +110,106 @@ const { registrarFactura } = useFacturas();
     formData.ImpColorCalle,
   ]);
 
-
- // 🧾 Guardar registro único + generar 4 facturas relacionadas
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  try {
-    if (!formData.Proveedor || !formData.Title) {
-      alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
-      return;
-    }
-
-    // ---------- 🔍 Validación de costos ----------
-    const sumaCostos =
-      formData.ImpBnCedi +
-      formData.ImpBnPalms +
-      formData.ImpColorPalms +
-      formData.ImpBnCalle +
-      formData.ImpColorCalle;
-
-    const diferencia = Math.abs(sumaCostos - formData.CosToImp);
-
-    if (diferencia > 0.01) {
-      alert(
-        `⚠️ Los costos de impresión no coinciden.\n\nCosto declarado: ${formData.CosToImp.toFixed(
-          2
-        )}\nSuma de costos: ${sumaCostos.toFixed(2)}`
-      );
-      return;
-    }
-
-    // ---------- 1️⃣ Guardar registro principal en Distribuciones ----------
-    const record = { ...formData };
-    delete (record as any).Id;
-
-    console.log("📤 Enviando distribución a SharePoint:", record);
-    await registrarDistribucion(record);
-    console.log("✅ Distribución guardada correctamente");
-
-    // ---------- 🧹 Función para limpiar campos no deseados ----------
-    const camposExcluidos = [
-      "CargoFijo",
-      "CosToImp",
-      "ImpBnCedi",
-      "ImpBnPalms",
-      "ImpColorPalms",
-      "ImpBnCalle",
-      "ImpColorCalle",
-      "CosTotMarNacionales",
-      "CosTotMarImpor",
-      "CosTotCEDI",
-      "CosTotServAdmin",
-      "CCmn",
-      "CCmi",
-      "CCcedi",
-      "CCsa",
-      "CostoTotal",
-    ];
-
-    const limpiarCampos = (obj: any) => {
-      const copia = { ...obj };
-      camposExcluidos.forEach((campo) => delete copia[campo]);
-      return copia;
-    };
-
-    // ---------- 2️⃣ Generar los 4 registros en la lista Facturas ----------
-    const facturasData = [
-      {
-        ...formData,
-        CC: formData.CCmn,
-        ValorAnIVA: formData.CosTotMarNacionales,
-        FecEntregaCont: null,
-        DocERP: "",
-        Observaciones: "",
-        RegistradoPor: "Sistema",
-      },
-      {
-        ...formData,
-        CC: formData.CCmi,
-        ValorAnIVA: formData.CosTotMarImpor,
-        FecEntregaCont: null,
-        DocERP: "",
-        Observaciones: "",
-        RegistradoPor: "Sistema",
-      },
-      {
-        ...formData,
-        CC: formData.CCcedi,
-        ValorAnIVA: formData.CosTotCEDI,
-        FecEntregaCont: null,
-        DocERP: "",
-        Observaciones: "",
-        RegistradoPor: "Sistema",
-      },
-      {
-        ...formData,
-        CC: formData.CCsa,
-        ValorAnIVA: formData.CosTotServAdmin,
-        FecEntregaCont: null,
-        DocERP: "",
-        Observaciones: "",
-        RegistradoPor: "Sistema",
-      },
-    ];
-
-    console.log("📦 Facturas a crear en SharePoint:", facturasData);
-
-    // ---------- 3️⃣ Envío de las 4 facturas ----------
-    for (const factura of facturasData) {
-      const facturaLimpia = limpiarCampos(factura);
-      try {
-        console.log("📤 Registrando factura:", facturaLimpia.CC);
-        await registrarFactura(facturaLimpia);
-        console.log(`✅ Factura registrada para CC: ${facturaLimpia.CC}`);
-      } catch (err) {
-        console.error(`❌ Error registrando factura para ${facturaLimpia.CC}`, err);
+  // 🧾 Guardar registro único + generar 4 facturas relacionadas
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (!formData.Proveedor || !formData.Title) {
+        alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
+        return;
       }
+
+      const sumaCostos =
+        formData.ImpBnCedi +
+        formData.ImpBnPalms +
+        formData.ImpColorPalms +
+        formData.ImpBnCalle +
+        formData.ImpColorCalle;
+      const diferencia = Math.abs(sumaCostos - formData.CosToImp);
+
+      if (diferencia > 0.01) {
+        alert(`⚠️ Los costos de impresión no coinciden.`);
+        return;
+      }
+
+      const record = { ...formData };
+      delete (record as any).Id;
+
+      console.log("📤 Enviando distribución:", record);
+      await registrarDistribucion(record);
+
+      // 🔹 Campos excluidos
+      const camposExcluidos = [
+        "CargoFijo",
+        "CosToImp",
+        "ImpBnCedi",
+        "ImpBnPalms",
+        "ImpColorPalms",
+        "ImpBnCalle",
+        "ImpColorCalle",
+        "CosTotMarNacionales",
+        "CosTotMarImpor",
+        "CosTotCEDI",
+        "CosTotServAdmin",
+        "CCmn",
+        "CCmi",
+        "CCcedi",
+        "CCsa",
+        "CostoTotal",
+      ];
+
+      const limpiarCampos = (obj: any) => {
+        const copia = { ...obj };
+        camposExcluidos.forEach((campo) => delete copia[campo]);
+        return copia;
+      };
+
+      // 🔹 Facturas relacionadas
+      const facturasData = [
+        { ...formData, CC: formData.CCmn, ValorAnIVA: formData.CosTotMarNacionales },
+        { ...formData, CC: formData.CCmi, ValorAnIVA: formData.CosTotMarImpor },
+        { ...formData, CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI },
+        { ...formData, CC: formData.CCsa, ValorAnIVA: formData.CosTotServAdmin },
+      ];
+
+      for (const factura of facturasData) {
+        await registrarFactura(limpiarCampos(factura));
+      }
+
+      alert("✅ Distribución y facturas guardadas con éxito.");
+      setProveedorSeleccionado("");
+    } catch (error: any) {
+      console.error("❌ Error al guardar:", error);
+      alert("⚠️ Ocurrió un error al guardar.");
     }
+  };
 
-    alert("✅ Distribución y facturas relacionadas guardadas con éxito.");
+  const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) =>
+    setFormData((s) => ({ ...s, [k]: v }));
 
-    // ---------- 4️⃣ Reset del formulario ----------
-    setProveedorSeleccionado("");
-    setFormData({
-      Proveedor: "",
-      Title: "",
-      CargoFijo: 0,
-      CosToImp: 0,
-      ValorAnIVA: 0,
-      ImpBnCedi: 0,
-      ImpBnPalms: 0,
-      ImpColorPalms: 0,
-      ImpBnCalle: 0,
-      ImpColorCalle: 0,
-      CosTotMarNacionales: 0,
-      CosTotMarImpor: 0,
-      CosTotCEDI: 0,
-      CosTotServAdmin: 0,
-      FechaEmision: "",
-      NoFactura: "",
-      Items: "SC70",
-      DescripItems: "UTILES, PAPELERIA Y FOTOCOPIAS RC",
-      CCmn: "22111 - DIRECCION MARCAS NACIONALES + CSC",
-      CCmi: "21111 - DIRECCION MARCAS IMPORTADAS",
-      CCcedi: "31311 - CEDI",
-      CCsa: "31611 - SERVICIOS ADMINISTRATIVOS",
-      CO: "001 - FABRICA",
-      un: "601 - GENERAL",
-      DetalleFac: "Detalle de impresiones en el mes actual",
-    });
-  } catch (error: any) {
-    console.error("❌ Error al guardar la distribución:", error);
-    alert("⚠️ Ocurrió un error al guardar la distribución o las facturas.");
+  // 🧩 Vista condicional: formulario o lista
+  if (mostrarLista) {
+    return (
+      <div className="distribucion-container">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2>📋 Distribuciones registradas</h2>
+          <button className="btn btn-secondary" onClick={() => setMostrarLista(false)}>
+            🔙 Volver al formulario
+          </button>
+        </div>
+        <DistribucionesLista onVolver={() => setMostrarLista(false)} />
+      </div>
+    );
   }
-};
-
-
-
-  const setField = <K extends keyof DistribucionFacturaData>(
-    k: K,
-    v: DistribucionFacturaData[K]
-  ) => setFormData((s) => ({ ...s, [k]: v }));
 
   return (
     <div className="distribucion-container">
-      <h2>📦 Distribución de Factura</h2>
-
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>📦 Distribución de Factura</h2>
+        <button className="btn btn-primary" onClick={() => setMostrarLista(true)}>
+          📋 Ver distribuciones registradas
+        </button>
+      </div>
       <form className="distribucion-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           {/* Proveedor y NIT */}
