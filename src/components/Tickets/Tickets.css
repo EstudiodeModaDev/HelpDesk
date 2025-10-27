@@ -9,9 +9,16 @@
   color-scheme: light !important;
 }
 
-/* Neutraliza dark global */
-.dark .tabla-tickets[data-force-light], .dark .tabla-tickets[data-force-light] *{
-  color-scheme: light !important;
+.dark .tabla-tickets[data-force-light]{
+  --tbl-max: 1600px;
+  --tbl-text: #111827;
+  --tbl-muted: #cfcfcf;
+  --tbl-border: #e5e7eb;
+  --tbl-odd: #ffffff;
+  --tbl-even: #e6e6e6;
+  --tbl-hover: #eef2ff;
+  --tbl-head: #ffffff;
+  --tbl-focus: #2563eb;
 }
 
 /* === 2) Tokens === */
@@ -152,3 +159,25 @@
 .tabla-tickets[data-force-light] input[type="date"]::-webkit-calendar-picker-indicator{
   filter: none !important; opacity: 1 !important;
 }
+
+.tabla-tickets .table-wrap, .tabla-tickets table, .tabla-tickets thead, .tabla-tickets tbody, .tabla-tickets tr, .tabla-tickets th, .tabla-tickets td {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  color: var(--tbl-text) !important;
+}
+
+.table-wrap tbody tr:nth-child(odd)  > * { background: var(--tbl-odd)  !important; }
+
+.table-wrap tbody tr:nth-child(even) > * { background: var(--tbl-even) !important; }
+
+.table-wrap tbody tr:hover > *{ background: var(--tbl-hover) !important; }
+
+.table-wrap thead th {
+  position: sticky; top: 0; z-index: 2;
+  box-shadow: 0 1px 0 var(--tbl-border), 0 2px 10px rgba(0,0,0,.05);
+}
+
+.table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
+
+.table-wrap td.sticky, .table-wrap th.sticky { background: var(--tbl-head) !important; }
