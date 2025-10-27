@@ -90,8 +90,22 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
   };
 
   // 🧮 Efecto para cálculos automáticos
+
   useEffect(() => {
-    const { CargoFijo, CosToImp, ImpBnCedi, ImpBnPalms, ImpColorPalms, ImpBnCalle, ImpColorCalle } = formData;
+    const parse = (v: unknown) =>
+    typeof v === "number"
+      ? v
+      : typeof v === "string"
+        ? Number(v.replace(/\./g, "").replace(",", ".")) // "es-CO" → número
+        : 0;
+
+    const CargoFijo        = parse(formData.CargoFijo);
+    const CosToImp         = parse(formData.CosToImp);
+    const ImpBnCedi        = parse(formData.ImpBnCedi);
+    const ImpBnPalms       = parse(formData.ImpBnPalms);
+    const ImpColorPalms    = parse(formData.ImpColorPalms);
+    const ImpBnCalle       = parse(formData.ImpBnCalle);
+    const ImpColorCalle    = parse(formData.ImpColorCalle);
 
     const cargoFijo3 = CargoFijo - CargoFijo / 3;
     const ValorAnIVA = CargoFijo + CosToImp;
@@ -100,13 +114,12 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     const otrosCostos = cargoFijo3 / 3 + promedioOtros;
     const totalImpresion = ImpBnCalle + ImpBnCedi + ImpBnPalms + ImpColorCalle + ImpColorPalms;
 
+    setdisplayCostoTotalImpresion( formatPesosEsCO(totalImpresion) );
+    setdisplayValorAntesIva(      formatPesosEsCO(ValorAnIVA) );
+    setdisplayTotalCedi(          formatPesosEsCO(CosTotCEDI) );
+    setDisplayTotalOtrasMarcas(   formatPesosEsCO(otrosCostos) );
 
-    setdisplayCostoTotalImpresion(formatPesosEsCO(String(totalImpresion)));
-    setdisplayValorAntesIva(formatPesosEsCO(String(ValorAnIVA)));
-    setdisplayTotalCedi(formatPesosEsCO(String(CosTotCEDI)));
-    setDisplayTotalOtrasMarcas(formatPesosEsCO(String(otrosCostos)));
-
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       ValorAnIVA,
       CosTotCEDI,
@@ -115,15 +128,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       CosTotServAdmin: otrosCostos,
       CosToImp: totalImpresion,
     }));
-  }, [
-    formData.CargoFijo,
-    formData.CosToImp,
-    formData.ImpBnCedi,
-    formData.ImpBnPalms,
-    formData.ImpColorPalms,
-    formData.ImpBnCalle,
-    formData.ImpColorCalle,
-  ]);
+  }, [ formData.CargoFijo, formData.CosToImp, formData.ImpBnCedi, formData.ImpBnPalms, formData.ImpColorPalms, formData.ImpBnCalle, formData.ImpColorCalle,]);
 
   const { account } = useAuth(); // <-- aquí asegúrate de tenerlo
 
@@ -177,20 +182,20 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       ];
 
       const limpiarCampos = (obj: any) => {
-  const copia = { ...obj };
-  camposExcluidos.forEach((campo) => delete copia[campo]);
-  // Asegurarse que RegistradoPor siempre quede
-  copia.RegistradoPor = obj.RegistradoPor ?? account?.name ?? "";
-  return copia;
-};
+        const copia = { ...obj };
+        camposExcluidos.forEach((campo) => delete copia[campo]);
+        // Asegurarse que RegistradoPor siempre quede
+        copia.RegistradoPor = obj.RegistradoPor ?? account?.name ?? "";
+        return copia;
+      };
 
       // 🔹 Facturas relacionadas
      const facturasData = [
-  { ...formData, CC: formData.CCmn, ValorAnIVA: formData.CosTotMarNacionales, RegistradoPor: account?.name ?? "" },
-  { ...formData, CC: formData.CCmi, ValorAnIVA: formData.CosTotMarImpor, RegistradoPor: account?.name ?? "" },
-  { ...formData, CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI, RegistradoPor: account?.name ?? "" },
-  { ...formData, CC: formData.CCsa, ValorAnIVA: formData.CosTotServAdmin, RegistradoPor: account?.name ?? "" },
-];
+        { ...formData, CC: formData.CCmn, ValorAnIVA: formData.CosTotMarNacionales, RegistradoPor: account?.name ?? "" },
+        { ...formData, CC: formData.CCmi, ValorAnIVA: formData.CosTotMarImpor, RegistradoPor: account?.name ?? "" },
+        { ...formData, CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI, RegistradoPor: account?.name ?? "" },
+        { ...formData, CC: formData.CCsa, ValorAnIVA: formData.CosTotServAdmin, RegistradoPor: account?.name ?? "" },
+      ];
 
       for (const factura of facturasData) {
         await registrarFactura(limpiarCampos(factura));
@@ -204,20 +209,16 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     }
   };
 
-  const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) =>
-    setFormData((s) => ({ ...s, [k]: v }));
+  const setField = <K extends keyof DistribucionFacturaData>(k: K, v: DistribucionFacturaData[K]) => setFormData((s) => ({ ...s, [k]: v }));
 
-  // 🧩 Vista condicional: formulario o lista
- // 🔹 Mostrar lista de distribuciones registradas
-if (mostrarLista) {
-  return (
-    <div className="distribucion-container">
-      {/* ✅ Solo renderizamos la lista, ya incluye su propio título y botón */}
-      <DistribucionesLista onVolver={() => setMostrarLista(false)} />
-    </div>
-  );
-}
-
+  if (mostrarLista) {
+    return (
+      <div className="distribucion-container">
+        {/* ✅ Solo renderizamos la lista, ya incluye su propio título y botón */}
+        <DistribucionesLista onVolver={() => setMostrarLista(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="distribucion-container">
