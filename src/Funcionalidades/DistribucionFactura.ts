@@ -9,31 +9,30 @@ export function useDistribucionFactura() {
   const { graph } = useGraphServices();
   const service = useMemo(() => new DistribucionFacturaService(graph), [graph]);
   const { account } = useAuth();
-    account?.name
+  account?.name;
 
   const [distribuciones, setDistribuciones] = useState<DistribucionFacturaData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
- // Obtener todas las distribuciones guardadas
-const obtenerDistribuciones = useCallback(async () => {
-  setLoading(true);
-  setError(null);
-  try {
-    const lista = await service.getAll({ orderby: "createdDateTime desc" });
-    console.log("📋 Distribuciones obtenidas:", lista);
-    setDistribuciones(lista);
-    return lista;
-  } catch (err: any) {
-    console.error("❌ Error al obtener distribuciones:", err);
-    setError(err?.message ?? "Error al cargar las distribuciones");
-    setDistribuciones([]);
-    return [];
-  } finally {
-    setLoading(false);
-  }
-}, [service]);
-
+  // 🔹 Obtener todas las distribuciones guardadas
+  const obtenerDistribuciones = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const lista = await service.getAll({ orderby: "createdDateTime desc" });
+      console.log("📋 Distribuciones obtenidas:", lista);
+      setDistribuciones(lista);
+      return lista;
+    } catch (err: any) {
+      console.error("❌ Error al obtener distribuciones:", err);
+      setError(err?.message ?? "Error al cargar las distribuciones");
+      setDistribuciones([]);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, [service]);
 
   // 🟢 Registrar una nueva distribución
   const registrarDistribucion = useCallback(async (data: Omit<DistribucionFacturaData, "id0">) => {
@@ -52,6 +51,12 @@ const obtenerDistribuciones = useCallback(async () => {
     }
   }, [service]);
 
+  // 🔁 Nuevo método: recargar distribuciones manualmente
+  const recargarDistribuciones = useCallback(async () => {
+    console.log("🔄 Recargando distribuciones...");
+    await obtenerDistribuciones();
+  }, [obtenerDistribuciones]);
+
   // ⚡ Carga inicial al montar
   useEffect(() => {
     void obtenerDistribuciones();
@@ -63,5 +68,6 @@ const obtenerDistribuciones = useCallback(async () => {
     error,
     obtenerDistribuciones,
     registrarDistribucion,
+    recargarDistribuciones, // ✅ Ahora también se exporta
   };
 }
