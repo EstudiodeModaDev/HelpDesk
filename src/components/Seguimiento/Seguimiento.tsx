@@ -5,6 +5,7 @@ import { useGraphServices } from "../../graph/GrapServicesContext";
 import type { Log } from "../../Models/Log";
 import type { Ticket } from "../../Models/Tickets";              // <-- NUEVO
 import Documentar from "../Documentar/Documentar";               // <-- NUEVO
+import { toISODateFlex } from "../../utils/Date";
 
 type Tab = "seguimiento" | "solucion";
 type Mode = "detalle" | "documentar";                            // <-- NUEVO
@@ -32,7 +33,7 @@ export default function TicketHistorial({
   const [mode, setMode] = React.useState<Mode>("detalle");       // <-- NUEVO
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
 
-  const { Logs } = useGraphServices();                   // <-- Tickets para traer el ticket
+  const { Logs } = useGraphServices();                 
 
   const [mensajes, setMensajes] = React.useState<Log[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -40,7 +41,7 @@ export default function TicketHistorial({
 
   // Cargar historial SOLO en modo detalle
   React.useEffect(() => {
-    if (mode !== "detalle") return;                               // <-- evita cargar cuando documentas
+    if (mode !== "detalle") return;                              
     let cancel = false;
     const load = async () => {
       setLoading(true);
@@ -64,7 +65,7 @@ export default function TicketHistorial({
     };
     load();
     return () => { cancel = true; };
-  }, [ticketId, Logs, mode]);                                     // <-- depende de mode
+  }, [ticketId, Logs, mode]);                                     
 
   // =======================
   // Vista Documentar (solo Documentar + Volver)
@@ -80,11 +81,7 @@ export default function TicketHistorial({
 
         {!ticket && <p style={{ opacity: 0.7, padding: 16 }}>Cargando ticket…</p>}
         {ticket && (
-          <Documentar
-            key={`doc-${tab}-${ticketId}`}                         // remonta el form al cambiar tipo
-            ticket={ticket}
-            tipo={tab}                                             // "seguimiento" | "solucion"
-          />
+          <Documentar key={`doc-${tab}-${ticketId}`} ticket={ticket} tipo={tab}/>
         )}
       </div>
     );
@@ -105,18 +102,10 @@ export default function TicketHistorial({
         {/* Tabs SOLO para admins/técnicos */}
         {isPrivileged && !isClosed && (
           <div style={{ display: "flex", gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => { setTab("seguimiento"); setMode("documentar"); }}  // <-- cambia vista aquí
-              className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}
-            >
+            <button type="button" onClick={() => { setTab("seguimiento"); setMode("documentar"); }}  className={`th-tab ${tab === "seguimiento" ? "th-tab--active" : ""}`}>
               Seguimiento
             </button>
-            <button
-              type="button"
-              onClick={() => { setTab("solucion"); setMode("documentar"); }}     // <-- cambia vista aquí
-              className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}
-            >
+            <button type="button" onClick={() => { setTab("solucion"); setMode("documentar"); }} className={`th-tab ${tab === "solucion" ? "th-tab--active" : ""}`}>
               Solución
             </button>
           </div>
@@ -175,24 +164,12 @@ function mapItemsToMensajes(items: any[]): Log[] {
   return (Array.isArray(items) ? items : []).map((it: any) => ({
     Id: String(it.Id),
     Actor: it.Actor ?? "Sistema",
-    Created: normalizeToISO(it.Created),
+    Created: toISODateFlex(it.Created),
     Title: it.Title ?? undefined,
     Descripcion: it.Descripcion ?? "",
     Tipo_de_accion: it.Tipo_de_accion,
     CorreoActor: it.CorreoActor,
   }));
-}
-
-function normalizeToISO(v: string | undefined): string {
-  if (!v) return new Date().toISOString();
-  if (/^\d{4}-\d{2}-\d{2}t/i.test(v)) return v;
-  const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
-  if (m) {
-    const [, dd, mm, yyyy, HH, MM] = m;
-    return `${yyyy}-${mm}-${dd}T${HH}:${MM}:00`;
-  }
-  const d = new Date(v);
-  return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
 }
 
 function formatDateTime(iso: string) {

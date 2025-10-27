@@ -19,12 +19,11 @@ const hasRecatRole = (r?: string) => {
 
 type Props = {
   ticket: Ticket;          // Ticket con el que se abre el detalle
-  onVolver: () => void;
   role: string;
 };
 
 /* ================== Componente ================== */
-export default function DetalleTicket({ ticket, onVolver, role }: Props) {
+export default function DetalleTicket({ ticket, role }: Props) {
   // Estado interno: ticket seleccionado (se actualiza con los clics de TicketsAsociados)
   const [selected, setSelected] = React.useState<Ticket>(ticket);
 
@@ -59,7 +58,6 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
   return (
     <div className="detalle-ticket">
       {/* Header superior */}
-      <button className="btn-volver" onClick={onVolver}>← Volver</button>
       <h2>Detalles Ticket #{selected.ID}</h2>
 
       {/* Fila 1: Asunto / Categoría */}
@@ -72,12 +70,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
         <div className="campo">
           <label>Categoría</label>
           {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowRecat(true)}
-              title="Recategorizar ticket"
-            >
+            <button type="button" className="as-text" onClick={() => setShowRecat(true)} title="Recategorizar ticket" >
               {categoria || "–"}
             </button>
           ) : (
@@ -103,12 +96,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
         <div className="campo">
           <label>Resolutor del caso</label>
           {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowReasig(true)}
-              title="Reasignar ticket"
-            >
+            <button type="button" className="as-text" onClick={() => setShowReasig(true)} title="Reasignar ticket" >
               {selected.Nombreresolutor || "–"}
             </button>
           ) : (
@@ -146,12 +134,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
         <div className="campo">
           <label>Observador del caso</label>
           {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowObservador(true)}
-              title="Asignar observador del ticket"
-            >
+            <button type="button" className="as-text" onClick={() => setShowObservador(true)} title="Asignar observador del ticket">
               {selected.Observador || "–"}
             </button>
           ) : (
@@ -163,14 +146,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
       </div>
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
-      <TicketsAsociados
-        key={selected.ID}              
-        ticket={selected}
-        onSelect={(t) => {
-          setSelected(t);              
-          setShowSeg(false);           // opcional: cierra seguimiento
-        }}
-      />
+      <TicketsAsociados key={selected.ID} ticket={selected} onSelect={(t) => {setSelected(t); setShowSeg(false); }}/>
 
       {/* Botón Seguimiento (toggle) */}
       <div>
@@ -182,14 +158,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
       {/* Historial (solo si showSeg = true) */}
       {showSeg && (
         <div style={{ marginTop: 16 }}>
-          <TicketHistorial
-            role={role ?? "Usuario"}
-            onVolver={() => setShowSeg(false)}
-            ticketId={selected.ID!}
-            onAddClick={() => {}}
-            onViewClick={() => {}}
-            ticket={selected}
-          />
+          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} onAddClick={() => {}} onViewClick={() => {}} ticket={selected}/>
         </div>
       )}
 
