@@ -241,3 +241,30 @@ main {
     margin: 0 auto;
   }
 }
+
+.content:has(.ticket-form--xl),
+.page:has(.ticket-form--xl),
+.main:has(.ticket-form--xl) {
+  max-width: none;
+  width: 100%;
+}
+
+.layout-con-sidebar .content {
+  max-width: none;
+  width: 100%;
+}
+
+.full-bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: max(24px, calc(50vw - 800px));  /* respiración + centrado visual */
+  padding-right: max(24px, calc(50vw - 800px));
+}
+
+.full-bleed > .ticket-form.ticket-form--xl {
+  width: 100%;
+  max-width: 1600px;   /* tope visual */
+  margin-inline: auto;
+}
+

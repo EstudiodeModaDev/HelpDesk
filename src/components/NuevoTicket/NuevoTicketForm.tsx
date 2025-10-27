@@ -183,200 +183,202 @@ export default function NuevoTicketForm() {
   const disabledArts = submitting || loadingCatalogos
 
   return (
-    <div className="ticket-form ticket-form--xl" data-force-light>
-      <h2 className="tf-title">Nuevo Ticket</h2>
+    <div>
+      <div className="ticket-form ticket-form--xl" data-force-light>
+        <h2 className="tf-title">Nuevo Ticket</h2>
 
-      <form onSubmit={handleSubmit} noValidate className="tf-grid">
-        {/* Solicitante */}
-        <div className="tf-field">
-          <label className="tf-label">Solicitante</label>
-          <Select<UserOptionEx, false>
-            options={combinedOptions}
-            placeholder={loadingWorkers || loadingFranq ? "Cargando opciones…" : "Buscar solicitante…"}
-            value={state.solicitante as UserOptionEx | null}
-            onChange={(opt) => setField("solicitante", opt ?? null)}
-            classNamePrefix="rs"
-            isDisabled={submitting || loadingWorkers || loadingFranq}
-            isLoading={loadingWorkers || loadingFranq}
-            filterOption={userFilter}
-            components={{ Option }}
-            noOptionsMessage={() => (usersError || franqError ? "Error cargando opciones" : "Sin coincidencias")}
-            isClearable
-          />
-          {errors.solicitante && <small className="error">{errors.solicitante}</small>}
-        </div>
-
-        {/* Resolutor */}
-        <div className="tf-field">
-          <label className="tf-label">Resolutor</label>
-          <Select<UserOption, false>
-            options={UseruserOptions}
-            placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
-            value={state.resolutor}
-            onChange={(opt) => setField("resolutor", opt ?? null)}
-            classNamePrefix="rs"
-            isDisabled={submitting || loading}
-            isLoading={loading}
-            filterOption={userFilter as any}
-            components={{ Option: Option as any }}
-            noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
-            isClearable
-          />
-          {errors.resolutor && <small className="error">{errors.resolutor}</small>}
-        </div>
-
-        {/* Fecha de apertura (opcional) */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-checkbox">
-            <input
-              type="checkbox"
-              checked={state.usarFechaApertura}
-              onChange={(ev) => setField("usarFechaApertura", ev.target.checked)}
-              disabled={submitting}
+        <form onSubmit={handleSubmit} noValidate className="tf-grid">
+          {/* Solicitante */}
+          <div className="tf-field">
+            <label className="tf-label">Solicitante</label>
+            <Select<UserOptionEx, false>
+              options={combinedOptions}
+              placeholder={loadingWorkers || loadingFranq ? "Cargando opciones…" : "Buscar solicitante…"}
+              value={state.solicitante as UserOptionEx | null}
+              onChange={(opt) => setField("solicitante", opt ?? null)}
+              classNamePrefix="rs"
+              isDisabled={submitting || loadingWorkers || loadingFranq}
+              isLoading={loadingWorkers || loadingFranq}
+              filterOption={userFilter}
+              components={{ Option }}
+              noOptionsMessage={() => (usersError || franqError ? "Error cargando opciones" : "Sin coincidencias")}
+              isClearable
             />
-            <span>Escoger fecha de apertura</span>
-          </label>
-        </div>
+            {errors.solicitante && <small className="error">{errors.solicitante}</small>}
+          </div>
 
-        {state.usarFechaApertura && (
+          {/* Resolutor */}
+          <div className="tf-field">
+            <label className="tf-label">Resolutor</label>
+            <Select<UserOption, false>
+              options={UseruserOptions}
+              placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
+              value={state.resolutor}
+              onChange={(opt) => setField("resolutor", opt ?? null)}
+              classNamePrefix="rs"
+              isDisabled={submitting || loading}
+              isLoading={loading}
+              filterOption={userFilter as any}
+              components={{ Option: Option as any }}
+              noOptionsMessage={() => (error ? "Error cargando usuarios" : "Sin coincidencias")}
+              isClearable
+            />
+            {errors.resolutor && <small className="error">{errors.resolutor}</small>}
+          </div>
+
+          {/* Fecha de apertura (opcional) */}
           <div className="tf-field tf-col-2">
-            <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
+            <label className="tf-checkbox">
+              <input
+                type="checkbox"
+                checked={state.usarFechaApertura}
+                onChange={(ev) => setField("usarFechaApertura", ev.target.checked)}
+                disabled={submitting}
+              />
+              <span>Escoger fecha de apertura</span>
+            </label>
+          </div>
+
+          {state.usarFechaApertura && (
+            <div className="tf-field tf-col-2">
+              <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
+              <input
+                id="fechaApertura"
+                type="date"
+                value={state.fechaApertura ?? ""}
+                onChange={(e) => setField("fechaApertura", e.target.value || null)}
+                disabled={submitting}
+                className="tf-input"
+              />
+              {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
+            </div>
+          )}
+
+          {/* Fuente */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
+            <select
+              id="fuente"
+              value={state.fuente}
+              onChange={(e) => setField("fuente", e.target.value as typeof state.fuente)}
+              disabled={submitting}
+              className="tf-input"
+            >
+              <option value="">Seleccione una fuente</option>
+              <option value="Correo">Correo</option>
+              <option value="Disponibilidad">Disponibilidad</option>
+              <option value="Teams">Teams</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="En persona">Presencial</option>
+            </select>
+            {errors.fuente && <small className="error">{errors.fuente}</small>}
+          </div>
+
+          {/* Motivo */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label" htmlFor="motivo">Motivo de la solicitud</label>
             <input
-              id="fechaApertura"
-              type="date"
-              value={state.fechaApertura ?? ""}
-              onChange={(e) => setField("fechaApertura", e.target.value || null)}
+              id="motivo"
+              type="text"
+              placeholder="Ingrese el motivo"
+              value={state.motivo}
+              onChange={(e) => setField("motivo", e.target.value)}
               disabled={submitting}
               className="tf-input"
             />
-            {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
+            {errors.motivo && <small className="error">{errors.motivo}</small>}
           </div>
-        )}
 
-        {/* Fuente */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
-          <select
-            id="fuente"
-            value={state.fuente}
-            onChange={(e) => setField("fuente", e.target.value as typeof state.fuente)}
-            disabled={submitting}
-            className="tf-input"
-          >
-            <option value="">Seleccione una fuente</option>
-            <option value="Correo">Correo</option>
-            <option value="Disponibilidad">Disponibilidad</option>
-            <option value="Teams">Teams</option>
-            <option value="WhatsApp">WhatsApp</option>
-            <option value="En persona">Presencial</option>
-          </select>
-          {errors.fuente && <small className="error">{errors.fuente}</small>}
-        </div>
-
-        {/* Motivo */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="motivo">Motivo de la solicitud</label>
-          <input
-            id="motivo"
-            type="text"
-            placeholder="Ingrese el motivo"
-            value={state.motivo}
-            onChange={(e) => setField("motivo", e.target.value)}
-            disabled={submitting}
-            className="tf-input"
-          />
-          {errors.motivo && <small className="error">{errors.motivo}</small>}
-        </div>
-
-        {/* Descripción */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label">Descripción del problema</label>
-          <RichTextBase64
-            value={state.descripcion}
-            onChange={(html) => setField("descripcion", html)}
-            placeholder="Describe el problema y pega capturas (Ctrl+V)…"
-          />
-          {errors.descripcion && <small className="error">{errors.descripcion}</small>}
-        </div>
-
-        {/* Categoría / Subcategoría / Artículo */}
-        <div className="tf-row tf-row--cats tf-col-2">
-          <div className="tf-field">
-            <label className="tf-label">Categoría</label>
-            <Select
-              classNamePrefix="rs"
-              options={catOptions}
-              value={catValue}
-              onChange={onCategoriaChange}
-              isDisabled={disabledCats}
-              placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
-              filterOption={makeFilter()}
-              isClearable
+          {/* Descripción */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label">Descripción del problema</label>
+            <RichTextBase64
+              value={state.descripcion}
+              onChange={(html) => setField("descripcion", html)}
+              placeholder="Describe el problema y pega capturas (Ctrl+V)…"
             />
-            {errors.categoria && <small className="error">{errors.categoria}</small>}
+            {errors.descripcion && <small className="error">{errors.descripcion}</small>}
           </div>
 
-          <div className="tf-field">
-            <label className="tf-label">Subcategoría</label>
-            <Select
-              classNamePrefix="rs"
-              options={subcatOptions}
-              value={subcatValue}
-              onChange={onSubcategoriaChange}
-              isDisabled={disabledSubs}
-              placeholder={
-                catId == null
-                  ? "Seleccione una subcategoría"
-                  : loadingCatalogos
-                  ? "Cargando subcategorías..."
-                  : "Seleccione una subcategoría"
-              }
-              filterOption={makeFilter()}
-              isClearable
-            />
-            {errors.subcategoria && <small className="error">{errors.subcategoria}</small>}
+          {/* Categoría / Subcategoría / Artículo */}
+          <div className="tf-row tf-row--cats tf-col-2">
+            <div className="tf-field">
+              <label className="tf-label">Categoría</label>
+              <Select
+                classNamePrefix="rs"
+                options={catOptions}
+                value={catValue}
+                onChange={onCategoriaChange}
+                isDisabled={disabledCats}
+                placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
+                filterOption={makeFilter()}
+                isClearable
+              />
+              {errors.categoria && <small className="error">{errors.categoria}</small>}
+            </div>
+
+            <div className="tf-field">
+              <label className="tf-label">Subcategoría</label>
+              <Select
+                classNamePrefix="rs"
+                options={subcatOptions}
+                value={subcatValue}
+                onChange={onSubcategoriaChange}
+                isDisabled={disabledSubs}
+                placeholder={
+                  catId == null
+                    ? "Seleccione una subcategoría"
+                    : loadingCatalogos
+                    ? "Cargando subcategorías..."
+                    : "Seleccione una subcategoría"
+                }
+                filterOption={makeFilter()}
+                isClearable
+              />
+              {errors.subcategoria && <small className="error">{errors.subcategoria}</small>}
+            </div>
+
+            <div className="tf-field">
+              <label className="tf-label">Artículo</label>
+              <Select
+                classNamePrefix="rs"
+                options={artOptions}
+                value={artValue}
+                onChange={onArticuloChange}
+                isDisabled={disabledArts}
+                placeholder={
+                  subcatId == null
+                    ? "Seleccione un artículo"
+                    : loadingCatalogos
+                    ? "Cargando artículos..."
+                    : "Seleccione un artículo"
+                }
+                filterOption={makeFilter()}
+                isClearable
+              />
+            </div>
           </div>
 
-          <div className="tf-field">
-            <label className="tf-label">Artículo</label>
-            <Select
-              classNamePrefix="rs"
-              options={artOptions}
-              value={artValue}
-              onChange={onArticuloChange}
-              isDisabled={disabledArts}
-              placeholder={
-                subcatId == null
-                  ? "Seleccione un artículo"
-                  : loadingCatalogos
-                  ? "Cargando artículos..."
-                  : "Seleccione un artículo"
-              }
-              filterOption={makeFilter()}
-              isClearable
+          {/* Archivo */}
+          <div className="tf-field tf-col-2">
+            <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
+            <input
+              id="archivo"
+              type="file"
+              onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
+              disabled={submitting}
+              className="tf-input"
             />
           </div>
-        </div>
 
-        {/* Archivo */}
-        <div className="tf-field tf-col-2">
-          <label className="tf-label" htmlFor="archivo">Adjuntar archivo</label>
-          <input
-            id="archivo"
-            type="file"
-            onChange={(e) => setField("archivo", e.target.files?.[0] ?? null)}
-            disabled={submitting}
-            className="tf-input"
-          />
-        </div>
-
-        {/* Submit */}
-        <div className="tf-actions tf-col-2">
-          <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
-            {submitting ? "Enviando..." : "Enviar Ticket"}
-          </button>
-        </div>
-      </form>
+          {/* Submit */}
+          <div className="tf-actions tf-col-2">
+            <button type="submit" disabled={submitting || loadingCatalogos} className="tf-submit">
+              {submitting ? "Enviando..." : "Enviar Ticket"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
