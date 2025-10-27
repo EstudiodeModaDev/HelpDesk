@@ -5,8 +5,7 @@
 }
 
 /* Scope "forzado" */
-.tabla-tickets[data-force-light],
-.tabla-tickets[data-force-light] *{
+.tabla-tickets[data-force-light], .tabla-tickets[data-force-light] *{
   color-scheme: light !important;
 }
 
@@ -18,7 +17,7 @@
 
 /* === 2) Tokens === */
 :root{
-  --tbl-max: 1200px;
+  --tbl-max: 1600px;
   --tbl-text: #111827;
   --tbl-muted: #6b7280;
   --tbl-border: #e5e7eb;
@@ -32,11 +31,9 @@
 .tabla-tickets{ background: transparent; color: var(--tbl-text); line-height: 1.35; }
 
 /* mismo ancho + centrado (lo recuperamos) */
-.tabla-tickets > .filtros,
-.tabla-tickets > .table-wrap,
-.tabla-tickets .table-wrap + div{
+.tabla-tickets > .filtros, .tabla-tickets > .table-wrap, .tabla-tickets .table-wrap + div{
   width: min(100%, var(--tbl-max));
-  margin-inline: auto;                 /* <-- lo que faltaba */
+  /*margin-inline: auto;*/                 /* <-- lo que faltaba */
 }
 
 /* === 3) Barra de filtros === */
