@@ -149,13 +149,13 @@ export default function TablaTickets() {
                 Siguiente
               </button>
 
-              <span style={{ marginLeft: 12 }}>Registris por pagina:</span>
+              <span style={{ marginLeft: 12 }}>Tickets por pagina:</span>
               <select
                 value={pageSize}
                 onChange={(e) => setPageSize(Number(e.target.value))}
                 disabled={loading}
               >
-                {[10, 20, 50, 100].map((n) => (
+                {[10, 15, 20, 50, 100].map((n) => (
                   <option key={n} value={n}>
                     {n}
                   </option>
