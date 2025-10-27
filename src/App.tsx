@@ -239,7 +239,7 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
         <div style={{fontWeight:800, display:'flex', alignItems:'center', gap:8}}>
           <span>🟢</span> <span>Soporte Técnico</span>
         </div>
-        <div style={{opacity:.8, fontSize:12, marginTop:4}}>Estamos aquí para ayudarte</div>
+        <div style={{opacity:.8, fontSize:12, marginTop:4}}>Estamos aquí para ayudarte.</div>
       </div>
 
       <nav className="sidebar__nav" role="navigation">
