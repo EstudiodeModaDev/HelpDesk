@@ -2,20 +2,17 @@
    1) PERSISTENCIA DE TEMA (fuerza estilo estable tipo "light")
    ========================================================= */
 .tabla-tickets{
-  /* Aísla del modo oscuro del SO/ navegador y de ancestros .dark */
   color-scheme: light !important;
   isolation: isolate;
 }
-/* Si tu app añade .dark o .theme-dark en el html/body */
-.dark .tabla-tickets,
-.theme-dark .tabla-tickets{
+
+/* Para el modo oscuro
+.dark .tabla-tickets, .theme-dark .tabla-tickets{
   color-scheme: light !important;
-}
+}*/
 
 /* Asegura colores explícitos en controles (no system colors) */
-.tabla-tickets input,
-.tabla-tickets select,
-.tabla-tickets button{
+.tabla-tickets input, .tabla-tickets select, .tabla-tickets button{
   background-color: #ffffff !important;
   color: #111827 !important;
   border-color: #e5e7eb !important;
