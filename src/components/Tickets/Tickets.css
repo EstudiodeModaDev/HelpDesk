@@ -32,7 +32,7 @@
 }
 
 .tabla-tickets .filtros input:focus, .tabla-tickets .filtros select:focus, .tabla-tickets .filtros button:focus-visible {
-  border-color: var(--primary) !important;
+  border-color: transparent !important;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring) 70%, transparent) !important;
   outline: none !important;
 }
