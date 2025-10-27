@@ -72,6 +72,7 @@ export function useFacturas() {
     
     try {
       await notifyFlow.invoke<conectorFacturas, any>({InitialDate: InitialDate, FinalDate: finalDate, user: account?.username ?? "" });
+      alert("se ha generado con éxito su conector, en minutos le llegar a su correo")
 
     } catch (err) {
         console.error("Ha ocurrido un error descargando el conector:", err);
