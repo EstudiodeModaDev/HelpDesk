@@ -1,14 +1,31 @@
-// src/components/DistribucionFactura/DistribucionesLista.tsx
-import React from "react";
+import React, { useState } from "react";
 import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFactura";
-import "./DistribucionesLista.css"
+import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
+// import DistribucionFacturaEditar from "../DistribucionFacturaEditar/DistribucionFacturaEditar";
+import "./DistribucionesLista.css";
+import DistribucionFacturaEditar from "./DistribucionFacturaEditar";
 
 interface DistribucionesListaProps {
   onVolver: () => void;
 }
 
 const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) => {
-  const { distribuciones, loading, error } = useDistribucionFactura();
+  const { distribuciones, loading, error, recargarDistribuciones } = useDistribucionFactura();
+
+  // 🔹 Estado para controlar el modal de edición
+  const [editando, setEditando] = useState<DistribucionFacturaData | null>(null);
+
+  const handleCerrarModal = () => setEditando(null);
+
+  const handleGuardado = () => {
+    recargarDistribuciones?.(); // si tu hook tiene esta función
+    setEditando(null);
+  };
+
+  const handleEliminar = (id: string) => {
+    console.log(`Distribución ${id} eliminada.`);
+    recargarDistribuciones?.();
+  };
 
   return (
     <div className="distribuciones-lista-container">
@@ -40,11 +57,12 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
                 <th>Marcas Importadas</th>
                 <th>CEDI</th>
                 <th>Serv. Admin.</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {distribuciones.map((item) => (
-                <tr key={item.Id ?? item.Id}>
+                <tr key={item.Id ?? item.NoFactura}>
                   <td>{item.Proveedor}</td>
                   <td>{item.Title}</td>
                   <td>{item.NoFactura}</td>
@@ -54,11 +72,29 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
                   <td>{item.CosTotMarImpor?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
                   <td>{item.CosTotCEDI?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
                   <td>{item.CosTotServAdmin?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
+                  <td className="text-center">
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => setEditando(item)}
+                    >
+                      ✏️ Editar
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* 🔹 Modal de edición */}
+      {editando && (
+        <DistribucionFacturaEditar
+          distribucion={editando}
+          onClose={handleCerrarModal}
+          onGuardar={handleGuardado}
+          onEliminar={handleEliminar}
+        />
       )}
     </div>
   );
