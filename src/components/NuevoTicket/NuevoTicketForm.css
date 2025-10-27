@@ -40,13 +40,6 @@
   width: clamp(1040px, 74vw, 1280px);
 }
 
-@media (min-width: 1200px) {
-  .ticket-form--xl {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-}
-
 /* ====== CAMPOS Y GRID ====== */
 .tf-title {
   margin: 0 0 16px;
@@ -223,4 +216,21 @@
   .tf-grid{ grid-template-columns: 1fr; }
   .tf-col-2{ grid-column: 1 / -1; }
   .tf-row--cats{ grid-template-columns: 1fr; }
+}
+
+.ticket-form--xl {
+  max-width: 1000px;
+  width: 100%;
+  margin: 2rem auto;
+  overflow: visible; /* evita scroll interno */
+}
+main {
+  overflow: auto;
+}
+
+@media (min-width: 1200px) {
+  .ticket-form--xl {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
 }
