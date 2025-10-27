@@ -1,250 +1,235 @@
-/* === Núcleo: forzar tema claro y aislar === */
+/* ===== EscalamientoInternet.css ===== */
+
+/* 1) Núcleo: forzar SIEMPRE tema claro dentro del scope */
 .esc-form{
-  color-scheme: light !important;   /* inputs nativos en claro */
-  isolation: isolate;               /* corta filtros/mezclas del exterior */
+  color-scheme: light !important;     /* inputs nativos en claro */
+  isolation: isolate;                 /* aísla filtros/mezclas del exterior */
+  --bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --primary: #2563eb;
+  --primary-ink: #ffffff;
+  --ring: rgba(37, 99, 235, 0.35);
+  --error: #b91c1c;
+  --radius: 14px;
+
   width: 100%;
   max-width: 100%;
-  padding: 16px;                    /* tu padding original */
+  padding: 20px;
   box-sizing: border-box;
-  background: #fff !important;      /* base clara persistente */
-  color: #111827 !important;
+  background: var(--bg) !important;
+  color: var(--text);
+  line-height: 1.4;
 }
 
-/* Neutraliza modo oscuro global del sitio */
+/* Neutraliza dark mode global de frameworks o del html */
 .dark .esc-form,
 .dark .esc-form *{
   color-scheme: light !important;
 }
 
-/* Reseteo suave para evitar que algo se desborde o herede rarezas */
-.esc-form,
-.esc-form *{
+/* 2) Reset suave dentro del scope */
+.esc-form, .esc-form *{
   box-sizing: border-box;
   min-width: 0;
 }
 
-/* ====== Título ====== */
-.esc-form .esc-title{
+/* 3) Título */
+.esc-title{
   margin: 0 0 12px 0;
   font-size: 28px;
   font-weight: 800;
-  letter-spacing: 0.2px;
-  color: #0f172a !important;
+  letter-spacing: .2px;
+  color: #0f172a;
 }
 
-/* ====== Barra de búsqueda ====== */
-.esc-form .esc-search{
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin: 12px 0 16px 0;
-}
-
-/* ====== Tarjeta / contenedor ====== */
-.esc-form .esc-card{
-  background: #fff !important;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(30,41,59,0.08);
-  padding: 16px;
-  border: 1px solid rgba(0,0,0,0.08);
-}
-
-/* ====== Grid ====== */
-.esc-form .esc-grid{
+/* 4) Buscador */
+.esc-search{
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px 16px;
-  width: 100%;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-bottom: 16px;
 }
-@media (max-width: 1024px){
-  .esc-form .esc-grid{ grid-template-columns: 1fr 1fr; }
+.esc-button{
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .02s ease, border-color .15s ease, background .15s ease;
 }
-@media (max-width: 640px){
-  .esc-form .esc-grid{ grid-template-columns: 1fr; }
+.esc-button:hover{
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+.esc-button:active{ transform: translateY(1px); }
+
+/* 5) Card del formulario */
+.esc-card{
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
 }
 
-.esc-form .esc-field{
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* 6) Grid del formulario */
+.esc-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
 }
-.esc-form .esc-col-2{ grid-column: 1 / -1; }
+.esc-field{ display: flex; flex-direction: column; gap: 6px; }
+.esc-col-2{ grid-column: span 2; }
 
-/* ====== Inputs / selects ====== */
-.esc-form .esc-input,
-.esc-form input,
-.esc-form select,
-.esc-form textarea{
-  appearance: none;
+/* 7) Inputs / Selects compartidos */
+.esc-input{
   width: 100%;
-  border: 1px solid rgba(0,0,0,0.12) !important;
-  border-radius: 8px;
+  background: #ffffff !important;     /* SIEMPRE blanco */
+  color: var(--text) !important;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 10px 12px;
   outline: none;
-  background: #fff !important;
-  color: #111827 !important;
-  line-height: 1.35;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+.esc-input::placeholder{ color: var(--muted); }
+.esc-input:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: #ffffff !important;
 }
 
-/* Flecha para <select> (opcional) */
-.esc-form select{
+/* Select: elimina flecha fea en algunos navegadores y mantiene look blanco */
+select.esc-input{
   background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    linear-gradient(45deg, transparent 50%, #6b7280 50%),
+    linear-gradient(135deg, #6b7280 50%, transparent 50%),
+    linear-gradient(#ffffff, #ffffff);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px),
+    calc(100% - 2.2rem) 0;
+  background-size: 6px 6px, 6px 6px, 1px 100%;
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 18px 18px;
-  padding-right: 40px;
+  padding-right: 2.6rem;
 }
 
-.esc-form .esc-input:focus,
-.esc-form input:focus,
-.esc-form select:focus,
-.esc-form textarea:focus{
-  outline: 2px solid rgba(0,0,0,0.25) !important;
-  outline-offset: 2px;
+/* 8) Etiquetas y errores */
+.esc-field > label{
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.error{
+  color: var(--error);
+  font-size: 12px;
+  margin-top: 2px;
 }
 
-/* ====== Botones ====== */
-.esc-form .esc-button{
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12) !important;
-  background: #fff !important;
-  color: #111827 !important;
-  cursor: pointer;
+/* 9) Adjuntos */
+.esc-attachments{
+  margin-top: 14px;
 }
-.esc-form .esc-actions{
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-.esc-form .esc-primary{
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: none;
-  background: #1d7167 !important;
-  color: #fff !important;
-  font-weight: 700;
-  cursor: pointer;
-}
-.esc-form .esc-primary:disabled{
-  opacity: .6;
-  cursor: not-allowed;
-}
-
-/* ====== Adjuntos ====== */
-.esc-form .esc-attachments{ margin-top: 12px; }
-.esc-form .esc-attachments-title{
+.esc-attachments-title{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
   margin-bottom: 8px;
-  display: flex;
+  color: #0f172a;
+}
+.esc-asterisk{ color: var(--error); }
+.esc-attachments-box{
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  padding: 14px;
+  background: #ffffff;
+}
+.esc-muted{ color: var(--muted); }
+.esc-files{
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+  display: grid;
   gap: 6px;
-  align-items: center;
-  color: #0f172a !important;
 }
-.esc-form .esc-asterisk{ color: #0b2a7a !important; }
-
-.esc-form .esc-attachments-box{
-  border: 2px solid #132b7a !important;
+.esc-files li{
+  padding: 8px 10px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px;
-  min-height: 110px;
-  background: #fff !important;
+  background: #fff;
 }
-
-.esc-form .esc-muted{
-  margin: 0 0 12px 0;
-  opacity: .8;
-  color: #111827 !important;
-}
-.esc-form .esc-files{
-  margin: 0 0 8px 0;
-  padding-left: 16px;
-}
-.esc-form .esc-upload{
+.esc-upload{
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 10px;
   cursor: pointer;
   user-select: none;
-  color: #0f172a !important;
+  background: #f8fafc;
+  transition: box-shadow .15s ease, border-color .15s ease, transform .02s ease;
+}
+.esc-upload:hover{
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+.esc-upload:active{ transform: translateY(1px); }
+
+/* 10) Acciones */
+.esc-actions{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.esc-primary{
+  padding: 12px 18px;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .02s ease, filter .15s ease;
+}
+.esc-primary:hover{ box-shadow: 0 0 0 6px var(--ring); filter: brightness(1.03); }
+.esc-primary:active{ transform: translateY(1px); }
+.esc-primary:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
 }
 
-/* 0) Gana por orden: pon este bloque DESPUÉS de cualquier Seguimiento.css/Ticket.css */
+/* 11) Autofill Chrome (evita amarillo/oscuro) */
+.esc-input:-webkit-autofill,
+.esc-input:-webkit-autofill:hover,
+.esc-input:-webkit-autofill:focus{
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 9999s ease-out 0s;
+}
 
-/* 1) Aislar y forzar claro de forma agresiva */
-.esc-form{
+/* 12) Responsivo */
+@media (max-width: 860px){
+  .esc-grid{ grid-template-columns: 1fr; }
+  .esc-col-2{ grid-column: auto; }
+  .esc-actions{ justify-content: stretch; }
+  .esc-primary{ width: 100%; }
+}
+
+/* 13) Seguridad extra: si algún contenedor fuerza dark, lo neutralizamos igual */
+:root[color-scheme="dark"] .esc-form,
+html[data-theme="dark"] .esc-form{
   color-scheme: light !important;
-  isolation: isolate;
-  background: #fff !important;
-  color: #111827 !important;
+  background: #ffffff !important;
 }
-
-/* 2) Neutralizar reglas globales tipo `.dark *` o `form{background:...}` */
-.dark .esc-form,
-.dark .esc-form *{
-  color-scheme: light !important;
-}
-.esc-form *{ box-sizing: border-box; min-width: 0; }
-
-/* 3) El culpable suele ser un selector genérico contra `form`. 
-      Súbele la especificidad al tuyo y fuerza fondo claro */
-.esc-form > form.esc-card,
-.esc-form form.esc-card{
-  background: #fff !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(30,41,59,0.08) !important;
-}
-
-/* 4) Si algún lib aplica fondo a TODO hijo (p. ej. .prose, tailwind dark:bg-*)
-      mantén tus campos y áreas transparentes sobre la tarjeta blanca */
-.esc-form .esc-card > *{
-  background: transparent !important;
-}
-
-/* 5) Inputs/selects/textarea: colores claros y foco coherente */
-.esc-form :is(.esc-input, input, select, textarea){
-  background: #fff !important;
-  color: #111827 !important;
-  border: 1px solid rgba(0,0,0,0.12) !important;
-  border-radius: 8px !important;
-}
-.esc-form :is(.esc-input, input, select, textarea):focus{
-  outline: 2px solid rgba(0,0,0,0.25) !important;
-  outline-offset: 2px;
-}
-
-/* 6) Botones */
-.esc-form .esc-button{
-  background: #fff !important;
-  color: #111827 !important;
-  border: 1px solid rgba(0,0,0,0.12) !important;
-}
-.esc-form .esc-primary{
-  background: #1d7167 !important;
-  color: #fff !important;
-}
-
-/* 7) Adjuntos */
-.esc-form .esc-attachments-box{
-  background: #fff !important;
-  border: 2px solid #132b7a !important;
-}
-
-/* 8) Cinturón de seguridad contra overflow por gradientes/sticky/etc */
-.esc-form{ max-width: 100%; overflow-x: hidden; }
-
-/* Gana a cualquier .ticket-form form oscuro */
-.ticket-form .esc-form > form.esc-card,
-.ticket-form .esc-form form.esc-card{
-  background: #fff !important;
-  color: #111827 !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(30,41,59,0.08) !important;
-}
-
-/* Si algún wrapper del Acta tiene fondo oscuro, blanquear solo ese nivel */
-.ticket-form .esc-form { background: #fff !important; }
-.ticket-form .esc-form .esc-card > * { background: transparent !important; }
