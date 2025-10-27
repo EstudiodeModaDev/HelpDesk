@@ -188,19 +188,16 @@ export default function DistribucionFactura() {
     setFormData((s) => ({ ...s, [k]: v }));
 
   // 🧩 Vista condicional: formulario o lista
-  if (mostrarLista) {
-    return (
-      <div className="distribucion-container">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h2>📋 Distribuciones registradas</h2>
-          <button className="btn btn-secondary" onClick={() => setMostrarLista(false)}>
-            🔙 Volver al formulario
-          </button>
-        </div>
-        <DistribucionesLista onVolver={() => setMostrarLista(false)} />
-      </div>
-    );
-  }
+ // 🔹 Mostrar lista de distribuciones registradas
+if (mostrarLista) {
+  return (
+    <div className="distribucion-container">
+      {/* ✅ Solo renderizamos la lista, ya incluye su propio título y botón */}
+      <DistribucionesLista onVolver={() => setMostrarLista(false)} />
+    </div>
+  );
+}
+
 
   return (
     <div className="distribucion-container">
