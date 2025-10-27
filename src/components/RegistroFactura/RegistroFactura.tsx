@@ -578,7 +578,7 @@ return (
         <button type="button" className="btn-volver" onClick={() => setMostrarDistribucion(false)}>
           🔙 Volver al registro de factura
         </button>
-        <button type="button" className="btn-volver" onClick={() => handleConector()}>
+        <button type="button" className="btn-volver" onClick={() => handleConector("2025-01-01", "2025-11-01")}>
           Prueba conector
         </button>
         <DistribucionFactura />
