@@ -364,25 +364,32 @@ if (mostrarLista) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
-            <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesBNCalle)}  
-              onChange={(e) => {
-                const raw = e.target.value;
-                const f = formatPesosEsCO(raw);
-                const num = toNumberFromEsCO(f);
-                setdisplayImpresionesBNCalle(f);
-                setField("ImpColorPalms", num)
-              }}
-              onBlur={() => {
-                const num = toNumberFromEsCO(displayImpresionesBNCalle);
-                setdisplayImpresionesBNCalle(
-                  new Intl.NumberFormat("es-CO", {
+          <label htmlFor="ImpBnCalle">Impresiones B/N Calle</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            name="ImpBnCalle"  // ✅ CORRECTO
+            placeholder="Ej: 100.000"
+            value={String(displayImpresionesBNCalle)}  
+            onChange={(e) => {
+              const raw = e.target.value;
+              const f = formatPesosEsCO(raw);
+              const num = toNumberFromEsCO(f);
+              setdisplayImpresionesBNCalle(f);
+              setField("ImpBnCalle", num);  // ✅ CORRECTO
+            }}
+            onBlur={() => {
+              const num = toNumberFromEsCO(displayImpresionesBNCalle);
+              setdisplayImpresionesBNCalle(
+                new Intl.NumberFormat("es-CO", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  }).format(Number.isFinite(num) ? num : 0)
-                );
-              }}/>
-          </div>
+                }).format(Number.isFinite(num) ? num : 0)
+              );
+            }}
+          />
+        </div>
+
 
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
