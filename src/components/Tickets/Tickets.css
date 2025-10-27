@@ -1,212 +1,127 @@
-/* ========================================================= 1) PERSISTENCIA DE TEMA (fuerza estilo estable tipo "light") ========================================================= */
+/* === 1) Persistencia real del tema === */
 .tabla-tickets{
-  color-scheme: light !important;
+  color-scheme: light !important;   /* <-- typo corregido */
   isolation: isolate;
 }
 
-/* Para el modo oscuro
-.dark .tabla-tickets, .theme-dark .tabla-tickets{
-  color-scheme: light !important;
-}*/
-
-/* Asegura colores explícitos en controles (no system colors) */
-.tabla-tickets input, .tabla-tickets select, .tabla-tickets button{
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  border-color: #e5e7eb !important;
-}
-
-/* Evita re-tinte de autocompletado en Chrome */
-.tabla-tickets input:-webkit-autofill{
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-  -webkit-text-fill-color: #111827 !important;
-}
-
-/* Por si hay CSS global que repinta dentro de .dark */
-.dark .tabla-tickets *{
+/* Scope "forzado" */
+.tabla-tickets[data-force-light],
+.tabla-tickets[data-force-light] *{
   color-scheme: light !important;
 }
 
-/* =========================================================
-   2) TOKENS Y BASE
-   ========================================================= */
+/* Neutraliza dark global */
+.dark .tabla-tickets[data-force-light],
+.dark .tabla-tickets[data-force-light] *{
+  color-scheme: light !important;
+}
+
+/* === 2) Tokens === */
 :root{
   --tbl-max: 1200px;
   --tbl-text: #111827;
   --tbl-muted: #6b7280;
   --tbl-border: #e5e7eb;
-  --tbl-odd: #ffffff;   /* filas 1,3,5... */
-  --tbl-even: #f7f8fb;  /* filas 2,4,6... */
+  --tbl-odd: #ffffff;
+  --tbl-even: #f7f8fb;
   --tbl-hover: #eef2ff;
   --tbl-head: #ffffff;
   --tbl-focus: #2563eb;
 }
 
-.tabla-tickets{
-  background: transparent;
-  color: var(--tbl-text);
-  line-height: 1.35;
-}
+.tabla-tickets{ background: transparent; color: var(--tbl-text); line-height: 1.35; }
 
-.tabla-tickets > .filtros, .tabla-tickets > .table-wrap{
+/* mismo ancho + centrado (lo recuperamos) */
+.tabla-tickets > .filtros,
+.tabla-tickets > .table-wrap,
+.tabla-tickets .table-wrap + div{
   width: min(100%, var(--tbl-max));
-  margin-inline: auto;
+  margin-inline: auto;                 /* <-- lo que faltaba */
 }
 
-/* =========================================================
-   3) BARRA DE FILTROS (mismo ancho que la tabla)
-   ========================================================= */
+/* === 3) Barra de filtros === */
 .tabla-tickets > .filtros{
-  margin: 0 !important; 
+  margin: 0 !important;
   padding: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr repeat(6, auto);
+  align-items: center;
 }
 
-.tabla-tickets[data-force-light], .tabla-tickets[data-force-light] * {
-  color-scheme: light !important;
-}
-
-.dark .tabla-tickets[data-force-light], .dark .tabla-tickets[data-force-light] * {
-  color-scheme: light !important;
-}
-
-.tabla-tickets[data-force-light] input, .tabla-tickets[data-force-light] select, .tabla-tickets[data-force-light] button {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: none !important;      
-  filter: none !important;
-}
-
-.tabla-tickets[data-force-light] > .filtros {
-  background: #ffffff !important;    /* si la quieres transparente, cambia a transparent */
+.tabla-tickets[data-force-light] > .filtros{
+  background: #ffffff !important;
   border: 1px solid #e5e7eb !important;
   border-radius: 12px !important;
   box-shadow: 0 8px 24px rgba(0,0,0,.06) !important;
-  padding: 8px !important;
 }
 
-.tabla-tickets[data-force-light] .table-wrap {
-  background: transparent !important;
-  border-color: #e5e7eb !important;
-  box-shadow: none !important;
-}
-
-.tabla-tickets[data-force-light] thead th {
-  background: #ffffff !important;
+.tabla-tickets input,
+.tabla-tickets select,
+.tabla-tickets button{
+  background-color: #ffffff !important;
   color: #111827 !important;
-  border-bottom: 1px solid #e5e7eb !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+  filter: none !important;
 }
 
-.tabla-tickets .filtros input[type="text"], .tabla-tickets .filtros input[type="date"], .tabla-tickets .filtros select, .tabla-tickets .filtros button{
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid var(--tbl-border);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--tbl-text);
-  font-size: 14px;
-}
-
-.tabla-tickets .filtros input::placeholder{ color: var(--tbl-muted); }
-
-.tabla-tickets .filtros input:focus, .tabla-tickets .filtros select:focus, .tabla-tickets .filtros button:focus{
-  outline: 0;
-  border-color: var(--tbl-focus);
+.tabla-tickets input::placeholder{ color: var(--tbl-muted); }
+.tabla-tickets input:focus,
+.tabla-tickets select:focus,
+.tabla-tickets button:focus{
+  outline: 0; border-color: var(--tbl-focus);
   box-shadow: 0 0 0 3px rgba(37,99,235,.25);
 }
 
-.tabla-tickets .filtros button{
-  cursor: pointer;
-  transition: transform .04s ease;
-}
-.tabla-tickets .filtros button:active{ transform: translateY(1px); }
-
-/* =========================================================
-   4) TABLA
-   ========================================================= */
+/* === 4) Tabla === */
 .table-wrap{
   border: 1px solid var(--tbl-border);
   border-radius: 12px;
   overflow: hidden;
-  background: transparent;  /* contenedor transparente */
-  overflow-x: auto;         /* responsive horizontal */
+  background: transparent;
+  overflow-x: auto;
+  margin-top: 10px;                    /* separados solo 10px */
 }
 
 .table-wrap > table{
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: transparent;  /* no hereda colores del sistema */
+  background: transparent;
   font-size: 14px;
 }
 
-/* Cabecera */
 .table-wrap thead th{
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--tbl-head) !important; /* fijo, no sistema */
+  position: sticky; top: 0; z-index: 1;
+  background: var(--tbl-head) !important;
   color: var(--tbl-text) !important;
   border-bottom: 1px solid var(--tbl-border);
-  text-align: left;
-  padding: 10px 12px;
-  white-space: nowrap;
-  font-weight: 600;
+  text-align: left; padding: 10px 12px; white-space: nowrap; font-weight: 600;
 }
 
-/* Celdas */
-.table-wrap tbody td{
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--tbl-border);
-  vertical-align: middle;
-}
+.table-wrap tbody td{ padding: 10px 12px; border-bottom: 1px solid var(--tbl-border); vertical-align: middle; }
 
-/* Zebra persistente */
-.table-wrap tbody tr:nth-child(odd){ background: var(--tbl-odd) !important; }
+.table-wrap tbody tr:nth-child(odd){  background: var(--tbl-odd) !important; }
 .table-wrap tbody tr:nth-child(even){ background: var(--tbl-even) !important; }
-
-/* Hover */
-.table-wrap tbody tr:hover{
-  background: var(--tbl-hover) !important;
-}
-
-/* Filas clicables */
+.table-wrap tbody tr:hover{ background: var(--tbl-hover) !important; }
 .table-wrap tbody tr{ cursor: pointer; }
 
-/* th clicables (orden) */
 .table-wrap thead th[role="button"]{ user-select: none; }
-.table-wrap thead th[role="button"]:focus{
-  outline: 0;
-  box-shadow: inset 0 -2px 0 var(--tbl-focus);
-}
+.table-wrap thead th[role="button"]:focus{ outline: 0; box-shadow: inset 0 -2px 0 var(--tbl-focus); }
 
-/* Estado */
-.estado-circulo{
-  width: 12px;
-  height: 12px;
-  display: inline-block;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.1);
-}
+.estado-circulo{ width: 12px; height: 12px; display: inline-block; border-radius: 999px; border: 1px solid rgba(0,0,0,.1); }
 
-.tabla-tickets > p{
-  margin: 0 !important;
-}
-
-.tabla-tickets > .filtros.toolbar,
-.tabla-tickets > .filtros.card{
-  margin: 0 !important;
-}
-
-/* =========================================================
-   5) PAGINACIÓN
-   ========================================================= */
+/* === 5) Paginación en claro === */
 .tabla-tickets .table-wrap + div{
-  width: min(100%, var(--tbl-max));
-  margin-top: 10px !important;
+  background: transparent !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+  border: 0 !important;
 }
 
-.tabla-tickets .table-wrap + div button, .tabla-tickets .table-wrap + div select{
+.tabla-tickets .table-wrap + div button,
+.tabla-tickets .table-wrap + div select{
   height: 32px;
   border: 1px solid var(--tbl-border);
   background: #fff !important;
@@ -215,68 +130,27 @@
   padding: 0 10px;
 }
 
-/* =========================================================
-   6) RESPONSIVE
-   ========================================================= */
+/* === 6) Responsive === */
 @media (max-width: 980px){
-  .tabla-tickets > .filtros{
-    grid-template-columns: 1fr;
-  }
+  .tabla-tickets > .filtros{ grid-template-columns: 1fr; }
   .tabla-tickets > .filtros > *{ width: 100%; }
-  .table-wrap{ overflow-x: auto; }
   .table-wrap table{ min-width: 720px; }
 }
-
 @media (max-width: 520px){
   .table-wrap table{ min-width: 640px; }
 }
 
-/* =========================================================
-   7) (OPCIONAL) Refuerzo frente a prefers-color-scheme: dark
-   ========================================================= */
+/* === 7) Prefers-color-scheme: solo una vez === */
 @media (prefers-color-scheme: dark){
-  .tabla-tickets{ color-scheme: light !important; }
+  .tabla-tickets,
+  .tabla-tickets[data-force-light]{ color-scheme: light !important; }
 }
 
-.tabla-tickets[data-force-light] tbody tr:nth-child(odd)  { background: #ffffff !important; }
-.tabla-tickets[data-force-light] tbody tr:nth-child(even) { background: #f7f8fb !important; }
-.tabla-tickets[data-force-light] tbody tr:hover           { background: #eef2ff !important; }
-
-/* Paginación: evita barra/strip oscuro del “footer” */
-.tabla-tickets[data-force-light] .table-wrap + div, .tabla-tickets[data-force-light] .tabla-paginacion {
-  background: transparent !important;   /* o #fff si prefieres tarjeta */
-  color: #111827 !important;
-  box-shadow: none !important;
-  border: 0 !important;
-}
-
-/* Botones/select de paginación en claro */
-.tabla-tickets[data-force-light] .table-wrap + div button, .tabla-tickets[data-force-light] .tabla-paginacion button, .tabla-tickets[data-force-light] .table-wrap + div select, .tabla-tickets[data-force-light] .tabla-paginacion select {
-  background: #ffffff !important;
-  color: #111827 !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: none !important;
-}
-
-/* Date picker: icono claro (algunos temas lo invierten en dark) */
-.tabla-tickets[data-force-light] input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: none !important;
-  opacity: 1 !important;
-}
-
-/* Autocompletado Chrome en claro */
-.tabla-tickets[data-force-light] input:-webkit-autofill {
+/* Extras de compatibilidad */
+.tabla-tickets input:-webkit-autofill{
   -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
   -webkit-text-fill-color: #111827 !important;
 }
-
-/* (Opcional) si algún global usa backdrop-filter o mix-blend-mode */
-.tabla-tickets[data-force-light] .filtros, .tabla-tickets[data-force-light] .table-wrap, .tabla-tickets[data-force-light] .table-wrap + div {
-  backdrop-filter: none !important;
-  mix-blend-mode: normal !important;
-}
-
-/* Refuerzo contra prefers-color-scheme */
-@media (prefers-color-scheme: dark){
-  .tabla-tickets[data-force-light] { color-scheme: light !important; }
+.tabla-tickets[data-force-light] input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: none !important; opacity: 1 !important;
 }
