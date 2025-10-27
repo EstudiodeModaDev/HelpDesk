@@ -43,51 +43,25 @@ export default function TablaTickets() {
 
   return (
     <div className="tabla-tickets">
-      {/* Barra de filtros (oculta en detalle) */}
-      {!ticketSeleccionado && (
-        <div
-          className="filtros"
-          style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}
-        >
-          {/* Búsqueda local (solo página actual) */}
-          <input
-            type="text"
-            placeholder="Buscar (resolutor, solicitante, asunto)…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
 
-          {/* Modo (servidor) */}
-          <select
-            value={filterMode}
-            onChange={(e) => setFilterMode(e.target.value as any)}
-            title="Estado"
-          >
+      {!ticketSeleccionado && (
+        <div className="filtros" style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr auto auto auto auto auto auto" }}>
+
+          <input type="text" placeholder="Buscar (resolutor, solicitante, asunto)..." value={search} onChange={(e) => setSearch(e.target.value)}/>
+
+          <select value={filterMode} onChange={(e) => setFilterMode(e.target.value as any)} title="Estado">
             <option value="En curso">En curso</option>
             <option value="Cerrados">Cerrados</option>
           </select>
 
-          {/* Rango (servidor) */}
-          <input
-            type="date"
-            value={range.from}
-            onChange={(e) => setRange({ ...range, from: e.target.value })}
-            title="Desde"
-          />
+          <input type="date" value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} title="Desde"/>
           <span>→</span>
-          <input
-            type="date"
-            value={range.to}
-            onChange={(e) => setRange({ ...range, to: e.target.value })}
-            title="Hasta"
-          />
+          <input type="date" value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })} title="Hasta"/>
 
-          {/* Aplicar rango (recarga primera página) */}
           <button type="button" onClick={applyRange} title="Aplicar rango">
             Aplicar
           </button>
 
-          {/* Recargar primera página */}
           <button type="button" onClick={reloadAll} title="Recargar">
             ⟳
           </button>

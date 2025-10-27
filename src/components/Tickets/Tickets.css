@@ -1,80 +1,122 @@
-/* ===== Forzar tema CLARO en TablaTickets (CSS puro) ===== */
-.tabla-tickets{
-  /* Fuerza controles nativos (inputs/selects) en claro */
+.tabla-tickets {
+  /* Forzamos MODO CLARO dentro del módulo */
   color-scheme: light;
-  isolation: isolate;                 /* evita inversiones heredadas */
-  background: var(--bg) !important;
+  isolation: isolate;
+
+  /* Tokens base (LIGHT) */
+  --bg: #ffffff;
+  --card: #f8fafc;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #2563eb;
+  --ring: #93c5fd;
+  --shadow: 0 8px 24px rgba(2, 6, 23, .08);
+
+  background: transparent;
   color: var(--text);
 }
 
-/* Barra de filtros siempre clara */
-.tabla-tickets .filtros,
-.tabla-tickets .filtros input[type="text"],
-.tabla-tickets .filtros input[type="date"],
-.tabla-tickets .filtros select,
-.tabla-tickets .filtros button{
+/* =========================================================
+= 2) BARRA DE FILTROS (inputs, selects, botones)
+   - Apariencia consistente y foco accesible
+========================================================= */
+.tabla-tickets .filtros, .tabla-tickets .filtros input[type="text"], .tabla-tickets .filtros input[type="date"], .tabla-tickets .filtros select, .tabla-tickets .filtros button {
   background: var(--bg) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
 }
 
-.tabla-tickets .filtros input::placeholder{ color: var(--muted) !important; }
-.tabla-tickets .filtros input:focus,
-.tabla-tickets .filtros select:focus{
+.tabla-tickets .filtros input::placeholder {
+  color: var(--muted) !important;
+}
+
+.tabla-tickets .filtros input:focus, .tabla-tickets .filtros select:focus, .tabla-tickets .filtros button:focus-visible {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px rgba(147,197,253,.35) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring) 70%, transparent) !important;
   outline: none !important;
 }
 
-/* Contenedor de tabla y celdas */
-.tabla-tickets .table-wrap{
+/* =========================================================
+= 3) TABLA (wrap, cabecera, cuerpo, filas, hover)
+========================================================= */
+.tabla-tickets .table-wrap {
   background: var(--bg) !important;
   border: 1px solid var(--border) !important;
   border-radius: 12px;
   box-shadow: var(--shadow);
+  overflow: hidden; /* evita bordes “cortados” del thead */
 }
-.tabla-tickets table{ color: var(--text); }
-.tabla-tickets thead th{
-  background: #f8fafc !important;      /* equivalente a var(--card) */
+
+.tabla-tickets table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text);
+}
+
+.tabla-tickets thead th {
+  background: var(--card) !important;
   color: var(--text) !important;
   border-bottom: 1px solid var(--border) !important;
+  text-align: left;
 }
-.tabla-tickets tbody td{
+
+.tabla-tickets tbody td {
   border-top: 1px solid var(--border) !important;
   color: var(--text) !important;
 }
-.tabla-tickets tbody tr:nth-child(odd){
-  background: #fbfdff !important;       /* alternado claro */
-}
-.tabla-tickets tbody tr:hover{
-  background: rgba(37,99,235,.08) !important; /* hover claro */
+
+.tabla-tickets tbody tr:nth-child(odd) {
+  background: #fbfdff !important; /* zebra suave */
 }
 
-/* Paginación */
+.tabla-tickets tbody tr:hover {
+  background: color-mix(in srgb, var(--primary) 8%, white) !important;
+}
+
+/* =========================================================
+= 4) PAGINACIÓN (controles junto a .table-wrap)
+========================================================= */
 .tabla-tickets .table-wrap + div button,
-.tabla-tickets .table-wrap + div select{
-  background: #f8fafc !important;
+.tabla-tickets .table-wrap + div select {
+  background: var(--card) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
+  box-shadow: none !important;
 }
-.tabla-tickets .table-wrap + div button[disabled]{
-  background: #f8fafc !important;
+
+.tabla-tickets .table-wrap + div button:hover:not(:disabled) {
+  background: #f3f4f6 !important;
+}
+
+.tabla-tickets .table-wrap + div button:disabled {
+  background: #f9fafb !important;
   color: var(--muted) !important;
-  border-color: var(--border) !important;
+  cursor: not-allowed !important;
 }
 
-/* Chips/indicadores */
-.tabla-tickets .estado-circulo{
+/* =========================================================
+= 5) CHIPS / INDICADORES DE ESTADO
+========================================================= */
+.tabla-tickets .estado-circulo {
   display: inline-block;
-  width: 10px; height: 10px;
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.06);
+  border: 1px solid rgba(0, 0, 0, .06);
 }
 
-/* SVGs e iconos usan el color del texto del módulo */
-.tabla-tickets svg { fill: currentColor; color: var(--text); }
+/* =========================================================
+= 6) ICONOS / SVG (heredan el color del texto)
+========================================================= */
+.tabla-tickets svg {
+  fill: currentColor;
+  color: var(--text);
+}
 
-/* Chrome autofill en claro */
+/* =========================================================
+= 7) AUTOFILL CHROME (mantener modo claro)
+========================================================= */
 .tabla-tickets input:-webkit-autofill,
 .tabla-tickets input:-webkit-autofill:hover,
 .tabla-tickets input:-webkit-autofill:focus {
@@ -83,7 +125,10 @@
   transition: background-color 9999s ease-out 0s;
 }
 
-/* ===== Botones de paginación siempre claros ===== */
+/* =========================================================
+= 8) BOTONES/SELECTS (fallback global dentro del módulo)
+   - Útil si usas botones fuera del contenedor de paginación
+========================================================= */
 .tabla-tickets button,
 .tabla-tickets select {
   background: #fff !important;
@@ -102,16 +147,12 @@
   cursor: not-allowed !important;
 }
 
-/* Fuerza esquema claro */
-.tabla-tickets {
-  color-scheme: light;
-  isolation: isolate;
-}
-
-
-/* Si el SO está en oscuro, re-aplica los tokens claros aquí */
-@media (prefers-color-scheme: dark){
-  .tabla-tickets{
+/* =========================================================
+= 9) PREFERENCIAS DEL SO EN OSCURO (seguimos forzando claro)
+   - Reaplicamos tokens claros por si el SO pide dark
+========================================================= */
+@media (prefers-color-scheme: dark) {
+  .tabla-tickets {
     --bg: #ffffff !important;
     --card: #f8fafc !important;
     --text: #0f172a !important;
@@ -119,8 +160,18 @@
     --border: #e5e7eb !important;
     --primary: #2563eb !important;
     --ring: #93c5fd !important;
-    --shadow: 0 8px 24px rgba(2,6,23,.08) !important;
+    --shadow: 0 8px 24px rgba(2, 6, 23, .08) !important;
+
     background: var(--bg) !important;
     color: var(--text) !important;
+  }
+}
+
+/* =========================================================
+= 10) ACCESIBILIDAD / MOTION (suavizar transiciones)
+========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .tabla-tickets * {
+    transition: none !important;
   }
 }
