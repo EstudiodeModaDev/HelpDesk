@@ -97,7 +97,7 @@
   background: var(--tbl-head) !important;
   color: var(--tbl-text) !important;
   border-bottom: 1px solid var(--tbl-border);
-  text-align: left; padding: 10px 12px; white-space: nowrap; font-weight: 600;
+  text-align: center; padding: 10px 12px; white-space: nowrap; font-weight: 600;
 }
 
 .table-wrap tbody td{ padding: 10px 12px; border-bottom: 1px solid var(--tbl-border); vertical-align: middle; }

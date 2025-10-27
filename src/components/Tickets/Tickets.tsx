@@ -25,7 +25,7 @@ export default function TablaTickets() {
 
   const { Tickets } = useGraphServices();
 
-  const {rows, loading, /*error,*/ filterMode, range, pageSize, pageIndex, hasNext, sorts,
+  const {rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts,
     setFilterMode, setRange, applyRange, setPageSize, nextPage, reloadAll,  toggleSort} = useTickets(Tickets, userMail, isAdmin.isAdmin);
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
@@ -68,9 +68,10 @@ export default function TablaTickets() {
         </div>
       )}
 
-      {/* Estados 
+      {/* Estados */}
+      {loading && <p>Cargando tickets…</p>}
       {error && <p style={{ color: "#b91c1c" }}>{error}</p>}
-      {!error && filtered.length === 0 && <p>No hay tickets para los filtros seleccionados.</p>}*/}
+      {!loading && !error && filtered.length === 0 && <p>No hay tickets para los filtros seleccionados.</p>}
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
