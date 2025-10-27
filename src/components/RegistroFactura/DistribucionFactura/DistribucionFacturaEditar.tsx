@@ -84,29 +84,30 @@ export default function DistribucionFacturaEditar({
       await serviceDist.update(String(distribucion.Id), cambiosDist);
 
       // 🔹 Intentar actualizar también en Facturas (si existe vínculo)
-      try {
+        try {
+        // Buscar por el número ORIGINAL de la distribución
         const posiblesFacturas = await serviceFact.getAll({
-          filter: `fields/NoFactura eq '${formData.NoFactura}'`,
+            filter: `fields/NoFactura eq '${distribucion.NoFactura}'`,
         });
 
         const facturaRelacionada = posiblesFacturas.items?.[0];
 
         if (facturaRelacionada?.id0 != null) {
-          const cambiosFactura = limpiarDatos({
+            const cambiosFactura = limpiarDatos({
             FechaEmision: formData.FechaEmision || null,
-            NoFactura: formData.NoFactura,
+            NoFactura: formData.NoFactura, // <- nuevo número
             CargoFijo: Number(formData.CargoFijo),
-          });
-          await serviceFact.update(String(facturaRelacionada.id0), cambiosFactura);
+            });
+
+            await serviceFact.update(String(facturaRelacionada.id0), cambiosFactura);
+            console.log(`✅ Factura actualizada: ${formData.NoFactura}`);
         } else {
-          console.warn("⚠️ No se encontró factura relacionada con ese número.");
+            console.warn("⚠️ No se encontró factura relacionada con el número original.");
         }
-      } catch (err) {
-        console.warn(
-          "⚠️ Error al intentar actualizar factura relacionada:",
-          err
-        );
-      }
+        } catch (err) {
+        console.warn("⚠️ Error al intentar actualizar factura relacionada:", err);
+        }
+
 
       onGuardar?.();
       onClose();
