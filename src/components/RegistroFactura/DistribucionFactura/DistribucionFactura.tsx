@@ -7,6 +7,7 @@ import { useDistribucionFactura } from "../../../Funcionalidades/DistribucionFac
 import { formatPesosEsCO, toNumberFromEsCO } from "../../../utils/Number";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import DistribucionesLista from "./DistribucionesLista"; // ✅ Importamos la lista
+import { useAuth } from "../../../auth/authContext";
 
 export default function DistribucionFactura() {
   const { proveedores, loading, error } = useProveedores();
@@ -114,6 +115,7 @@ export default function DistribucionFactura() {
   // 🧾 Guardar registro único + generar 4 facturas relacionadas
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const { account } = useAuth(); // <-- aquí asegúrate de tenerlo
     try {
       if (!formData.Proveedor || !formData.Title) {
         alert("⚠️ Por favor selecciona un proveedor antes de guardar.");
@@ -166,12 +168,12 @@ export default function DistribucionFactura() {
       };
 
       // 🔹 Facturas relacionadas
-      const facturasData = [
-        { ...formData, CC: formData.CCmn, ValorAnIVA: formData.CosTotMarNacionales },
-        { ...formData, CC: formData.CCmi, ValorAnIVA: formData.CosTotMarImpor },
-        { ...formData, CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI },
-        { ...formData, CC: formData.CCsa, ValorAnIVA: formData.CosTotServAdmin },
-      ];
+     const facturasData = [
+  { ...formData, CC: formData.CCmn, ValorAnIVA: formData.CosTotMarNacionales, RegistradoPor: account?.name ?? "" },
+  { ...formData, CC: formData.CCmi, ValorAnIVA: formData.CosTotMarImpor, RegistradoPor: account?.name ?? "" },
+  { ...formData, CC: formData.CCcedi, ValorAnIVA: formData.CosTotCEDI, RegistradoPor: account?.name ?? "" },
+  { ...formData, CC: formData.CCsa, ValorAnIVA: formData.CosTotServAdmin, RegistradoPor: account?.name ?? "" },
+];
 
       for (const factura of facturasData) {
         await registrarFactura(limpiarCampos(factura));
