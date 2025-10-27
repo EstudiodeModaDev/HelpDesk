@@ -16,6 +16,12 @@ export type FlowToUser = {
   mail: boolean
 };
 
+export type conectorFacturas = {
+  InitialDate: string;
+  FinalDate: string;
+  user: string;
+}
+
 export type AdjuntoPayload = {
   name: string;
   size: number;

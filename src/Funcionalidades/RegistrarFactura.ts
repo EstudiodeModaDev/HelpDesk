@@ -4,6 +4,8 @@ import { useGraphServices } from "../graph/GrapServicesContext";
 import type { ReFactura } from "../Models/RegistroFacturaInterface";
 import { useAuth } from "../auth/authContext";
 import { FacturasService } from "../Services/Facturas.service";
+import { FlowClient } from "./FlowClient";
+import type { conectorFacturas } from "../Models/FlujosPA";
 
 const toMs = (v: string | number | Date | null | undefined) =>
   v == null ? -Infinity : new Date(v).getTime();
@@ -14,16 +16,13 @@ export function useFacturas() {
   const { account } = useAuth();
   account?.name
 
-  // Creamos una instancia del servicio de facturas (que se conecta a SharePoint)
   const service = useMemo(() => new FacturasService(graph), [graph]);
-
-  // Estado local del hook
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9a72962755ff499897a60603bf97337c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Zg3IBn51rBif8_R-Du4q2Z3TpfkKP-xdNXQQ3IEKkac")
+  
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-
-  // 🟢 Función para obtener todas las facturas registradas
   const obtenerFacturas = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -45,7 +44,6 @@ export function useFacturas() {
     }
   }, [service]);
 
-  // 🟢 Función para registrar una nueva factura
   const registrarFactura = useCallback(async (f: Omit<ReFactura, "id0">) => {
     setLoading(true);
     setError(null);
@@ -66,10 +64,19 @@ export function useFacturas() {
     }
   }, [service]);
 
-  // ⚡ Carga inicial de facturas al montar el componente
   useEffect(() => {
     void obtenerFacturas();
   }, [obtenerFacturas]);
+
+  const handleConector = async (/*InitialDate: string, finalDate: string,*/) => {
+    
+    try {
+      await notifyFlow.invoke<conectorFacturas, any>({InitialDate: "2025-01-01", FinalDate: "2025-11-01", user: account?.username ?? "" });
+
+    } catch (err) {
+        console.error("Ha ocurrido un error descargando el conector:", err);
+      } 
+    };
 
   // Retornamos el estado y las funciones públicas del hook
   return {
@@ -78,6 +85,7 @@ export function useFacturas() {
     error,
     obtenerFacturas,
     registrarFactura,
+    handleConector
   };
 }
 

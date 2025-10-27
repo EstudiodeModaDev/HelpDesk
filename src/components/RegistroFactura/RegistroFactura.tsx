@@ -447,7 +447,7 @@ export default function RegistroFactura() {
     };
     fetchCompras();
   }, []);
-  const { registrarFactura } = useFacturas();
+  const { registrarFactura, handleConector } = useFacturas();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -575,12 +575,11 @@ return (
     {/* ✅ Si se pide mostrar el formulario de Distribución, lo mostramos */}
     {mostrarDistribucion ? (
       <>
-        <button
-          type="button"
-          className="btn-volver"
-          onClick={() => setMostrarDistribucion(false)}
-        >
+        <button type="button" className="btn-volver" onClick={() => setMostrarDistribucion(false)}>
           🔙 Volver al registro de factura
+        </button>
+        <button type="button" className="btn-volver" onClick={() => handleConector()}>
+          Prueba conector
         </button>
         <DistribucionFactura />
       </>
