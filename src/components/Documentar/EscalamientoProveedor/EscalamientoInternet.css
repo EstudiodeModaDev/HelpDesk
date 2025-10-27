@@ -169,3 +169,68 @@
   user-select: none;
   color: #0f172a !important;
 }
+
+/* 0) Gana por orden: pon este bloque DESPUÉS de cualquier Seguimiento.css/Ticket.css */
+
+/* 1) Aislar y forzar claro de forma agresiva */
+.esc-form{
+  color-scheme: light !important;
+  isolation: isolate;
+  background: #fff !important;
+  color: #111827 !important;
+}
+
+/* 2) Neutralizar reglas globales tipo `.dark *` o `form{background:...}` */
+.dark .esc-form,
+.dark .esc-form *{
+  color-scheme: light !important;
+}
+.esc-form *{ box-sizing: border-box; min-width: 0; }
+
+/* 3) El culpable suele ser un selector genérico contra `form`. 
+      Súbele la especificidad al tuyo y fuerza fondo claro */
+.esc-form > form.esc-card,
+.esc-form form.esc-card{
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(30,41,59,0.08) !important;
+}
+
+/* 4) Si algún lib aplica fondo a TODO hijo (p. ej. .prose, tailwind dark:bg-*)
+      mantén tus campos y áreas transparentes sobre la tarjeta blanca */
+.esc-form .esc-card > *{
+  background: transparent !important;
+}
+
+/* 5) Inputs/selects/textarea: colores claros y foco coherente */
+.esc-form :is(.esc-input, input, select, textarea){
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid rgba(0,0,0,0.12) !important;
+  border-radius: 8px !important;
+}
+.esc-form :is(.esc-input, input, select, textarea):focus{
+  outline: 2px solid rgba(0,0,0,0.25) !important;
+  outline-offset: 2px;
+}
+
+/* 6) Botones */
+.esc-form .esc-button{
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid rgba(0,0,0,0.12) !important;
+}
+.esc-form .esc-primary{
+  background: #1d7167 !important;
+  color: #fff !important;
+}
+
+/* 7) Adjuntos */
+.esc-form .esc-attachments-box{
+  background: #fff !important;
+  border: 2px solid #132b7a !important;
+}
+
+/* 8) Cinturón de seguridad contra overflow por gradientes/sticky/etc */
+.esc-form{ max-width: 100%; overflow-x: hidden; }
