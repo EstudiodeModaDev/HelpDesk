@@ -36,17 +36,14 @@
 
 /* ====== ANCHO EXTRA (ACTÍVALO CON .ticket-form--xl) ====== */
 .ticket-form--xl{
-  /* Más ancho sin desbordar pantallas pequeñas */
   max-width: none;
   width: clamp(1040px, 74vw, 1280px);
 }
 
-/* Si quieres todavía un poco más ancho en pantallas grandes, descomenta: */
-/*
 @media (min-width: 1600px){
   .ticket-form--xl { width: clamp(1200px, 62vw, 1440px); }
 }
-*/
+
 
 /* ====== CAMPOS Y GRID ====== */
 .tf-title {
