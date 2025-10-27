@@ -57,10 +57,8 @@
    3) BARRA DE FILTROS (mismo ancho que la tabla)
    ========================================================= */
 .tabla-tickets > .filtros{
-  display: grid !important;
-  gap: 8px;
-  grid-template-columns: 1fr repeat(6, auto);
-  align-items: center;
+  margin: 0 !important; 
+  padding: 8px;
 }
 
 .tabla-tickets[data-force-light], .tabla-tickets[data-force-light] * {
@@ -191,12 +189,21 @@
   border: 1px solid rgba(0,0,0,.1);
 }
 
+.tabla-tickets > p{
+  margin: 0 !important;
+}
+
+.tabla-tickets > .filtros.toolbar,
+.tabla-tickets > .filtros.card{
+  margin: 0 !important;
+}
+
 /* =========================================================
    5) PAGINACIÓN
    ========================================================= */
 .tabla-tickets .table-wrap + div{
   width: min(100%, var(--tbl-max));
-  margin: 8px auto 0;
+  margin-top: 10px !important;
 }
 
 .tabla-tickets .table-wrap + div button, .tabla-tickets .table-wrap + div select{
