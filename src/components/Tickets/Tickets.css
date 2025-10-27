@@ -95,10 +95,10 @@
   background: var(--tbl-head) !important;
   color: var(--tbl-text) !important;
   border-bottom: 1px solid var(--tbl-border);
-  text-align: center; padding: 10px 12px; white-space: nowrap; font-weight: 600;
+  text-align: left; padding: 10px 12px; white-space: nowrap; font-weight: 600;
 }
 
-.table-wrap tbody td{ padding: 10px 12px; border-bottom: 1px solid var(--tbl-border); vertical-align: middle; }
+.table-wrap tbody td{ padding: 10px 12px; border-bottom: 1px solid var(--tbl-border);   vertical-align: middle; text-align: left; }
 
 .table-wrap tbody tr:nth-child(odd){  background: var(--tbl-odd) !important; }
 .table-wrap tbody tr:nth-child(even){ background: var(--tbl-even) !important; }
