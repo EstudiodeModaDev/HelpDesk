@@ -136,11 +136,38 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
     e.preventDefault();
 
     try {
-      // 1) Validaciones
-      if (!formData.Proveedor || !formData.Title) {
-        alert("⚠️ Por favor selecciona un proveedor y un título antes de guardar.");
-        return;
-      }
+  // 1) Validaciones
+  if (!formData.Proveedor || !formData.Title) {
+    alert("⚠️ Por favor selecciona un proveedor y un título antes de guardar.");
+    return;
+  }
+  
+  if (formData.CargoFijo <= 0) {
+    alert("⚠️ El Cargo Fijo debe ser mayor que cero.");
+    return;
+  }
+
+  if (
+    formData.ImpBnCedi <= 0 &&
+    formData.ImpBnPalms <= 0 &&
+    formData.ImpColorPalms <= 0 &&
+    formData.ImpBnCalle <= 0 &&
+    formData.ImpColorCalle <= 0
+  ) {
+    alert("⚠️ Por favor ingresa al menos un valor mayor que cero en las impresiones.");
+    return;
+  }
+
+  if (!formData.FechaEmision) {
+    alert("⚠️ Por favor ingresa la fecha de emisión.");
+    return;
+  }
+
+  if (!formData.NoFactura.trim()) {
+    alert("⚠️ Por favor ingresa el número de factura.");
+    return;
+  }
+
 
       const sumaCostos =
         (formData.ImpBnCedi ?? 0) +
@@ -168,7 +195,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
         copia.RegistradoPor = src.RegistradoPor ?? account?.name ?? "";
           // ✅ Asegurar que la fecha se envíe como tipo Date o ISO
           if (src.FechaEmision) {
-            copia.FechaEmision = new Date(src.FechaEmision).toISOString(); // ← formato ISO seguro
+             copia.FechaEmision = src.FechaEmision;
           }
         return copia;
       };
@@ -186,7 +213,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
 
               // ✅ Convertir fecha antes de enviar
         if (formData.FechaEmision) {
-          distribucion.FechaEmision = new Date(formData.FechaEmision).toISOString();
+          distribucion.FechaEmision = formData.FechaEmision;
         }
 
       const res = await registrarDistribucion(distribucion);
