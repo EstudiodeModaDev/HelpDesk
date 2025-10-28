@@ -1,5 +1,5 @@
 // src/components/DistribucionFactura/DistribucionFacturaEditar.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
 import { FacturasService } from "../../../Services/Facturas.service";
@@ -30,18 +30,26 @@ export default function DistribucionFacturaEditar({
       : "",
     NoFactura: distribucion.NoFactura ?? "",
     CargoFijo: distribucion.CargoFijo ?? 0,
+    CosToImp: distribucion.CosToImp ?? 0,
     ImpBnCedi: distribucion.ImpBnCedi ?? 0,
     ImpBnPalms: distribucion.ImpBnPalms ?? 0,
     ImpColorPalms: distribucion.ImpColorPalms ?? 0,
     ImpBnCalle: distribucion.ImpBnCalle ?? 0,
     ImpColorCalle: distribucion.ImpColorCalle ?? 0,
+
+    // Valores calculados
+    ValorAnIVA: distribucion.ValorAnIVA ?? 0,
+    CosTotCEDI: distribucion.CosTotCEDI ?? 0,
+    CosTotMarNacionales: distribucion.CosTotMarNacionales ?? 0,
+    CosTotMarImpor: distribucion.CosTotMarImpor ?? 0,
+    CosTotServAdmin: distribucion.CosTotServAdmin ?? 0,
   });
 
   // 🔹 Función para actualizar campos del form
   const setField = <K extends keyof typeof formData>(k: K, v: typeof formData[K]) =>
     setFormData((s) => ({ ...s, [k]: v }));
 
-  // ✅ Limpia los datos antes de enviarlos al servicio (evita undefined o NaN)
+  // ✅ Limpieza de datos antes de enviar
   const limpiarDatos = (obj: Record<string, any>) => {
     const limpio: Record<string, any> = {};
     for (const [k, v] of Object.entries(obj)) {
@@ -53,7 +61,48 @@ export default function DistribucionFacturaEditar({
     return limpio;
   };
 
-  // 🧾 Guardar cambios
+  // 🧮 Recalcular campos derivados cada vez que cambia algo
+  useEffect(() => {
+    const parse = (v: unknown) =>
+      typeof v === "number"
+        ? v
+        : typeof v === "string"
+        ? Number(v.replace(/\./g, "").replace(",", ".")) // "es-CO"
+        : 0;
+
+    const CargoFijo = parse(formData.CargoFijo);
+    const ImpBnCedi = parse(formData.ImpBnCedi);
+    const ImpBnPalms = parse(formData.ImpBnPalms);
+    const ImpColorPalms = parse(formData.ImpColorPalms);
+    const ImpBnCalle = parse(formData.ImpBnCalle);
+    const ImpColorCalle = parse(formData.ImpColorCalle);
+
+    const CosToImp = ImpBnCedi + ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle;
+    const cargoFijo3 = CargoFijo - CargoFijo / 3;
+    const ValorAnIVA = CargoFijo + CosToImp;
+    const CosTotCEDI = CargoFijo / 3 + ImpBnCedi;
+    const promedioOtros = (ImpBnPalms + ImpColorPalms + ImpBnCalle + ImpColorCalle) / 3;
+    const otrosCostos = cargoFijo3 / 3 + promedioOtros;
+
+    setFormData((prev) => ({
+      ...prev,
+      CosToImp,
+      ValorAnIVA,
+      CosTotCEDI,
+      CosTotMarNacionales: otrosCostos,
+      CosTotMarImpor: otrosCostos,
+      CosTotServAdmin: otrosCostos,
+    }));
+  }, [
+    formData.CargoFijo,
+    formData.ImpBnCedi,
+    formData.ImpBnPalms,
+    formData.ImpColorPalms,
+    formData.ImpBnCalle,
+    formData.ImpColorCalle,
+  ]);
+
+  // 🧾 Guardar cambios (actualiza distribución + facturas relacionadas)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -64,67 +113,66 @@ export default function DistribucionFacturaEditar({
     }
 
     try {
-      // 🔹 1️⃣ Preparar los cambios de la distribución
+      // 🔹 1️⃣ Actualizar distribución
       const cambiosDist = limpiarDatos({
         FechaEmision: formData.FechaEmision || null,
         NoFactura: formData.NoFactura,
-        CargoFijo: Number(formData.CargoFijo),
-        ImpBnCedi: Number(formData.ImpBnCedi),
-        ImpBnPalms: Number(formData.ImpBnPalms),
-        ImpColorPalms: Number(formData.ImpColorPalms),
-        ImpBnCalle: Number(formData.ImpBnCalle),
-        ImpColorCalle: Number(formData.ImpColorCalle),
+        CargoFijo: formData.CargoFijo,
+        CosToImp: formData.CosToImp,
+        ImpBnCedi: formData.ImpBnCedi,
+        ImpBnPalms: formData.ImpBnPalms,
+        ImpColorPalms: formData.ImpColorPalms,
+        ImpBnCalle: formData.ImpBnCalle,
+        ImpColorCalle: formData.ImpColorCalle,
+        ValorAnIVA: formData.ValorAnIVA,
+        CosTotCEDI: formData.CosTotCEDI,
+        CosTotMarNacionales: formData.CosTotMarNacionales,
+        CosTotMarImpor: formData.CosTotMarImpor,
+        CosTotServAdmin: formData.CosTotServAdmin,
       });
 
-      console.log("📦 Enviando datos limpios a SharePoint:", cambiosDist);
-
-      // 🔹 2️⃣ Actualizar la distribución principal
+      console.log("📦 Actualizando distribución con:", cambiosDist);
       await serviceDist.update(String(distribucion.Id), cambiosDist);
       console.log("✅ Distribución actualizada correctamente.");
 
-      // 🔹 3️⃣ Buscar facturas relacionadas por IdDistribuida
-      // 🔹 3️⃣ Buscar facturas relacionadas por IdDistribuida (que apunta al Id de la distribución actual)
-        if (!distribucion.Id) {
-        console.warn("⚠️ No hay Id de distribución para buscar facturas relacionadas.");
-        } else {
-        const filtro = `fields/IdDistrubuida eq ${distribucion.Id}`;
+      // 🔹 2️⃣ Buscar facturas relacionadas
+      const filtro = `fields/IdDistrubuida eq ${distribucion.Id}`;
+      const posiblesFacturas = await serviceFact.getAll({ filter: filtro });
+      const facturasRelacionadas = posiblesFacturas.items || [];
 
-        const posiblesFacturas = await serviceFact.getAll({ filter: filtro });
-        const facturasRelacionadas = posiblesFacturas.items || [];
+      if (facturasRelacionadas.length === 0) {
+        console.warn("⚠️ No se encontraron facturas relacionadas con ese IdDistrubuida.");
+      } else {
+        console.log(`📄 Se encontraron ${facturasRelacionadas.length} facturas con IdDistrubuida=${distribucion.Id}`);
 
-       if (facturasRelacionadas.length > 0) {
-            console.log(
-                `📄 Se encontraron ${facturasRelacionadas.length} facturas con IdDistrubuida=${distribucion.Id}`
-            );
+        // 🔹 3️⃣ Determinar valores por tipo de factura
+        const partidas = [
+          { tipo: "CCmn", ValorAnIVA: formData.CosTotMarNacionales },
+          { tipo: "CCmi", ValorAnIVA: formData.CosTotMarImpor },
+          { tipo: "CCcedi", ValorAnIVA: formData.CosTotCEDI },
+          { tipo: "CCsa", ValorAnIVA: formData.CosTotServAdmin },
+        ];
 
-            // 🔹 4️⃣ Armar cambios a aplicar a todas las facturas
-            const cambiosFactura = limpiarDatos({
-                FechaEmision: formData.FechaEmision || null,
-                NoFactura: formData.NoFactura,
-                CargoFijo: Number(formData.CargoFijo),
-                ImpBnCedi: Number(formData.ImpBnCedi),
-                ImpBnPalms: Number(formData.ImpBnPalms),
-                ImpColorPalms: Number(formData.ImpColorPalms),
-                ImpBnCalle: Number(formData.ImpBnCalle),
-                ImpColorCalle: Number(formData.ImpColorCalle),
-            });
+        // 🔁 4️⃣ Actualizar cada factura
+        for (let i = 0; i < facturasRelacionadas.length; i++) {
+          const factura = facturasRelacionadas[i];
+          const partida = partidas[i] || partidas[0];
 
+          const cambiosFactura = limpiarDatos({
+            FechaEmision: formData.FechaEmision || null,
+            NoFactura: formData.NoFactura,
+            ValorAnIVA: partida.ValorAnIVA,
+          });
 
-          // 🔁 5️⃣ Actualizar cada factura
-          for (const factura of facturasRelacionadas) {
-            if (factura.id0 != null) {
-              await serviceFact.update(String(factura.id0), cambiosFactura);
-              console.log(`🧾 Factura ${factura.id0} actualizada.`);
-            }
+          if (factura.id0 != null) {
+            await serviceFact.update(String(factura.id0), cambiosFactura);
+            console.log(`🧾 Factura ${factura.id0} actualizada.`);
           }
-
-          console.log(`✅ ${facturasRelacionadas.length} factura(s) actualizadas correctamente.`);
-        } else {
-          console.warn("⚠️ No se encontraron facturas relacionadas con ese IdDistribuida.");
         }
+
+        console.log(`✅ ${facturasRelacionadas.length} factura(s) actualizadas correctamente.`);
       }
 
-      // 🔹 6️⃣ Finalizar
       onGuardar?.();
       onClose();
     } catch (err) {
