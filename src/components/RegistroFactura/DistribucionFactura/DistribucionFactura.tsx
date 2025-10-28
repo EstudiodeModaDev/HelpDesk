@@ -166,7 +166,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
         const copia = { ...src };
         EXCLUIR_EN_FACTURA.forEach((k) => delete (copia as any)[k]);
         copia.RegistradoPor = src.RegistradoPor ?? account?.name ?? "";
-        copia.FechaEmision = null
+        // copia.FechaEmision = null
         return copia;
       };
 
