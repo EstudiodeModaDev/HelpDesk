@@ -72,7 +72,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
   return (
     <section className="case-detail">
-      {/* Encabezado */}
+
       <header className="cd-header">
         <h2 className="cd-title">Caso – ID {selected.ID}</h2>
         <button type="button" className="btn-volver" onClick={onVolver}>
@@ -80,61 +80,29 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         </button>
       </header>
 
-      {/* Grid de 3 columnas */}
       <div className="cd-grid">
-        {/* Columna 1 */}
-        <div className="cd-panel">
-          <Row label="Fecha de Apertura">
-            <span className="cd-pill">{formatYYYYMMDD(new Date(selected.FechaApertura  ?? ""))?? "—"}</span>
-          </Row>
-
-          <Row label="Fecha de solución">
-            <span>{formatYYYYMMDD(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span>
-          </Row>
-
+          <Row label="Fecha de Apertura"><span className="cd-pill">{formatYYYYMMDD(new Date(selected.FechaApertura  ?? ""))?? "—"}</span></Row>
+          <Row label="Fecha de solución"><span>{formatYYYYMMDD(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span></Row>
           <hr className="cd-div" />
-
           <Row label="Estado">
             <div className="cd-inline">
-              <span
-                className={`cd-badge ${
-                  selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"
-                }`}
-              >
+              <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
                 {selected.Estadodesolicitud}
               </span>
             </div>
           </Row>
-
-          <Row label="ANS">
-            <span>{selected.ANS ?? "—"}</span>
-          </Row>
-        </div>
-
-        {/* Columna 2 */}
-        <div className="cd-panel">
+          <Row label="ANS"><span>{selected.ANS ?? "—"}</span></Row>
           <Row label="Categoría">
             {canRecategorizar ? (
-              <button
-                type="button"
-                className="as-text"
-                title="Recategorizar ticket"
-                onClick={() => setShowRecat(true)}
-              >
+              <button type="button" className="as-text" title="Recategorizar ticket" onClick={() => setShowRecat(true)}>
                 {categoria || "–"}
               </button>
             ) : (
               <span>{categoria || "–"}</span>
             )}
           </Row>
+          <Row label="Fuente solicitante"><span>{selected.Fuente ?? "—"}</span></Row>
 
-          <Row label="Fuente solicitante">
-            <span>{selected.Fuente ?? "—"}</span>
-          </Row>
-        </div>
-
-        {/* Columna 3 */}
-        <div className="cd-panel cd-col3">
           {/* Franja de 4 columnas */}
           <div className="cd-people">
             <div className="cd-people-item">
@@ -151,12 +119,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
               <div className="cd-people-label">Observador</div>
               <div className="cd-people-value">
                 {canRecategorizar ? (
-                  <button
-                    type="button"
-                    className="as-text"
-                    title="Asignar observador"
-                    onClick={() => setShowObservador(true)}
-                  >
+                  <button type="button" className="as-text" title="Asignar observador" onClick={() => setShowObservador(true)}>
                     {selected.Observador || "–"}
                   </button>
                 ) : (
@@ -171,12 +134,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
               <div className="cd-people-label">Resolutor</div>
               <div className="cd-people-value">
                 {canRecategorizar ? (
-                  <button
-                    type="button"
-                    className="as-text"
-                    title="Reasignar ticket"
-                    onClick={() => setShowReasig(true)}
-                  >
+                  <button type="button" className="as-text" title="Reasignar ticket" onClick={() => setShowReasig(true)}>
                     {selected.Nombreresolutor || "–"}
                   </button>
                 ) : (
@@ -199,7 +157,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
               <span>—</span>
             </Row>
           </div>
-        </div>
+
       </div>
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}

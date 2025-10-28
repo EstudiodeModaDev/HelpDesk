@@ -14,17 +14,6 @@
   --cd-yellow-border: #e0b84a;
 }
 
-.case-detail{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.25;
-  color: var(--cd-ink);
-  background: var(--cd-bg);
-  border: 1px solid var(--cd-border);
-  border-radius: 6px;
-  padding: 12px;
-  margin: 0 auto;
-}
 
 /* ====== Header ====== */
 .cd-header{
