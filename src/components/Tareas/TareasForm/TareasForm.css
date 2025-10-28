@@ -230,7 +230,7 @@
 
 .ft-form .rs__control input,
 .ft-form .rs__control input:focus{
-  background: none !important;           /* quita el rectángulo blanco */
+  background: none !important;          
   box-shadow: none !important;
   outline: none !important;
 }
