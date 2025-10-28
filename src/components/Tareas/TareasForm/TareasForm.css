@@ -161,15 +161,24 @@
   background: var(--field-bg) !important;
   box-shadow: none !important;
 }
+
 .rs__control--is-focused{
-  box-shadow: none !important;
-  box-shadow: 0 0 0 4px var(--ring) !important;
-  background: #fff !important;
+  outline: none;
+  border-color: var(--link);                 /* opcional */
+  box-shadow: 0 0 0 3px rgba(37,99,235,.25) !important; /* anillo externo */
+  /* Asegura que no haya recorte raro del fondo */
+  background-clip: padding-box;
 }
+
 .rs__control--is-disabled{
   background: var(--field-bg-disabled) !important;
   color: #94a3b8 !important;
   cursor: not-allowed !important;
+}
+
+.lt-scope input:focus, .lt-scope select:focus {
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* Placeholder / single value */
