@@ -56,7 +56,6 @@
   padding: 20px;
   /* espacio superior extra para que el select no tape el contenido */
   padding-top: 72px;
-  max-width: 920px;
   width: 100%;
   box-sizing: border-box;
 }
