@@ -16,7 +16,7 @@ export default function TareasPage() {
     <div className="tareas-page">
       <FormTarea />
       <ListaTareas/>
-      <ActivityStatusCard percent={percentaje} tasks={monthlyItems} tasksPerWeek={0}/>
+      <ActivityStatusCard percent={percentaje} tasks={monthlyItems} tasksPerWeek={5}/>
     </div>
   );
 }
