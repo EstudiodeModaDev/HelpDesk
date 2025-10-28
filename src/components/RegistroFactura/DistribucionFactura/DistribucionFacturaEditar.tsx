@@ -23,6 +23,7 @@ export default function DistribucionFacturaEditar({
   const serviceDist = new DistribucionFacturaService(graph);
   const serviceFact = new FacturasService(graph);
 
+  // 🧮 Estado local con los campos editables
   const [formData, setFormData] = useState({
     FechaEmision: distribucion.FechaEmision
       ? new Date(distribucion.FechaEmision).toISOString().split("T")[0]
@@ -36,27 +37,23 @@ export default function DistribucionFacturaEditar({
     ImpColorCalle: distribucion.ImpColorCalle ?? 0,
   });
 
-  const setField = <K extends keyof typeof formData>(
-    k: K,
-    v: typeof formData[K]
-  ) => setFormData((s) => ({ ...s, [k]: v }));
+  // 🔹 Función para actualizar campos del form
+  const setField = <K extends keyof typeof formData>(k: K, v: typeof formData[K]) =>
+    setFormData((s) => ({ ...s, [k]: v }));
 
-  // ✅ Limpia los datos antes de enviarlos al servicio
+  // ✅ Limpia los datos antes de enviarlos al servicio (evita undefined o NaN)
   const limpiarDatos = (obj: Record<string, any>) => {
     const limpio: Record<string, any> = {};
     for (const [k, v] of Object.entries(obj)) {
       if (v === undefined) continue;
-      if (v === "") {
-        limpio[k] = null;
-      } else if (typeof v === "number" && isNaN(v)) {
-        limpio[k] = 0;
-      } else {
-        limpio[k] = v;
-      }
+      if (v === "") limpio[k] = null;
+      else if (typeof v === "number" && isNaN(v)) limpio[k] = 0;
+      else limpio[k] = v;
     }
     return limpio;
   };
 
+  // 🧾 Guardar cambios
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -67,7 +64,7 @@ export default function DistribucionFacturaEditar({
     }
 
     try {
-      // 🔹 Preparar cambios y limpiar datos
+      // 🔹 1️⃣ Preparar los cambios de la distribución
       const cambiosDist = limpiarDatos({
         FechaEmision: formData.FechaEmision || null,
         NoFactura: formData.NoFactura,
@@ -81,59 +78,64 @@ export default function DistribucionFacturaEditar({
 
       console.log("📦 Enviando datos limpios a SharePoint:", cambiosDist);
 
+      // 🔹 2️⃣ Actualizar la distribución principal
       await serviceDist.update(String(distribucion.Id), cambiosDist);
+      console.log("✅ Distribución actualizada correctamente.");
 
-      // 🔹 Intentar actualizar también en Facturas (si existe vínculo)
-      // 🔹 Intentar actualizar también en Facturas (si existen vínculos)
-try {
-  const posiblesFacturas = await serviceFact.getAll({
-    filter: `fields/NoFactura eq '${formData.NoFactura}'`,
-  });
+      // 🔹 3️⃣ Buscar facturas relacionadas por IdDistribuida
+      if (!distribucion.IdDistribuida) {
+        console.warn("⚠️ No hay IdDistribuida para buscar facturas relacionadas.");
+      } else {
+        const filtro = `fields/IdDistribuida eq ${distribucion.IdDistribuida}`;
+        const posiblesFacturas = await serviceFact.getAll({ filter: filtro });
+        const facturasRelacionadas = posiblesFacturas.items || [];
 
-  const facturasRelacionadas = posiblesFacturas.items || [];
+        if (facturasRelacionadas.length > 0) {
+          console.log(`📄 Se encontraron ${facturasRelacionadas.length} facturas con IdDistribuida=${distribucion.IdDistribuida}`);
 
-  if (facturasRelacionadas.length > 0) {
-    const cambiosFactura = limpiarDatos({
-      FechaEmision: formData.FechaEmision || null,
-      NoFactura: formData.NoFactura,
-      // Solo los campos que existan en la lista Facturas
-    });
+          // 🔹 4️⃣ Armar cambios a aplicar a todas las facturas
+          const cambiosFactura = limpiarDatos({
+            FechaEmision: formData.FechaEmision || null,
+            NoFactura: formData.NoFactura,
+            CargoFijo: Number(formData.CargoFijo),
+            ImpBnCedi: Number(formData.ImpBnCedi),
+            ImpBnPalms: Number(formData.ImpBnPalms),
+            ImpColorPalms: Number(formData.ImpColorPalms),
+            ImpBnCalle: Number(formData.ImpBnCalle),
+            ImpColorCalle: Number(formData.ImpColorCalle),
+          });
 
-    // 🔁 Actualizar todas las facturas relacionadas
-    for (const factura of facturasRelacionadas) {
-      if (factura.id0 != null) {
-        await serviceFact.update(String(factura.id0), cambiosFactura);
+          // 🔁 5️⃣ Actualizar cada factura
+          for (const factura of facturasRelacionadas) {
+            if (factura.id0 != null) {
+              await serviceFact.update(String(factura.id0), cambiosFactura);
+              console.log(`🧾 Factura ${factura.id0} actualizada.`);
+            }
+          }
+
+          console.log(`✅ ${facturasRelacionadas.length} factura(s) actualizadas correctamente.`);
+        } else {
+          console.warn("⚠️ No se encontraron facturas relacionadas con ese IdDistribuida.");
+        }
       }
-    }
 
-    console.log(`✅ ${facturasRelacionadas.length} factura(s) actualizadas correctamente.`);
-  } else {
-    console.warn("⚠️ No se encontraron facturas relacionadas con ese número.");
-  }
-} catch (err) {
-  console.warn("⚠️ Error al intentar actualizar facturas relacionadas:", err);
-}
-
-
-
+      // 🔹 6️⃣ Finalizar
       onGuardar?.();
       onClose();
     } catch (err) {
-      console.error("❌ Error al actualizar distribución:", err);
+      console.error("❌ Error al actualizar distribución o facturas:", err);
       alert("Error al actualizar la distribución. Revisa la consola para más detalles.");
     }
   };
 
+  // 🗑️ Eliminar distribución
   const handleEliminar = async () => {
     if (!distribucion.Id) {
-      console.error("❌ No se encontró Id del registro de distribución.");
       alert("No se puede eliminar: falta el Id del registro.");
       return;
     }
 
-    const confirmar = window.confirm(
-      `¿Seguro deseas eliminar el registro de distribución?`
-    );
+    const confirmar = window.confirm("¿Seguro deseas eliminar el registro de distribución?");
     if (!confirmar) return;
 
     try {
@@ -146,6 +148,7 @@ try {
     }
   };
 
+  // 🧱 UI del modal
   return (
     <div className="modal-backdrop">
       <div className="modal">
@@ -205,9 +208,7 @@ try {
             <input
               type="number"
               value={formData.ImpColorPalms}
-              onChange={(e) =>
-                setField("ImpColorPalms", Number(e.target.value))
-              }
+              onChange={(e) => setField("ImpColorPalms", Number(e.target.value))}
             />
           </label>
 
@@ -230,15 +231,9 @@ try {
           </label>
 
           <div className="modal-buttons">
-            <button type="submit" className="btn-guardar">
-              ✅ Guardar
-            </button>
-            <button type="button" className="btn-cancelar" onClick={onClose}>
-              ❌ Cancelar
-            </button>
-            <button type="button" className="btn-eliminar" onClick={handleEliminar}>
-              🗑️ Eliminar
-            </button>
+            <button type="submit" className="btn-guardar">✅ Guardar</button>
+            <button type="button" className="btn-cancelar" onClick={onClose}>❌ Cancelar</button>
+            <button type="button" className="btn-eliminar" onClick={handleEliminar}>🗑️ Eliminar</button>
           </div>
         </form>
       </div>
