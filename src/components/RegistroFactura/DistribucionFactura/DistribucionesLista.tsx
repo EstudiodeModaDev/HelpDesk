@@ -27,6 +27,15 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
     recargarDistribuciones?.();
   };
 
+   const formatearFecha = (fecha?: string) => {
+    if (!fecha) return "";
+    return new Date(fecha).toLocaleDateString("es-CO", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="distribuciones-lista-container">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -66,7 +75,7 @@ const DistribucionesLista: React.FC<DistribucionesListaProps> = ({ onVolver }) =
                   <td>{item.Proveedor}</td>
                   <td>{item.Title}</td>
                   <td>{item.NoFactura}</td>
-                  <td>{item.FechaEmision}</td>
+                  <td>{formatearFecha(item.FechaEmision)}</td>
                   <td>{item.CosToImp?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
                   <td>{item.CosTotMarNacionales?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>
                   <td>{item.CosTotMarImpor?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</td>

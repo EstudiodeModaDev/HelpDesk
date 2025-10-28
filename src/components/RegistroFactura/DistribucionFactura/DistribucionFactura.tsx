@@ -447,7 +447,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
 
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
-            <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesColorCalle)}  
+            <input type="text" inputMode="numeric" name="ImpColorCalle" placeholder="Ej: 100.000" value={String(displayImpresionesColorCalle)}  
               onChange={(e) => {
                 const raw = e.target.value;
                 const f = formatPesosEsCO(raw);
@@ -478,12 +478,12 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones-Automatico</label>
+            <label htmlFor="CosTotMarImpor">Costo Total Marcas Importaciones</label>
             <input type="text" inputMode="numeric" name="CosTotMarImpor" placeholder="Se llenara automaticamente" value={String(displayTotalOtrasMarcas)} readOnly/>
           </div>
 
           <div className="form-group">
-            <label htmlFor="CosTotServAdmin">Costo Total de Servicios Administrativos-Automatico</label>
+            <label htmlFor="CosTotServAdmin">Costo Total de Servicios Administrativos</label>
              <input type="text" inputMode="numeric" name="CosTotServAdmin" placeholder="Se llenara automaticamente" value={String(displayTotalOtrasMarcas)} readOnly/>
           </div>
         </div>
