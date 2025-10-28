@@ -1,6 +1,6 @@
 // src/components/Tickets/Tickets.tsx
 import * as React from "react";
-import DetalleTicket from "../DetallesTickets/DetallesTickets";
+import { CaseDetail } from "../DetallesTickets/DetallesTickets";
 import "./Tickets.css";
 
 import { useAuth } from "../../auth/authContext";
@@ -75,7 +75,7 @@ export default function TablaTickets() {
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
-        <DetalleTicket onVolver={() => setTicketSeleccionado(null)} ticket={ticketSeleccionado} role={userRole.role} />
+        <CaseDetail onVolver={() => setTicketSeleccionado(null)} ticket={ticketSeleccionado} role={userRole.role} />
       ) : (
         <div className="table-wrap">
           <table>
