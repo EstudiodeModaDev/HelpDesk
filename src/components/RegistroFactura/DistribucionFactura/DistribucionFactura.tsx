@@ -447,7 +447,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
 
           <div className="form-group">
             <label htmlFor="ImpColorCalle">Impresiones Color Calle</label>
-            <input type="text" inputMode="numeric" name="ImpColorPalms" placeholder="Ej: 100.000" value={String(displayImpresionesColorCalle)}  
+            <input type="text" inputMode="numeric" name="ImpColorCalle" placeholder="Ej: 100.000" value={String(displayImpresionesColorCalle)}  
               onChange={(e) => {
                 const raw = e.target.value;
                 const f = formatPesosEsCO(raw);
