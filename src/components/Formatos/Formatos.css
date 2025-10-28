@@ -229,3 +229,26 @@
   border-radius: 999px;
 }
 .tg-terms-text::-webkit-scrollbar-track{ background: transparent; }
+
+/* ========= Quitar fondo del card ========= */
+/* El componente queda sin fondo, sin borde y sin sombra */
+.tg-card.tg-scope{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  /* mantenemos el espacio superior para el select fijo */
+  padding: 0 0 0 0 !important;
+  padding-top: 72px !important;
+}
+
+/* El select conserva su propio estilo y fondo */
+.tg-select{
+  background: var(--field-bg);
+  border: 1px solid var(--border);
+}
+
+/* El bloque de Términos sigue teniendo fondo suave para legibilidad */
+.tg-terms-text{
+  background: var(--field-bg);
+  border: 1px solid var(--border);
+}
