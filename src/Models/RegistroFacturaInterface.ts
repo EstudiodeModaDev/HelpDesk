@@ -17,5 +17,5 @@ export interface ReFactura {
   RegistradoPor: string;
   NIT? : string;
   Created?: string;
-  IdDistribuida?: string;
+  IdDistrubuida?: string;
 }
