@@ -194,13 +194,9 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
         EXCLUIR_EN_FACTURA.forEach((k) => delete (copia as any)[k]);
         copia.RegistradoPor = src.RegistradoPor ?? account?.name ?? "";
           // ✅ Asegurar que la fecha se envíe como tipo Date o ISO
-            if (src.FechaEmision) {
-    const fechaOriginal = new Date(src.FechaEmision);
-    const dia = String(fechaOriginal.getDate()).padStart(2, "0");
-    const mes = String(fechaOriginal.getMonth() + 1).padStart(2, "0");
-    const anio = fechaOriginal.getFullYear();
-    copia.FechaEmision = `${dia}/${mes}/${anio}`;
-  }
+          if (src.FechaEmision) {
+             copia.FechaEmision = src.FechaEmision;
+          }
         return copia;
       };
 
@@ -216,14 +212,9 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       delete (distribucion as any).Id;
 
               // ✅ Convertir fecha antes de enviar
-        // ✅ Convertir fecha antes de enviar en formato DD/MM/YYYY
-if (formData.FechaEmision) {
-  const fechaOriginal = new Date(formData.FechaEmision);
-  const dia = String(fechaOriginal.getDate()).padStart(2, "0");
-  const mes = String(fechaOriginal.getMonth() + 1).padStart(2, "0");
-  const anio = fechaOriginal.getFullYear();
-  distribucion.FechaEmision = `${dia}/${mes}/${anio}`;
-}
+        if (formData.FechaEmision) {
+          distribucion.FechaEmision = formData.FechaEmision;
+        }
 
       const res = await registrarDistribucion(distribucion);
       const distribucionId = (res && (res.Id)) ?? res; 

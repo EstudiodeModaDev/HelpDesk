@@ -119,7 +119,7 @@
 /* 🔹 Ajustar ancho del selector de proveedor */
 #proveedor-select {
   width: 95% !important; /* mismo ancho que los demás */
-  max-width: 320px; /* opcional: evita que se estire demasiado */
+  max-width: 300px; /* opcional: evita que se estire demasiado */
   flex: unset; /* anula el "flex: 1" heredado del .form-group */
 }
 
