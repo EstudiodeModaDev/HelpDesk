@@ -1,25 +1,37 @@
+// src/components/Facturas/FacturasLista/FacturasLista.tsx
 import { useEffect, useState } from "react";
 import FacturaFiltros from "../FacturaFiltros/FacturaFiltros";
 import FacturaEditar from "../FacturaEditar/FacturaEditar";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
+import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import "./FacturasLista.css";
 import { truncateNoCutGraphemes } from "../../../utils/Commons";
+import FacturaDistribuidaModal from "../DistribucionFactura/FacturaDistribuidaModal";
 
 export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   const { obtenerFacturas } = useFacturas();
 
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
-  const [facturasFiltradas, setFacturasFiltradas] = useState<ReFactura[]>([]); // ✅ Lista filtrada
+  const [facturasFiltradas, setFacturasFiltradas] = useState<ReFactura[]>([]);
   const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
 
+  const [modalDistribucion, setModalDistribucion] = useState<{
+    visible: boolean;
+    facturasGrupo: ReFactura[] | null;
+  }>({
+    visible: false,
+    facturasGrupo: null,
+  });
+
+  // 🔹 Cargar facturas al iniciar
   useEffect(() => {
     const cargarFacturas = async () => {
       try {
         const lista = await obtenerFacturas();
         setFacturas(lista);
-        setFacturasFiltradas(lista); // ✅ Inicialmente mostrar todas
+        setFacturasFiltradas(lista);
       } catch (err) {
         console.error("Error al cargar facturas:", err);
       }
@@ -42,74 +54,113 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
       year: "numeric",
     });
   };
-  
+
+  // 🔹 Filtros
   const aplicarFiltros = (filtros: Partial<ReFactura>) => {
     const filtradas = facturas.filter((f) => {
-      // 📅 Filtrar por fecha si existe
       const coincideFecha = filtros.FechaEmision
         ? f.FechaEmision?.slice(0, 10) === filtros.FechaEmision
         : true;
 
-      // 📅 Filtrar por fecha si existe
       const coincideFechaEnt = filtros.FecEntregaCont
         ? f.FecEntregaCont?.slice(0, 10) === filtros.FecEntregaCont
         : true;
 
-      // 🔢 Número de factura
       const coincideNumero = filtros.NoFactura
         ? f.NoFactura?.toLowerCase().includes(filtros.NoFactura.toLowerCase())
         : true;
 
-      // 🏢 Proveedor
       const coincideProveedor = filtros.Proveedor
         ? f.Proveedor?.toLowerCase().includes(filtros.Proveedor.toLowerCase())
         : true;
 
-      // 🧾 NIT
       const coincideNIT = filtros.Title
         ? f.Title?.toLowerCase().includes(filtros.Title.toLowerCase())
         : true;
 
-      //  Ítem
-      const coincideItem = filtros.Items
-        ? f.Items === filtros.Items
-        : true;
+      const coincideItem = filtros.Items ? f.Items === filtros.Items : true;
+      const coincidecc = filtros.CC ? f.CC === filtros.CC : true;
+      const coincideco = filtros.CO ? f.CO === filtros.CO : true;
+      const coincideun = filtros.un ? f.un === filtros.un : true;
 
-        // cc
-      const coincidecc = filtros.CC
-        ? f.CC === filtros.CC
-        : true;
-
-        // co
-      const coincideco = filtros.CO
-        ? f.CO === filtros.CO
-        : true;
-
-        //  un
-      const coincideun = filtros.un
-        ? f.un === filtros.un
-        : true;
-
-       //  erp
       const coincideERP = filtros.DocERP
         ? f.DocERP?.toLowerCase().includes(filtros.DocERP.toLowerCase())
         : true;
 
-      return coincideFecha && coincideNumero && coincideProveedor && coincideNIT && coincideItem && coincideFechaEnt && coincidecc && coincideco &&  coincideun && coincideERP ;
+      return (
+        coincideFecha &&
+        coincideNumero &&
+        coincideProveedor &&
+        coincideNIT &&
+        coincideItem &&
+        coincideFechaEnt &&
+        coincidecc &&
+        coincideco &&
+        coincideun &&
+        coincideERP
+      );
     });
 
     setFacturasFiltradas(filtradas);
   };
 
+  // 🔹 Verificar si es la primera factura del grupo
+  const esPrimeraDistribuida = (factura: ReFactura) => {
+    if (!factura.IdDistribuida) return false;
+    const grupo = facturasFiltradas.filter(
+      (f) => f.IdDistribuida === factura.IdDistribuida
+    );
+    if (grupo.length === 0) return false;
+    const primera = grupo.sort(
+      (a, b) =>
+        new Date(a.FechaEmision ?? "").getTime() -
+        new Date(b.FechaEmision ?? "").getTime()
+    )[0];
+    return factura.id0 === primera.id0;
+  };
+
+ // Conversor de ReFactura → DistribucionFacturaData
+const convertirADistribucion = (factura: ReFactura): DistribucionFacturaData => ({
+  Id: factura.id0 ? factura.id0.toString() : "",
+  Proveedor: factura.Proveedor ?? "",
+  Title: factura.Title ?? "", // nit
+  ValorAnIVA: factura.ValorAnIVA ?? 0,
+  FechaEmision: factura.FechaEmision ?? "",
+  NoFactura: factura.NoFactura ?? "",
+  Items: factura.Items ?? "",
+  DescripItems: factura.DescripItems ?? "",
+  CO: factura.CO ?? "",
+  un: factura.un ?? "",
+  DetalleFac: factura.DetalleFac ?? "",
+  IdDistribuida: factura.IdDistribuida ?? "",
+  
+  // Estos campos no existen en ReFactura → valores por defecto
+  CargoFijo: 0,
+  CosToImp: 0,
+  ImpBnCedi: 0,
+  ImpBnPalms: 0,
+  ImpColorPalms: 0,
+  ImpBnCalle: 0,
+  ImpColorCalle: 0,
+  CosTotMarNacionales: 0,
+  CosTotMarImpor: 0,
+  CosTotCEDI: 0,
+  CosTotServAdmin: 0,
+
+  // Distribución de centros de costos (no están en ReFactura, se dejan vacíos)
+  CCmn: "",
+  CCmi: "",
+  CCcedi: "",
+  CCsa: "",
+});
+
+
   return (
     <div className="facturas-lista">
-      {/* 🔔 Notificación visual */}
       {mensaje && <div className="notificacion">{mensaje}</div>}
 
-      {/* 🔎 Filtros de búsqueda (se envía la función aplicarFiltros) */}
       <FacturaFiltros onFiltrar={aplicarFiltros} />
 
-      {/* 📋 Tabla de facturas */}
       <div className="tabla-scroll">
         <table className="tabla-facturas">
           <thead>
@@ -153,8 +204,22 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{factura.un}</td>
                   <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
                   <td>{factura.DocERP}</td>
-                  <td><span className="one-line-ellipsis" title={factura.DetalleFac}>{truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}</span></td>
-                  <td><span className="one-line-ellipsis" title={factura.Observaciones}>{truncateNoCutGraphemes(factura.Observaciones ?? "", 20)}</span></td>
+                  <td>
+                    <span
+                      className="one-line-ellipsis"
+                      title={factura.DetalleFac}
+                    >
+                      {truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className="one-line-ellipsis"
+                      title={factura.Observaciones}
+                    >
+                      {truncateNoCutGraphemes(factura.Observaciones ?? "", 20)}
+                    </span>
+                  </td>
                   <td>
                     <button
                       className="btn-editar"
@@ -163,12 +228,31 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                     >
                       ✏️
                     </button>
+
+                    {/* ✅ Botón Ver distribución solo en la primera del grupo */}
+                    {esPrimeraDistribuida(factura) && (
+                      <button
+                        className="btn-ver-distribucion"
+                        title="Ver distribución"
+                        onClick={() => {
+                          const grupo = facturasFiltradas.filter(
+                            (f) => f.IdDistribuida === factura.IdDistribuida
+                          );
+                          setModalDistribucion({
+                            visible: true,
+                            facturasGrupo: grupo,
+                          });
+                        }}
+                      >
+                        📊
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={11} style={{ textAlign: "center", padding: "1rem" }}>
+                <td colSpan={15} style={{ textAlign: "center", padding: "1rem" }}>
                   No hay facturas que coincidan con los filtros.
                 </td>
               </tr>
@@ -177,19 +261,19 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
         </table>
       </div>
 
-      {/* 🔽 Botón para volver al registro */}
       <button className="btn-volver-fijo" onClick={onVolver}>
         🔽 Registrar factura
       </button>
 
-      {/* 🧰 Modal o panel de edición */}
       {facturaEdit && (
         <FacturaEditar
           factura={facturaEdit}
           onClose={() => setFacturaEdit(null)}
           onEliminar={(idEliminado) => {
             setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
-            setFacturasFiltradas((prev) => prev.filter((f) => f.id0 !== idEliminado)); // ✅ Mantener filtro
+            setFacturasFiltradas((prev) =>
+              prev.filter((f) => f.id0 !== idEliminado)
+            );
             setMensaje("🗑️ Factura eliminada correctamente");
             setTimeout(() => setFacturaEdit(null), 100);
           }}
@@ -197,13 +281,25 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
             try {
               const lista = await obtenerFacturas();
               setFacturas(lista);
-              setFacturasFiltradas(lista); // ✅ Refrescar lista filtrada
+              setFacturasFiltradas(lista);
               setMensaje("✅ Factura actualizada correctamente");
               setTimeout(() => setFacturaEdit(null), 100);
             } catch (err) {
               console.error("Error al refrescar lista tras editar:", err);
             }
           }}
+        />
+      )}
+
+      {/* ✅ Modal de distribución */}
+      {modalDistribucion.visible && modalDistribucion.facturasGrupo && (
+        <FacturaDistribuidaModal
+          factura={convertirADistribucion(
+            modalDistribucion.facturasGrupo[0]
+          )}
+          onClose={() =>
+            setModalDistribucion({ visible: false, facturasGrupo: null })
+          }
         />
       )}
     </div>
