@@ -15,7 +15,7 @@ type Props = {
 
 export default function ActivityStatusCard({title = "Estado de actividad", percent, tasks, taskThisMonth, locale = "es-CO", accentColor, ringSize = 140,}: Props) {
 
-  const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+  const safePercent = Math.ceil(Math.max(0, Math.min(100, Number(percent) || 0)));
   const stroke = 10;
   const radius = (ringSize - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
