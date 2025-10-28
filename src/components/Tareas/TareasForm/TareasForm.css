@@ -1,21 +1,36 @@
-/* ====== Tokens base ====== */
+/* =========================================================
+   1) TOKENS / VARIABLES DE TEMA
+   ---------------------------------------------------------
+   - Paleta base en claro
+   - Alturas/radios sombreados consistentes
+   =======================================================*/
 :root{
   --bg: #ffffff;
   --surface: #ffffff;
   --border: #e5e7eb;
   --ink: #0f172a;
   --muted: #64748b;
+
   --field-bg: #f8fafc;
   --field-bg-disabled:#f1f5f9;
-  --ring: rgba(37, 99, 235, .35);
-  --primary: #2563eb;
+
+  --primary: #2563eb;                 /* color principal */
+  --ring: rgba(37, 99, 235, .35);     /* anillo externo suave */
+
   --primary-ink: #ffffff;
   --danger:#dc2626;
+
   --radius: 14px;
   --shadow: 0 12px 28px rgba(2, 6, 23, .08);
 }
 
-/* ====== Scope / Card ====== */
+/* =========================================================
+   2) SCOPE / CARD
+   ---------------------------------------------------------
+   - "isolation: isolate" evita que filtros globales afecten
+     a este formulario (útil con temas oscuros globales)
+   - Tarjeta contenedora del form
+   =======================================================*/
 .ft-scope{
   isolation: isolate;
 }
@@ -38,7 +53,11 @@
   color: var(--ink);
 }
 
-/* ====== Form layout ====== */
+/* =========================================================
+   3) LAYOUT DEL FORMULARIO
+   ---------------------------------------------------------
+   - Grilla base y campos
+   =======================================================*/
 .ft-form{
   display: grid;
   gap: 14px;
@@ -55,7 +74,12 @@
   color: var(--ink);
 }
 
-/* ====== Inputs / Selects (nativos) ====== */
+/* =========================================================
+   4) INPUTS / SELECTS NATIVOS
+   ---------------------------------------------------------
+   - Estilo consistente para inputs HTML
+   - Transiciones suaves
+   =======================================================*/
 .ft-form input[type="text"],
 .ft-form input[type="date"],
 .ft-form input[type="time"],
@@ -76,7 +100,12 @@
   color: #94a3b8;
 }
 
-/* Focus ring */
+/* =========================================================
+   5) FOCO (NATIVOS)
+   ---------------------------------------------------------
+   - Halo externo para inputs nativos
+   - Fondo a blanco al enfocar
+   =======================================================*/
 .ft-form input:focus,
 .ft-form select:focus{
   outline: none;
@@ -85,7 +114,9 @@
   background: #fff;
 }
 
-/* Disabled */
+/* =========================================================
+   6) ESTADOS: DISABLED Y ERRORES
+   =======================================================*/
 .ft-form input:disabled,
 .ft-form select:disabled{
   background: var(--field-bg-disabled);
@@ -93,13 +124,16 @@
   cursor: not-allowed;
 }
 
-/* Error text */
 .error{
   color: var(--danger);
   font-size: 12px;
 }
 
-/* ====== Fieldset (fecha/hora) ====== */
+/* =========================================================
+   7) FIELDSET (FECHA/HORA)
+   ---------------------------------------------------------
+   - Estructura para agrupar campos relacionados
+   =======================================================*/
 .ft-fieldset{
   border: 0;
   margin: 0;
@@ -115,7 +149,11 @@
   color: var(--ink);
 }
 
-/* ====== Acciones ====== */
+/* =========================================================
+   8) ACCIONES / BOTONES
+   ---------------------------------------------------------
+   - Botón principal con feedback sutil
+   =======================================================*/
 .ft-actions{
   display: flex;
   justify-content: flex-end;
@@ -151,48 +189,57 @@
   cursor: not-allowed;
 }
 
-/* ====== react-select (classNamePrefix="rs") ====== */
+/* =========================================================
+   9) REACT-SELECT (classNamePrefix="rs")
+   ---------------------------------------------------------
+   Objetivo:
+   - Mantener un halo EXTERNO de foco en el control
+   - Eliminar halos INTERNOS del input invisible de react-select
+   =======================================================*/
 
-/* Contenedor general */
+/* Contenedor del control */
 .rs__control{
   min-height: 42px;
   border-radius: 10px !important;
   border: 1px solid var(--border) !important;
   background: var(--field-bg) !important;
-  box-shadow: none !important;
+  box-shadow: none !important;            /* sin sombras por defecto */
 }
 
+/* Foco del control: SOLO anillo EXTERNO */
 .rs__control--is-focused{
   outline: none;
-  border-color: var(--link);                 /* opcional */
-  box-shadow: 0 0 0 3px rgba(37,99,235,.25) !important; /* anillo externo */
-  /* Asegura que no haya recorte raro del fondo */
-  background-clip: padding-box;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--ring) !important;   /* anillo externo */
+  background-clip: padding-box;                   /* evita recortes raros */
 }
 
+/* Deshabilitado */
 .rs__control--is-disabled{
   background: var(--field-bg-disabled) !important;
   color: #94a3b8 !important;
   cursor: not-allowed !important;
 }
 
-.lt-scope input:focus, .lt-scope select:focus {
+/* Anula halo INTERNO del input de react-select */
+.ft-form .rs__control input:focus,
+.ft-form .rs__control *:focus{
   box-shadow: none !important;
   outline: none !important;
 }
 
-/* Placeholder / single value */
+/* Placeholder / valor seleccionado */
 .rs__placeholder{ color: #94a3b8 !important; }
 .rs__single-value{ color: var(--ink) !important; }
 
-/* Input interno */
+/* Input interno (texto) */
 .rs__input-container{ color: var(--ink) !important; }
 
-/* Indicadores */
+/* Indicadores (flecha) y separador */
 .rs__indicator-separator{ display: none; }
 .rs__dropdown-indicator{ color: #64748b !important; }
 
-/* Menú */
+/* Menú desplegable */
 .rs__menu{
   margin-top: 6px !important;
   border-radius: 10px !important;
@@ -201,6 +248,7 @@
   overflow: hidden;
   z-index: 20;
 }
+
 .rs__menu-list{ padding: 6px !important; }
 
 /* Opción */
@@ -209,21 +257,25 @@
   padding: 10px 10px;
   color: var(--ink);
 }
+
 .rs__option--is-focused{
   background: #eff6ff !important; /* azul muy claro */
 }
+
 .rs__option--is-selected{
   background: #dbeafe !important;
 }
 
-/* Mensajes de menú */
+/* Mensajes del menú */
 .rs__no-options,
 .rs__loading-message{
   color: #64748b !important;
   padding: 10px !important;
 }
 
-/* ====== Decorado de opción custom ====== */
+/* =========================================================
+   10) DECORADO DE OPCIÓN CUSTOM (si usas Option personalizada)
+   =======================================================*/
 .rs-opt{
   display: flex;
   align-items: center;
@@ -251,21 +303,38 @@
   border: 1px solid #e0e7ff;
 }
 
-/* === Ancho y padding de la tarjeta === */
+/* =========================================================
+   11) AJUSTES VISUALES / COHERENCIA
+   ---------------------------------------------------------
+   - Consistencia de alturas y radios entre nativos y react-select
+   - Ajustes de padding en tarjetas compartidas
+   =======================================================*/
 .ft-card,
 .lt-card{
-  padding: 22px 22px 18px;     /* un poco más de aire */
+  padding: 22px 22px 18px;  /* un poco más de aire */
 }
 
-/* Si tu contenedor padre centra: asegúrate de no forzar min-height */
-.lt-card{ min-height: unset; } /* evita que “estire” verticalmente */
-
-/* === Grilla responsiva del formulario === */
-.ft-form{
-  gap: 14px;
+.lt-card{ 
+  min-height: unset;        /* evita estirar verticalmente si no hace falta */
 }
 
-/* En ≥ 640px ponemos 2 columnas suaves */
+.ft-title{ font-size: 22px; }
+
+.ft-form input[type="text"],
+.ft-form input[type="date"],
+.ft-form input[type="time"],
+.ft-form select,
+.rs__control{
+  height: 44px;             /* misma altura en todos los campos */
+  border-radius: 12px;
+}
+
+/* =========================================================
+   12) RESPONSIVE
+   ---------------------------------------------------------
+   - En ≥640px: dos columnas, con fieldset de 2 col.
+   - Botón a la derecha en esa vista
+   =======================================================*/
 @media (min-width: 640px){
   .ft-form{
     display: grid;
@@ -273,10 +342,11 @@
     column-gap: 14px;
     row-gap: 14px;
   }
-  /* Campos de una columna por defecto */
-  .ft-form .ft-field{ grid-column: span 2; }   /* todos full por defecto */
 
-  /* El fieldset de Programación va en 2 columnas internas */
+  /* Por defecto, cada .ft-field ocupa dos columnas */
+  .ft-form .ft-field{ grid-column: span 2; }
+
+  /* Fieldset “Programación del evento” a 2 columnas internas */
   .ft-fieldset{
     grid-column: span 2;
     display: grid;
@@ -284,38 +354,30 @@
     gap: 12px;
   }
   .ft-legend{
-    grid-column: 1 / -1;      /* legend a lo ancho */
+    grid-column: 1 / -1; /* legend a lo ancho */
   }
-
-  /* Fecha y Hora en la misma fila */
   .ft-fieldset .ft-field{ grid-column: span 1; }
 
-  /* Días para recordatorio + botón en una fila si quieres */
+  /* Acciones alineadas a la derecha en la segunda columna */
   .ft-actions{ grid-column: 2; justify-self: end; }
 }
 
-/* === Ajustes visuales menores para mantener proporciones === */
-.ft-title{ font-size: 22px; }
-.ft-form input[type="text"],
-.ft-form input[type="date"],
-.ft-form input[type="time"],
-.ft-form select,
-.rs__control{
-  height: 44px;                /* mantiene altura pareja al crecer el ancho */
-  border-radius: 12px;
-}
-
-
-/* ====== Responsive ====== */
+/* Ajustes para pantallas pequeñas */
 @media (max-width: 480px){
   .ft-card{ margin: 16px 12px; padding: 14px; }
   .ft-title{ font-size: 18px; }
 }
 
+/* =========================================================
+   13) CONTEXTO TAREAS PAGE (SI COEXISTE CON OTRAS TARJETAS)
+   ---------------------------------------------------------
+   - Evita centrado/estiramiento cuando se renderiza 
+     junto con otras cards dentro de un grid mayor
+   =======================================================*/
 .tareas-page .ft-card,
 .tareas-page .lt-card{
   width: 100%;
   max-width: none;
-  margin: 0;           /* evita centrar dentro del grid */
-  min-height: unset;   /* opcional: que no se “estire” de más */
+  margin: 0;
+  min-height: unset;
 }
