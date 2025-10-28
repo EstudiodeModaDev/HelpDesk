@@ -15,7 +15,7 @@
   --field-bg-disabled:#f1f5f9;
 
   --primary: #2563eb;                 /* color principal */
-  --ring: rgba(37, 99, 235, .35);     /* anillo externo suave */
+  --ring: none    /* anillo externo suave */
 
   --primary-ink: #ffffff;
   --danger:#dc2626;
@@ -316,6 +316,16 @@ rs-override .rs__control{
 .rs__control{
   height: 44px;             /* misma altura en todos los campos */
   border-radius: 12px;
+}
+.ft-field:has(.rs-override)                { grid-column: auto; }
+.ft-field:has(.rs-override){
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ft-field:has(.rs-override) > label{
+  margin-bottom: 0;
+  font-weight: 600;
 }
 
 /* =========================================================
