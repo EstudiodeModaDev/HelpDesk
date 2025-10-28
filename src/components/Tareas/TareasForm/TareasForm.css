@@ -1,10 +1,7 @@
 /* =========================================================
-   1) TOKENS / VARIABLES DE TEMA
-   ---------------------------------------------------------
-   - Paleta base en claro
-   - Alturas/radios sombreados consistentes
+   1) TOKENS / VARIABLES DE TEMA (MODO CLARO)
    =======================================================*/
-:root{
+:root {
   --bg: #ffffff;
   --surface: #ffffff;
   --border: #e5e7eb;
@@ -12,30 +9,32 @@
   --muted: #64748b;
 
   --field-bg: #f8fafc;
-  --field-bg-disabled:#f1f5f9;
+  --field-bg-disabled: #f1f5f9;
 
-  --primary: #2563eb;                 /* color principal */
-  --ring: none    /* anillo externo suave */
+  --primary: #2563eb;
+  --ring: rgba(37, 99, 235, 0.35); /* anillo externo suave */
 
   --primary-ink: #ffffff;
-  --danger:#dc2626;
+  --danger: #dc2626;
 
   --radius: 14px;
-  --shadow: 0 12px 28px rgba(2, 6, 23, .08);
+  --shadow: 0 12px 28px rgba(2, 6, 23, 0.08);
 }
 
 /* =========================================================
    2) SCOPE / CARD
-   ---------------------------------------------------------
-   - "isolation: isolate" evita que filtros globales afecten
-     a este formulario (útil con temas oscuros globales)
-   - Tarjeta contenedora del form
    =======================================================*/
-.ft-scope{
+.ft-scope {
   isolation: isolate;
+  color-scheme: light !important;
 }
 
-.ft-card{
+.dark .ft-scope,
+.dark .ft-scope * {
+  color-scheme: light !important;
+}
+
+.ft-card {
   max-width: 560px;
   margin: 24px auto;
   background: var(--surface);
@@ -45,7 +44,7 @@
   padding: 18px 18px 16px;
 }
 
-.ft-title{
+.ft-title {
   margin: 4px 0 14px;
   text-align: center;
   font-weight: 700;
@@ -55,20 +54,18 @@
 
 /* =========================================================
    3) LAYOUT DEL FORMULARIO
-   ---------------------------------------------------------
-   - Grilla base y campos
    =======================================================*/
-.ft-form{
+.ft-form {
   display: grid;
   gap: 14px;
 }
 
-.ft-field{
+.ft-field {
   display: grid;
   gap: 8px;
 }
 
-.ft-label{
+.ft-label {
   font-size: 14px;
   font-weight: 600;
   color: var(--ink);
@@ -76,14 +73,11 @@
 
 /* =========================================================
    4) INPUTS / SELECTS NATIVOS
-   ---------------------------------------------------------
-   - Estilo consistente para inputs HTML
-   - Transiciones suaves
    =======================================================*/
 .ft-form input[type="text"],
 .ft-form input[type="date"],
 .ft-form input[type="time"],
-.ft-form select{
+.ft-form select {
   appearance: none;
   width: 100%;
   height: 42px;
@@ -93,21 +87,18 @@
   background: var(--field-bg);
   color: var(--ink);
   font-size: 14px;
-  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
-.ft-form input::placeholder{
+.ft-form input::placeholder {
   color: #94a3b8;
 }
 
 /* =========================================================
    5) FOCO (NATIVOS)
-   ---------------------------------------------------------
-   - Halo externo para inputs nativos
-   - Fondo a blanco al enfocar
    =======================================================*/
 .ft-form input:focus,
-.ft-form select:focus{
+.ft-form select:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 4px var(--ring);
@@ -118,23 +109,21 @@
    6) ESTADOS: DISABLED Y ERRORES
    =======================================================*/
 .ft-form input:disabled,
-.ft-form select:disabled{
+.ft-form select:disabled {
   background: var(--field-bg-disabled);
   color: #94a3b8;
   cursor: not-allowed;
 }
 
-.error{
+.error {
   color: var(--danger);
   font-size: 12px;
 }
 
 /* =========================================================
-   7) FIELDSET (FECHA/HORA)
-   ---------------------------------------------------------
-   - Estructura para agrupar campos relacionados
+   7) FIELDSET (FECHA / HORA)
    =======================================================*/
-.ft-fieldset{
+.ft-fieldset {
   border: 0;
   margin: 0;
   padding: 0;
@@ -142,7 +131,7 @@
   gap: 12px;
 }
 
-.ft-legend{
+.ft-legend {
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 2px;
@@ -151,16 +140,14 @@
 
 /* =========================================================
    8) ACCIONES / BOTONES
-   ---------------------------------------------------------
-   - Botón principal con feedback sutil
    =======================================================*/
-.ft-actions{
+.ft-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 8px;
 }
 
-.ft-btn{
+.ft-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -173,199 +160,155 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: filter .15s ease, transform .02s ease;
+  transition: filter 0.15s ease, transform 0.02s ease;
 }
 
-.ft-btn::before{
+.ft-btn::before {
   content: "✓";
   font-weight: 700;
   line-height: 1;
 }
 
-.ft-btn:hover{ filter: brightness(1.03); }
-.ft-btn:active{ transform: translateY(1px); }
-.ft-btn:disabled{
-  opacity: .7;
-  cursor: not-allowed;
-}
+.ft-btn:hover { filter: brightness(1.03); }
+.ft-btn:active { transform: translateY(1px); }
+.ft-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* =========================================================
    9) REACT-SELECT (classNamePrefix="rs")
-   ---------------------------------------------------------
-   Objetivo:
-   - Mantener un halo EXTERNO de foco en el control
-   - Eliminar halos INTERNOS del input invisible de react-select
    =======================================================*/
-rs-override .rs__control{
-  min-height: var(--input-h);
-  height: var(--input-h);
-  border: 1px solid var(--bd) !important;
+.rs__control {
+  min-height: 44px;
   border-radius: 10px !important;
-  background:#fff !important;
+  border: 1px solid var(--border) !important;
+  background: var(--field-bg) !important;
   box-shadow: none !important;
-  overflow: hidden; /* 👈 impide que la flecha se salga del borde */
+  overflow: hidden; /* recorta bordes y fondo de la flecha */
 }
-.rs-override .rs__control:hover{
-  border-color: var(--bd-strong) !important;
-}
-.rs-override .rs__control--is-focused{
+
+/* Foco del control */
+.rs__control--is-focused {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
+  box-shadow: 0 0 0 3px var(--ring) !important;
+  background: var(--field-bg) !important;
+  background-clip: padding-box;
 }
 
-/* Value & padding */
-.rs-override .rs__value-container{
-  padding: 0 12px !important;
+/* Deshabilitado */
+.rs__control--is-disabled {
+  background: var(--field-bg-disabled) !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
 }
 
-/* Indicadores: SIN flecha custom y alineados dentro */
-.rs-override .rs__indicators{
-  width: auto;
-  padding-right: 8px;
-  justify-content: flex-end;
-}
-.rs-override .rs__indicator-separator{ display:none !important; }
-
-/* Elimina la flecha que añadíamos vía ::after */
-.rs-override .rs__indicators::after{
-  content: none !important;
-  display: none !important;
-}
-
-/* Asegura que el caret propio no desborde */
-.rs-override .rs__dropdown-indicator{
-  padding: 0 !important;
-}
-.rs-override .rs__dropdown-indicator svg{
-  display: block; /* evita espacios inline que empujan fuera */
-}
-
-/* Quitar halo interno del input de búsqueda */
-.rs-override .rs__input input,
-.rs-override .rs__input input:focus,
-.rs-override .rs__input input:focus-visible{
-  outline: none !important;
+/* === Arreglo de fondo blanco y halo interno === */
+.rs__control *,
+.rs__value-container,
+.rs__input-container,
+.rs__indicators,
+.rs__indicators *,
+.rs__control input,
+.rs__control input:focus {
+  background: transparent !important;
   box-shadow: none !important;
-  background: transparent;
-}
-/* Cubre cualquier hijo con focus accidental */
-.rs-override .rs__control *:focus{
   outline: none !important;
-  box-shadow: none !important;
 }
 
-/* Menú y opciones */
-.rs-override .rs__menu{
-  border:1px solid var(--bd);
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  margin-top:6px;
-}
-.rs-override .rs__menu-list{
-  padding:6px 0 !important;
-  max-height:280px;
-}
-.rs-override .rs__option{
-  padding:10px 14px !important;
-  font-size:.98rem;
-}
-.rs-override .rs__option--is-focused{
-  background:#f3f4f6 !important;
-}
-.rs-override .rs__option--is-selected{
-  background:#eef2ff !important;
-  color:var(--ink) !important;
-  font-weight:600;
+/* Indicadores (flecha) */
+.rs__indicator-separator { display: none !important; }
+.rs__dropdown-indicator { color: #64748b !important; }
+
+/* Placeholder y texto */
+.rs__placeholder { color: var(--muted) !important; }
+.rs__single-value { color: var(--ink) !important; }
+.rs__input-container input { color: var(--ink) !important; }
+
+/* Menú desplegable */
+.rs__menu {
+  margin-top: 6px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  overflow: hidden;
+  z-index: 20;
 }
 
-/* Placeholder / texto */
-.rs-override .rs__placeholder{ color: var(--muted) !important; }
-.rs-override .rs__single-value{ color: var(--ink) !important; }
-.rs-override .rs__input-container input{ color: var(--ink) !important; }
+.rs__menu-list { padding: 6px !important; }
 
+/* Opción */
+.rs__option {
+  border-radius: 8px;
+  padding: 10px 10px;
+  color: var(--ink);
+}
 
-.ft-form input:focus, .ft-form select:focus{
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--ring);
-  background: transparent;                              /* ok para inputs nativos */
+.rs__option--is-focused { background: #f3f4f6 !important; }
+.rs__option--is-selected {
+  background: #dbeafe !important;
+  color: var(--ink) !important;
+  font-weight: 600;
+}
+
+/* Mensajes del menú */
+.rs__no-options,
+.rs__loading-message {
+  color: #64748b !important;
+  padding: 10px !important;
 }
 
 /* =========================================================
-   11) AJUSTES VISUALES / COHERENCIA
-   ---------------------------------------------------------
-   - Consistencia de alturas y radios entre nativos y react-select
-   - Ajustes de padding en tarjetas compartidas
+   10) COHERENCIA VISUAL GENERAL
    =======================================================*/
 .ft-card,
-.lt-card{
-  padding: 22px 22px 18px;  /* un poco más de aire */
-}
+.lt-card { padding: 22px 22px 18px; }
 
-.lt-card{ 
-  min-height: unset;        /* evita estirar verticalmente si no hace falta */
-}
-
-.ft-title{ font-size: 22px; }
+.ft-title { font-size: 22px; }
 
 .ft-form input[type="text"],
 .ft-form input[type="date"],
 .ft-form input[type="time"],
 .ft-form select,
-.rs__control{
-  height: 44px;             /* misma altura en todos los campos */
+.rs__control {
+  height: 44px;
   border-radius: 12px;
-}
-.ft-field:has(.rs-override)                { grid-column: auto; }
-.ft-field:has(.rs-override){
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.ft-field:has(.rs-override) > label{
-  margin-bottom: 0;
-  font-weight: 600;
 }
 
 /* =========================================================
-   12) RESPONSIVE
-   ---------------------------------------------------------
-   - En ≥640px: dos columnas, con fieldset de 2 col.
-   - Botón a la derecha en esa vista
+   11) RESPONSIVE
    =======================================================*/
-@media (min-width: 640px){
-  .ft-form{
+@media (min-width: 640px) {
+  .ft-form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 14px;
     row-gap: 14px;
   }
 
-  /* Por defecto, cada .ft-field ocupa dos columnas */
-  .ft-form .ft-field{ grid-column: span 2; }
+  .ft-form .ft-field { grid-column: span 2; }
 
-  /* Fieldset “Programación del evento” a 2 columnas internas */
-  .ft-fieldset{
+  .ft-fieldset {
     grid-column: span 2;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-  .ft-legend{
-    grid-column: 1 / -1; /* legend a lo ancho */
-  }
-  .ft-fieldset .ft-field{ grid-column: span 1; }
 
-  /* Acciones alineadas a la derecha en la segunda columna */
-  .ft-actions{ grid-column: 2; justify-self: end; }
+  .ft-legend { grid-column: 1 / -1; }
+  .ft-fieldset .ft-field { grid-column: span 1; }
+  .ft-actions { grid-column: 2; justify-self: end; }
 }
 
-/* Ajustes para pantallas pequeñas */
-@media (max-width: 480px){
-  .ft-card{ margin: 16px 12px; padding: 14px; }
-  .ft-title{ font-size: 18px; }
+@media (max-width: 480px) {
+  .ft-card { margin: 16px 12px; padding: 14px; }
+  .ft-title { font-size: 18px; }
 }
 
-
-
+/* =========================================================
+   12) CONTEXTO TAREAS PAGE
+   =======================================================*/
+.tareas-page .ft-card,
+.tareas-page .lt-card {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-height: unset;
+}
