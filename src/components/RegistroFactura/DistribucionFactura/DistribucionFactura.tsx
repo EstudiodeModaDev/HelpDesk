@@ -166,7 +166,10 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
         const copia = { ...src };
         EXCLUIR_EN_FACTURA.forEach((k) => delete (copia as any)[k]);
         copia.RegistradoPor = src.RegistradoPor ?? account?.name ?? "";
-        // copia.FechaEmision = null
+          // ✅ Asegurar que la fecha se envíe como tipo Date o ISO
+          if (src.FechaEmision) {
+            copia.FechaEmision = new Date(src.FechaEmision).toISOString(); // ← formato ISO seguro
+          }
         return copia;
       };
 
@@ -180,6 +183,11 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       // 3) Primero: crear DISTRIBUCIÓN y capturar su Id
       const distribucion = { ...formData };
       delete (distribucion as any).Id;
+
+              // ✅ Convertir fecha antes de enviar
+        if (formData.FechaEmision) {
+          distribucion.FechaEmision = new Date(formData.FechaEmision).toISOString();
+        }
 
       const res = await registrarDistribucion(distribucion);
       const distribucionId = (res && (res.Id)) ?? res; 
@@ -199,7 +207,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
           ...toFacturaBase(formData),
           CC,
           ValorAnIVA,
-          IdDistrubuida: distribucionId, // <-- vínculo aquí
+          IdDistribuida: distribucionId, // <-- vínculo aquí
         };
 
         await registrarFactura(factura);
