@@ -1,41 +1,26 @@
-/* ===== Paleta fija (blanco/gris/azul/negro) y misma en dark ===== */
+/* ===== Paleta fija y misma en dark ===== */
 .detalle-ticket{
   width: 100%;
-  max-width: none;
-
-  --surface: #ffffff;
   --bg: #ffffff;
+  --surface: #ffffff;
   --ink: #0f172a;
   --muted: #6b7280;
   --border: #e5e7eb;
   --primary: #2563eb;
-
+  --panel: #f3f4f6;     /* gris del recuadro */
   --radius: 14px;
   --shadow: 0 12px 28px rgba(2, 6, 23, .08);
-
   color-scheme: light;
   isolation: isolate;
   color: var(--ink);
-
-  /* Panel ÚNICO: todo es un formulario */
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 16px;
 }
+.dark .detalle-ticket, .dark .detalle-ticket *{ color-scheme: light !important; }
 
-/* Forzar misma paleta si el sitio usa dark */
-.dark .detalle-ticket, .dark .detalle-ticket *{
-  color-scheme: light !important;
-}
-
-/* Encabezado */
+/* Header */
 .detalle-ticket h2{
   margin: 8px 0 14px 0;
   font-size: clamp(18px, 2.4vw, 22px);
   font-weight: 800;
-  color: var(--ink);
 }
 .btn-volver{
   display:inline-flex; align-items:center; gap:6px;
@@ -46,59 +31,63 @@
 }
 .btn-volver:focus-visible{ outline:none; box-shadow:0 0 0 4px rgba(37,99,235,.35); }
 
-/* ===== GRID único del formulario ===== */
-.dt-grid{
-  /* 2 columnas de “campo” en desktop, 1 en móviles */
+/* ===== GRID de 3 columnas ===== */
+.dt-grid3{
   display: grid;
-  gap: 0;                       /* sin huecos: sensación de bloque único */
-  grid-template-columns: repeat(2, minmax(320px, 1fr));
-  border-top: 1px solid var(--border);   /* líneas horizontales entre filas */
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
 }
-@media (max-width: 900px){
-  .dt-grid{ grid-template-columns: 1fr; }
+@media (max-width: 1200px){ .dt-grid3{ grid-template-columns: repeat(2, minmax(280px, 1fr)); } }
+@media (max-width: 780px){ .dt-grid3{ grid-template-columns: 1fr; } }
+
+/* Cada columna es un recuadro gris (como la imagen) */
+.grupo{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 10px;
 }
 
-/* Cada fila contiene 2 “campo” (o 1 si se usa .campo--wide) */
-.fila{
-  display: contents;  /* las filas no generan cajas, solo ordenan */
+/* Secciones a ancho completo (descripción, asociados, seguimiento) */
+.grupo--full{
+  grid-column: 1 / -1;
 }
 
 /* ===== Campo: label a la izquierda, valor a la derecha ===== */
 .campo{
   display: grid;
-  grid-template-columns: 220px 1fr;  /* ancho label fijo */
+  grid-template-columns: 200px 1fr;   /* ancho del label */
   align-items: start;
-  column-gap: 16px;
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--border);  /* línea de separación */
+  column-gap: 14px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
 }
+.campo:last-child{ border-bottom: 0; }
+
 @media (max-width: 520px){
   .campo{ grid-template-columns: 160px 1fr; }
 }
 
-/* Campo que ocupa todo el ancho del grid */
-.campo--wide{
+/* Campo que ocupa 100% dentro del grupo */
+.campo--full{
   grid-column: 1 / -1;
 }
 
-/* Label a la izquierda */
 .campo > label{
   margin-top: 2px;
   font-size: 12px;
   color: var(--muted);
   letter-spacing: .2px;
 }
-
-/* Valor a la derecha */
-.campo > span,
-.campo .as-text,
-.campo .campo__content{
+.campo > span, .campo .as-text, .campo .campo__content{
   font-size: 15px;
   font-weight: 600;
   color: var(--ink);
 }
 
-/* Botón “como texto” (recategorizar/reasignar/observador) */
+/* “Botón como texto” para acciones inline */
 .as-text{
   display:inline; padding:0; margin:0; background:transparent; border:none;
   color: var(--primary); cursor:pointer; text-decoration:none;
@@ -106,17 +95,17 @@
 .as-text:hover{ text-decoration: underline; }
 .as-text:focus-visible{ outline: 2px solid rgba(37,99,235,.35); outline-offset: 2px; }
 
-/* Descripción larga: panel con scroll pero integrado */
+/* Descripción integrada pero con borde interno y scroll si es larga */
 .descripcion-wrap{
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 10px;
   max-height: 260px;
   overflow: auto;
   background: #fff;
 }
 
-/* Botón secundario para acciones internas del form (seguimiento, etc.) */
+/* Botón secundario para seguimiento dentro del formulario */
 .btn-sec{
   display:inline-flex; align-items:center; gap:6px;
   padding:8px 12px; border-radius:10px;
@@ -125,13 +114,13 @@
 }
 .btn-sec:hover{ background:#f8fafc; }
 .btn-sec:focus-visible{ outline:2px solid rgba(37,99,235,.35); outline-offset:2px; }
-.mt-8{ margin-top:8px; }
 
-/* ===== Modales (sin cambios de paleta) ===== */
+.mt-8{ margin-top: 8px; }
+
+/* ===== Modales (misma paleta) ===== */
 .modal-overlay{
-  position: fixed; inset: 0; z-index: 50;
-  background: rgba(15, 23, 42, .4);
-  display: grid; place-items: center;
+  position: fixed; inset: 0; background: rgba(15, 23, 42, .4);
+  display:grid; place-items:center; z-index:50;
 }
 .modal-card{
   width: min(920px, 96vw);
@@ -152,4 +141,4 @@
 }
 .modal-close:hover{ background:#f8fafc; }
 .modal-close:focus-visible{ outline:2px solid rgba(37,99,235,.35); outline-offset:2px; }
-.modal-body{ padding:16px; max-height:min(70vh, 640px); overflow:auto; background:#fff; }
+.modal-body{ padding:16px; max-height:min(70vh,640px); overflow:auto; background:#fff; }
