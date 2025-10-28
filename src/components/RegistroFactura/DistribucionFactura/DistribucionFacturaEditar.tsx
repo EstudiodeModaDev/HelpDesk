@@ -181,25 +181,55 @@ export default function DistribucionFacturaEditar({
     }
   };
 
-  // 🗑️ Eliminar distribución
-  const handleEliminar = async () => {
-    if (!distribucion.Id) {
-      alert("No se puede eliminar: falta el Id del registro.");
-      return;
+  // 🗑️ Eliminar distribución y facturas relacionadas
+const handleEliminar = async () => {
+  if (!distribucion.Id) {
+    alert("No se puede eliminar: falta el Id del registro.");
+    return;
+  }
+
+  const confirmar = window.confirm(
+    "¿Seguro deseas eliminar el registro de distribución y sus facturas relacionadas?"
+  );
+  if (!confirmar) return;
+
+  try {
+    // 1️⃣ Buscar facturas relacionadas con este IdDistrubuida
+    const filtro = `fields/IdDistrubuida eq ${distribucion.Id}`;
+    const posiblesFacturas = await serviceFact.getAll({ filter: filtro });
+    const facturasRelacionadas = posiblesFacturas.items || [];
+
+    if (facturasRelacionadas.length > 0) {
+      console.log(`🗑️ Se eliminarán ${facturasRelacionadas.length} facturas con IdDistrubuida=${distribucion.Id}`);
+
+      // 2️⃣ Eliminar cada factura encontrada
+      for (const factura of facturasRelacionadas) {
+        if (factura.id0 != null) {
+          try {
+            await serviceFact.delete(String(factura.id0));
+            console.log(`✅ Factura eliminada Id=${factura.id0}`);
+          } catch (err) {
+            console.error(`❌ Error al eliminar factura Id=${factura.id0}:`, err);
+          }
+        }
+      }
+    } else {
+      console.log("ℹ️ No se encontraron facturas relacionadas para eliminar.");
     }
 
-    const confirmar = window.confirm("¿Seguro deseas eliminar el registro de distribución?");
-    if (!confirmar) return;
+    // 3️⃣ Eliminar la distribución principal
+    await serviceDist.delete(String(distribucion.Id));
+    console.log("✅ Distribución eliminada correctamente.");
 
-    try {
-      await serviceDist.delete(String(distribucion.Id));
-      onEliminar?.(String(distribucion.Id));
-      onClose();
-    } catch (err) {
-      console.error("❌ Error al eliminar distribución:", err);
-      alert("Error al eliminar la distribución.");
-    }
-  };
+    // 4️⃣ Refrescar o cerrar modal
+    onEliminar?.(String(distribucion.Id));
+    onClose();
+  } catch (err) {
+    console.error("❌ Error al eliminar distribución o facturas:", err);
+    alert("Error al eliminar la distribución o sus facturas relacionadas.");
+  }
+};
+
 
   // 🧱 UI del modal
   return (
