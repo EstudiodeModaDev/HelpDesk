@@ -22,6 +22,7 @@ import UsuariosPanel from './components/Usuarios/Usuarios';
 import HomeIcon from "./assets/home.svg"
 import addIcon from "./assets/add.svg"
 import seeTickets from "./assets/tickets.svg"
+import tareasIcon from "./assets/tareas.svg"
 /* ---------------------- ROLES & NAVS ---------------------- */
 type Role = 'Administrador' | 'Técnico' | 'Usuario';
 
@@ -36,8 +37,8 @@ export type MenuItem = {
 const NAVS_ADMIN: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketForm/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon:  <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
-  { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
+  { id: 'ticketTable', label: 'Ver Tickets',  icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
+  { id: 'task',        label: 'Tareas',       icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage/> },
   { id: 'formatos',    label: 'Formatos',     icon: '📄', to: <Formatos/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
   { id: 'admin', label: 'Administración', icon: '⚙️', children: [
@@ -67,8 +68,8 @@ const NAVS_ADMIN: MenuItem[] = [
 const NAVS_TECNICO: MenuItem[] = [
   { id: 'home',        label: 'Home',         icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home/> },
   { id: 'ticketform',  label: 'Nuevo Ticket', icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketForm/> },
-  { id: 'ticketTable', label: 'Ver Tickets',  icon:  <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
-  { id: 'task',        label: 'Tareas',       icon: '✅', to: <TareasPage/> },
+  { id: 'ticketTable', label: 'Ver Tickets',  icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets/>},
+  { id: 'task',        label: 'Tareas',       icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage/> },
   { id: 'info',        label: 'Información',  icon: '📘', to: <InfoPage/> },
   { id: 'admin', label: 'Administración', icon: '⚙️', children: [
        { id: 'anuncios',    label: 'Anuncios', to: <RegistroFactura/>},
@@ -217,12 +218,7 @@ function Sidebar(props: {navs: readonly MenuItem[]; selected: string; onSelect: 
         const active = selected === n.id;
         return (
           <li key={n.id} className="sb-li">
-            <button
-              className={`sideItem sideItem--leaf ${active ? 'sideItem--active' : ''}`}
-              style={{ paddingLeft: pad + 18 }}
-              onClick={() => onSelect(n.id)}
-              aria-current={active ? 'page' : undefined}
-            >
+            <button className={`sideItem sideItem--leaf ${active ? 'sideItem--active' : ''}`} style={{ paddingLeft: pad + 18 }} onClick={() => onSelect(n.id)} aria-current={active ? 'page' : undefined}>
               <span className="sideItem__icon" aria-hidden="true">{n.icon ?? '•'}</span>
               <span className="sideItem__label">{n.label}</span>
             </button>
