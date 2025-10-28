@@ -148,7 +148,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
       </div>
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
-      <TicketsAsociados key={selected.ID} ticket={selected} onSelect={(t) => {setSelected(t); setShowSeg(false); }}/>
+      <div className="seccion"><TicketsAsociados key={selected.ID} ticket={selected} onSelect={(t) => {setSelected(t); setShowSeg(false); }}/></div>
 
       {/* Botón Seguimiento (toggle) */}
       <div>
@@ -159,7 +159,7 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
 
       {/* Historial (solo si showSeg = true) */}
       {showSeg && (
-        <div style={{ marginTop: 16 }}>
+        <div className="seccion">
           <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} onAddClick={() => {}} onViewClick={() => {}} ticket={selected}/>
         </div>
       )}
