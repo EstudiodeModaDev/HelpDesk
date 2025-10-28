@@ -78,43 +78,41 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       <div className="cd-grid">
         {/* Fechas */}
-        <Row className="col-1" label="Fecha de Apertura">
+        <Row className="pos-apertura" label="Fecha de Apertura">
           <span className="cd-pill">{toUtcIso(new Date(selected.FechaApertura ?? "")) ?? "—"}</span>
         </Row>
-        <Row className="col-2" label="Fecha de solución">
+        <Row className="pos-solucion" label="Fecha de solución">
           <span>{toUtcIso(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span>
         </Row>
 
         {/* Estado / ANS */}
-        <Row className="col-1" label="Estado">
+        <Row className="pos-estado" label="Estado">
           <div className="cd-inline">
             <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
               {selected.Estadodesolicitud}
             </span>
           </div>
         </Row>
-        <Row className="col-2" label="ANS">
+        <Row className="pos-ans" label="ANS">
           <span>{selected.ANS ?? "—"}</span>
         </Row>
 
         {/* Categoría (derecha) */}
-        <Row className="col-3" label="Categoría">
+        <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
             <button type="button" className="as-text" title="Recategorizar ticket" onClick={() => setShowRecat(true)}>
               {categoria || "–"}
             </button>
-          ) : (
-            <span>{categoria || "–"}</span>
-          )}
+          ) : (<span>{categoria || "–"}</span>)}
         </Row>
 
-        {/* Fuente solicitante (izquierda, alta) */}
-        <Row className="col-1 row-tall" label="Fuente solicitante">
+        {/* Fuente (alto doble en col 1) */}
+        <Row className="pos-fuente" label="Fuente solicitante">
           <span>{selected.Fuente ?? "—"}</span>
         </Row>
 
-        {/* Franja de personas (centro + derecha) */}
-        <div className="cd-people">
+        {/* Personas (ocupa col 2-3) */}
+        <div className="cd-people pos-people">
           {/* Actor */}
           <div className="cd-people-item">
             <div className="cd-people-label">Actor</div>
@@ -130,12 +128,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-label">Observador</div>
             <div className="cd-people-value">
               {canRecategorizar ? (
-                <button type="button" className="as-text" title="Asignar observador" onClick={() => setShowObservador(true)}>
+                <button type="button" className="as-text" onClick={() => setShowObservador(true)}>
                   {selected.Observador || "–"}
                 </button>
-              ) : (
-                <span title="No tiene permisos">{selected.Observador || "—"}</span>
-              )}
+              ) : (<span>{selected.Observador || "—"}</span>)}
             </div>
           </div>
           {/* Resolutor */}
@@ -143,23 +139,20 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-label">Resolutor</div>
             <div className="cd-people-value">
               {canRecategorizar ? (
-                <button type="button" className="as-text" title="Reasignar ticket" onClick={() => setShowReasig(true)}>
+                <button type="button" className="as-text" onClick={() => setShowReasig(true)}>
                   {selected.Nombreresolutor || "–"}
                 </button>
-              ) : (
-                <span title="No tiene permisos">{selected.Nombreresolutor || "–"}</span>
-              )}
+              ) : (<span>{selected.Nombreresolutor || "–"}</span>)}
             </div>
           </div>
         </div>
 
-        {/* Bloque derecho: título / descripción / casos */}
-        <div className="cd-fields">
-          <Row label="Título"><span>{selected.Title}</span></Row>
-          <Row className="row-lg" label="Descripción"><HtmlContent html={selected.Descripcion ?? ""} /></Row>
-          <Row label="Casos asociados"><span>—</span></Row>
-        </div>
+        {/* Columna derecha en orden vertical */}
+        <Row className="pos-titulo" label="Título"><span>{selected.Title}</span></Row>
+        <Row className="pos-descr" label="Descripción"><HtmlContent html={selected.Descripcion ?? ""} /></Row>
+        <Row className="pos-casos" label="Casos asociados"><span>—</span></Row>
       </div>
+
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
       <div className="seccion">

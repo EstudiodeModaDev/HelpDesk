@@ -133,3 +133,39 @@
   .cd-grid{ grid-template-columns: 1fr; }
   .col-1, .col-2, .col-3, .span-2, .full { grid-column: 1 !important; }
 }
+
+/* === GRID LÓGICO: 3 columnas, autoflow denso === */
+.cd-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 16px;
+  grid-auto-rows: min-content;
+}
+
+/* Utilidades de colocación por CELDA */
+.pos-apertura   { grid-column: 1; grid-row: 1; }
+.pos-solucion   { grid-column: 2; grid-row: 1; }
+.pos-categoria  { grid-column: 3; grid-row: 1; }
+
+.pos-estado     { grid-column: 1; grid-row: 2; }
+.pos-ans        { grid-column: 2; grid-row: 2; }
+
+.pos-fuente     { grid-column: 1; grid-row: 3 / span 2; }   /* alto doble */
+.pos-people     { grid-column: 2 / span 2; grid-row: 3; }   /* ocupa col 2-3 */
+
+.pos-titulo     { grid-column: 3; grid-row: 4; }
+.pos-descr      { grid-column: 3; grid-row: 5; }
+.pos-casos      { grid-column: 3; grid-row: 6; }
+
+/* tickets asociados ocupa todo el ancho del grid */
+.seccion{ grid-column: 1 / -1; }
+
+@media (max-width: 1100px){
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .pos-people, .pos-titulo, .pos-descr, .pos-casos{ grid-column: 1 / -1; }
+  .pos-fuente{ grid-row: auto; grid-column: 1 / -1; }
+}
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .cd-row{ grid-template-columns: 160px 1fr; }
+}
