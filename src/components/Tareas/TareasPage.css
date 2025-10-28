@@ -1,15 +1,13 @@
 /* ==========================================================================
-   1) Scope + TOKENS (claros SIEMPRE, incluso si el SO está en oscuro)
+   1) Scope + tokens (forzamos tema claro con tus variables)
    ========================================================================== */
 
-/* Forzamos que controles nativos usen tema claro y aislamos el scope */
 .tareas-page,
 .tareas-page .ft-scope,
 .tareas-page .lt-scope{
   color-scheme: light;
   isolation: isolate;
 
-  /* === TOKENS FIJOS (los que enviaste) === */
   --bg: #ffffff;
   --surface: #ffffff;
   --border: #e5e7eb;
@@ -24,14 +22,14 @@
   --radius: 14px;
   --shadow: 0 12px 28px rgba(2, 6, 23, .08);
 
-  /* Layout tokens específicos de la página */
-  --gap: 18px;
-  --pad: 16px;
-  --col-left: 320px;    /* Form */
-  --col-right: 280px;   /* Resumen */
+  /* Layout tokens */
+  --gap: 24px;
+  --pad: 18px;
+  --col-left: 340px;
+  --col-right: 300px;
 }
 
-/* Si el sistema está en oscuro, mantenemos EXACTAMENTE los mismos valores */
+/* Mantiene los mismos valores en modo oscuro */
 @media (prefers-color-scheme: dark){
   .tareas-page,
   .tareas-page .ft-scope,
@@ -52,27 +50,27 @@
   }
 }
 
-/* Fondo general y texto base */
-.tareas-page{
-  background: var(--bg);
-  color: var(--ink);
-  padding: 16px;
-  box-sizing: border-box;
-  min-height: 100%;
-}
-
 /* ==========================================================================
-   2) GRID PRINCIPAL (3 columnas: Form – Lista – Resumen)
+   2) Estructura principal
    ========================================================================== */
 
+/* Fondo general limpio (sin color, sin sombra) */
 .tareas-page{
+  background: transparent;
+  color: var(--ink);
+  padding: 24px;
+  box-sizing: border-box;
+  min-height: 100vh;
   display: grid;
   grid-template-columns: var(--col-left) 1fr var(--col-right);
   gap: var(--gap);
   align-items: start;
 }
 
-/* Skin de tarjeta para los hijos directos (uniforma los 3 paneles) */
+/* ==========================================================================
+   3) Paneles (los 3 hijos principales)
+   ========================================================================== */
+
 .tareas-page > *{
   background: var(--surface);
   border: 1px solid var(--border);
@@ -80,132 +78,33 @@
   box-shadow: var(--shadow);
   padding: var(--pad);
   min-width: 0;
+  width: 100%;             /* todos mismo ancho en su grid cell */
+  box-sizing: border-box;
 }
 
-/* Laterales “sticky” como en la maqueta */
+/* Laterales sticky */
 .tareas-page > :nth-child(1),
 .tareas-page > :nth-child(3){
   position: sticky;
-  top: 16px; /* ajusta si tienes header fijo */
+  top: 20px;
 }
 
-/* La lista central respira un poco más */
+/* Ajuste visual del panel central */
 .tareas-page > :nth-child(2){
-  padding: calc(var(--pad) + 4px) calc(var(--pad) + 2px);
+  padding: calc(var(--pad) + 4px);
 }
 
 /* ==========================================================================
-   3) ELEMENTOS COMUNES (tabs, badges, inputs rápidos)
+   4) Responsividad
    ========================================================================== */
 
-/* Títulos internos */
-.tareas-page h2, .tareas-page h3{
-  margin: 0 0 8px 0;
-  line-height: 1.2;
-}
-
-/* Tabs (usando role ARIA o clases) */
-.tareas-page [role="tablist"], .tareas-page .tabs{
-  display: inline-flex;
-  gap: 8px;
-  padding: 6px;
-  background: var(--field-bg);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-}
-
-.tareas-page [role="tab"], .tareas-page .tab{
-  border: 0;
-  background: transparent;
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.tareas-page [role="tab"][aria-selected="true"],
-.tareas-page .tab.is-active{
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: 0 2px 8px rgba(0,0,0,.06);
-}
-
-/* Badges de estado (ejemplos) */
-.tareas-page .badge{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  line-height: 1;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--field-bg);
-  color: var(--ink);
-  border: 1px solid var(--border);
-}
-.tareas-page .badge--alta{ color: var(--danger); }
-.tareas-page .badge--media{ color: #b45309; } /* ámbar */
-.tareas-page .badge--baja{ color: #16a34a; }  /* verde */
-
-/* Inputs/botones rápidos coherentes con tokens */
-.tareas-page input[type="text"],
-.tareas-page input[type="search"],
-.tareas-page select,
-.tareas-page textarea{
-  width: 100%;
-  font: inherit;
-  padding: 10px 12px;
-  background: var(--field-bg);
-  color: var(--ink);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 6px);
-  outline: none;
-}
-.tareas-page input:focus,
-.tareas-page select:focus,
-.tareas-page textarea:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px var(--ring);
-}
-
-/* Botón primario (si algún hijo no tiene estilos propios) */
-.tareas-page .btn,
-.tareas-page button.primary{
-  background: var(--primary);
-  color: var(--primary-ink);
-  border: 1px solid var(--primary);
-  border-radius: calc(var(--radius) - 6px);
-  padding: 10px 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.tareas-page .btn:focus,
-.tareas-page button.primary:focus{
-  box-shadow: 0 0 0 4px var(--ring);
-}
-
-/* ==========================================================================
-   4) RESPONSIVO
-   ========================================================================== */
-
-@media (min-width: 1200px){
-  .tareas-page{ --gap: 22px; }
-}
-
-@media (max-width: 1199px){
-  .tareas-page{
-    --col-left: 300px;
-    --col-right: 260px;
-  }
-}
-
-/* 2 columnas (form + lista) y el resumen abajo */
+/* 2 columnas (form + lista) y resumen abajo */
 @media (max-width: 1023px){
   .tareas-page{
     grid-template-columns: var(--col-left) 1fr;
     grid-template-areas:
-      "left   center"
-      "right  right";
+      "left center"
+      "right right";
   }
   .tareas-page > :nth-child(1){ grid-area: left; }
   .tareas-page > :nth-child(2){ grid-area: center; }
