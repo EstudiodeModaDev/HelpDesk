@@ -1,11 +1,8 @@
 import * as React from "react";
 import type { Ticket } from "../../Models/Tickets";
 import "./DetalleTicket.css";
-
 import TicketHistorial from "../Seguimiento/Seguimiento";
 import HtmlContent from "../Renderizador/Renderizador";
-import { toISODateTimeFlex } from "../../utils/Date";
-
 import Recategorizar from "./ModalRecategorizar/Recategorizar";
 import Reasignar from "./Reasignar/Reasignar";
 import AsignarObservador from "./Observador/Observador";
@@ -24,128 +21,143 @@ type Props = {
 };
 
 /* ================== Componente ================== */
-export default function DetalleTicket({ ticket, onVolver, role }: Props) {
-  // Estado interno: ticket seleccionado (se actualiza con los clics de TicketsAsociados)
-  const [selected, setSelected] = React.useState<Ticket>(ticket);
+export type Opcion = { value: string; label: string };
 
-  // Si cambia la prop `ticket` (por navegación externa), sincroniza el seleccionado
-  React.useEffect(() => {
-    if (!selected || selected.ID !== ticket.ID) {
-      setSelected(ticket);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticket?.ID]);
 
-  // Modales y toggles
-  const [showSeg, setShowSeg] = React.useState(false);
-  const [showRecat, setShowRecat] = React.useState(false);
-  const [showReasig, setShowReasig] = React.useState(false);
-  const [showObservador, setShowObservador] = React.useState(false);
+function Row({label, children,}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="cd-row">
+      <label className="cd-label">{label}</label>
+      <div className="cd-value">{children}</div>
+    </div>
+  );
+}
 
-  const canRecategorizar = hasRecatRole(role);
+export function CaseDetail({ticket, onVolver, role}: Props) {
+   const [selected, setSelected] = React.useState<Ticket>(ticket);
+    React.useEffect(() => {
+      if (!selected || selected.ID !== ticket.ID) {
+        setSelected(ticket);
+      }
+    }, [ticket?.ID]);
+    const [showSeg, setShowSeg] = React.useState(false);
+    const [showRecat, setShowRecat] = React.useState(false);
+    const [showReasig, setShowReasig] = React.useState(false);
+    const [showObservador, setShowObservador] = React.useState(false);
+    const canRecategorizar = hasRecatRole(role);
 
-  // Derivados del ticket seleccionado
-  const categoria = [selected.Categoria, selected.SubCategoria, selected.SubSubCategoria]
-    .filter(Boolean)
-    .join(" > ");
+    // Derivados del ticket seleccionado
+    const categoria = [selected.Categoria, selected.SubCategoria, selected.SubSubCategoria].filter(Boolean).join(" > ");
 
-  const fechaApertura = toISODateTimeFlex(selected.FechaApertura) || "–";
-  const fechaMaxSolucion = selected.TiempoSolucion
-    ? `${toISODateTimeFlex(selected.TiempoSolucion)}${selected.ANS ? ` (${selected.ANS})` : ""}`
-    : "No hay fecha de solución establecida";
+    if (!selected) return <div>Ticket no encontrado</div>;
 
-  if (!selected) return <div>Ticket no encontrado</div>;
 
   return (
-    <div className="detalle-ticket">
-      {/* Header superior */}
-      <button className="btn-volver" onClick={onVolver}>← Volver</button>
-      <h2>Detalles Ticket #{selected.ID}</h2>
+    <section className="case-detail">
+      {/* Encabezado */}
+      <header className="cd-header">
+        <h2 className="cd-title"> Caso – ID {ticket.ID}</h2>
+        <button className="btn-volver" onClick={onVolver}>← Volver</button>
+      </header>
 
-      <div className="dt-grid3">
-        
-        <div className="grupo">
-          <div className="campo">
-            <label>Fecha de Apertura</label>
-            <span>{fechaApertura}</span>
-          </div>
+      {/* Grid de 3 columnas */}
+      <div className="cd-grid">
+        {/* Columna 1 */}
+        <div className="cd-panel">
+          <Row label="Fecha de Apertura">
+            <span className="cd-pill">{ticket.FechaApertura}</span>
+          </Row>
+          {/*<Row label="Tiempo para adueñarse">
+            <span>{data.tiempoAdueñarse ?? "—"}</span>
+          </Row>*/}
+          <Row label="Fecha de solución">
+            <span>{ticket.TiempoSolucion ?? "—"}</span>
+          </Row>
 
-          <div className="campo">
-            <label>Fecha máxima de solución</label>
-            <span>{fechaMaxSolucion}</span>
-          </div>
-        </div>
+          <hr className="cd-div" />
 
-        <div className="grupo">
-          <div className="campo">
-            <label>Estado del caso</label>
-            <span>{selected.Estadodesolicitud || "–"}</span>
-          </div>
-
-          <div className="campo">
-            <label>Categoría</label>
-            {canRecategorizar ? (
-              <button type="button" className="as-text" onClick={() => setShowRecat(true)} title="Recategorizar ticket" >
-                {categoria || "–"}
-              </button>
-            ) : (
-              <span title="No tiene permisos para recategorizar">{categoria || "–"}</span>
-            )}
-          </div>
-
-          <div className="campo">
-            <label>Fuente de solicitud</label>
-            <span>{selected.Fuente || "–"}</span>
-          </div>
-        </div>
-
-        <div className="grupo">
-          <div className="campo">
-            <label>Solicitante del ticket</label>
-            <span>{selected.Solicitante || "–"}</span>
-          </div>
-
-          <div className="campo">
-            <label>Resolutor del caso</label>
-            {canRecategorizar ? (
-              <button type="button" className="as-text" onClick={() => setShowReasig(true)} title="Reasignar ticket" >
-                {selected.Nombreresolutor || "–"}
-              </button>
-            ) : (
-              <span title="No tiene permisos para reasignar">{selected.Nombreresolutor || "–"}</span>
-            )}
-          </div>
-
-          <div className="campo">
-            <label>Observador del caso</label>
-            {canRecategorizar ? (
-              <button type="button" className="as-text" onClick={() => setShowObservador(true)} title="Asignar observador del ticket">
-                {selected.Observador || "–"}
-              </button>
-            ) : (
-              <span title="No tiene permisos para nombrar un observador">
-                {selected.Observador || "No hay observador asignado"}
+          <Row label="Estado">
+            <div className="cd-inline">
+              <span className={`cd-badge ${ticket.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
+                {ticket.Estadodesolicitud}
               </span>
-            )}
-          </div>
+            </div>
+          </Row>
+          <Row label="ANS">
+            <span>{ticket.ANS}</span>
+          </Row>
         </div>
 
-        <div className="grupo">
-          <div className="campo">
-            <label>Asunto</label>
-            <span>{selected.Title}</span>
+        {/* Columna 2 */}
+        <div className="cd-panel">
+          <hr className="cd-div" />
+
+          <Row label="Categoría">
+            <button type="button" className="as-text" onClick={() => setShowRecat(true)} title="Recategorizar ticket" >
+              {categoria || "–"}
+            </button>
+          </Row>
+          <Row label="Fuente solicitante">
+            <span>{ticket.Fuente}</span>
+          </Row>
+        </div>
+
+        {/* Columna 3 */}
+        <div className="cd-panel cd-col3">
+          {/* Franja de 4 columnas */}
+          <div className="cd-people">
+            <div className="cd-people-item">
+              <div className="cd-people-label">Actor</div>
+            </div>
+            <div className="cd-people-item">
+              <div className="cd-people-label">Solicitante</div>
+              <div className="cd-people-value">{ticket.Solicitante}</div>
+            </div>
+            <div className="cd-people-item">
+              <div className="cd-people-label">Observador</div>
+              <div className="cd-people-value">
+                {canRecategorizar ? (
+                  <button type="button" className="as-text" onClick={() => setShowObservador(true)} title="Asignar observador del ticket">
+                    {selected.Observador || "–"}
+                  </button>
+                ) : (
+                  <span title="No tiene permisos para nombrar un observador">
+                    {selected.Observador || "No hay observador asignado"}
+                  </span>
+                )}
+            </div>
+            </div>
+            <div className="cd-people-item">
+              <div className="cd-people-label">Resolutor</div>
+              {canRecategorizar ? (
+                <button type="button" className="as-text" onClick={() => setShowReasig(true)} title="Reasignar ticket" >
+                  {selected.Nombreresolutor || "–"}
+                </button>
+              ) : (
+                <span title="No tiene permisos para reasignar">{selected.Nombreresolutor || "–"}</span>
+              )}
+            </div>
           </div>
 
-          <div className="campo campo--wide">
-            <label>Descripción del caso</label>
-            <div className="descripcion-wrap">
+          <div className="cd-fields">
+            <Row label="Título">
+              <span>{ticket.Title}</span>
+            </Row>
+            <Row label="Descripción">
               <HtmlContent html={selected.Descripcion} />
-            </div>
+            </Row>
+            <Row label="Casos asociados">
+              <span>—</span>
+            </Row>
           </div>
         </div>
       </div>
 
-      {/* ======= Tickets relacionados (padre/hijos) ======= */}
+      {/* Acciones */}
+       {/* ======= Tickets relacionados (padre/hijos) ======= */}
       <div className="seccion"><TicketsAsociados key={selected.ID} ticket={selected} onSelect={(t) => {setSelected(t); setShowSeg(false); }}/></div>
 
       {/* Botón Seguimiento (toggle) */}
@@ -206,6 +218,8 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }
+
+
