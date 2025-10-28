@@ -222,14 +222,12 @@
 }
 
 /* Anula halo INTERNO del input de react-select */
-.ft-form .rs__control input:focus,
-.ft-form .rs__control *:focus{
+.ft-form .rs__control input:focus, .ft-form .rs__control *:focus{
   box-shadow: none !important;
   outline: none !important;
 }
 
-.ft-form .rs__control input,
-.ft-form .rs__control input:focus{
+.ft-form .rs__control input, .ft-form .rs__control input:focus{
   background: none !important;          
   box-shadow: none !important;
   outline: none !important;
@@ -271,7 +269,7 @@
 }
 
 .rs__option--is-focused{
-  background: #eff6ff !important; /* azul muy claro */
+  background: transparent !important; /* azul muy claro */
 }
 
 .rs__option--is-selected{
