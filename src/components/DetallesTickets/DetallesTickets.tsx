@@ -62,88 +62,90 @@ export default function DetalleTicket({ ticket, onVolver, role }: Props) {
       <button className="btn-volver" onClick={onVolver}>← Volver</button>
       <h2>Detalles Ticket #{selected.ID}</h2>
 
-      {/* Fila 1: Asunto / Categoría */}
-      <div className="fila">
-        <div className="campo">
-          <label>Asunto</label>
-          <span>{selected.Title}</span>
-        </div>
+      <div className="dt-grid">
+        {/* Fila 1: Asunto / Categoría */}
+        <div className="fila">
+          <div className="campo">
+            <label>Asunto</label>
+            <span>{selected.Title}</span>
+          </div>
 
-        <div className="campo">
-          <label>Categoría</label>
-          {canRecategorizar ? (
-            <button type="button" className="as-text" onClick={() => setShowRecat(true)} title="Recategorizar ticket" >
-              {categoria || "–"}
-            </button>
-          ) : (
-            <span title="No tiene permisos para recategorizar">{categoria || "–"}</span>
-          )}
-        </div>
-      </div>
-
-      {/* Fila 2: Fechas */}
-      <div className="fila">
-        <div className="campo">
-          <label>Fecha de Apertura</label>
-          <span>{fechaApertura}</span>
-        </div>
-        <div className="campo">
-          <label>Fecha máxima de solución</label>
-          <span>{fechaMaxSolucion}</span>
-        </div>
-      </div>
-
-      {/* Fila 3: Resolutor / Solicitante */}
-      <div className="fila">
-        <div className="campo">
-          <label>Resolutor del caso</label>
-          {canRecategorizar ? (
-            <button type="button" className="as-text" onClick={() => setShowReasig(true)} title="Reasignar ticket" >
-              {selected.Nombreresolutor || "–"}
-            </button>
-          ) : (
-            <span title="No tiene permisos para reasignar">{selected.Nombreresolutor || "–"}</span>
-          )}
-        </div>
-        <div className="campo">
-          <label>Solicitante del ticket</label>
-          <span>{selected.Solicitante || "–"}</span>
-        </div>
-      </div>
-
-      {/* Fila 4: Estado / Fuente */}
-      <div className="fila">
-        <div className="campo">
-          <label>Estado del caso</label>
-          <span>{selected.Estadodesolicitud || "–"}</span>
-        </div>
-
-        <div className="campo">
-          <label>Fuente de solicitud</label>
-          <span>{selected.Fuente || "–"}</span>
-        </div>
-      </div>
-
-      {/* Fila 5: Descripción / Observador */}
-      <div className="fila">
-        <div className="campo">
-          <label>Descripción del caso</label>
-          <div className="descripcion-wrap">
-            <HtmlContent html={selected.Descripcion} />
+          <div className="campo">
+            <label>Categoría</label>
+            {canRecategorizar ? (
+              <button type="button" className="as-text" onClick={() => setShowRecat(true)} title="Recategorizar ticket" >
+                {categoria || "–"}
+              </button>
+            ) : (
+              <span title="No tiene permisos para recategorizar">{categoria || "–"}</span>
+            )}
           </div>
         </div>
 
-        <div className="campo">
-          <label>Observador del caso</label>
-          {canRecategorizar ? (
-            <button type="button" className="as-text" onClick={() => setShowObservador(true)} title="Asignar observador del ticket">
-              {selected.Observador || "–"}
-            </button>
-          ) : (
-            <span title="No tiene permisos para nombrar un observador">
-              {selected.Observador || "No hay observador asignado"}
-            </span>
-          )}
+        {/* Fila 2: Fechas */}
+        <div className="fila">
+          <div className="campo">
+            <label>Fecha de Apertura</label>
+            <span>{fechaApertura}</span>
+          </div>
+          <div className="campo">
+            <label>Fecha máxima de solución</label>
+            <span>{fechaMaxSolucion}</span>
+          </div>
+        </div>
+
+        {/* Fila 3: Resolutor / Solicitante */}
+        <div className="fila">
+          <div className="campo">
+            <label>Resolutor del caso</label>
+            {canRecategorizar ? (
+              <button type="button" className="as-text" onClick={() => setShowReasig(true)} title="Reasignar ticket" >
+                {selected.Nombreresolutor || "–"}
+              </button>
+            ) : (
+              <span title="No tiene permisos para reasignar">{selected.Nombreresolutor || "–"}</span>
+            )}
+          </div>
+          <div className="campo">
+            <label>Solicitante del ticket</label>
+            <span>{selected.Solicitante || "–"}</span>
+          </div>
+        </div>
+
+        {/* Fila 4: Estado / Fuente */}
+        <div className="fila">
+          <div className="campo">
+            <label>Estado del caso</label>
+            <span>{selected.Estadodesolicitud || "–"}</span>
+          </div>
+
+          <div className="campo">
+            <label>Fuente de solicitud</label>
+            <span>{selected.Fuente || "–"}</span>
+          </div>
+        </div>
+
+        {/* Fila 5: Descripción / Observador */}
+        <div className="fila">
+          <div className="campo campo--wide">
+            <label>Descripción del caso</label>
+            <div className="descripcion-wrap">
+              <HtmlContent html={selected.Descripcion} />
+            </div>
+          </div>
+
+          <div className="campo">
+            <label>Observador del caso</label>
+            {canRecategorizar ? (
+              <button type="button" className="as-text" onClick={() => setShowObservador(true)} title="Asignar observador del ticket">
+                {selected.Observador || "–"}
+              </button>
+            ) : (
+              <span title="No tiene permisos para nombrar un observador">
+                {selected.Observador || "No hay observador asignado"}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
