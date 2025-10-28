@@ -196,122 +196,94 @@
    - Mantener un halo EXTERNO de foco en el control
    - Eliminar halos INTERNOS del input invisible de react-select
    =======================================================*/
-
-/* Contenedor del control */
-.rs__control{
-  min-height: 42px;
+rs-override .rs__control{
+  min-height: var(--input-h);
+  height: var(--input-h);
+  border: 1px solid var(--bd) !important;
   border-radius: 10px !important;
-  border: 1px solid var(--border) !important;
-  background: var(--field-bg) !important;
-  box-shadow: none !important;            /* sin sombras por defecto */
+  background:#fff !important;
+  box-shadow: none !important;
+  overflow: hidden; /* 👈 impide que la flecha se salga del borde */
 }
-
-/* Foco del control: SOLO anillo EXTERNO */
-.rs__control--is-focused{
+.rs-override .rs__control:hover{
+  border-color: var(--bd-strong) !important;
+}
+.rs-override .rs__control--is-focused{
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px var(--ring) !important;
-  background: var(--field-bg) !important;       /* importante */
-  background-clip: padding-box;
+  box-shadow: 0 0 0 4px var(--ring) !important; /* halo exterior correcto */
 }
 
-/* Deshabilitado */
-.rs__control--is-disabled{
-  background: var(--field-bg-disabled) !important;
-  color: #94a3b8 !important;
-  cursor: not-allowed !important;
+/* Value & padding */
+.rs-override .rs__value-container{
+  padding: 0 12px !important;
 }
 
-/* Anula halo INTERNO del input de react-select */
-.ft-form .rs__control input:focus, .ft-form .rs__control *:focus{
-  box-shadow: none !important;
+/* Indicadores: SIN flecha custom y alineados dentro */
+.rs-override .rs__indicators{
+  width: auto;
+  padding-right: 8px;
+  justify-content: flex-end;
+}
+.rs-override .rs__indicator-separator{ display:none !important; }
+
+/* Elimina la flecha que añadíamos vía ::after */
+.rs-override .rs__indicators::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* Asegura que el caret propio no desborde */
+.rs-override .rs__dropdown-indicator{
+  padding: 0 !important;
+}
+.rs-override .rs__dropdown-indicator svg{
+  display: block; /* evita espacios inline que empujan fuera */
+}
+
+/* Quitar halo interno del input de búsqueda */
+.rs-override .rs__input input,
+.rs-override .rs__input input:focus,
+.rs-override .rs__input input:focus-visible{
   outline: none !important;
-}
-
-.ft-form .rs__control input, .ft-form .rs__control input:focus{
-  background: none !important;          
   box-shadow: none !important;
+  background: transparent;
+}
+/* Cubre cualquier hijo con focus accidental */
+.rs-override .rs__control *:focus{
   outline: none !important;
+  box-shadow: none !important;
 }
 
-
-/* Placeholder / valor seleccionado */
-.rs__placeholder{ color: #94a3b8 !important; }
-.rs__single-value{ color: var(--ink) !important; }
-
-/* Input interno (texto) */
-.rs__input-container{ color: var(--ink) !important; }
-.rs__value-container{
-  background: transparent !important;
+/* Menú y opciones */
+.rs-override .rs__menu{
+  border:1px solid var(--bd);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  margin-top:6px;
+}
+.rs-override .rs__menu-list{
+  padding:6px 0 !important;
+  max-height:280px;
+}
+.rs-override .rs__option{
+  padding:10px 14px !important;
+  font-size:.98rem;
+}
+.rs-override .rs__option--is-focused{
+  background:#f3f4f6 !important;
+}
+.rs-override .rs__option--is-selected{
+  background:#eef2ff !important;
+  color:var(--ink) !important;
+  font-weight:600;
 }
 
+/* Placeholder / texto */
+.rs-override .rs__placeholder{ color: var(--muted) !important; }
+.rs-override .rs__single-value{ color: var(--ink) !important; }
+.rs-override .rs__input-container input{ color: var(--ink) !important; }
 
-/* Indicadores (flecha) y separador */
-.rs__indicator-separator{ display: none; }
-.rs__dropdown-indicator{ color: #64748b !important; }
-
-/* Menú desplegable */
-.rs__menu{
-  margin-top: 6px !important;
-  border-radius: 10px !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: var(--shadow) !important;
-  overflow: hidden;
-  z-index: 20;
-}
-
-.rs__menu-list{ padding: 6px !important; }
-
-/* Opción */
-.rs__option{
-  border-radius: 8px;
-  padding: 10px 10px;
-  color: var(--ink);
-}
-
-.rs__option--is-focused{
-  background: transparent !important; /* azul muy claro */
-}
-
-.rs__option--is-selected{
-  background: #dbeafe !important;
-}
-
-/* Mensajes del menú */
-.rs__no-options,
-.rs__loading-message{
-  color: #64748b !important;
-  padding: 10px !important;
-}
-
-/* =========================================================
-   10) DECORADO DE OPCIÓN CUSTOM (si usas Option personalizada)
-   =======================================================*/
-.rs-opt{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.rs-opt__text{
-  display: grid;
-  gap: 2px;
-}
-.rs-opt__title{
-  font-weight: 600;
-  color: var(--ink);
-}
-.rs-opt__meta{
-  font-size: 12px;
-  color: #64748b;
-}
-.rs-opt__tag{
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
-  border: 1px solid #e0e7ff;
-}
 
 .ft-form input:focus, .ft-form select:focus{
   outline: none;
@@ -320,7 +292,6 @@
   background: transparent;                              /* ok para inputs nativos */
 }
 
-.ft-form .rs__control input:focus{ background: transparent !important; }
 /* =========================================================
    11) AJUSTES VISUALES / COHERENCIA
    ---------------------------------------------------------
@@ -386,54 +357,5 @@
   .ft-title{ font-size: 18px; }
 }
 
-/* =========================================================
-   13) CONTEXTO TAREAS PAGE (SI COEXISTE CON OTRAS TARJETAS)
-   ---------------------------------------------------------
-   - Evita centrado/estiramiento cuando se renderiza 
-     junto con otras cards dentro de un grid mayor
-   =======================================================*/
-.tareas-page .ft-card,
-.tareas-page .lt-card{
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  min-height: unset;
-}
 
-.ft-form .rs__control{
-  background: var(--field-bg) !important;
-}
 
-/* 2) Todo lo de adentro debe ser transparente (para que no aparezca el rectángulo) */
-.ft-form .rs__control *{
-  background: transparent !important;
-}
-
-/* 3) Enfocado: anillo externo; fondo del control se mantiene y lo interno sigue transparente */
-.ft-form .rs__control--is-focused{
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px var(--ring) !important;
-  background: var(--field-bg) !important;
-  background-clip: padding-box;
-}
-
-/* 4) Casos especiales: input interno y value container */
-.ft-form .rs__value-container,
-.ft-form .rs__input-container,
-.ft-form .rs__control input,
-.ft-form .rs__control input:focus{
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-/* 5) Si el menú usa portal no lo toques; pero si ves el borde blanco pegado,
-      asegúrate de que el menú tenga margen/separación. */
-.ft-form .rs__menu{
-  margin-top: 6px !important;
-}
-
-/* SOLO para depurar (quítalo luego) */
-.ft-form .rs__control > * { outline: 1px dashed red; }
-.ft-form .rs__value-container { outline-color: blue; }
-.ft-form .rs__input-container { outline-color: green; }
