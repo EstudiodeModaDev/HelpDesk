@@ -83,27 +83,32 @@ export default function DistribucionFacturaEditar({
       console.log("✅ Distribución actualizada correctamente.");
 
       // 🔹 3️⃣ Buscar facturas relacionadas por IdDistribuida
-      if (!distribucion.IdDistribuida) {
-        console.warn("⚠️ No hay IdDistribuida para buscar facturas relacionadas.");
-      } else {
-        const filtro = `fields/IdDistribuida eq ${distribucion.IdDistribuida}`;
+      // 🔹 3️⃣ Buscar facturas relacionadas por IdDistribuida (que apunta al Id de la distribución actual)
+        if (!distribucion.Id) {
+        console.warn("⚠️ No hay Id de distribución para buscar facturas relacionadas.");
+        } else {
+        const filtro = `fields/IdDistrubuida eq ${distribucion.Id}`;
+
         const posiblesFacturas = await serviceFact.getAll({ filter: filtro });
         const facturasRelacionadas = posiblesFacturas.items || [];
 
-        if (facturasRelacionadas.length > 0) {
-          console.log(`📄 Se encontraron ${facturasRelacionadas.length} facturas con IdDistribuida=${distribucion.IdDistribuida}`);
+       if (facturasRelacionadas.length > 0) {
+            console.log(
+                `📄 Se encontraron ${facturasRelacionadas.length} facturas con IdDistrubuida=${distribucion.Id}`
+            );
 
-          // 🔹 4️⃣ Armar cambios a aplicar a todas las facturas
-          const cambiosFactura = limpiarDatos({
-            FechaEmision: formData.FechaEmision || null,
-            NoFactura: formData.NoFactura,
-            CargoFijo: Number(formData.CargoFijo),
-            ImpBnCedi: Number(formData.ImpBnCedi),
-            ImpBnPalms: Number(formData.ImpBnPalms),
-            ImpColorPalms: Number(formData.ImpColorPalms),
-            ImpBnCalle: Number(formData.ImpBnCalle),
-            ImpColorCalle: Number(formData.ImpColorCalle),
-          });
+            // 🔹 4️⃣ Armar cambios a aplicar a todas las facturas
+            const cambiosFactura = limpiarDatos({
+                FechaEmision: formData.FechaEmision || null,
+                NoFactura: formData.NoFactura,
+                CargoFijo: Number(formData.CargoFijo),
+                ImpBnCedi: Number(formData.ImpBnCedi),
+                ImpBnPalms: Number(formData.ImpBnPalms),
+                ImpColorPalms: Number(formData.ImpColorPalms),
+                ImpBnCalle: Number(formData.ImpBnCalle),
+                ImpColorCalle: Number(formData.ImpColorCalle),
+            });
+
 
           // 🔁 5️⃣ Actualizar cada factura
           for (const factura of facturasRelacionadas) {
