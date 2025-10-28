@@ -212,9 +212,14 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
       delete (distribucion as any).Id;
 
               // ✅ Convertir fecha antes de enviar
-        if (formData.FechaEmision) {
-          distribucion.FechaEmision = formData.FechaEmision;
-        }
+        // ✅ Convertir fecha antes de enviar en formato DD/MM/YYYY
+if (formData.FechaEmision) {
+  const fechaOriginal = new Date(formData.FechaEmision);
+  const dia = String(fechaOriginal.getDate()).padStart(2, "0");
+  const mes = String(fechaOriginal.getMonth() + 1).padStart(2, "0");
+  const anio = fechaOriginal.getFullYear();
+  distribucion.FechaEmision = `${dia}/${mes}/${anio}`;
+}
 
       const res = await registrarDistribucion(distribucion);
       const distribucionId = (res && (res.Id)) ?? res; 
