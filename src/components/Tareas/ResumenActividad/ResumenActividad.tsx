@@ -7,13 +7,13 @@ type Props = {
   title?: string;
   percent: number;
   tasks: Tarea[];
-  tasksPerWeek: number;
+  taskThisMonth: number;
   locale?: string;
   accentColor?: string;
   ringSize?: number;
 };
 
-export default function ActivityStatusCard({title = "Estado de actividad", percent, tasks, tasksPerWeek, locale = "es-CO", accentColor, ringSize = 140,}: Props) {
+export default function ActivityStatusCard({title = "Estado de actividad", percent, tasks, taskThisMonth, locale = "es-CO", accentColor, ringSize = 140,}: Props) {
 
   const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
   const stroke = 10;
@@ -73,8 +73,8 @@ export default function ActivityStatusCard({title = "Estado de actividad", perce
 
       {/* ===== Pie / frecuencia ===== */}
       <footer className="as-footer" aria-label="Frecuencia objetivo">
-        <strong className="as-footer-value">{tasksPerWeek}</strong>
-        <span className="as-footer-text">tareas por semana</span>
+        <strong className="as-footer-value">{taskThisMonth}</strong>
+        <span className="as-footer-text">tareas este mes</span>
       </footer>
     </section>
   );

@@ -41,6 +41,7 @@ async function patchTarea(TareaSvc: any, id: string, data: Partial<Tarea>) {
 export function useTareas(TareaSvc: TareasService) {
   const [rows, setRows] = React.useState<Tarea[]>([]);
   const [monthlyItems, setMonthlyItems] = React.useState<Tarea[]>([]);
+  const [cantidadTareas, setCantidadTareas] = React.useState<number>(0);
   const [percentaje, setPercentaje] = React.useState<number>(0)
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -127,6 +128,7 @@ export function useTareas(TareaSvc: TareasService) {
 
       setMonthlyItems(itemsPendientes);
       setPercentaje(porcentaje);
+      setCantidadTareas(total)
     } catch (e: any) {
       setError(e?.message ?? "Error cargando tareas");
       setMonthlyItems([]);
@@ -238,7 +240,7 @@ export function useTareas(TareaSvc: TareasService) {
   }, [loadTasks]);
 
   return {
-    rows, loading, error, filterMode,  state, errors, percentaje, monthlyItems,
+    rows, loading, error, filterMode,  state, errors, percentaje, monthlyItems, cantidadTareas,
     setFilterMode, setField, handleSubmit, deleteTask, iniciarTarea, finalizarTarea, reloadAll,
   };
 }

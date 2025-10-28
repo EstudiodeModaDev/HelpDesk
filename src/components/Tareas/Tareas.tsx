@@ -11,12 +11,12 @@ export default function TareasPage() {
   const {Tareas} = (useGraphServices() as ReturnType<typeof useGraphServices> & {
     Tareas: TareasService
   });
-  const { monthlyItems, percentaje } = useTareas(Tareas);
+  const { monthlyItems, percentaje, cantidadTareas } = useTareas(Tareas);
   return (
     <div className="tareas-page">
       <FormTarea />
       <ListaTareas/>
-      <ActivityStatusCard percent={percentaje} tasks={monthlyItems} tasksPerWeek={5}/>
+      <ActivityStatusCard percent={percentaje} tasks={monthlyItems} taskThisMonth={cantidadTareas}/>
     </div>
   );
 }
