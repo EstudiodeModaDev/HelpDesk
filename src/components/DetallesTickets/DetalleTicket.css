@@ -169,3 +169,46 @@
   .cd-grid{ grid-template-columns: 1fr; }
   .cd-row{ grid-template-columns: 160px 1fr; }
 }
+
+/* === Grid base (ya lo tienes) === */
+.cd-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 16px;
+  grid-auto-rows: min-content;
+}
+
+/* ===== POSICIONES NUEVAS ===== */
+/* Fila 1 */
+.pos-apertura { grid-column: 1; grid-row: 1; }
+.pos-solucion { grid-column: 2; grid-row: 1; }
+.pos-fuente   { grid-column: 3; grid-row: 1; }   /* aquí colocamos “Fuente solicitante” */
+
+/* Fila 2 */
+.pos-categoria{ grid-column: 1; grid-row: 2; }
+.pos-ans      { grid-column: 2; grid-row: 2; }
+.pos-estado   { grid-column: 3; grid-row: 2; }
+
+/* Fila 3: franja personas en una sola fila (4 cajas internas) */
+.pos-people   { grid-column: 1 / -1; grid-row: 3; }
+
+/* Fila 4-6: bloques independientes full-width */
+.pos-titulo   { grid-column: 1 / -1; grid-row: 4; }
+.pos-descr    { grid-column: 1 / -1; grid-row: 5; }
+.pos-casos    { grid-column: 1 / -1; grid-row: 6; }
+
+/* Franja de personas: 4 columnas internas */
+.cd-people{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+@media (max-width: 1100px){
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .pos-people, .pos-titulo, .pos-descr, .pos-casos{ grid-column: 1 / -1; }
+}
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .cd-row{ grid-template-columns: 160px 1fr; }
+}
+

@@ -77,15 +77,30 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       </header>
 
       <div className="cd-grid">
-        {/* Fechas */}
+        {/* Fila 1 */}
         <Row className="pos-apertura" label="Fecha de Apertura">
           <span className="cd-pill">{toUtcIso(new Date(selected.FechaApertura ?? "")) ?? "—"}</span>
         </Row>
         <Row className="pos-solucion" label="Fecha de solución">
           <span>{toUtcIso(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span>
         </Row>
+        <Row className="pos-fuente" label="Fuente solicitante">
+          <span>{selected.Fuente ?? "—"}</span>
+        </Row>
 
-        {/* Estado / ANS */}
+        {/* Fila 2 */}
+        <Row className="pos-categoria" label="Categoría">
+          {canRecategorizar ? (
+            <button type="button" className="as-text" onClick={() => setShowRecat(true)}>
+              {categoria || "–"}
+            </button>
+          ) : (<span>{categoria || "–"}</span>)}
+        </Row>
+
+        <Row className="pos-ans" label="ANS">
+          <span>{selected.ANS ?? "—"}</span>
+        </Row>
+
         <Row className="pos-estado" label="Estado">
           <div className="cd-inline">
             <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
@@ -93,37 +108,17 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             </span>
           </div>
         </Row>
-        <Row className="pos-ans" label="ANS">
-          <span>{selected.ANS ?? "—"}</span>
-        </Row>
 
-        {/* Categoría (derecha) */}
-        <Row className="pos-categoria" label="Categoría">
-          {canRecategorizar ? (
-            <button type="button" className="as-text" title="Recategorizar ticket" onClick={() => setShowRecat(true)}>
-              {categoria || "–"}
-            </button>
-          ) : (<span>{categoria || "–"}</span>)}
-        </Row>
-
-        {/* Fuente (alto doble en col 1) */}
-        <Row className="pos-fuente" label="Fuente solicitante">
-          <span>{selected.Fuente ?? "—"}</span>
-        </Row>
-
-        {/* Personas (ocupa col 2-3) */}
+        {/* Fila 3: personas */}
         <div className="cd-people pos-people">
-          {/* Actor */}
           <div className="cd-people-item">
             <div className="cd-people-label">Actor</div>
             <div className="cd-people-value">—</div>
           </div>
-          {/* Solicitante */}
           <div className="cd-people-item">
             <div className="cd-people-label">Solicitante</div>
             <div className="cd-people-value">{selected.Solicitante ?? "—"}</div>
           </div>
-          {/* Observador */}
           <div className="cd-people-item">
             <div className="cd-people-label">Observador</div>
             <div className="cd-people-value">
@@ -134,7 +129,6 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
               ) : (<span>{selected.Observador || "—"}</span>)}
             </div>
           </div>
-          {/* Resolutor */}
           <div className="cd-people-item">
             <div className="cd-people-label">Resolutor</div>
             <div className="cd-people-value">
@@ -147,10 +141,14 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
           </div>
         </div>
 
-        {/* Columna derecha en orden vertical */}
-        <Row className="pos-titulo" label="Título"><span>{selected.Title}</span></Row>
-        <Row className="pos-descr" label="Descripción"><HtmlContent html={selected.Descripcion ?? ""} /></Row>
-        <Row className="pos-casos" label="Casos asociados"><span>—</span></Row>
+        {/* Fila 4-6 */}
+        <Row className="pos-titulo" label="Título">
+          <span>{selected.Title}</span>
+        </Row>
+
+        <Row className="pos-descr" label="Descripción">
+          <HtmlContent html={selected.Descripcion ?? ""} />
+        </Row>
       </div>
 
 
