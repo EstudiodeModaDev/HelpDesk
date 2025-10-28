@@ -71,7 +71,7 @@ export function useTareas(TareaSvc: TareasService) {
 
     return {
       filter: f.join(" and "),
-      orderby: "createdDateTime desc",
+      orderby: "fields/Fechadesolicitud desc",
       top: 1000,
     };
   }, [filterMode]);
