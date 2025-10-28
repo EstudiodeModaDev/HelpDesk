@@ -230,7 +230,7 @@
 
 .ft-form .rs__control input,
 .ft-form .rs__control input:focus{
-  background: transparent !important;           /* quita el rectángulo blanco */
+  background: none !important;           /* quita el rectángulo blanco */
   box-shadow: none !important;
   outline: none !important;
 }
@@ -315,8 +315,7 @@
   border: 1px solid #e0e7ff;
 }
 
-.ft-form input:focus,
-.ft-form select:focus{
+.ft-form input:focus, .ft-form select:focus{
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 4px var(--ring);
