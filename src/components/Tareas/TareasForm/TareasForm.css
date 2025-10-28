@@ -432,3 +432,8 @@
 .ft-form .rs__menu{
   margin-top: 6px !important;
 }
+
+/* SOLO para depurar (quítalo luego) */
+.ft-form .rs__control > * { outline: 1px dashed red; }
+.ft-form .rs__value-container { outline-color: blue; }
+.ft-form .rs__input-container { outline-color: green; }
