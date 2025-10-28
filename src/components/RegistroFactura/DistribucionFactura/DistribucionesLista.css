@@ -41,7 +41,7 @@
 
 /* Contenedor de tabla */
 .table-responsive {
-  overflow-x: auto;
+  overflow-x: auto; /* Scroll horizontal */
   overflow-y: auto;
   max-height: 65vh;
   border: 1px solid #ddd;
@@ -52,7 +52,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: fixed; /* Para columnas con ancho fijo */
   min-width: 1000px;
   background-color: #fff;
   font-size: 14px;
@@ -60,10 +60,11 @@
 
 .table th,
 .table td {
-  padding: 10px 8px;
+  padding: 8px 6px; /* Reducido para caber mejor */
   text-align: center;
   border-bottom: 1px solid #e0e0e0;
   word-wrap: break-word;
+  vertical-align: middle;
 }
 
 /* Cabecera */
@@ -90,6 +91,7 @@
 /* ================================
    📏 ANCHOS DE COLUMNAS
    ================================ */
+
 .table th:nth-child(1),
 .table td:nth-child(1) {
   width: 160px; /* Proveedor */
@@ -121,6 +123,24 @@
 .table th:nth-child(9),
 .table td:nth-child(9) {
   width: 140px; /* Costos */
+}
+
+/* Última columna ACCIONES */
+.table th:nth-child(10),
+.table td:nth-child(10) {
+  width: 100px; /* Fijar ancho máximo */
+  white-space: nowrap; /* Evitar salto de línea en botones */
+  text-align: center;
+}
+
+/* Botón editar en ACCIONES */
+.table td:nth-child(10) .btn {
+  padding: 4px 8px;
+  font-size: 13px;
+  max-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ================================
