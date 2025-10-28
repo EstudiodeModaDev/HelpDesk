@@ -29,7 +29,7 @@ import filesIcon from "./assets/file.svg";
    Tipos de navegación y contexto de visibilidad
    ============================================================ */
 
-type Role = "Administrador" | "Técnico" | "Usuario";
+type Role = "Administrador" | "Tecnico" | "Usuario";
 
 type RenderCtx = {services?: { Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService }};
 
@@ -58,19 +58,19 @@ export type NavContext = {
 
 const NAV: MenuItem[] = [
   {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home /> },
-  {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Técnico"],},
+  {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
   {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
-  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, roles: ["Administrador", "Técnico", "Usuario"],},
+  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, roles: ["Administrador", "Tecnico"],},
   {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage /> },
   {id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
-  {id: "info", label: "Información", to: <InfoPage /> },
-  {id: "admin", label: "Administración", roles: ["Administrador", "Técnico"], children: [
-      { id: "anuncios", label: "Anuncios", to: <RegistroFactura /> },
+  {id: "info", label: "Información", to: <InfoPage />,  },
+  {id: "admin", label: "Administración", roles: ["Administrador", "Tecnico"], children: [
+      { id: "anuncios", label: "Anuncios", to: <RegistroFactura />, roles: ["Administrador", "Tecnico"]},
       { id: "plantillas", label: "Plantillas", to: <CrearPlantilla /> },
       { id: "usuarios", label: "Usuarios", to: <UsuariosPanel />, roles: ["Administrador"] },
     ],
   },
-  {id: "acciones", label: "Acciones", roles: ["Administrador", "Técnico"], children: [
+  {id: "acciones", label: "Acciones", roles: ["Administrador", "Tecnico"], children: [
       {id: "siesa", label: "Siesa", children: [{id: "cajpos", label: "Cajeros POS", to: (rctx: RenderCtx) =>
                                                                                       rctx.services ? (
                                                                                         <CajerosPOSForm services={{ Tickets: rctx.services.Tickets, Logs: rctx.services.Logs }} />
@@ -307,7 +307,7 @@ function LoggedApp({ user }: { user: User }) {
 
   // contexto de visibilidad: rol, flags y disponibilidad de servicios
   const navCtx = React.useMemo<NavContext>(() => {
-    const safeRole: Role = role === "Administrador" || role === "Técnico" || role === "Usuario" ? (role as Role) : "Usuario";
+    const safeRole: Role = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as Role) : "Usuario";
     return {
       role: safeRole,
       flags: new Set<string>([ ]),
