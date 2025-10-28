@@ -37,10 +37,10 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(260px, 1fr)); /* 🔹 inputs más angostos */
-  gap: 28px; /* 🔹 más separación entre columnas */
+  gap: 30px; /* 🔹 más separación entre columnas */
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   .form-grid { grid-template-columns: repeat(2, minmax(240px, 1fr)); }
 }
 
@@ -62,7 +62,7 @@
   margin-bottom: 6px;
   color: var(--muted);
   font-weight: 600;
-  padding-right: 10px; /* 🔹 más espacio horizontal visual */
+  padding-right: 15px; /* 🔹 más espacio horizontal visual */
   white-space: nowrap;
 }
 
@@ -115,6 +115,14 @@
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
 }
+
+/* 🔹 Ajustar ancho del selector de proveedor */
+#proveedor-select {
+  width: 85% !important; /* mismo ancho que los demás */
+  max-width: 260px; /* opcional: evita que se estire demasiado */
+  flex: unset; /* anula el "flex: 1" heredado del .form-group */
+}
+
 
 /* ========= Botón de guardar ========= */
 .btn-guardar {
