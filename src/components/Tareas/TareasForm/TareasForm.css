@@ -399,3 +399,36 @@
   margin: 0;
   min-height: unset;
 }
+
+.ft-form .rs__control{
+  background: var(--field-bg) !important;
+}
+
+/* 2) Todo lo de adentro debe ser transparente (para que no aparezca el rectángulo) */
+.ft-form .rs__control *{
+  background: transparent !important;
+}
+
+/* 3) Enfocado: anillo externo; fondo del control se mantiene y lo interno sigue transparente */
+.ft-form .rs__control--is-focused{
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--ring) !important;
+  background: var(--field-bg) !important;
+  background-clip: padding-box;
+}
+
+/* 4) Casos especiales: input interno y value container */
+.ft-form .rs__value-container,
+.ft-form .rs__input-container,
+.ft-form .rs__control input,
+.ft-form .rs__control input:focus{
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* 5) Si el menú usa portal no lo toques; pero si ves el borde blanco pegado,
+      asegúrate de que el menú tenga margen/separación. */
+.ft-form .rs__menu{
+  margin-top: 6px !important;
+}
