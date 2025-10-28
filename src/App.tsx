@@ -60,10 +60,10 @@ const NAV: MenuItem[] = [
   {id: "home", label: "Home", icon: <img src={HomeIcon} alt="" className="sb-icon" />, to: <Home /> },
   {id: "ticketform", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: () => <NuevoTicketForm />, roles: ["Administrador", "Tecnico"],},
   {id: "ticketform_user", label: "Nuevo Ticket", icon: <img src={addIcon} alt="" className="sb-icon" />, to: <NuevoTicketUsuarioForm />, roles: ["Usuario"],},
-  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />, roles: ["Administrador", "Tecnico", "Usuario"],},
-  {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage /> },
+  {id: "ticketTable", label: "Ver Tickets", icon: <img src={seeTickets} alt="" className="sb-icon" />, to: <TablaTickets />,},
+  {id: "task", label: "Tareas", icon: <img src={tareasIcon} alt="" className="sb-icon" />, to: <TareasPage />, roles: ["Administrador", "Tecnico"] },
   {id: "formatos", label: "Formatos", icon: <img src={filesIcon} alt="" className="sb-icon" />, to: <Formatos />, roles: ["Administrador"] },
-  {id: "info", label: "Información", to: <InfoPage />,  },
+  {id: "info", label: "Información", to: <InfoPage />, roles: ["Administrador", "Tecnico"]  },
   {id: "admin", label: "Administración", roles: ["Administrador", "Tecnico"], children: [
       { id: "anuncios", label: "Anuncios", to: <RegistroFactura />, roles: ["Administrador", "Tecnico"]},
       { id: "plantillas", label: "Plantillas", to: <CrearPlantilla /> },
