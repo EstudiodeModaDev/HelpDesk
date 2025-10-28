@@ -75,7 +75,7 @@ export default function TablaTickets() {
 
       {/* Tabla o Detalle */}
       {ticketSeleccionado ? (
-        <DetalleTicket ticket={ticketSeleccionado} role={userRole.role} />
+        <DetalleTicket onVolver={() => setTicketSeleccionado(null)} ticket={ticketSeleccionado} role={userRole.role} />
       ) : (
         <div className="table-wrap">
           <table>

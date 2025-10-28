@@ -18,12 +18,13 @@ const hasRecatRole = (r?: string) => {
 };
 
 type Props = {
-  ticket: Ticket;          // Ticket con el que se abre el detalle
+  ticket: Ticket;          
+  onVolver: () => void;
   role: string;
 };
 
 /* ================== Componente ================== */
-export default function DetalleTicket({ ticket, role }: Props) {
+export default function DetalleTicket({ ticket, onVolver, role }: Props) {
   // Estado interno: ticket seleccionado (se actualiza con los clics de TicketsAsociados)
   const [selected, setSelected] = React.useState<Ticket>(ticket);
 
@@ -58,6 +59,7 @@ export default function DetalleTicket({ ticket, role }: Props) {
   return (
     <div className="detalle-ticket">
       {/* Header superior */}
+      <button className="btn-volver" onClick={onVolver}>← Volver</button>
       <h2>Detalles Ticket #{selected.ID}</h2>
 
       {/* Fila 1: Asunto / Categoría */}

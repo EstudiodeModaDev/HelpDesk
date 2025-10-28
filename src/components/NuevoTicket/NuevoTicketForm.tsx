@@ -229,12 +229,7 @@ export default function NuevoTicketForm() {
           {/* Fecha de apertura (opcional) */}
           <div className="tf-field tf-col-2">
             <label className="tf-checkbox">
-              <input
-                type="checkbox"
-                checked={state.usarFechaApertura}
-                onChange={(ev) => setField("usarFechaApertura", ev.target.checked)}
-                disabled={submitting}
-              />
+              <input type="checkbox" checked={state.usarFechaApertura} onChange={(ev) => setField("usarFechaApertura", ev.target.checked)} disabled={submitting}/>
               <span>Escoger fecha de apertura</span>
             </label>
           </div>
@@ -242,14 +237,7 @@ export default function NuevoTicketForm() {
           {state.usarFechaApertura && (
             <div className="tf-field tf-col-2">
               <label className="tf-label" htmlFor="fechaApertura">Fecha de apertura</label>
-              <input
-                id="fechaApertura"
-                type="date"
-                value={state.fechaApertura ?? ""}
-                onChange={(e) => setField("fechaApertura", e.target.value || null)}
-                disabled={submitting}
-                className="tf-input"
-              />
+              <input id="fechaApertura" type="date" value={state.fechaApertura ?? ""} onChange={(e) => setField("fechaApertura", e.target.value || null)} disabled={submitting} className="tf-input"/>
               {errors.fechaApertura && <small className="error">{errors.fechaApertura}</small>}
             </div>
           )}
@@ -257,13 +245,7 @@ export default function NuevoTicketForm() {
           {/* Fuente */}
           <div className="tf-field tf-col-2">
             <label className="tf-label" htmlFor="fuente">Fuente Solicitante</label>
-            <select
-              id="fuente"
-              value={state.fuente}
-              onChange={(e) => setField("fuente", e.target.value as typeof state.fuente)}
-              disabled={submitting}
-              className="tf-input"
-            >
+            <select id="fuente" value={state.fuente} onChange={(e) => setField("fuente", e.target.value as typeof state.fuente)} disabled={submitting} className="tf-input">
               <option value="">Seleccione una fuente</option>
               <option value="Correo">Correo</option>
               <option value="Disponibilidad">Disponibilidad</option>
@@ -277,26 +259,14 @@ export default function NuevoTicketForm() {
           {/* Motivo */}
           <div className="tf-field tf-col-2">
             <label className="tf-label" htmlFor="motivo">Motivo de la solicitud</label>
-            <input
-              id="motivo"
-              type="text"
-              placeholder="Ingrese el motivo"
-              value={state.motivo}
-              onChange={(e) => setField("motivo", e.target.value)}
-              disabled={submitting}
-              className="tf-input"
-            />
+            <input id="motivo" type="text" placeholder="Ingrese el motivo" value={state.motivo} onChange={(e) => setField("motivo", e.target.value)} disabled={submitting} className="tf-input"/>
             {errors.motivo && <small className="error">{errors.motivo}</small>}
           </div>
 
           {/* Descripción */}
           <div className="tf-field tf-col-2">
             <label className="tf-label">Descripción del problema</label>
-            <RichTextBase64
-              value={state.descripcion}
-              onChange={(html) => setField("descripcion", html)}
-              placeholder="Describe el problema y pega capturas (Ctrl+V)…"
-            />
+            <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
             {errors.descripcion && <small className="error">{errors.descripcion}</small>}
           </div>
 
@@ -304,16 +274,8 @@ export default function NuevoTicketForm() {
           <div className="tf-row tf-row--cats tf-col-2">
             <div className="tf-field">
               <label className="tf-label">Categoría</label>
-              <Select
-                classNamePrefix="rs"
-                options={catOptions}
-                value={catValue}
-                onChange={onCategoriaChange}
-                isDisabled={disabledCats}
-                placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
-                filterOption={makeFilter()}
-                isClearable
-              />
+              <Select classNamePrefix="rs" options={catOptions} value={catValue} onChange={onCategoriaChange} isDisabled={disabledCats} placeholder={loadingCatalogos ? "Cargando categorías..." : "Seleccione una categoría"}
+                filterOption={makeFilter()} isClearable/>
               {errors.categoria && <small className="error">{errors.categoria}</small>}
             </div>
 
