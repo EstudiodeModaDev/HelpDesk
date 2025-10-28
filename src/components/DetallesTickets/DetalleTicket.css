@@ -100,3 +100,36 @@
   .cd-grid{ grid-template-columns: 1fr; }
   .cd-row{ grid-template-columns: 160px 1fr; }
 }
+
+/* === GRID LÓGICO: 3 columnas, autoflow denso === */
+.cd-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: min-content;
+  grid-auto-flow: dense;
+  gap: 12px 16px;
+}
+
+/* Utilidades de colocación */
+.col-1 { grid-column: 1; }
+.col-2 { grid-column: 2; }
+.col-3 { grid-column: 3; }
+.span-2 { grid-column: span 2; }
+.full  { grid-column: 1 / -1; }
+
+.row-span-2 { grid-row: span 2; }     /* alto doble */
+.row-tall   .cd-value { min-height: 96px; } /* alto cómodo para textos */
+.row-lg     .cd-value { min-height: 140px; }
+
+/* Franja personas y campos a la derecha */
+.cd-people { grid-column: 2 / span 2; }   /* ocupa columnas 2 y 3 */
+.cd-fields { grid-column: 3; }            /* bloque derecho */
+
+@media (max-width: 1100px){
+  .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .cd-people, .cd-fields { grid-column: 1 / -1; }
+}
+@media (max-width: 720px){
+  .cd-grid{ grid-template-columns: 1fr; }
+  .col-1, .col-2, .col-3, .span-2, .full { grid-column: 1 !important; }
+}

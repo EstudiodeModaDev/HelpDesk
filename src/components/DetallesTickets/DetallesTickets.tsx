@@ -25,18 +25,14 @@ type Props = {
 export type Opcion = { value: string; label: string };
 
 
-function Row({label, children,}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Row({label, children, className = "",}: {label: string; children: React.ReactNode; className?: string;}) {
   return (
-    <div className="cd-row">
+    <div className={`cd-row ${className}`}>
       <label className="cd-label">{label}</label>
       <div className="cd-value">{children}</div>
     </div>
   );
 }
-
 export function CaseDetail({ ticket, onVolver, role }: Props) {
   // === Estado local del ticket seleccionado
   const [selected, setSelected] = React.useState<Ticket>(ticket);
@@ -81,83 +77,88 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       </header>
 
       <div className="cd-grid">
-          <Row label="Fecha de Apertura"><span className="cd-pill">{toUtcIso(new Date(selected.FechaApertura  ?? ""))?? "—"}</span></Row>
-          <Row label="Fecha de solución"><span>{toUtcIso(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span></Row>
-          <hr className="cd-div" />
-          <Row label="Estado">
-            <div className="cd-inline">
-              <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
-                {selected.Estadodesolicitud}
-              </span>
-            </div>
-          </Row>
-          <Row label="ANS"><span>{selected.ANS ?? "—"}</span></Row>
-          <Row label="Categoría">
-            {canRecategorizar ? (
-              <button type="button" className="as-text" title="Recategorizar ticket" onClick={() => setShowRecat(true)}>
-                {categoria || "–"}
-              </button>
-            ) : (
-              <span>{categoria || "–"}</span>
-            )}
-          </Row>
-          <Row label="Fuente solicitante"><span>{selected.Fuente ?? "—"}</span></Row>
+        {/* Fechas */}
+        <Row className="col-1" label="Fecha de Apertura">
+          <span className="cd-pill">{toUtcIso(new Date(selected.FechaApertura ?? "")) ?? "—"}</span>
+        </Row>
+        <Row className="col-2" label="Fecha de solución">
+          <span>{toUtcIso(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span>
+        </Row>
 
-          {/* Franja de 4 columnas */}
-          <div className="cd-people">
-            <div className="cd-people-item">
-              <div className="cd-people-label">Actor</div>
-              <div className="cd-people-value">—</div>
-            </div>
+        {/* Estado / ANS */}
+        <Row className="col-1" label="Estado">
+          <div className="cd-inline">
+            <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
+              {selected.Estadodesolicitud}
+            </span>
+          </div>
+        </Row>
+        <Row className="col-2" label="ANS">
+          <span>{selected.ANS ?? "—"}</span>
+        </Row>
 
-            <div className="cd-people-item">
-              <div className="cd-people-label">Solicitante</div>
-              <div className="cd-people-value">{selected.Solicitante ?? "—"}</div>
-            </div>
+        {/* Categoría (derecha) */}
+        <Row className="col-3" label="Categoría">
+          {canRecategorizar ? (
+            <button type="button" className="as-text" title="Recategorizar ticket" onClick={() => setShowRecat(true)}>
+              {categoria || "–"}
+            </button>
+          ) : (
+            <span>{categoria || "–"}</span>
+          )}
+        </Row>
 
-            <div className="cd-people-item">
-              <div className="cd-people-label">Observador</div>
-              <div className="cd-people-value">
-                {canRecategorizar ? (
-                  <button type="button" className="as-text" title="Asignar observador" onClick={() => setShowObservador(true)}>
-                    {selected.Observador || "–"}
-                  </button>
-                ) : (
-                  <span title="No tiene permisos para nombrar un observador">
-                    {selected.Observador || "No hay observador asignado"}
-                  </span>
-                )}
-              </div>
-            </div>
+        {/* Fuente solicitante (izquierda, alta) */}
+        <Row className="col-1 row-tall" label="Fuente solicitante">
+          <span>{selected.Fuente ?? "—"}</span>
+        </Row>
 
-            <div className="cd-people-item">
-              <div className="cd-people-label">Resolutor</div>
-              <div className="cd-people-value">
-                {canRecategorizar ? (
-                  <button type="button" className="as-text" title="Reasignar ticket" onClick={() => setShowReasig(true)}>
-                    {selected.Nombreresolutor || "–"}
-                  </button>
-                ) : (
-                  <span title="No tiene permisos para reasignar">
-                    {selected.Nombreresolutor || "–"}
-                  </span>
-                )}
-              </div>
+        {/* Franja de personas (centro + derecha) */}
+        <div className="cd-people">
+          {/* Actor */}
+          <div className="cd-people-item">
+            <div className="cd-people-label">Actor</div>
+            <div className="cd-people-value">—</div>
+          </div>
+          {/* Solicitante */}
+          <div className="cd-people-item">
+            <div className="cd-people-label">Solicitante</div>
+            <div className="cd-people-value">{selected.Solicitante ?? "—"}</div>
+          </div>
+          {/* Observador */}
+          <div className="cd-people-item">
+            <div className="cd-people-label">Observador</div>
+            <div className="cd-people-value">
+              {canRecategorizar ? (
+                <button type="button" className="as-text" title="Asignar observador" onClick={() => setShowObservador(true)}>
+                  {selected.Observador || "–"}
+                </button>
+              ) : (
+                <span title="No tiene permisos">{selected.Observador || "—"}</span>
+              )}
             </div>
           </div>
-
-          <div className="cd-fields">
-            <Row label="Título">
-              <span>{selected.Title}</span>
-            </Row>
-            <Row label="Descripción">
-              <HtmlContent html={selected.Descripcion ?? ""} />
-            </Row>
-            <Row label="Casos asociados">
-              <span>—</span>
-            </Row>
+          {/* Resolutor */}
+          <div className="cd-people-item">
+            <div className="cd-people-label">Resolutor</div>
+            <div className="cd-people-value">
+              {canRecategorizar ? (
+                <button type="button" className="as-text" title="Reasignar ticket" onClick={() => setShowReasig(true)}>
+                  {selected.Nombreresolutor || "–"}
+                </button>
+              ) : (
+                <span title="No tiene permisos">{selected.Nombreresolutor || "–"}</span>
+              )}
+            </div>
           </div>
+        </div>
 
+        {/* Bloque derecho: título / descripción / casos */}
+        <div className="cd-fields">
+          <Row label="Título"><span>{selected.Title}</span></Row>
+          <Row className="row-lg" label="Descripción"><HtmlContent html={selected.Descripcion ?? ""} /></Row>
+          <Row label="Casos asociados"><span>—</span></Row>
+        </div>
       </div>
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
