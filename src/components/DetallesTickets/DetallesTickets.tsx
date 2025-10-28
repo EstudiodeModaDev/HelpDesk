@@ -7,7 +7,7 @@ import Recategorizar from "./ModalRecategorizar/Recategorizar";
 import Reasignar from "./Reasignar/Reasignar";
 import AsignarObservador from "./Observador/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
-import { formatYYYYMMDD } from "../../utils/Date";
+import { toUtcIso } from "../../utils/Date";
 
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
@@ -81,8 +81,8 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       </header>
 
       <div className="cd-grid">
-          <Row label="Fecha de Apertura"><span className="cd-pill">{formatYYYYMMDD(new Date(selected.FechaApertura  ?? ""))?? "—"}</span></Row>
-          <Row label="Fecha de solución"><span>{formatYYYYMMDD(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span></Row>
+          <Row label="Fecha de Apertura"><span className="cd-pill">{toUtcIso(new Date(selected.FechaApertura  ?? ""))?? "—"}</span></Row>
+          <Row label="Fecha de solución"><span>{toUtcIso(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span></Row>
           <hr className="cd-div" />
           <Row label="Estado">
             <div className="cd-inline">
