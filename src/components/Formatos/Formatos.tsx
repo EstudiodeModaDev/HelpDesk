@@ -7,18 +7,12 @@ import SolicitudesRed from "./Seguridad de red/SeguridadRed";
 import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
 
-import type { SolicitudUsuario } from "../../Funcionalidades/Formatos";
 import type { OpcionSolicitud } from "../../Models/Formatos";
 import type { FilaSolicitudRed, FilaSolicitudERP } from "../../Models/Formatos";
 import type { FilaPermisoNav } from "../../Funcionalidades/PermisosNavegacion";
 
 /** Opciones del selector */
-const OPCIONES: OpcionSolicitud[] = [
-  "Solicitud de servicios de TI",
-  "FR Admin seguridad unidad de red",
-  "FR Administrador seguridad ERP",
-  "Permisos de navegacion",
-] as const;
+const OPCIONES: OpcionSolicitud[] = ["Solicitud de servicios de TI", "FR Admin seguridad unidad de red", "FR Administrador seguridad ERP", "Permisos de navegacion",] as const;
 
 /** TyC por opción (HTML controlado por nosotros) */
 const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
@@ -78,10 +72,7 @@ export default function Formatos() {
   // Enrutamiento al formulario según la opción elegida
   if (confirmado && opcion) {
     if (opcion === "Solicitud de servicios de TI") {
-      const handleSubmitTI = async (payload: SolicitudUsuario) => {
-        console.log("TI → payload", payload);
-      };
-      return <SolicitudUsuarioForm onSubmit={handleSubmitTI} />;
+      return <SolicitudUsuarioForm />;
     }
 
     if (opcion === "FR Admin seguridad unidad de red") {

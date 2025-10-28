@@ -14,20 +14,10 @@ export type ExtensionTelefonica =
   | "Solicitud nueva"
   | "Traslado";
 
-export type ServicioPrograma =
-  | "ERP"
-  | "Sistema de pedidos"
-  | "AdminPOS"
-  | "POS Principal"
-  | "Correo"
-  | "Office"
-  | "Impresoras"
-  | "Generic Transfer";
-
   export type PermisoRed = "Lectura" | "Escritura" | "Lectura y escritura";
 
   //Modelo solicitud de permisos de red
-  export interface FilaSolicitudRed {
+export interface FilaSolicitudRed {
   id: string;       
   carpeta1: string;
   subcarpeta1: string;
@@ -62,3 +52,38 @@ export interface FilaSolicitudERP {
   usuarioMail: string;
   observaciones: string;
 }
+
+export type Servicios = {
+  correo: boolean;
+  office: boolean;
+  erp: boolean;
+  pedidos: boolean;
+  adminpos: boolean;
+  posprincipal: boolean;
+  impresoras: boolean;
+  generictransfer: boolean;
+};
+
+export type SolicitudUsuario = {
+  solicitadoPor: string;
+  correoSolicitadoPor: string;
+  contratacion: string;
+  nombre: string;
+  apellidos: string;
+  cedula: string;
+  contacto: string;
+  cargo: string;
+  direccion: string;
+  gerencia: string;
+  jefatura: string;
+  centroCostos: string;
+  centroOperativo: string;
+  ciudad: string;
+  fechaIngreso: string; // "yyyy-mm-dd"
+  tipoEquipo: string;
+  extensionTelefonica: string;
+  servicios: Servicios;
+  observaciones: string; 
+};
+
+export type SolicitudUsuarioErrors = Partial<Record<keyof SolicitudUsuario, string>>;
