@@ -208,10 +208,10 @@
 
 /* Foco del control: SOLO anillo EXTERNO */
 .rs__control--is-focused{
-  outline: none;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px var(--ring) !important;   /* anillo externo */
-  background-clip: padding-box;                   /* evita recortes raros */
+  box-shadow: 0 0 0 3px var(--ring) !important;
+  background: var(--field-bg) !important;       /* importante */
+  background-clip: padding-box;
 }
 
 /* Deshabilitado */
@@ -228,12 +228,24 @@
   outline: none !important;
 }
 
+.ft-form .rs__control input,
+.ft-form .rs__control input:focus{
+  background: transparent !important;           /* quita el rectángulo blanco */
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+
 /* Placeholder / valor seleccionado */
 .rs__placeholder{ color: #94a3b8 !important; }
 .rs__single-value{ color: var(--ink) !important; }
 
 /* Input interno (texto) */
 .rs__input-container{ color: var(--ink) !important; }
+.rs__value-container{
+  background: transparent !important;
+}
+
 
 /* Indicadores (flecha) y separador */
 .rs__indicator-separator{ display: none; }
@@ -303,6 +315,15 @@
   border: 1px solid #e0e7ff;
 }
 
+.ft-form input:focus,
+.ft-form select:focus{
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: #fff;                              /* ok para inputs nativos */
+}
+
+.ft-form .rs__control input:focus{ background: transparent !important; }
 /* =========================================================
    11) AJUSTES VISUALES / COHERENCIA
    ---------------------------------------------------------
