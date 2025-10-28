@@ -1,19 +1,19 @@
-/* ========= 0) Alcance + tokens (misma paleta en claro/oscuro) ========= */
+/* ==========================================================================
+   DetalleTicket.css
+   Paleta fija (blanco, gris, azul, negro) y mismo look en dark
+   ========================================================================== */
+
+/* ---- Alcance + tokens ---- */
 .detalle-ticket{
-  /* NO limitar ancho: usar todo el disponible */
   width: 100%;
   max-width: none;
 
-  /* Paleta fija (blanco, gris, azul, negro) */
   --bg: #ffffff;
+  --surface: #ffffff;
   --ink: #0f172a;          /* casi negro */
   --muted: #6b7280;        /* gris texto secundario */
-  --border: #e5e7eb;       /* gris borde */
-  --surface: #ffffff;      /* tarjetas/paneles */
+  --border: #e5e7eb;       /* gris bordes */
   --primary: #2563eb;      /* azul */
-  --warning: #f59e0b;      /* opcional para chips */
-  --danger: #dc2626;       /* rojo leve para acciones */
-
   --radius: 14px;
   --shadow: 0 12px 28px rgba(2, 6, 23, .08);
 
@@ -22,15 +22,15 @@
   color: var(--ink);
 }
 
-/* Fuerza misma paleta en modo oscuro del SO/app */
-.dark .detalle-ticket, 
+/* Forzar misma paleta si el sitio usa dark */
+.dark .detalle-ticket,
 .dark .detalle-ticket *{
   color-scheme: light !important;
 }
 
-/* ========= 1) Encabezado ========= */
+/* ---- Header ---- */
 .detalle-ticket h2{
-  margin: 8px 0 18px 0;
+  margin: 10px 0 18px 0;
   font-size: clamp(18px, 2.4vw, 22px);
   font-weight: 800;
   letter-spacing: .2px;
@@ -55,17 +55,18 @@
   box-shadow: 0 0 0 4px rgba(37,99,235,.35);
 }
 
-/* ========= 2) Cuerpo en filas de 2 columnas (como la imagen) ========= */
+/* ---- Filas de 2 columnas (como la imagen) ---- */
 .fila{
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
   margin: 0 0 12px 0;
 }
 @media (max-width: 860px){
   .fila{ grid-template-columns: 1fr; }
 }
 
+/* ---- Campo tarjeta ---- */
 .campo{
   display: grid;
   grid-template-rows: auto 1fr;
@@ -75,12 +76,11 @@
   border-radius: var(--radius);
   padding: 12px 14px;
   box-shadow: var(--shadow);
-  min-height: 72px;
+  min-height: 78px;
 }
 
 .campo label{
   font-size: 12px;
-  text-transform: none;
   color: var(--muted);
   letter-spacing: .2px;
 }
@@ -93,7 +93,7 @@
   text-align: left;
 }
 
-/* Botón “as-text” (recategorizar, reasignar, observador) */
+/* Botón con apariencia de enlace (recategorizar, reasignar, observador) */
 .as-text{
   display: inline;
   padding: 0;
@@ -107,29 +107,23 @@
 .as-text:hover{ text-decoration: underline; }
 .as-text:focus-visible{ outline: 2px solid rgba(37,99,235,.35); outline-offset: 2px; }
 
-/* Descripción con borde y scroll suave si es larga */
+/* ---- Descripción (panel scrollable) ---- */
 .descripcion-wrap{
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px;
-  max-height: 240px; 
+  max-height: 240px;
   overflow: auto;
   background: #fff;
 }
 
-/* ========= 3) Tickets asociados y separadores ========= */
-.detalle-ticket > .seccion,
-.detalle-ticket > div:not(.fila):not(.modal-overlay){
-  margin-top: 16px;
-}
+/* ---- Secciones extra (tickets asociados, historial) ---- */
+.seccion{ margin-top: 16px; }
 .detalle-ticket hr{
-  border: 0;
-  height: 1px;
-  background: var(--border);
-  margin: 16px 0;
+  border: 0; height: 1px; background: var(--border); margin: 16px 0;
 }
 
-/* ========= 4) Modales ========= */
+/* ---- Modales ---- */
 .modal-overlay{
   position: fixed;
   inset: 0;
@@ -171,14 +165,9 @@
 }
 .modal-close:hover{ background: #f8fafc; }
 .modal-close:focus-visible{ outline: 2px solid rgba(37,99,235,.35); outline-offset: 2px; }
-
 .modal-body{
   padding: 16px;
   max-height: min(70vh, 640px);
   overflow: auto;
   background: #fff;
 }
-
-/* ========= 5) Ajustes menores ========= */
-/* Espacio bajo el botón de seguimiento */
-.detalle-ticket > div > .btn-volver + *{ margin-top: 8px; }
