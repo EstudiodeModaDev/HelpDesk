@@ -1,21 +1,21 @@
-/* ========= Tokens base (reutiliza los del proyecto principal) ========= */
+/* ========= Tokens base ========= */
 :root {
-  --ink:#0f172a;
-  --muted:#6b7280;
-  --bg:#ffffff;
-  --card:#ffffff;
-  --bd:#e5e7eb;
-  --bd-strong:#d1d5db;
-  --primary:#2563eb;
-  --ring:rgba(37,99,235,.35);
-  --radius:12px;
-  --shadow:0 8px 22px rgba(2,6,23,.06);
-  --input-h:34px; /* 🔹 antes 44px, más compacto */
+  --ink: #0f172a;
+  --muted: #6b7280;
+  --bg: #ffffff;
+  --card: #ffffff;
+  --bd: #e5e7eb;
+  --bd-strong: #d1d5db;
+  --primary: #2563eb;
+  --ring: rgba(37, 99, 235, .35);
+  --radius: 12px;
+  --shadow: 0 8px 22px rgba(2, 6, 23, .06);
+  --input-h: 34px; /* altura compacta */
 }
 
 /* ========= Contenedor principal ========= */
 .distribucion-container {
-  max-width: 1400px;
+  max-width: 1200px; /* 🔹 antes 1400px, más compacto */
   margin: 24px auto;
   padding: 20px;
   background: var(--card);
@@ -36,12 +36,12 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(320px, 1fr));
-  gap: 26px; /* 🔹 más espacio entre campos */
+  grid-template-columns: repeat(3, minmax(260px, 1fr)); /* 🔹 inputs más angostos */
+  gap: 28px; /* 🔹 más separación entre columnas */
 }
 
 @media (max-width: 1200px) {
-  .form-grid { grid-template-columns: repeat(3, minmax(280px, 1fr)); }
+  .form-grid { grid-template-columns: repeat(2, minmax(240px, 1fr)); }
 }
 
 @media (max-width: 900px) {
@@ -51,23 +51,29 @@
 /* ========= Campos ========= */
 .form-group {
   grid-column: span 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 🔹 alinear bien el label e input */
 }
 
 .form-group label {
-  display: block;
+  display: inline-block;
   font-size: .98rem;
-  margin-bottom: 8px; /* 🔹 más espacio label-input */
+  margin-bottom: 6px;
   color: var(--muted);
   font-weight: 600;
+  padding-right: 10px; /* 🔹 más espacio horizontal visual */
+  white-space: nowrap;
 }
 
 /* ========= Inputs ========= */
 .form-group input[type="text"],
 .form-group input[type="number"],
+.form-group input[type="date"],
 .form-group select {
-  width: 100%;
-  height: var(--input-h); /* 🔹 altura reducida */
-  padding: 0 12px; /* 🔹 menos relleno lateral */
+  width: 85%; /* 🔹 menos ancho horizontal */
+  height: var(--input-h);
+  padding: 0 12px;
   border: 1px solid var(--bd);
   border-radius: 10px;
   background: #fff;
@@ -75,7 +81,7 @@
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
   box-sizing: border-box;
-  font-size: .98rem; /* 🔹 misma fuente */
+  font-size: .96rem;
 }
 
 /* Hover y focus */
@@ -102,19 +108,19 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  padding-right: 34px; /* 🔹 ajustado a menor altura */
+  padding-right: 34px;
   background-repeat: no-repeat;
   background-position: right 10px center;
-  background-size: 15px 15px; /* 🔹 más pequeño */
+  background-size: 15px 15px;
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
 }
 
-/* ========= Botón de guardar (versión mejorada) ========= */
+/* ========= Botón de guardar ========= */
 .btn-guardar {
   grid-column: 1 / -1;
   height: 46px;
-  margin: 26px 7px 0; /* 🔹 más separación respecto a inputs */
+  margin: 26px 7px 0;
   padding: 0 20px;
   border-radius: 12px;
   border: none;
@@ -159,9 +165,14 @@
   .btn-guardar {
     grid-column: 1 / -1;
   }
+
+  .form-group input,
+  .form-group select {
+    width: 100%; /* 🔹 en móvil sí ocupa todo */
+  }
 }
 
-/* ========= Fila especial para proveedor y NIT ========= */
+/* ========= Fila especial proveedor + NIT ========= */
 .form-row {
   display: flex;
   gap: 20px;
