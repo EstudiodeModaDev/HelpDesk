@@ -1,167 +1,102 @@
-/* ====== Look & feel general (similar a ITSM clásico) ====== */
-:root{
-  --cd-bg: #ffffff;
-  --cd-ink: #1f2937;       /* texto */
-  --cd-muted: #6b7280;     /* secundarios */
-  --cd-grid-gap: 14px;
-  --cd-border: #d9dde3;    /* borde de celdas */
-  --cd-label-bg: #eceff3;  /* celda label gris */
-  --cd-panel-bg: #f3f5f7;  /* panel gris claro */
-  --cd-link: #1e63c6;      /* link azul */
-  --cd-focus: #2563eb;
-  --cd-yellow: #ffd46a;    /* botón amarillo */
-  --cd-yellow-ink: #6b4b00;
-  --cd-yellow-border: #e0b84a;
+/* === 1) Caja ÚNICA === */
+.case-detail{
+  background: #fff;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  padding: 12px;
 }
 
-
-/* ====== Header ====== */
+/* header con borde inferior sutil */
 .cd-header{
   display:flex; align-items:center; justify-content:space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eef1f4;
 }
-.cd-title{
-  margin:0; font-size:16px; font-weight:800;
-}
-.btn-volver{
-  background: transparent; border: 1px solid var(--cd-border);
-  padding: 6px 10px; border-radius: 4px; cursor: pointer;
-}
-.btn-volver:hover{ background:#f8fafc; }
 
-/* ====== Grid 3 columnas ====== */
+/* === 2) Grid interno de 3 columnas SIN paneles === */
 .cd-grid{
-  display:grid;
+  display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--cd-grid-gap);
+  gap: 12px 16px;           /* row-gap / column-gap */
 }
 
-/* Panel gris con “tarjeta” interna */
-.cd-panel{
-  background: var(--cd-panel-bg);
-  border: 1px solid var(--cd-border);
-  border-radius: 4px;
-  padding: 8px;
-}
+/* Quita “cajas” de columna (si existía) */
+.cd-panel{ background: transparent; border: 0; padding: 0; }
 
-/* ====== Filas (label a la izquierda) ====== */
+/* Cada fila (label/valor) conserva su cajita */
 .cd-row{
-  display:grid;
-  grid-template-columns: 200px minmax(0,1fr);
-  border: 1px solid var(--cd-border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 6px;
+  display: grid;
+  grid-template-columns: 220px minmax(0,1fr);
+  gap: 10px;
+  margin: 0;               /* limpio */
 }
 .cd-label{
-  background: var(--cd-label-bg);
-  padding: 8px 10px;
+  background: #eceff3;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  padding: 10px 12px;
   font-weight: 700;
-  color:#333;
 }
 .cd-value{
   background: #fff;
-  padding: 8px 10px;
-  min-height: 32px;
-  display:flex; align-items:center; gap:8px;
-  color:#111;
-}
-.cd-div{
-  border:0; height: 10px; background: transparent; margin: 6px 0;
+  border: 1px solid #d9dde3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: 36px;
+  display: flex; align-items: center; gap: 8px;
 }
 
-/* Chips/pastillas pequeñas (fechas) */
-.cd-pill{
-  display:inline-block; background:#fff;
-  border:1px solid var(--cd-border); border-radius: 4px;
-  padding: 4px 8px; font-weight:600;
-}
+/* Pastilla y badge (como ya lo tienes) */
+.cd-pill{ background:#fff; border:1px solid #d9dde3; border-radius:6px; padding:6px 8px; font-weight:600; }
+.cd-badge{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; }
+.cd-badge.is-open{ background:#e7f6f1; color:#118a72; border:1px solid #cfe9e2; }
+.cd-badge.is-closed{ background:#f5f7fa; color:#243341; border:1px solid #e4e7ec; }
+.as-text{ background:none; border:none; padding:0; color:#1e63c6; font-weight:600; cursor:pointer; }
+.as-text:hover{ text-decoration:underline; }
 
-/* Estado */
-.cd-inline{ display:flex; align-items:center; gap:8px; }
-.cd-badge{
-  display:inline-block; padding: 4px 10px; border-radius: 12px;
-  font-weight: 700; font-size: 12px; border:1px solid var(--cd-border);
-  background:#fff; color:#111;
-}
-.cd-badge.is-open{ background:#eefdfc; color:#0b7a75; }
-.cd-badge.is-closed{ background:#f5f7fa; color:#222; }
+/* === 3) Ubicaciones dentro del grid === */
+/* (Los Row se colocan automáticamente ocupando 1 columna) */
 
-/* Botón “as-text” (azul de la imagen) */
-.as-text{
-  background: none; border: none; padding: 0;
-  color: var(--cd-link); cursor: pointer; font-weight: 600;
-}
-.as-text:hover{ text-decoration: underline; }
-
-/* ====== Franja de personas (4 columnas con encabezado gris) ====== */
+/* La franja de personas ocupa columnas 2 y 3 */
 .cd-people{
-  display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-  margin-bottom: 8px;
+  grid-column: 2 / span 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
-.cd-people-item{
-  border:1px solid var(--cd-border); border-radius:4px; overflow:hidden;
-  background:#fff;
-}
-.cd-people-label{
-  background: var(--cd-label-bg);
-  padding: 8px 10px; font-weight:700; color:#333;
-  border-bottom:1px solid var(--cd-border);
-}
-.cd-people-value{
-  padding: 8px 10px; min-height: 34px; display:flex; align-items:center;
+.cd-people-item{ border:1px solid #d9dde3; border-radius:8px; overflow:hidden; background:#fff; }
+.cd-people-label{ background:#eceff3; padding:8px 10px; font-weight:700; border-bottom:1px solid #d9dde3; }
+.cd-people-value{ padding:8px 10px; min-height:34px; display:flex; align-items:center; }
+
+/* Título/Descripción/Casos se quedan en la columna 3 */
+.cd-fields{ grid-column: 3; }
+.cd-fields .cd-row{ margin: 0 0 10px; }
+.cd-fields .cd-value{ align-items: flex-start; }
+.cd-fields .cd-value p{ margin:0; }
+
+/* ===== Tickets Asociados (sección inferior dentro de la misma caja) ===== */
+.seccion{
+  grid-column: 1 / -1;        /* ocupa las 3 columnas */
+  background: #fff;
+  border-top: 1px solid #eef1f4;
+  padding-top: 10px;
+  margin-top: 4px;
 }
 
-/* ====== Campos grandes (Título/Descripción) ====== */
-.cd-fields .cd-row{ margin-bottom: 8px; }
-.cd-desc{ margin:0; white-space: pre-wrap; }
+/* Opcional: si quieres una línea vertical tenue entre columnas */
+.cd-grid.cd-grid--dividers > *{ position:relative; }
+.cd-grid.cd-grid--dividers > *:not(:nth-child(3n))::after{
+  content:""; position:absolute; top:0; right:-8px; bottom:0; width:1px; background:#e8ecf1;
+}
 
-/* ====== Acciones inferiores ====== */
-.cd-actions{
-  display:flex; gap:10px; justify-content:flex-end;
-  padding-top: 12px; border-top:1px solid var(--cd-border); margin-top: 8px;
-}
-.cd-btn{
-  background: var(--cd-yellow);
-  color: var(--cd-yellow-ink);
-  border: 1px solid var(--cd-yellow-border);
-  padding: 8px 14px; border-radius: 4px; font-weight: 700; cursor: pointer;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
-}
-.cd-btn:hover{ filter: brightness(0.98); }
-
-
-/* ====== Modal genérico (si usas los modales de recategorización) ====== */
-.modal-overlay{
-  position: fixed; inset: 0; background: rgba(0,0,0,.35);
-  display:flex; align-items:center; justify-content:center; z-index: 60;
-}
-.modal-card{
-  background:#fff; border:1px solid var(--cd-border); border-radius:6px;
-  width: min(780px, 96vw);
-  box-shadow: 0 12px 30px rgba(0,0,0,.22);
-}
-.modal-head{
-  display:flex; align-items:center; justify-content:space-between;
-  padding: 10px 12px; background: var(--cd-label-bg);
-  border-bottom:1px solid var(--cd-border);
-}
-.modal-head h3{ margin:0; font-size:15px; font-weight:800; }
-.modal-close{
-  background: transparent; border: none; font-size: 18px; cursor: pointer;
-}
-.modal-body{ padding: 12px; }
-
-/* ====== Links azules en panel como en screenshot ====== */
-.cd-link{ color: var(--cd-link); text-decoration: none; }
-.cd-link:hover{ text-decoration: underline; }
-
-/* ====== Responsivo ====== */
+/* === Responsive === */
 @media (max-width: 1100px){
   .cd-grid{ grid-template-columns: 1fr 1fr; }
+  .cd-people{ grid-column: 1 / -1; } /* ocupa todo el ancho */
+  .cd-fields{ grid-column: 1 / -1; }
 }
-@media (max-width: 780px){
+@media (max-width: 720px){
   .cd-grid{ grid-template-columns: 1fr; }
   .cd-row{ grid-template-columns: 160px 1fr; }
-  .cd-people{ grid-template-columns: 1fr 1fr; }
 }
