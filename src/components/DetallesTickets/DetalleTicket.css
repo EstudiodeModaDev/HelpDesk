@@ -367,7 +367,7 @@
 :root{
   --cd-label-min: 0px;          /* mínimo real (permite truncar si hace falta) */
   --cd-label-ideal: 18vw;       /* ancho preferido relativo al viewport */
-  --cd-label-max: 200px;        /* techo en desktop */
+  --cd-label-max: 150px;        /* techo en desktop */
 }
 
 /* === Fila label/valor con label responsivo (min 0, max X) === */
