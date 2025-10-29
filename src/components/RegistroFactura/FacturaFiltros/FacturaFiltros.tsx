@@ -123,7 +123,7 @@ export default function FacturaFiltros({
         </select>
 
          {/* 🧾 Selector de un */}
-        <select name="UN" value={filtros.un || ""} onChange={handleChange}>
+        <select name="un" value={filtros.un || ""} onChange={handleChange}>
           <option value="">Sel und. negocio</option>
           {opcionesun.map((ou) => (
             <option key={ou.codigo} value={ou.codigo}>
@@ -139,7 +139,6 @@ export default function FacturaFiltros({
           type="text"
           name="DocERP"
           value={filtros.DocERP || ""}
-          readOnly
           placeholder="Doc ERP"
         />
 
