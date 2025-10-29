@@ -13,18 +13,19 @@ type Props = {
   emptyChildrenText?: string;
   onSelect?: (t: Ticket) => void;         
   buildHref?: (id: number | string) => string;
+  role: string;
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
-export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref,}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref, role}: Props) {
   const { Tickets } = useGraphServices();
-
-  // Hook de relacionados
+  const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
   const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
 
   // ====== Relacionador (UI) ======
   const [showRel, setShowRel] = React.useState(false);
   const [loadingOpts, setLoadingOpts] = React.useState(false);
+  
 
   async function openRelacionador() {
     try {
@@ -57,9 +58,11 @@ export default function TicketsAsociados({title = "Tickets Asociados", ticket, e
           <h2 className="ta-title">{title}</h2>
         </div>
 
-          <a className="ta-seeall" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">
-            Relacion nuevo
-          </a>
+          {isPrivileged &&
+            <a className="ta-seeall" onClick={showRel ? closeRelacionador : openRelacionador} aria-label="Relacionar nuevo">
+              Relacion nuevo
+            </a>
+          }
       </header>
 
       {/* ===== Contenido ===== */}

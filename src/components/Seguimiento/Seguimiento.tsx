@@ -30,7 +30,7 @@ export default function TicketHistorial({
   ticket
 }: Props) {
   const [tab, setTab] = React.useState<Tab>(defaultTab);
-  const [mode, setMode] = React.useState<Mode>("detalle");       // <-- NUEVO
+  const [mode, setMode] = React.useState<Mode>("detalle"); 
   const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
 
   const { Logs } = useGraphServices();                 

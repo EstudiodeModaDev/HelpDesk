@@ -156,23 +156,12 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
       <div className="seccion">
-        <TicketsAsociados
-          key={String(selected.ID)}
-          ticket={selected}
-          onSelect={(t: Ticket) => {
-            setSelected(t);
-            setShowSeg(false);
-          }}
-        />
+        <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setSelected(t); setShowSeg(false);}} />
       </div>
 
       {/* Botón Seguimiento (toggle) */}
       <div>
-        <button
-          type="button"
-          className="btn-volver"
-          onClick={() => setShowSeg((v) => !v)}
-        >
+        <button type="button" className="btn-volver" onClick={() => setShowSeg((v) => !v)}>
           {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
         </button>
       </div>
@@ -180,14 +169,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       {/* Historial (solo si showSeg = true) */}
       {showSeg && (
         <div className="seccion">
-          <TicketHistorial
-            role={role ?? "Usuario"}
-            onVolver={() => setShowSeg(false)}
-            ticketId={selected.ID!}
-            onAddClick={() => {}}
-            onViewClick={() => {}}
-            ticket={selected}
-          />
+          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected}/>
         </div>
       )}
 
