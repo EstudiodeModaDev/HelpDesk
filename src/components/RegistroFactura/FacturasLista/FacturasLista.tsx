@@ -4,28 +4,31 @@ import FacturaFiltros from "../FacturaFiltros/FacturaFiltros";
 import FacturaEditar from "../FacturaEditar/FacturaEditar";
 import { useFacturas } from "../../../Funcionalidades/RegistrarFactura";
 import type { ReFactura } from "../../../Models/RegistroFacturaInterface";
-import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import "./FacturasLista.css";
 import { truncateNoCutGraphemes } from "../../../utils/Commons";
+
+// NUEVAS IMPORTACIONES
+import { useGraphServices } from "../../../graph/GrapServicesContext";
+import { DistribucionFacturaService } from "../../../Services/DistribucionFactura.service";
+// import FacturaDistribuidaModal from "../FacturaDistribuidaModal/FacturaDistribuidaModal"; // ajusta ruta si la colocas en otra carpeta
+import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 import FacturaDistribuidaModal from "../DistribucionFactura/FacturaDistribuidaModal";
 
 export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   const { obtenerFacturas } = useFacturas();
+  const { graph } = useGraphServices();
+
+  const distService = new DistribucionFacturaService(graph);
 
   const [facturas, setFacturas] = useState<ReFactura[]>([]);
   const [facturasFiltradas, setFacturasFiltradas] = useState<ReFactura[]>([]);
   const [facturaEdit, setFacturaEdit] = useState<ReFactura | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
 
-  const [modalDistribucion, setModalDistribucion] = useState<{
-    visible: boolean;
-    facturasGrupo: ReFactura[] | null;
-  }>({
-    visible: false,
-    facturasGrupo: null,
-  });
+  // Estado para modal de distribución
+  const [distribucionSel, setDistribucionSel] = useState<DistribucionFacturaData | null>(null);
+  const [loadingDistribucion, setLoadingDistribucion] = useState(false);
 
-  // 🔹 Cargar facturas al iniciar
   useEffect(() => {
     const cargarFacturas = async () => {
       try {
@@ -55,34 +58,27 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     });
   };
 
-  // 🔹 Filtros
   const aplicarFiltros = (filtros: Partial<ReFactura>) => {
     const filtradas = facturas.filter((f) => {
       const coincideFecha = filtros.FechaEmision
         ? f.FechaEmision?.slice(0, 10) === filtros.FechaEmision
         : true;
-
       const coincideFechaEnt = filtros.FecEntregaCont
         ? f.FecEntregaCont?.slice(0, 10) === filtros.FecEntregaCont
         : true;
-
       const coincideNumero = filtros.NoFactura
         ? f.NoFactura?.toLowerCase().includes(filtros.NoFactura.toLowerCase())
         : true;
-
       const coincideProveedor = filtros.Proveedor
         ? f.Proveedor?.toLowerCase().includes(filtros.Proveedor.toLowerCase())
         : true;
-
       const coincideNIT = filtros.Title
         ? f.Title?.toLowerCase().includes(filtros.Title.toLowerCase())
         : true;
-
       const coincideItem = filtros.Items ? f.Items === filtros.Items : true;
       const coincidecc = filtros.CC ? f.CC === filtros.CC : true;
       const coincideco = filtros.CO ? f.CO === filtros.CO : true;
       const coincideun = filtros.un ? f.un === filtros.un : true;
-
       const coincideERP = filtros.DocERP
         ? f.DocERP?.toLowerCase().includes(filtros.DocERP.toLowerCase())
         : true;
@@ -104,56 +100,20 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
     setFacturasFiltradas(filtradas);
   };
 
-  // 🔹 Verificar si es la primera factura del grupo
-  const esPrimeraDistribuida = (factura: ReFactura) => {
-    if (!factura.IdDistribuida) return false;
-    const grupo = facturasFiltradas.filter(
-      (f) => f.IdDistribuida === factura.IdDistribuida
-    );
-    if (grupo.length === 0) return false;
-    const primera = grupo.sort(
-      (a, b) =>
-        new Date(a.FechaEmision ?? "").getTime() -
-        new Date(b.FechaEmision ?? "").getTime()
-    )[0];
-    return factura.id0 === primera.id0;
+  // NUEVO: abrir modal de distribución asociada
+  const abrirModalDistribucion = async (idDistrubuida?: string) => {
+    if (!idDistrubuida) return;
+    try {
+      setLoadingDistribucion(true);
+      const dist = await distService.get(String(idDistrubuida));
+      setDistribucionSel(dist);
+    } catch (err) {
+      console.error("Error al obtener distribución:", err);
+      alert("No se pudo cargar la distribución asociada. Revisa la consola.");
+    } finally {
+      setLoadingDistribucion(false);
+    }
   };
-
- // Conversor de ReFactura → DistribucionFacturaData
-const convertirADistribucion = (factura: ReFactura): DistribucionFacturaData => ({
-  Id: factura.id0 ? factura.id0.toString() : "",
-  Proveedor: factura.Proveedor ?? "",
-  Title: factura.Title ?? "", // nit
-  ValorAnIVA: factura.ValorAnIVA ?? 0,
-  FechaEmision: factura.FechaEmision ?? "",
-  NoFactura: factura.NoFactura ?? "",
-  Items: factura.Items ?? "",
-  DescripItems: factura.DescripItems ?? "",
-  CO: factura.CO ?? "",
-  un: factura.un ?? "",
-  DetalleFac: factura.DetalleFac ?? "",
-  IdDistribuida: factura.IdDistribuida ?? "",
-  
-  // Estos campos no existen en ReFactura → valores por defecto
-  CargoFijo: 0,
-  CosToImp: 0,
-  ImpBnCedi: 0,
-  ImpBnPalms: 0,
-  ImpColorPalms: 0,
-  ImpBnCalle: 0,
-  ImpColorCalle: 0,
-  CosTotMarNacionales: 0,
-  CosTotMarImpor: 0,
-  CosTotCEDI: 0,
-  CosTotServAdmin: 0,
-
-  // Distribución de centros de costos (no están en ReFactura, se dejan vacíos)
-  CCmn: "",
-  CCmi: "",
-  CCcedi: "",
-  CCsa: "",
-});
-
 
   return (
     <div className="facturas-lista">
@@ -205,18 +165,12 @@ const convertirADistribucion = (factura: ReFactura): DistribucionFacturaData => 
                   <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
                   <td>{factura.DocERP}</td>
                   <td>
-                    <span
-                      className="one-line-ellipsis"
-                      title={factura.DetalleFac}
-                    >
+                    <span className="one-line-ellipsis" title={factura.DetalleFac}>
                       {truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}
                     </span>
                   </td>
                   <td>
-                    <span
-                      className="one-line-ellipsis"
-                      title={factura.Observaciones}
-                    >
+                    <span className="one-line-ellipsis" title={factura.Observaciones}>
                       {truncateNoCutGraphemes(factura.Observaciones ?? "", 20)}
                     </span>
                   </td>
@@ -229,24 +183,17 @@ const convertirADistribucion = (factura: ReFactura): DistribucionFacturaData => 
                       ✏️
                     </button>
 
-                    {/* ✅ Botón Ver distribución solo en la primera del grupo */}
-                    {esPrimeraDistribuida(factura) && (
+                    {/* NUEVO: mostrar botón para ver distribución solo si existe IdDistrubuida */}
+                    {factura.IdDistrubuida ? (
                       <button
-                        className="btn-ver-distribucion"
+                        className="btn-ver-dist"
                         title="Ver distribución"
-                        onClick={() => {
-                          const grupo = facturasFiltradas.filter(
-                            (f) => f.IdDistribuida === factura.IdDistribuida
-                          );
-                          setModalDistribucion({
-                            visible: true,
-                            facturasGrupo: grupo,
-                          });
-                        }}
+                        onClick={() => abrirModalDistribucion(factura.IdDistrubuida)}
+                        style={{ marginLeft: 8 }}
                       >
                         📊
                       </button>
-                    )}
+                    ) : null}
                   </td>
                 </tr>
               ))
@@ -271,9 +218,7 @@ const convertirADistribucion = (factura: ReFactura): DistribucionFacturaData => 
           onClose={() => setFacturaEdit(null)}
           onEliminar={(idEliminado) => {
             setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
-            setFacturasFiltradas((prev) =>
-              prev.filter((f) => f.id0 !== idEliminado)
-            );
+            setFacturasFiltradas((prev) => prev.filter((f) => f.id0 !== idEliminado));
             setMensaje("🗑️ Factura eliminada correctamente");
             setTimeout(() => setFacturaEdit(null), 100);
           }}
@@ -291,16 +236,18 @@ const convertirADistribucion = (factura: ReFactura): DistribucionFacturaData => 
         />
       )}
 
-      {/* ✅ Modal de distribución */}
-      {modalDistribucion.visible && modalDistribucion.facturasGrupo && (
+      {/* Modal de distribución */}
+      {distribucionSel && (
         <FacturaDistribuidaModal
-          factura={convertirADistribucion(
-            modalDistribucion.facturasGrupo[0]
-          )}
-          onClose={() =>
-            setModalDistribucion({ visible: false, facturasGrupo: null })
-          }
+          distribucion={distribucionSel}
+          onClose={() => setDistribucionSel(null)}
         />
+      )}
+
+      {loadingDistribucion && (
+        <div className="loading-overlay">
+          Cargando distribución...
+        </div>
       )}
     </div>
   );

@@ -88,7 +88,7 @@ export class FacturasService {
       Observaciones: f.Observaciones ?? "",
       RegistradoPor: f.RegistradoPor ?? "",
       Created: f.Created ?? f.created ?? item.created ?? item.Created,
-      IdDistribuida: f.IdDistribuida ?? "",
+      IdDistrubuida: f.IdDistrubuida ?? "",
     };
   }
 
