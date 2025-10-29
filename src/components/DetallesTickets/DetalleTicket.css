@@ -96,6 +96,7 @@
   .cd-people{ grid-column: 1 / -1; } /* ocupa todo el ancho */
   .cd-fields{ grid-column: 1 / -1; }
 }
+
 @media (max-width: 720px){
   .cd-grid{ grid-template-columns: 1fr; }
   .cd-row{ grid-template-columns: 160px 1fr; }
@@ -142,12 +143,6 @@
   grid-auto-rows: min-content;
 }
 
-.pos-ans, .pos-apertura, .pos-casos, .pos-categoria, .pos-categoria, .pos-estado,
-.pos-fuente, .pos-people, .pos-solucion, .pos-titulo{
-  min-width: 0px;
-  max-width: 100px;
-}
-
 /* Utilidades de colocación por CELDA */
 .pos-apertura   { grid-column: 1; grid-row: 1; }
 .pos-solucion   { grid-column: 2; grid-row: 1; }
@@ -171,6 +166,7 @@
   .pos-people, .pos-titulo, .pos-descr, .pos-casos{ grid-column: 1 / -1; }
   .pos-fuente{ grid-row: auto; grid-column: 1 / -1; }
 }
+
 @media (max-width: 720px){
   .cd-grid{ grid-template-columns: 1fr; }
   .cd-row{ grid-template-columns: 160px 1fr; }
@@ -187,12 +183,16 @@
 /* ===== POSICIONES NUEVAS ===== */
 /* Fila 1 */
 .pos-apertura { grid-column: 1; grid-row: 1; }
+
 .pos-solucion { grid-column: 2; grid-row: 1; }
+
 .pos-fuente   { grid-column: 3; grid-row: 1; }   /* aquí colocamos “Fuente solicitante” */
 
 /* Fila 2 */
 .pos-categoria{ grid-column: 1; grid-row: 2; }
+
 .pos-ans      { grid-column: 2; grid-row: 2; }
+
 .pos-estado   { grid-column: 3; grid-row: 2; }
 
 /* Fila 3: franja personas en una sola fila (4 cajas internas) */
@@ -200,7 +200,9 @@
 
 /* Fila 4-6: bloques independientes full-width */
 .pos-titulo   { grid-column: 1 / -1; grid-row: 4; }
+
 .pos-descr    { grid-column: 1 / -1; grid-row: 5; }
+
 .pos-casos    { grid-column: 1 / -1; grid-row: 6; }
 
 /* Franja de personas: 4 columnas internas */
@@ -209,10 +211,12 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
+
 @media (max-width: 1100px){
   .cd-grid{ grid-template-columns: 1fr 1fr; }
   .pos-people, .pos-titulo, .pos-descr, .pos-casos{ grid-column: 1 / -1; }
 }
+
 @media (max-width: 720px){
   .cd-grid{ grid-template-columns: 1fr; }
   .cd-row{ grid-template-columns: 160px 1fr; }
@@ -223,12 +227,13 @@
   /* padding fluido: 10–16px según ancho */
   padding: clamp(10px, 2.2vw, 16px);
 }
+
 .cd-grid{
   /* gaps un poco más compactos en general */
   gap: clamp(8px, 1.6vw, 16px) clamp(10px, 1.8vw, 16px);
 }
-.cd-label,
-.cd-value{
+
+.cd-label, .cd-value{
   /* altura cómoda pero no rígida para que quepa texto en móvil */
   min-height: 36px;
 }
@@ -241,19 +246,19 @@
 
   /* Opcional: compacta tipografías un punto */
   .cd-label{ font-size: 0.95rem; }
+
   .cd-value{ font-size: 0.95rem; }
 
   /* Franja de personas a todo el ancho y 2 columnas internas */
-  .pos-people{ grid-column: 1 / -1; }
+  .pos-people{ grid-column: 1 / -1; } 
+  
   .cd-people{
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
   /* Bloques grandes a ancho completo para lectura */
-  .pos-titulo,
-  .pos-descr,
-  .pos-casos{
+  .pos-titulo, .pos-descr, .pos-casos{
     grid-column: 1 / -1;
   }
 
@@ -272,10 +277,7 @@
   }
 
   /* Todas las posiciones pasan a full-width sin sorpresas */
-  .col-1, .col-2, .col-3, .span-2, .full,
-  .pos-apertura, .pos-solucion, .pos-fuente,
-  .pos-categoria, .pos-ans, .pos-estado,
-  .pos-people, .pos-titulo, .pos-descr, .pos-casos{
+  .col-1, .col-2, .col-3, .span-2, .full, .pos-apertura, .pos-solucion, .pos-fuente, .pos-categoria, .pos-ans, .pos-estado, .pos-people, .pos-titulo, .pos-descr, .pos-casos{
     grid-column: 1 / -1 !important;
   }
 
@@ -284,14 +286,16 @@
     grid-template-columns: 1fr;
     gap: 6px;
   }
+
   .cd-label{
     padding: 8px 10px;
     font-size: 0.92rem;
     border-radius: 8px;
   }
+
   .cd-value{
     padding: 10px;
-    min-height: unset;      /* deja crecer por contenido */
+    min-height: unset;    
   }
 
   /* Franja de personas: scroll horizontal con snap (comodísimo en móvil) */
@@ -305,6 +309,7 @@
     gap: 10px;
     padding-bottom: 6px;
   }
+
   .cd-people-item{
     scroll-snap-align: start;
     min-width: 240px;
@@ -315,11 +320,12 @@
     white-space: normal;
     word-break: break-word;
   }
+
   .cd-value .truncate{
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3;  /* 3 líneas máx en móvil */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
   }
 
@@ -357,3 +363,48 @@
 .cd-badge, .cd-pill{ white-space: nowrap; }
 .cd-value{ min-width: 0; } /* clave para truncar en grid */
 
+/* ===== Tokens para controlar el ancho del label ===== */
+:root{
+  --cd-label-min: 0px;          /* mínimo real (permite truncar si hace falta) */
+  --cd-label-ideal: 18vw;       /* ancho preferido relativo al viewport */
+  --cd-label-max: 200px;        /* techo en desktop */
+}
+
+/* === Fila label/valor con label responsivo (min 0, max X) === */
+/* clamp(min, ideal, max) garantiza que no se pase del máximo ni baje del mínimo */
+.cd-row{
+  grid-template-columns: clamp(var(--cd-label-min), var(--cd-label-ideal), var(--cd-label-max)) minmax(0, 1fr);
+}
+
+/* Seguro para truncado dentro de grid (evita desbordes) */
+.cd-label{ 
+  min-width: 0;                 /* <- importante para que clamp funcione bien */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;          /* quítalo si prefieres que el label salte de línea */
+}
+
+/* ===== Ajustes por “breakpoint” ===== */
+/* Tablet: labels un poco más angostos y techo más bajo */
+@media (max-width: 1024px){
+  :root{
+    --cd-label-ideal: 28vw;     /* más flexible en pantallas medianas */
+    --cd-label-max: 180px;      /* techo más pequeño */
+  }
+}
+
+/* Teléfonos: ya apilas label encima del valor; por si mantienes 2 columnas, lo hacemos aún más compacto */
+@media (max-width: 680px){
+  :root{
+    --cd-label-ideal: 40vw;
+    --cd-label-max: 150px;
+  }
+}
+
+/* Muy pequeños */
+@media (max-width: 400px){
+  :root{
+    --cd-label-ideal: 48vw;
+    --cd-label-max: 140px;
+  }
+}

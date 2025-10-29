@@ -7,7 +7,7 @@ import Recategorizar from "./ModalRecategorizar/Recategorizar";
 import Reasignar from "./Reasignar/Reasignar";
 import AsignarObservador from "./Observador/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
-import { toUtcIso } from "../../utils/Date";
+import { ParseDateShow, toUtcIso } from "../../utils/Date";
 
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
@@ -79,10 +79,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
       <div className="cd-grid">
         {/* Fila 1 */}
         <Row className="pos-apertura" label="Fecha de Apertura">
-          <span>{toUtcIso(new Date(selected.FechaApertura ?? "")) ?? "—"}</span>
+          <span>{ParseDateShow(selected.FechaApertura ?? "") ?? "—"}</span>
         </Row>
         <Row className="pos-solucion" label="Fecha de solución">
-          <span>{toUtcIso(new Date(selected.TiempoSolucion ?? "")) ?? "—"}</span>
+          <span>{ParseDateShow(selected.TiempoSolucion ?? "") ?? "—"}</span>
         </Row>
         <Row className="pos-fuente" label="Fuente solicitante">
           <span>{selected.Fuente ?? "—"}</span>
