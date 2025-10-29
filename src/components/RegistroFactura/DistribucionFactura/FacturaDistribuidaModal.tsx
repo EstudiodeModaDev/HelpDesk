@@ -1,142 +1,152 @@
-// src/components/Factura/FacturaDistribuidaModal.tsx
+// src/components/Facturas/FacturaDistribuidaModal.tsx
 // import React from "react";
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
-// import type { FacturaData } from "../../Models/Factura";
 
 interface Props {
-  factura: DistribucionFacturaData;
+  distribucion: DistribucionFacturaData;
   onClose: () => void;
 }
 
-export default function FacturaDistribuidaModal({ factura, onClose }: Props) {
-  if (!factura) return null;
+export default function FacturaDistribuidaModal({ distribucion, onClose }: Props) {
+  if (!distribucion) return null;
 
-  // 🧮 Cálculos
-  const impColor =
-    (factura.ImpColorCalle ?? 0) + (factura.ImpColorPalms ?? 0);
-  const impBn =
-    (factura.ImpBnCedi ?? 0) +
-    (factura.ImpBnCalle ?? 0) +
-    (factura.ImpBnPalms ?? 0);
+  // Totales
+  const canonFijo = distribucion.CargoFijo ?? 0;
+  const impresiones = distribucion.CosToImp ?? 0;
+  const valorAnIVA = distribucion.ValorAnIVA ?? 0;
 
-  const distCedi = (factura.CargoFijo ?? 0) / 3;
-  const distPalms = ((2 / 3) * (factura.CargoFijo ?? 0)) / 3;
-  const distCalle = ((2 / 3) * (factura.CargoFijo ?? 0)) / 3;
+  // Detalles por impresión
+  const impresionesColor = (distribucion.ImpColorCalle ?? 0) + (distribucion.ImpColorPalms ?? 0);
+  const impresionesBN = (distribucion.ImpBnCedi ?? 0) + (distribucion.ImpBnCalle ?? 0) + (distribucion.ImpBnPalms ?? 0);
+
+  // Distribución del cargo fijo según tus fórmulas
+  const cedi = canonFijo / 3;
+  const resta = (2 / 3) * canonFijo; // parte restante del cargo fijo
+  const thirtyFivePalms = resta / 3;
+  const calle = resta / 3;
+
+  // Totales por CO (los valores ya los provees en la distribución)
+  const marcasNac = distribucion.CosTotMarNacionales ?? 0;
+  const marcasImp = distribucion.CosTotMarImpor ?? 0;
+  const servAdmin = distribucion.CosTotServAdmin ?? 0;
+  const costoCedi = distribucion.CosTotCEDI ?? 0;
+
+  // Formato moneda (COP, sin decimales)
+  const fmt = (v: number) =>
+    v.toLocaleString("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 });
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-      <div className="bg-white w-[550px] max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl p-6">
-        <h2 className="text-xl font-semibold text-center mb-4">Factura distribuida</h2>
-
-        {/* Totales */}
-        <div className="border rounded-xl p-3 mb-4">
-          <h3 className="font-medium mb-2 text-gray-700">Totales</h3>
-          <table className="w-full text-sm">
-            <tbody>
-              <tr>
-                <td>Canon fijo</td>
-                <td className="text-right font-medium">
-                  ${factura.CargoFijo?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-              <tr>
-                <td>Impresiones</td>
-                <td className="text-right font-medium">
-                  ${factura.CosToImp?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-              <tr>
-                <td>Valor Ante IVA</td>
-                <td className="text-right font-semibold text-gray-800">
-                  ${factura.ValorAnIVA?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div className="modal-backdrop">
+      <div className="modal-card">
+        <div className="modal-header">
+          <h2>Factura distribuida</h2>
+          <button aria-label="Cerrar" onClick={onClose} className="modal-close">✖</button>
         </div>
 
-        {/* Detalles por impresión */}
-        <div className="border rounded-xl p-3 mb-4">
-          <h3 className="font-medium mb-2 text-gray-700">Detalles por impresión</h3>
-          <table className="w-full text-sm">
-            <tbody>
-              <tr>
-                <td>🟦 Impresiones a color</td>
-                <td className="text-right">${impColor.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td>⬜ Impresiones B/N</td>
-                <td className="text-right">${impBn.toLocaleString()}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="modal-body">
+          {/* Totales */}
+          <section className="card-section">
+            <h3>Totales</h3>
+            <div className="row">
+              <div>Canon fijo</div>
+              <div>{fmt(canonFijo)}</div>
+            </div>
+            <div className="row">
+              <div>Impresiones</div>
+              <div>{fmt(impresiones)}</div>
+            </div>
+            <div className="row">
+              <div>Valor Ante de IVA</div>
+              <div>{fmt(valorAnIVA)}</div>
+            </div>
+          </section>
+
+          {/* Detalles por impresión */}
+          <section className="card-section">
+            <h3>Detalles por impresión</h3>
+            <div className="row">
+              <div>Impresiones a color</div>
+              <div>{fmt(impresionesColor)}</div>
+            </div>
+            <div className="row">
+              <div>Impresiones B/N</div>
+              <div>{fmt(impresionesBN)}</div>
+            </div>
+          </section>
+
+          {/* Distribución */}
+          <section className="card-section">
+            <h3>Distribución</h3>
+            <div className="row">
+              <div>CEDI</div>
+              <div>{fmt(cedi)}</div>
+            </div>
+            <div className="row">
+              <div>35 Palms</div>
+              <div>{fmt(thirtyFivePalms)}</div>
+            </div>
+            <div className="row">
+              <div>Calle</div>
+              <div>{fmt(calle)}</div>
+            </div>
+          </section>
+
+          {/* Total por C.O */}
+          <section className="card-section">
+            <h3>Total por C.O</h3>
+
+            <div className="co-row">
+              <div className="co-desc">
+                <div className="co-title">Marcas nacionales</div>
+                <div className="co-sub">CO: 001 • UN: 601</div>
+              </div>
+              <div className="co-value">{fmt(marcasNac)}</div>
+            </div>
+
+            <div className="co-row">
+              <div className="co-desc">
+                <div className="co-title">Dirección marcas importadas</div>
+                <div className="co-sub">CO: 001 • UN: 601</div>
+              </div>
+              <div className="co-value">{fmt(marcasImp)}</div>
+            </div>
+
+            <div className="co-row">
+              <div className="co-desc">
+                <div className="co-title">Servicios administrativos</div>
+                <div className="co-sub">CO: 001 • UN: 601</div>
+              </div>
+              <div className="co-value">{fmt(servAdmin)}</div>
+            </div>
+
+            <div className="co-row">
+              <div className="co-desc">
+                <div className="co-title">CEDI</div>
+                <div className="co-sub">CO: 001 • UN: 601</div>
+              </div>
+              <div className="co-value">{fmt(costoCedi)}</div>
+            </div>
+          </section>
+
+          {/* Información adicional */}
+          <section className="card-section small">
+            <div className="row">
+              <div>Proveedor</div>
+              <div>{distribucion.Proveedor}</div>
+            </div>
+            <div className="row">
+              <div>NIT</div>
+              <div>{distribucion.Title}</div>
+            </div>
+            <div className="row">
+              <div>Factura</div>
+              <div>{distribucion.NoFactura}</div>
+            </div>
+          </section>
         </div>
 
-        {/* Distribución */}
-        <div className="border rounded-xl p-3 mb-4">
-          <h3 className="font-medium mb-2 text-gray-700">Distribución</h3>
-          <table className="w-full text-sm">
-            <tbody>
-              <tr>
-                <td>Cedi</td>
-                <td className="text-right">${distCedi.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td>35 Palms</td>
-                <td className="text-right">${distPalms.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td>Calle 16</td>
-                <td className="text-right">${distCalle.toLocaleString()}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* Totales por C.O */}
-        <div className="border rounded-xl p-3 mb-4">
-          <h3 className="font-medium mb-2 text-gray-700">Total por C.O</h3>
-          <table className="w-full text-sm">
-            <tbody>
-              <tr>
-                <td>Marcas nacionales</td>
-                <td>CO:001 / UN:601</td>
-                <td className="text-right">
-                  ${factura.CosTotMarNacionales?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-              <tr>
-                <td>Marcas importadas</td>
-                <td>CO:001 / UN:601</td>
-                <td className="text-right">
-                  ${factura.CosTotMarImpor?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-              <tr>
-                <td>Servicios administrativos</td>
-                <td>CO:001 / UN:601</td>
-                <td className="text-right">
-                  ${factura.CosTotServAdmin?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-              <tr>
-                <td>CEDI</td>
-                <td>CO:001 / UN:601</td>
-                <td className="text-right font-semibold text-gray-800">
-                  ${factura.CosTotCEDI?.toLocaleString() ?? "0"}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className="text-center">
-          <button
-            onClick={onClose}
-            className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
-          >
-            Cerrar
-          </button>
+        <div className="modal-footer">
+          <button onClick={onClose} className="btn-close">Cerrar</button>
         </div>
       </div>
     </div>
