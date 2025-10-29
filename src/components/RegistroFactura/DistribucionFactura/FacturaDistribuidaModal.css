@@ -109,6 +109,25 @@
   color: #111;
 }
 
+/* === BLOQUE: Nombre + Serial === */
+.row-info {
+  display: flex;
+  align-items: center;
+  gap: 3rem; /* 🔥 controla el espacio entre nombre y serial */
+  min-width: 320px; /* mantiene alineación uniforme */
+}
+
+.row-info .nombre {
+  font-weight: 500;
+  color: #222;
+}
+
+.row-info .serial {
+  color: #666;
+  font-family: monospace; /* 🔤 hace que los espacios sean uniformes */
+  letter-spacing: 0.5px;
+}
+
 /* === COSTOS === */
 .co-row {
   display: flex;
@@ -172,5 +191,12 @@
   }
   .card-section {
     padding: 1rem;
+  }
+
+  .row-info {
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: auto;
+    align-items: flex-start;
   }
 }
