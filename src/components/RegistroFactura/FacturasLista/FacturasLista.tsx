@@ -156,142 +156,144 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
   });
 
   return (
-    <div className="facturas-lista">
-      {mensaje && <div className="notificacion">{mensaje}</div>}
+  <div className="facturas-lista">
+    {mensaje && <div className="notificacion">{mensaje}</div>}
 
-      <FacturaFiltros onFiltrar={aplicarFiltros} />
+    <FacturaFiltros onFiltrar={aplicarFiltros} />
 
-      <div className="tabla-scroll">
-        <table className="tabla-facturas">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>FechaEmi</th>
-              <th>N°Fac</th>
-              <th>Proveedor</th>
-              <th>NIT</th>
-              <th>Valor</th>
-              <th>Items</th>
-              <th>CC</th>
-              <th>CO</th>
-              <th>UN</th>
-              <th>FechaCont</th>
-              <th>DocERP</th>
-              <th>Detalle</th>
-              <th>Obser</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {facturasFiltradas.length > 0 ? (
-              facturasFiltradas.map((factura, index) => (
-                <tr key={factura.id0 || index}>
-                  <td>{index + 1}</td>
-                  <td>{formatearFecha(factura.FechaEmision)}</td>
-                  <td>{factura.NoFactura}</td>
-                  <td>{factura.Proveedor}</td>
-                  <td>{factura.Title}</td>
-                  <td>
-                    {factura.ValorAnIVA.toLocaleString("es-CO", {
-                      style: "currency",
-                      currency: "COP",
-                      minimumFractionDigits: 0,
-                    })}
-                  </td>
-                  <td>{factura.Items}</td>
-                  <td>{factura.CC}</td>
-                  <td>{factura.CO}</td>
-                  <td>{factura.un}</td>
-                  <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
-                  <td>{factura.DocERP}</td>
-                  <td
-                    className="one-line-ellipsis"
-                    title={factura.DetalleFac}
+    <div className="tabla-scroll">
+      <table className="tabla-facturas">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>FechaEmi</th>
+            <th>N°Fac</th>
+            <th>Proveedor</th>
+            <th>NIT</th>
+            <th>Valor</th>
+            <th>Items</th>
+            <th>CC</th>
+            <th>CO</th>
+            <th>UN</th>
+            <th>FechaCont</th>
+            <th>DocERP</th>
+            <th>Detalle</th>
+            <th>Obser</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {facturasFiltradas.length > 0 ? (
+            facturasFiltradas.map((factura, index) => (
+              <tr key={factura.id0 || index}>
+                <td>{index + 1}</td>
+                <td>{formatearFecha(factura.FechaEmision)}</td>
+                <td>{factura.NoFactura}</td>
+                <td>{factura.Proveedor}</td>
+                <td>{factura.Title}</td>
+                <td>
+                  {factura.ValorAnIVA.toLocaleString("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                    minimumFractionDigits: 0,
+                  })}
+                </td>
+                <td>{factura.Items}</td>
+                <td>{factura.CC}</td>
+                <td>{factura.CO}</td>
+                <td>{factura.un}</td>
+                <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
+                <td>{factura.DocERP}</td>
+                <td
+                  className="one-line-ellipsis"
+                  title={factura.DetalleFac}
+                >
+                  {truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}
+                </td>
+                <td
+                  className="one-line-ellipsis"
+                  title={factura.Observaciones}
+                >
+                  {truncateNoCutGraphemes(factura.Observaciones ?? "", 20)}
+                </td>
+
+                {/* ✅ Botones de acción */}
+                <td style={{ textAlign: "center" }}>
+                  <button
+                    className="btn-editar"
+                    title="Editar factura"
+                    onClick={() => setFacturaEdit(factura)}
                   >
-                    {truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}
-                  </td>
-                  <td
-                    className="one-line-ellipsis"
-                    title={factura.Observaciones}
-                  >
-                    {truncateNoCutGraphemes(factura.Observaciones ?? "", 20)}
-                  </td>
-                  <td>
+                    ✏️
+                  </button>
+
+                  {factura.IdDistribuida && esPrimeraDistribuida(factura) && (
                     <button
-                      className="btn-editar"
-                      title="Editar factura"
-                      onClick={() => setFacturaEdit(factura)}
+                      className="btn-ver-distribucion ml-2"
+                      title="Ver distribución"
+                      onClick={() =>
+                        setModalDistribucion({
+                          visible: true,
+                          facturaDistribuida: convertirADistribucion(factura),
+                        })
+                      }
                     >
-                      ✏️
+                      📊
                     </button>
-
-                    {/* 📊 Mostrar solo en la primera del grupo distribuido */}
-                    {factura.IdDistribuida && esPrimeraDistribuida(factura) && (
-                      <button
-                        className="btn-ver-distribucion"
-                        title="Ver distribución"
-                        onClick={() =>
-                          setModalDistribucion({
-                            visible: true,
-                            facturaDistribuida: convertirADistribucion(factura),
-                          })
-                        }
-                      >
-                        📊
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={15} style={{ textAlign: "center", padding: "1rem" }}>
-                  No hay facturas que coincidan con los filtros.
+                  )}
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <button className="btn-volver-fijo" onClick={onVolver}>
-        🔽 Registrar factura
-      </button>
-
-      {/* 🧾 Modal de factura distribuida */}
-      {modalDistribucion.visible && modalDistribucion.facturaDistribuida && (
-        <FacturaDistribuidaModal
-          factura={modalDistribucion.facturaDistribuida}
-          onClose={() =>
-            setModalDistribucion({ visible: false, facturaDistribuida: null })
-          }
-        />
-      )}
-
-      {/* ✏️ Modal de edición */}
-      {facturaEdit && (
-        <FacturaEditar
-          factura={facturaEdit}
-          onClose={() => setFacturaEdit(null)}
-          onEliminar={(idEliminado) => {
-            setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
-            setFacturasFiltradas((prev) =>
-              prev.filter((f) => f.id0 !== idEliminado)
-            );
-            setMensaje("🗑️ Factura eliminada correctamente");
-          }}
-          onGuardar={async () => {
-            try {
-              const lista = await obtenerFacturas();
-              setFacturas(lista);
-              setFacturasFiltradas(lista);
-              setMensaje("✅ Factura actualizada correctamente");
-            } catch (err) {
-              console.error("Error al refrescar lista tras editar:", err);
-            }
-          }}
-        />
-      )}
+            ))
+          ) : (
+            <tr>
+              <td colSpan={15} style={{ textAlign: "center", padding: "1rem" }}>
+                No hay facturas que coincidan con los filtros.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
-  );
+
+    <button className="btn-volver-fijo" onClick={onVolver}>
+      🔽 Registrar factura
+    </button>
+
+    {/* 🧾 Modal de factura distribuida */}
+    {modalDistribucion.visible && modalDistribucion.facturaDistribuida && (
+      <FacturaDistribuidaModal
+        factura={modalDistribucion.facturaDistribuida}
+        onClose={() =>
+          setModalDistribucion({ visible: false, facturaDistribuida: null })
+        }
+      />
+    )}
+
+    {/* ✏️ Modal de edición */}
+    {facturaEdit && (
+      <FacturaEditar
+        factura={facturaEdit}
+        onClose={() => setFacturaEdit(null)}
+        onEliminar={(idEliminado) => {
+          setFacturas((prev) => prev.filter((f) => f.id0 !== idEliminado));
+          setFacturasFiltradas((prev) =>
+            prev.filter((f) => f.id0 !== idEliminado)
+          );
+          setMensaje("🗑️ Factura eliminada correctamente");
+        }}
+        onGuardar={async () => {
+          try {
+            const lista = await obtenerFacturas();
+            setFacturas(lista);
+            setFacturasFiltradas(lista);
+            setMensaje("✅ Factura actualizada correctamente");
+          } catch (err) {
+            console.error("Error al refrescar lista tras editar:", err);
+          }
+        }}
+      />
+    )}
+  </div>
+);
+
 }
