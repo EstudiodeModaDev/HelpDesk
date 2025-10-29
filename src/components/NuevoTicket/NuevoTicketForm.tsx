@@ -229,9 +229,7 @@ export default function NuevoTicketForm() {
               <label className="tf-label">Categoría</label>
               <Select<TreeOption, false>
                 classNamePrefix="rs"
-                placeholder={
-                  loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"
-                }
+                placeholder={loadingCatalogos ? "Cargando catálogo..." : "Buscar categoría/sub/artículo…"}
                 options={treeOptions}
                 value={treeValue}
                 onChange={onTreeChange}
