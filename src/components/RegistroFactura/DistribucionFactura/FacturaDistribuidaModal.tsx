@@ -1,5 +1,8 @@
 // src/components/Facturas/FacturaDistribuidaModal.tsx
 // import React from "react";
+
+import "./FacturaDistribuidaModal.css";
+
 import type { DistribucionFacturaData } from "../../../Models/DistribucionFactura";
 
 interface Props {
