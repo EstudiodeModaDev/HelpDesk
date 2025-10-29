@@ -142,6 +142,12 @@
   grid-auto-rows: min-content;
 }
 
+.pos-ans, .pos-apertura, .pos-casos, .pos-categoria, .pos-categoria, .pos-estado,
+.pos-fuente, .pos-people, .pos-solucion, .pos-titulo{
+  min-width: 0px;
+  max-width: 100px;
+}
+
 /* Utilidades de colocación por CELDA */
 .pos-apertura   { grid-column: 1; grid-row: 1; }
 .pos-solucion   { grid-column: 2; grid-row: 1; }
