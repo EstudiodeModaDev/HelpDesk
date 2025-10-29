@@ -1,66 +1,111 @@
-/* 🧩 Contenedor de la tabla con scroll vertical y horizontal */
+/* === 1) Persistencia real del tema === */
+.tabla-facturas, .tabla-scroll {
+  color-scheme: light !important;
+  isolation: isolate;
+}
+
+/* Scope "forzado" */
+.tabla-facturas[data-force-light], .tabla-facturas[data-force-light] *{
+  color-scheme: light !important;
+}
+
+.dark .tabla-facturas[data-force-light]{
+  --tbl-max: 1600px;
+  --tbl-text: #111827;
+  --tbl-muted: #cfcfcf;
+  --tbl-border: #e5e7eb;
+  --tbl-odd: #ffffff;
+  --tbl-even: #e6e6e6;
+  --tbl-hover: #eef2ff;
+  --tbl-head: #ffffff;
+  --tbl-focus: #2563eb;
+}
+
+/* === 2) Tokens === */
+:root{
+  --tbl-max: 1600px;
+  --tbl-text: #111827;
+  --tbl-muted: #cfcfcf;
+  --tbl-border: #e5e7eb;
+  --tbl-odd: #ffffff;
+  --tbl-even: #e6e6e6;
+  --tbl-hover: #eef2ff;
+  --tbl-head: #ffffff;
+  --tbl-focus: #2563eb;
+}
+
+/* === 3) Contenedor principal === */
+.tabla-facturas {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  background: transparent;
+  color: var(--tbl-text);
+  line-height: 1.35;
+}
+
+/* Scroll horizontal/vertical y fondo como tabla-tickets */
 .tabla-scroll {
   flex: 1;
   overflow-y: auto;
-  overflow-x: auto;           /* scroll horizontal si el contenido no cabe */
+  overflow-x: auto;
   max-height: 50vh;
   margin-bottom: 20px;
-  border-radius: 12px;        /* similar a tabla-tickets */
-  border: 1px solid #e5e7eb; /* borde ligero */
-  background: #ffffff;        /* fondo claro */
+  border-radius: 12px;
+  border: 1px solid var(--tbl-border);
+  background: var(--tbl-head);
   box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 
-/* 🧩 Tabla */
+/* === 4) Tabla === */
 .tabla-facturas {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 10px;
-  min-width: 1200px;        /* evita que se aplaste demasiado */
+  min-width: 1200px;
   font-size: 14px;
   background: transparent;
 }
 
-/* Encabezados */
+/* Encabezados sticky */
 .tabla-facturas th {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #ffffff;
-  color: #111827;
+  background: var(--tbl-head) !important;
+  color: var(--tbl-text) !important;
   padding: 10px 12px;
   text-align: left;
   font-weight: 600;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 0 #e5e7eb, 0 2px 10px rgba(0,0,0,.05);
+  border-bottom: 1px solid var(--tbl-border);
+  box-shadow: 0 1px 0 var(--tbl-border), 0 2px 10px rgba(0,0,0,.05);
   white-space: nowrap;
+  user-select: none;
+}
+
+.tabla-facturas th[role="button"]:focus{
+  outline: 0; 
+  box-shadow: inset 0 -2px 0 var(--tbl-focus);
 }
 
 /* Celdas */
 .tabla-facturas td {
   padding: 10px 12px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
+  border-bottom: 1px solid var(--tbl-border);
   vertical-align: middle;
+  text-align: left;
+  background: var(--tbl-odd);
   word-wrap: break-word;
   white-space: normal;
-  background: #fff;
 }
 
 /* Filas alternadas y hover */
-.tabla-facturas tbody tr:nth-child(odd) {
-  background: #ffffff;
-}
-
-.tabla-facturas tbody tr:nth-child(even) {
-  background: #e6e6e6;
-}
-
-.tabla-facturas tbody tr:hover {
-  background: #eef2ff;
-  cursor: pointer;
-}
+.tabla-facturas tbody tr:nth-child(odd) > *  { background: var(--tbl-odd) !important; }
+.tabla-facturas tbody tr:nth-child(even) > * { background: var(--tbl-even) !important; }
+.tabla-facturas tbody tr:hover > * { background: var(--tbl-hover) !important; cursor: pointer; }
 
 /* Texto con puntos suspensivos */
 .one-line-ellipsis {
@@ -73,29 +118,20 @@
 
 /* Columnas específicas */
 .tabla-facturas th:nth-child(1),
-.tabla-facturas td:nth-child(1) { width: 50px; }   /* Num */
+.tabla-facturas td:nth-child(1) { width: 50px; }
 .tabla-facturas th:nth-child(4),
-.tabla-facturas td:nth-child(4) { width: 150px; }  /* Proveedor */
+.tabla-facturas td:nth-child(4) { width: 150px; }
 .tabla-facturas th:nth-child(5),
-.tabla-facturas td:nth-child(5) { width: 130px; }  /* NIT */
+.tabla-facturas td:nth-child(5) { width: 130px; }
 .tabla-facturas th:nth-child(13),
 .tabla-facturas td:nth-child(13),
 .tabla-facturas th:nth-child(14),
-.tabla-facturas td:nth-child(14) {
-  width: 240px;
-  text-align: left;
-}
-
-/* Columna Acciones compacta */
+.tabla-facturas td:nth-child(14) { width: 240px; text-align: left; }
 .tabla-facturas th:last-child,
-.tabla-facturas td:last-child {
-  width: 64px;
-  text-align: center;
-  white-space: nowrap;
-}
+.tabla-facturas td:last-child { width: 64px; text-align: center; white-space: nowrap; }
 
-/* Botón editar */
-.btn-editar {
+/* Botones */
+.btn-editar, .btn-ver-dist {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -109,11 +145,26 @@
   line-height: 1;
 }
 
-/* Responsive */
+/* Sticky para filas o celdas si es necesario */
+.tabla-facturas td.sticky, .tabla-facturas th.sticky { background: var(--tbl-head) !important; }
+
+/* === 5) Responsive === */
 @media (max-width: 980px){
   .tabla-facturas { min-width: 900px; }
 }
 
 @media (max-width: 520px){
   .tabla-facturas { min-width: 640px; }
+}
+
+/* === 6) Prefers-color-scheme === */
+@media (prefers-color-scheme: dark){
+  .tabla-facturas,
+  .tabla-facturas[data-force-light]{ color-scheme: light !important; }
+}
+
+/* Extras de compatibilidad */
+.tabla-facturas input:-webkit-autofill{
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #111827 !important;
 }
