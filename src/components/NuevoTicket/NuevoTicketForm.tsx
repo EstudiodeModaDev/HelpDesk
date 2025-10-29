@@ -217,15 +217,19 @@ export default function NuevoTicketForm() {
           </div>
 
           {/* Descripción */}
-          <div className="tf-field tf-col-2">
-            <label className="tf-label">Descripción del problema</label>
+        <div className={`tf-field tf-col-2 ${errors.descripcion ? "has-error" : ""}`}>
+          <label className="tf-label">Descripción del problema</label>
+
+          <div className="rtb-box">
             <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
-            {errors.descripcion && <small className="error">{errors.descripcion}</small>}
           </div>
+
+          {errors.descripcion && <small className="error">{errors.descripcion}</small>}
+        </div>
 
           {/* Categoría / Subcategoría / Artículo */}
           <div className="tf-row tf-row--cats tf-col-2"> 
-            <div className="tf-field" style={{ border: '1px solid #dc2626' }}>
+            <div className="tf-field">
               <label className="tf-label">Categoría</label>
               <Select<TreeOption, false>
                 classNamePrefix="rs"

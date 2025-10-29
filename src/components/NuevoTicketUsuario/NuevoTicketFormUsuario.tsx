@@ -34,9 +34,11 @@ export default function NuevoTicketUsuarioForm() {
         </div>
 
         {/* Descripción */}
-        <div className="tf-field tf-col-2" style={{ border: '1px solid #dc2626' }}>
+        <div className="tf-field tf-col-2">
           <label className="tf-label">Descripción del problema</label>
-          <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)…"/>
+          <div className="rtb-box">
+            <RichTextBase64 value={state.descripcion} onChange={(html) => setField("descripcion", html)} placeholder="Describe el problema y pega capturas (Ctrl+V)..."/>
+          </div>
           {errors.descripcion && <small className="error">{errors.descripcion}</small>}
         </div>
 
