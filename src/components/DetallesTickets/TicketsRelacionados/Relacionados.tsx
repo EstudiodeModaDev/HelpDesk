@@ -6,6 +6,8 @@ import type { Ticket } from "../../../Models/Tickets";
 import "./TicketsAsociados.css";
 import type { TicketLite } from "./RelacionarTickets/Relacionador";
 import RelacionadorInline from "./RelacionarTickets/Relacionador";
+import { useUserRoleFromSP } from "../../../Funcionalidades/Usuarios";
+import { useAuth } from "../../../auth/authContext";
 
 type Props = {
   title?: string;
@@ -13,13 +15,14 @@ type Props = {
   emptyChildrenText?: string;
   onSelect?: (t: Ticket) => void;         
   buildHref?: (id: number | string) => string;
-  role: string;
   onRelateConfirm?: (payload: { mode: "padre" | "hijo" | "masiva"; selected: TicketLite[] }) => Promise<void> | void;
 };
 
-export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref, role}: Props) {
+export default function TicketsAsociados({title = "Tickets Asociados", ticket, emptyChildrenText = "No es hijo de ningun caso", onSelect, buildHref}: Props) {
   const { Tickets } = useGraphServices();
-  const isPrivileged = role === "Administrador" || role === "Tecnico" || role === "Técnico";
+  const {account} = useAuth()
+  const userRole = useUserRoleFromSP(account?.username)
+  const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { padre, hijos, loading, error, loadRelateds } = useTicketsRelacionados(Tickets, ticket);
 
   // ====== Relacionador (UI) ======

@@ -20,7 +20,7 @@ function renderSortIndicator(field: SortField, sorts: Array<{field: SortField; d
 export default function TablaTickets() {
   const { account } = useAuth();
   const userMail = account?.username ?? "";
-  const isAdmin = useIsAdmin(userMail); // ajusta tu lógica real de roles
+  const isAdmin = useIsAdmin(userMail);
   const userRole = useUserRoleFromSP(userMail)
 
   const { Tickets } = useGraphServices();

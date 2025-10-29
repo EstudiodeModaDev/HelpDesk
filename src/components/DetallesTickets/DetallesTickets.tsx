@@ -156,7 +156,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
       {/* ======= Tickets relacionados (padre/hijos) ======= */}
       <div className="seccion">
-        <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setSelected(t); setShowSeg(false);}} />
+        <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setSelected(t); setShowSeg(false)}} />
       </div>
 
       {/* Botón Seguimiento (toggle) */}
