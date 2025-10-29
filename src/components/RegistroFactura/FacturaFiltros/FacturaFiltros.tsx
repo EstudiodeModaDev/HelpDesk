@@ -136,12 +136,14 @@ export default function FacturaFiltros({
 
        
 
-          <input
+                <input
           type="text"
           name="DocERP"
           value={filtros.DocERP || ""}
+          onChange={handleChange}   // ← 👈 falta esto
           placeholder="Doc ERP"
         />
+
 
          <label>
           Fecha entrega cont
