@@ -225,7 +225,7 @@ export default function NuevoTicketForm() {
 
           {/* Categoría / Subcategoría / Artículo */}
           <div className="tf-row tf-row--cats tf-col-2"> 
-            <div className="tf-field">
+            <div className="tf-field" style={{ borderColor: 'red' }}>
               <label className="tf-label">Categoría</label>
               <Select<TreeOption, false>
                 classNamePrefix="rs"
