@@ -91,10 +91,12 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         {/* Fila 2 */}
         <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
-            <button type="button" className="as-text" onClick={() => setShowRecat(true)}>
+            <button type="button" className="as-text" onClick={() => setShowRecat(true)} title={categoria || ""}>
               {categoria || "–"}
             </button>
-          ) : (<span>{categoria || "–"}</span>)}
+          ) : (
+            <span title={categoria || ""}>{categoria || "–"}</span>
+          )}
         </Row>
 
         <Row className="pos-ans" label="ANS">
