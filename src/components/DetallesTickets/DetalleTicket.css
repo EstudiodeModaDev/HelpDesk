@@ -367,7 +367,7 @@
 :root{
   --cd-label-min: 0px;          /* mínimo real (permite truncar si hace falta) */
   --cd-label-ideal: 18vw;       /* ancho preferido relativo al viewport */
-  --cd-label-max: 150px;        /* techo en desktop */
+  --cd-label-max: 180px;        /* techo en desktop */
 }
 
 /* === Fila label/valor con label responsivo (min 0, max X) === */
@@ -407,4 +407,50 @@
     --cd-label-ideal: 48vw;
     --cd-label-max: 140px;
   }
+}
+
+/* —— Botón “link” dentro de cd-value: reset fuerte —— */
+.cd-value button.as-text,
+.cd-value .as-text {
+  /* quita cualquier estilo heredado de botones */
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0;
+  display: inline;              /* no bloque, no pill */
+  color: #1e63c6 !important;
+  font: inherit;                /* hereda tipografía del contenedor */
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* truncado seguro dentro de la cajita */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* hover/focus accesibles sin fondo raro */
+.cd-value .as-text:hover {
+  text-decoration: underline;
+  background: transparent !important;
+}
+.cd-value .as-text:focus-visible {
+  outline: 2px solid #1e63c6;      /* aro claro */
+  outline-offset: 2px;
+  border-radius: 2px;
+  background: transparent !important;
+}
+
+/* Si tienes un reset global tipo 'button { background: ... }',
+   esto lo neutraliza específicamente cuando lleva .as-text */
+button.as-text {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }

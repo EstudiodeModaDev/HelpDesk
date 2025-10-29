@@ -40,16 +40,13 @@ export function toISODateFlex(v?: string | Date | null): string {
 }
 
 export function ParseDateShow(fecha: string){
-  const fechaParse = new Date(fecha)
-  const shortDate = fechaParse.toLocaleString("es-CO", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
-  return shortDate
+  try{
+    const fechaParse = new Date(fecha)
+    const shortDate = fechaParse.toLocaleString("es-CO", {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false});
+    return shortDate
+  }catch{
+    return "N/A"
+  }
 }
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
