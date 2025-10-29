@@ -144,7 +144,6 @@ export default function FacturaFiltros({
           placeholder="Doc ERP"
         />
 
-
          <label>
           Fecha entrega cont
           <input
