@@ -68,28 +68,28 @@ export default function FacturaDistribuidaModal({ distribucion, onClose }: Props
           <section className="card-section">
             <h3>Detalles por impresión</h3>
             <div className="row">
-              <div>Impresiones a color</div>
+              <div>🔵 Impresiones a color</div>
               <div>{fmt(impresionesColor)}</div>
             </div>
             <div className="row">
-              <div>Impresiones B/N</div>
+              <div>⚪️ Impresiones B/N</div>
               <div>{fmt(impresionesBN)}</div>
             </div>
           </section>
 
           {/* Distribución */}
           <section className="card-section">
-            <h3>Distribución</h3>
+            <h3>Distribución de canon fijo</h3>
             <div className="row">
-              <div>CEDI</div>
+              <div>CEDI         WDS3807853</div>
               <div>{fmt(cedi)}</div>
             </div>
             <div className="row">
-              <div>35 Palms</div>
+              <div>35 Palms         VZU2Z03365</div>
               <div>{fmt(thirtyFivePalms)}</div>
             </div>
             <div className="row">
-              <div>Calle</div>
+              <div>Calle         VZU2Z03220</div>
               <div>{fmt(calle)}</div>
             </div>
           </section>
