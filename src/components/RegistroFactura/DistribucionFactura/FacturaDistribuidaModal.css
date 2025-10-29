@@ -104,10 +104,6 @@
 .row:last-child {
   border-bottom: none;
 }
-.row div:first-child {
-  white-space: pre; /* 🔥 mantiene los espacios tal cual los escribes */
-  font-family: monospace; /* opcional: ayuda a que los espacios se vean uniformes */
-}
 .row div:last-child {
   font-weight: 600;
   color: #111;

@@ -25,7 +25,7 @@ export default function FacturaDistribuidaModal({ distribucion, onClose }: Props
   // Distribución del cargo fijo según tus fórmulas
   const cedi = canonFijo / 3;
   const resta = (2 / 3) * canonFijo; // parte restante del cargo fijo
-  const thirtyFivePalms = resta / 3;
+  const palms = resta / 3;
   const calle = resta / 3;
 
   // Totales por CO (los valores ya los provees en la distribución)
@@ -78,21 +78,34 @@ export default function FacturaDistribuidaModal({ distribucion, onClose }: Props
           </section>
 
           {/* Distribución */}
-          <section className="card-section">
-            <h3>Distribución de canon fijo</h3>
-            <div className="row">
-              <div>CEDI         WDS3807853</div>
-              <div>{fmt(cedi)}</div>
+<section className="card-section">
+  <h3>Distribución de canon fijo</h3>
+
+          <div className="row">
+            <div className="row-info">
+              <span className="nombre">CEDI</span>
+              <span className="serial">WDS3807853</span>
             </div>
-            <div className="row">
-              <div>35 Palms         VZU2Z03365</div>
-              <div>{fmt(thirtyFivePalms)}</div>
+            <div>{fmt(cedi)}</div>
+          </div>
+
+          <div className="row">
+            <div className="row-info">
+              <span className="nombre">35 Palms</span>
+              <span className="serial">VZU2Z03365</span>
             </div>
-            <div className="row">
-              <div>Calle         VZU2Z03220</div>
-              <div>{fmt(calle)}</div>
+            <div>{fmt(palms)}</div>
+          </div>
+
+          <div className="row">
+            <div className="row-info">
+              <span className="nombre">Calle</span>
+              <span className="serial">VZU2Z03220</span>
             </div>
-          </section>
+            <div>{fmt(calle)}</div>
+          </div>
+        </section>
+
 
           {/* Total por C.O */}
           <section className="card-section">
