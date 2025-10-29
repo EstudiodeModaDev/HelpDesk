@@ -7,7 +7,7 @@ import Recategorizar from "./ModalRecategorizar/Recategorizar";
 import Reasignar from "./Reasignar/Reasignar";
 import AsignarObservador from "./Observador/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
-import { ParseDateShow, toUtcIso } from "../../utils/Date";
+import { ParseDateShow } from "../../utils/Date";
 
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
