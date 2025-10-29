@@ -184,11 +184,11 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                     </button>
 
                     {/* NUEVO: mostrar botón para ver distribución solo si existe IdDistrubuida */}
-                    {factura.IdDistribuida ? (
+                    {factura.IdDistrubuida ? (
                       <button
                         className="btn-ver-dist"
                         title="Ver distribución"
-                        onClick={() => abrirModalDistribucion(factura.IdDistribuida)}
+                        onClick={() => abrirModalDistribucion(factura.IdDistrubuida)}
                         style={{ marginLeft: 8 }}
                       >
                         📊

@@ -234,7 +234,7 @@ const mensajePredeterminado = `Detalle de impresiones en ${mesActual}`;
           ...toFacturaBase(formData),
           CC,
           ValorAnIVA,
-          IdDistrubuida: distribucionId, // <-- vínculo aquí
+          IdDistribuida: distribucionId, // <-- vínculo aquí
         };
 
         await registrarFactura(factura);
