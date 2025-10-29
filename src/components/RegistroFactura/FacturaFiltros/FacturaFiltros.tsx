@@ -112,6 +112,7 @@ export default function FacturaFiltros({
           ))}
         </select>
 
+
         {/* 🧾 Selector de co */}
         <select name="CO" value={filtros.CO || ""} onChange={handleChange}>
           <option value="">Sel centro ope</option>
