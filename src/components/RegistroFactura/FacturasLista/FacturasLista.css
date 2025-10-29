@@ -157,8 +157,6 @@
 @media (max-width: 520px){
   .tabla-facturas { min-width: 640px; }
 }
-
-
 /* === 6) Prefers-color-scheme === */
 @media (prefers-color-scheme: dark){
   .tabla-facturas,
