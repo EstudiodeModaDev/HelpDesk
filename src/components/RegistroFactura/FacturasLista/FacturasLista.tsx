@@ -149,7 +149,10 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{index + 1}</td>
                   <td>{formatearFecha(factura.FechaEmision)}</td>
                   <td>{factura.NoFactura}</td>
-                  <td>{factura.Proveedor}</td>
+                  <td>
+                    <span className="one-line-ellipsis" title={factura.Proveedor}>   
+                      {truncateNoCutGraphemes(factura.Proveedor ?? "", 20)}
+                    </span></td>
                   <td>{factura.Title}</td>
                   <td>
                     {factura.ValorAnIVA.toLocaleString("es-CO", {
@@ -165,7 +168,7 @@ export default function FacturasLista({ onVolver }: { onVolver: () => void }) {
                   <td>{formatearFecha(factura.FecEntregaCont ?? "")}</td>
                   <td>{factura.DocERP}</td>
                   <td>
-                    <span className="one-line-ellipsis" title={factura.DetalleFac}>
+                    <span className="one-line-ellipsis" title={factura.DetalleFac}>   
                       {truncateNoCutGraphemes(factura.DetalleFac ?? "", 20)}
                     </span>
                   </td>
