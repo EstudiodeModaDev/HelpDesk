@@ -305,7 +305,6 @@ function LoggedApp({ user }: { user: User }) {
   // servicios de Graph para condiciones y render perezoso
   const services = useGraphServices() as {Tickets: TicketsService; Usuarios: UsuariosSPService; Logs: LogService;};
 
-  // contexto de visibilidad: rol, flags y disponibilidad de servicios
   const navCtx = React.useMemo<NavContext>(() => {
     const safeRole: Role = role === "Administrador" || role === "Tecnico" || role === "Usuario" ? (role as Role) : "Usuario";
     return {

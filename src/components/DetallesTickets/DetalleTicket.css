@@ -212,3 +212,142 @@
   .cd-row{ grid-template-columns: 160px 1fr; }
 }
 
+/* ====== Ajustes base “fluid” ====== */
+.case-detail{
+  /* padding fluido: 10–16px según ancho */
+  padding: clamp(10px, 2.2vw, 16px);
+}
+.cd-grid{
+  /* gaps un poco más compactos en general */
+  gap: clamp(8px, 1.6vw, 16px) clamp(10px, 1.8vw, 16px);
+}
+.cd-label,
+.cd-value{
+  /* altura cómoda pero no rígida para que quepa texto en móvil */
+  min-height: 36px;
+}
+
+/* ====== Tablet y pantallas medianas ====== */
+@media (max-width: 1024px){
+  .cd-grid{
+    grid-template-columns: 1fr 1fr;   /* de 3 a 2 columnas */
+  }
+
+  /* Opcional: compacta tipografías un punto */
+  .cd-label{ font-size: 0.95rem; }
+  .cd-value{ font-size: 0.95rem; }
+
+  /* Franja de personas a todo el ancho y 2 columnas internas */
+  .pos-people{ grid-column: 1 / -1; }
+  .cd-people{
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Bloques grandes a ancho completo para lectura */
+  .pos-titulo,
+  .pos-descr,
+  .pos-casos{
+    grid-column: 1 / -1;
+  }
+
+  /* Labels un poco más estrechos en filas label/valor */
+  .cd-row{
+    grid-template-columns: 180px minmax(0,1fr);
+    gap: 8px 10px;
+  }
+}
+
+/* ====== Teléfonos (stack real, una columna) ====== */
+@media (max-width: 680px){
+  .cd-grid{
+    grid-template-columns: 1fr;     /* 1 columna */
+    grid-auto-rows: auto;
+  }
+
+  /* Todas las posiciones pasan a full-width sin sorpresas */
+  .col-1, .col-2, .col-3, .span-2, .full,
+  .pos-apertura, .pos-solucion, .pos-fuente,
+  .pos-categoria, .pos-ans, .pos-estado,
+  .pos-people, .pos-titulo, .pos-descr, .pos-casos{
+    grid-column: 1 / -1 !important;
+  }
+
+  /* FILAS: apila label sobre valor para ahorrar ancho */
+  .cd-row{
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .cd-label{
+    padding: 8px 10px;
+    font-size: 0.92rem;
+    border-radius: 8px;
+  }
+  .cd-value{
+    padding: 10px;
+    min-height: unset;      /* deja crecer por contenido */
+  }
+
+  /* Franja de personas: scroll horizontal con snap (comodísimo en móvil) */
+  .cd-people{
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 1fr);  /* cards legibles */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding-bottom: 6px;
+  }
+  .cd-people-item{
+    scroll-snap-align: start;
+    min-width: 240px;
+  }
+
+  /* Pastillas y badges: permiten salto de línea y truncado amigable */
+  .cd-value, .cd-pill, .cd-badge{
+    white-space: normal;
+    word-break: break-word;
+  }
+  .cd-value .truncate{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;  /* 3 líneas máx en móvil */
+    -webkit-box-orient: vertical;
+  }
+
+  /* Reduce un poco sombras y bordes para menos ruido visual */
+  .cd-label, .cd-value, .cd-people-item{
+    border-color: #e5e9ef;
+  }
+}
+
+/* ====== Teléfonos muy pequeños ====== */
+@media (max-width: 400px){
+  .case-detail{ padding: 10px; }
+  .cd-label{ font-size: 0.88rem; padding: 7px 9px; }
+  .cd-value{ font-size: 0.92rem; padding: 9px; }
+
+  /* Botones tipo “as-text” más tocables */
+  .as-text{
+    padding: 6px 4px;
+    margin: -4px;
+  }
+
+  /* Personas un poco más estrechas para caber mejor */
+  .cd-people{
+    grid-auto-columns: minmax(200px, 85%);
+  }
+}
+
+/* ====== Accesibilidad y pulido ====== */
+/* Evita animaciones bruscas si el usuario las desactiva */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Evita que chips/badges rompan el layout por espacios largos */
+.cd-badge, .cd-pill{ white-space: nowrap; }
+.cd-value{ min-width: 0; } /* clave para truncar en grid */
+
