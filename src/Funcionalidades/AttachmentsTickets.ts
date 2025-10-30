@@ -26,12 +26,6 @@ export function useTicketsAttachments(id: string) {
     }
   }, [id, notifyFlow]); 
 
-
-  React.useEffect(() => {
-    loadAttachments();
-  }, [loadAttachments]);
-
-
   return {
     rows, loading, error,
     loadAttachments
