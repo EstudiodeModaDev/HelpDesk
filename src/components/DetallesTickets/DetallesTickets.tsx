@@ -104,11 +104,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         {/* Fila 2 */}
         <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
-            <button
-              type="button"
-              className="as-text"
-              onClick={() => setShowRecat(true)}
-            >
+            <button type="button" className="as-text" onClick={() => setShowRecat(true)}>
               <Trunc text={categoria || "–"} lines={1} />
             </button>
           ) : (
@@ -122,14 +118,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
         <Row className="pos-estado" label="Estado">
           <div className="cd-inline">
-            <span
-              className={`cd-badge ${
-                selected.Estadodesolicitud === "Cerrado"
-                  ? "is-closed"
-                  : "is-open"
-              }`}
-              title={selected.Estadodesolicitud ?? ""}
-            >
+            <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`} title={selected.Estadodesolicitud ?? ""}>
               {selected.Estadodesolicitud}
             </span>
           </div>
@@ -197,6 +186,35 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
           </div>
         </Row>
       </div>
+
+      {/* ===== Adjuntos ===== */}
+      {Array.isArray(rows) && (
+        <section className="cd-attachments">
+          <h3 className="cd-subtitle">Adjuntos ({rows.length})</h3>
+
+          {rows.length === 0 ? (
+            <p className="cd-empty">Sin adjuntos.</p>
+          ) : (
+            <ul className="cd-files" role="list">
+              {rows.map((r: any, i: number) => {
+                const name = r?.DisplayName ?? r?.name ?? `Archivo ${i + 1}`;
+                const href = r?.AbsoluteUri ?? r?.link ?? r?.Url ?? r?.url ?? "";
+
+                if (!href) return null;
+
+                return (
+                  <li key={`${href}-${i}`} className="cd-file">
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="cd-file-link" title={name}>
+                      <span className={`cd-file-ico ext-${name}`} aria-hidden />
+                      <Trunc text={name} lines={1} />
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      )}
 
       {/* ===== Tickets relacionados ===== */}
       <div className="seccion">
