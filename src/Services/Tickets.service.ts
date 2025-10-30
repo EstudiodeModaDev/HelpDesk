@@ -174,8 +174,8 @@ export class TicketsService {
     await this.ensureIds();
 
     // Por ID de lista (más robusto que por título)
-    const api =
-      `https://${this.hostname}${this.sitePath}/_api/web/lists/getbytitle('${this.listName}')/items?$filter=Id%20eq%${itemId}&$select=Attachments,AttachmentFiles&$expand=AttachmentFiles`;
+    const api = `https://${this.hostname}${this.sitePath}` + `/_api/web/lists/getByTitle('${encodeURIComponent(this.listName)}')/items(${itemId})` + `?$select=Id,Attachments` +
+    `&$expand=AttachmentFiles($select=FileName,ServerRelativeUrl,Length)`;;;
 
     // *** CLAVE: usa getAbsolute, NO graph.get ***
     const res = await this.graph.get<any>(api, {
