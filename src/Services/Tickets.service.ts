@@ -175,7 +175,7 @@ export class TicketsService {
 
     // Por ID de lista (más robusto que por título)
     const api =
-      `_api/web/lists/getbytitle('${this.listName}')/items?$filter=Id%20eq%${itemId}&$select=Attachments,AttachmentFiles&$expand=AttachmentFiles`;
+      `https://${this.hostname}${this.sitePath}/_api/web/lists/getbytitle('${this.listName}')/items?$filter=Id%20eq%${itemId}&$select=Attachments,AttachmentFiles&$expand=AttachmentFiles`;
 
     // *** CLAVE: usa getAbsolute, NO graph.get ***
     const res = await this.graph.getAbsolute<any>(api, {
