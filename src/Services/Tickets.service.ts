@@ -173,7 +173,7 @@ export class TicketsService {
   async listAttachments(itemId: string | number): Promise<AttachmentLite[]> {
     await this.ensureIds();
 
-    const url = `https://${this.hostname}.sharepoint.com/_api/web/lists/getbytitle('${this.listName}')/items(${itemId})?$expand=AttachmentFiles `;
+    const url = `https://${this.hostname}/_api/web/lists/getbytitle('${this.listName}')/items(${itemId})?$expand=AttachmentFiles `;
 
     try {
       const res = await this.graph.get<any>(url);
