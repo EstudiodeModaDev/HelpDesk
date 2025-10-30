@@ -454,3 +454,66 @@ button.as-text {
   border: 0 !important;
   box-shadow: none !important;
 }
+
+
+/* ---- truncado responsivo ---- */
+.trunc{
+  min-width: 0;
+  display: block;
+  /* en desktop no forzamos truncado */
+}
+
+/* En pantallas pequeñas: truncar a N líneas (por defecto 1) */
+@media (max-width: 720px){
+  .trunc{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: var(--lines, 1);
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    word-break: break-word;
+  }
+}
+
+/* ---- tooltip al pasar el mouse (desktop) ---- */
+@media (hover:hover){
+  .ttip{ position: relative; }
+  .ttip:hover::after{
+    content: attr(data-full);
+    position: fixed;             /* evita que contenedores con overflow lo recorten */
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-height: 60vh;
+    overflow: auto;
+    padding: 10px 12px;
+    background: #111827;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    z-index: 9999;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+}
+
+/* Opcional: borde sutil al foco teclado */
+.ttip:focus-visible{
+  outline: 2px solid #1e63c6;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---- descripción HTML: clampa solo en móvil (3–5 líneas) ---- */
+@media (max-width: 720px){
+  .html-trunc{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;       /* ajusta a gusto */
+    -webkit-box-orient: vertical;
+  }
+  .html-trunc p{ margin: 0 0 .5rem 0; }
+}
+

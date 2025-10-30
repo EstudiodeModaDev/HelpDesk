@@ -8,6 +8,7 @@ import Reasignar from "./Reasignar/Reasignar";
 import AsignarObservador from "./Observador/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
 import { ParseDateShow } from "../../utils/Date";
+import Trunc from "../Trunc/trunc";
 
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
@@ -68,7 +69,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
 
   return (
     <section className="case-detail">
-
+      {/* ===== Header ===== */}
       <header className="cd-header">
         <h2 className="cd-title">Caso – ID {selected.ID}</h2>
         <button type="button" className="btn-volver" onClick={onVolver}>
@@ -76,36 +77,50 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         </button>
       </header>
 
+      {/* ===== GRID ===== */}
       <div className="cd-grid">
         {/* Fila 1 */}
         <Row className="pos-apertura" label="Fecha de Apertura">
-          <span>{ParseDateShow(selected.FechaApertura ?? "") ?? "—"}</span>
+          <Trunc text={ParseDateShow(selected.FechaApertura ?? "") ?? "—"} />
         </Row>
+
         <Row className="pos-solucion" label="Fecha de solución">
-          <span>{ParseDateShow(selected.TiempoSolucion ?? "") ?? "—"}</span>
+          <Trunc text={ParseDateShow(selected.TiempoSolucion ?? "") ?? "—"} />
         </Row>
+
         <Row className="pos-fuente" label="Fuente solicitante">
-          <span>{selected.Fuente ?? "—"}</span>
+          <Trunc text={selected.Fuente} lines={1} />
         </Row>
 
         {/* Fila 2 */}
         <Row className="pos-categoria" label="Categoría">
           {canRecategorizar ? (
-            <button type="button" className="as-text" onClick={() => setShowRecat(true)} title={categoria || ""}>
-              {categoria || "–"}
+            <button
+              type="button"
+              className="as-text"
+              onClick={() => setShowRecat(true)}
+            >
+              <Trunc text={categoria || "–"} lines={1} />
             </button>
           ) : (
-            <span title={categoria || ""}>{categoria || "–"}</span>
+            <Trunc text={categoria || "–"} lines={1} />
           )}
         </Row>
 
         <Row className="pos-ans" label="ANS">
-          <span>{selected.ANS ?? "—"}</span>
+          <Trunc text={selected.ANS ?? "—"} lines={1} />
         </Row>
 
         <Row className="pos-estado" label="Estado">
           <div className="cd-inline">
-            <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : "is-open"}`}>
+            <span
+              className={`cd-badge ${
+                selected.Estadodesolicitud === "Cerrado"
+                  ? "is-closed"
+                  : "is-open"
+              }`}
+              title={selected.Estadodesolicitud ?? ""}
+            >
               {selected.Estadodesolicitud}
             </span>
           </div>
@@ -117,69 +132,108 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
             <div className="cd-people-label">Actor</div>
             <div className="cd-people-value">—</div>
           </div>
+
           <div className="cd-people-item">
             <div className="cd-people-label">Solicitante</div>
-            <div className="cd-people-value">{selected.Solicitante ?? "—"}</div>
+            <div className="cd-people-value">
+              <Trunc text={selected.Solicitante} lines={1} />
+            </div>
           </div>
+
           <div className="cd-people-item">
             <div className="cd-people-label">Observador</div>
             <div className="cd-people-value">
               {canRecategorizar ? (
-                <button type="button" className="as-text" onClick={() => setShowObservador(true)}>
-                  {selected.Observador || "–"}
+                <button
+                  type="button"
+                  className="as-text"
+                  onClick={() => setShowObservador(true)}
+                >
+                  <Trunc text={selected.Observador || "–"} lines={1} />
                 </button>
-              ) : (<span>{selected.Observador || "—"}</span>)}
+              ) : (
+                <Trunc text={selected.Observador || "—"} lines={1} />
+              )}
             </div>
           </div>
+
           <div className="cd-people-item">
             <div className="cd-people-label">Resolutor</div>
             <div className="cd-people-value">
               {canRecategorizar ? (
-                <button type="button" className="as-text" onClick={() => setShowReasig(true)}>
-                  {selected.Nombreresolutor || "–"}
+                <button
+                  type="button"
+                  className="as-text"
+                  onClick={() => setShowReasig(true)}
+                >
+                  <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
                 </button>
-              ) : (<span>{selected.Nombreresolutor || "–"}</span>)}
+              ) : (
+                <Trunc text={selected.Nombreresolutor || "–"} lines={1} />
+              )}
             </div>
           </div>
         </div>
 
-        {/* Fila 4-6 */}
+        {/* Fila 4: Título */}
         <Row className="pos-titulo" label="Título">
-          <span>{selected.Title}</span>
+          {/* 2 líneas en móvil para mejor legibilidad */}
+          <Trunc text={selected.Title} lines={2} />
         </Row>
 
+        {/* Fila 5: Descripción (HTML truncada en móvil vía .html-trunc) */}
         <Row className="pos-descr" label="Descripción">
-          <HtmlContent html={selected.Descripcion ?? ""} />
+          <div className="html-trunc">
+            <HtmlContent html={selected.Descripcion ?? ""} />
+          </div>
         </Row>
       </div>
 
-
-      {/* ======= Tickets relacionados (padre/hijos) ======= */}
+      {/* ===== Tickets relacionados ===== */}
       <div className="seccion">
-        <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setSelected(t); setShowSeg(false)}} />
+        <TicketsAsociados key={String(selected.ID)} ticket={selected} onSelect={(t: Ticket) => {setShowSeg(false); setSelected(t)}}/>
       </div>
 
-      {/* Botón Seguimiento (toggle) */}
+      {/* ===== Botón de Seguimiento ===== */}
       <div>
-        <button type="button" className="btn-volver" onClick={() => setShowSeg((v) => !v)}>
+        <button
+          type="button"
+          className="btn-volver"
+          onClick={() => setShowSeg((v) => !v)}
+        >
           {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
         </button>
       </div>
 
-      {/* Historial (solo si showSeg = true) */}
+      {/* ===== Historial (toggle) ===== */}
       {showSeg && (
         <div className="seccion">
-          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected}/>
+          <TicketHistorial
+            role={role ?? "Usuario"}
+            onVolver={() => setShowSeg(false)}
+            ticketId={selected.ID!}
+            ticket={selected}
+          />
         </div>
       )}
 
-      {/* ==== Modal de Recategorización ==== */}
+      {/* ===== Modal: Recategorización ===== */}
       {showRecat && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Recategorizar ticket">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Recategorizar ticket"
+        >
           <div className="modal-card">
             <div className="modal-head">
               <h3>Recategorizar ticket #{selected.ID}</h3>
-              <button type="button" className="modal-close" onClick={() => setShowRecat(false)} aria-label="Cerrar">
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowRecat(false)}
+                aria-label="Cerrar"
+              >
                 ✕
               </button>
             </div>
@@ -190,13 +244,23 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         </div>
       )}
 
-      {/* ==== Modal de Reasignación ==== */}
+      {/* ===== Modal: Reasignación ===== */}
       {showReasig && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Reasignar ticket">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reasignar ticket"
+        >
           <div className="modal-card">
             <div className="modal-head">
               <h3>Reasignar ticket #{selected.ID}</h3>
-              <button type="button" className="modal-close" onClick={() => setShowReasig(false)} aria-label="Cerrar">
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowReasig(false)}
+                aria-label="Cerrar"
+              >
                 ✕
               </button>
             </div>
@@ -207,13 +271,23 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         </div>
       )}
 
-      {/* ==== Modal de Observador ==== */}
+      {/* ===== Modal: Observador ===== */}
       {showObservador && (
-        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Asignar observador">
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Asignar observador"
+        >
           <div className="modal-card">
             <div className="modal-head">
               <h3>Asignar observador a ticket #{selected.ID}</h3>
-              <button type="button" className="modal-close" onClick={() => setShowObservador(false)} aria-label="Cerrar">
+              <button
+                type="button"
+                className="modal-close"
+                onClick={() => setShowObservador(false)}
+                aria-label="Cerrar"
+              >
                 ✕
               </button>
             </div>
