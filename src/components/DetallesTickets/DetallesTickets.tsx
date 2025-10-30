@@ -52,7 +52,7 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
   }, [ticket?.ID]);
 
   React.useEffect(() => {
-    loadAttachments
+    loadAttachments()
   }, [ticket?.ID]);
 
   const [showSeg, setShowSeg] = React.useState(false);
@@ -189,19 +189,20 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
         <section className="cd-attachments">
           <h3 className="cd-subtitle">Adjuntos ({rows.length})</h3>
 
-          {rows.length === 0 ? (
+
+          {(rows.length === 0 ? (
             <p className="cd-empty">Sin adjuntos.</p>
           ) : (
             <ul className="cd-files" role="list">
               {rows.map((r: any, i: number) => {
                 const name = r?.DisplayName ?? r?.name ?? `Archivo ${i + 1}`;
                 const href = r?.AbsoluteUri ?? r?.link ?? r?.Url ?? r?.url ?? "";
-
                 if (!href) return null;
-
                 return (
                   <li key={`${href}-${i}`} className="cd-file">
-                    <a href={href} target="_blank" rel="noopener noreferrer" className="cd-file-link" title={name}>
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="cd-file-link"
+                      title={name}
+                    >
                       <span className={`cd-file-ico ext-${name}`} aria-hidden />
                       <Trunc text={name} lines={1} />
                     </a>
@@ -209,9 +210,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
                 );
               })}
             </ul>
-          )}
+          ))}
         </section>
       )}
+
 
       {/* ===== Tickets relacionados ===== */}
       <div className="seccion">
