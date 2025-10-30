@@ -1,7 +1,7 @@
 // src/Services/Tickets.service.ts
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts, PageResult } from '../Models/Commons';
-import type { AttachmentLite, Ticket } from '../Models/Tickets';
+import type { Ticket } from '../Models/Tickets';
 
 export class TicketsService {
   private graph!: GraphRest;
@@ -169,44 +169,6 @@ export class TicketsService {
     const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
     return { items, nextLink };
   }
-
-  async listAttachments_SP(itemId: string | number): Promise<AttachmentLite[]> {
-    await this.ensureIds();
-
-    // Por ID de lista (más robusto que por título)
-    const api = `https://${this.hostname}${this.sitePath}` + `/_api/web/lists/getByTitle('${encodeURIComponent(this.listName)}')/items(${itemId})` + `?$select=Id,Attachments` +
-    `&$expand=AttachmentFiles($select=FileName,ServerRelativeUrl,Length)`;;;
-
-    // *** CLAVE: usa getAbsolute, NO graph.get ***
-    const res = await this.graph.getAbsolute<any>(api, {
-      headers: { Accept: "application/json;odata=nometadata" }
-    });
-
-    const rows = Array.isArray(res?.value) ? res.value : [];
-    return rows.map((x: any) => {
-      const serverRelativeUrl = String(x.ServerRelativeUrl);
-      const dl =
-        `https://${this.hostname}${this.sitePath}/_api/web/` +
-        `GetFileByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/$value`;
-
-      return {
-        name: String(x.FileName),
-        length: Number(x.Length ?? 0),
-        serverRelativeUrl,
-        downloadUrl: dl,
-      };
-    });
-  }
-
- /* async downloadAttachment(itemId: string | number, attachmentId: string): Promise<Blob> {
-    await this.ensureIds();
-    const path =
-      `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
-      `/attachments/${encodeURIComponent(attachmentId)}/$value`;
-
-    // Usa tu wrapper GraphRest para peticiones relativas autenticadas
-    return await this.graph.getBlob<any>(path);
-  }*/
 
 }
 
