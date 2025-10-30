@@ -12,7 +12,7 @@ export function useTicketsAttachments(TicketsSvc: TicketsService, id: string) {
     try {
       const attchments = await TicketsSvc.listAttachments(Number(id));
       attchments.forEach(a => {
-        console.log("[Attachments]", a.name, a.size, a.webUrl, a.downloadUrl);
+        console.log("[Attachments]", a.name, a.size, a.contentType,);
         
       });
       setRows(attchments);

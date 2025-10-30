@@ -43,12 +43,12 @@ export type ticketOption = {
 };
 
 export type AttachmentLite = {
-  id: string;
-  name: string;
-  size: number;
-  webUrl: string;
-  downloadUrl: string | null;
+  id: string;                     // id opaco del adjunto (suele ser el nombre de archivo, pero trátalo como opaco)
+  name: string;                   // nombre del archivo
+  size: number;                   // bytes
+  contentType?: string;
   lastModifiedDateTime?: string;
+  downloadPath: string;     
 };
 
 // Para filtros locales

@@ -172,32 +172,47 @@ export class TicketsService {
 
   async listAttachments(itemId: string | number): Promise<AttachmentLite[]> {
     await this.ensureIds();
-    try {
-      const url =
-        `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
-        `/driveItem/children?$select=id,name,size,webUrl,lastModifiedDateTime,@microsoft.graph.downloadUrl`;
 
+    const url =
+      `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
+      `/attachments?$select=id,name,contentType,size,lastModifiedDateTime`;
+
+    try {
       const res = await this.graph.get<any>(url);
       const rows = Array.isArray(res?.value) ? res.value : [];
 
-      return rows.map((x: any) => ({
-        id: String(x.id),
-        name: String(x.name ?? ""),
-        size: Number(x.size ?? 0),
-        webUrl: String(x.webUrl ?? ""),
-        downloadUrl: (x['@microsoft.graph.downloadUrl'] as string) ?? null,
-        lastModifiedDateTime: x.lastModifiedDateTime,
-      }));
+      return rows.map((x: any) => {
+        const attId = String(x.id); // id opaco, úsalo tal cual
+        const downloadPath =
+          `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
+          `/attachments/${encodeURIComponent(attId)}/$value`;
+
+        return {
+          id: attId,
+          name: String(x.name ?? ""),
+          size: Number(x.size ?? 0),
+          contentType: x.contentType,
+          lastModifiedDateTime: x.lastModifiedDateTime,
+          downloadPath,
+        } as AttachmentLite;
+      });
     } catch (err: any) {
-      // Si el item no tiene carpeta de adjuntos, Graph puede responder 404
-      if (String(err?.status || err).includes("404")) return [];
+      // Si la lista no tiene adjuntos habilitados o el item no tiene ninguno, puede devolver 404
+      const status = err?.status ?? err?.response?.status ?? 0;
+      if (String(status) === "404") return [];
       throw err;
     }
   }
 
-    /*async downloadAttachment(downloadUrl: string): Promise<Blob> {
-      return await this.graph.fetchBlobAbsolute(downloadUrl);
-    }*/
+ /* async downloadAttachment(itemId: string | number, attachmentId: string): Promise<Blob> {
+    await this.ensureIds();
+    const path =
+      `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
+      `/attachments/${encodeURIComponent(attachmentId)}/$value`;
+
+    // Usa tu wrapper GraphRest para peticiones relativas autenticadas
+    return await this.graph.getBlob<any>(path);
+  }*/
 
 }
 
