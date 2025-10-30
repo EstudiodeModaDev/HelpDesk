@@ -178,7 +178,7 @@ export class TicketsService {
     `&$expand=AttachmentFiles($select=FileName,ServerRelativeUrl,Length)`;;;
 
     // *** CLAVE: usa getAbsolute, NO graph.get ***
-    const res = await this.graph.get<any>(api, {
+    const res = await this.graph.getAbsolute<any>(api, {
       headers: { Accept: "application/json;odata=nometadata" }
     });
 

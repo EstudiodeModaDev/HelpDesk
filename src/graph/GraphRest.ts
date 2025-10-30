@@ -92,35 +92,56 @@ export class GraphRest {
   }
 
   async getAbsolute<T = any>(url: string, init?: RequestInit): Promise<T> {
-    const token = await this.getToken();
+    const token = await this.getToken(); 
 
+    // 1) Separa headers de las demás opciones para no pisarlas
+    const { headers: initHeaders, ...restInit } = init ?? {};
+
+    // 2) Merge de headers sin sobrescribir Authorization
+    const headers = new Headers();
+    headers.set("Authorization", `Bearer ${token}`);
+    headers.set("Accept", "application/json;odata=nometadata");
+    // opcional: útil para OData (quita warnings “randomly may fail…” que no aportan)
+    // headers.set("Prefer", "odata.maxpagesize=500"); // ejemplo
+    if (initHeaders) {
+      const ih = new Headers(initHeaders as any);
+      ih.forEach((v, k) => headers.set(k, v));
+    }
+
+    // 3) Ejecuta fetch con merge correcto
     const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Prefer: 'HonorNonIndexedQueriesWarningMayFailRandomly',
-        ...(init?.headers || {}),
-      },
-      ...init,
+      method: "GET",
+      ...restInit,       // ← aquí jamás viene 'headers'
+      headers,           // ← headers finales ya fusionados
     });
 
     if (!res.ok) {
-      let detail = '';
+      let detail = "";
       try {
+        // Intenta leer texto una vez
         const txt = await res.text();
         if (txt) {
-          try { detail = JSON.parse(txt)?.error?.message ?? JSON.parse(txt)?.message ?? txt; }
-          catch { detail = txt; }
+          try {
+            const j = JSON.parse(txt);
+            detail = j?.error?.message ?? j?.message ?? txt;
+          } catch {
+            detail = txt;
+          }
         }
       } catch {}
-      throw new Error(`GET (absolute) ${url} → ${res.status} ${res.statusText}${detail ? `: ${detail}` : ''}`);
+      throw new Error(`GET (absolute) ${url} → ${res.status} ${res.statusText}${detail ? `: ${detail}` : ""}`);
     }
 
     if (res.status === 204) return undefined as unknown as T;
 
-    const ct = res.headers.get('content-type') ?? '';
+    // 4) Devuelve JSON si el content-type lo indica; si no, regresa texto tal cual
+    const ct = res.headers.get("content-type") ?? "";
+    if (ct.includes("application/json")) {
+      return (await res.json()) as T;
+    }
     const txt = await res.text();
-    if (!txt) return undefined as unknown as T;
-    return ct.includes('application/json') ? JSON.parse(txt) as T : (txt as unknown as T);
+    // si esperas cosas tipo XML/HTML de SharePoint en errores 200, lo devuelves como string
+    return txt as unknown as T;
   }
+
 }
