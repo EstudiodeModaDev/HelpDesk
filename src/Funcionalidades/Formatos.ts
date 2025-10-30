@@ -3,11 +3,16 @@ import type { SolicitudUsuario, SolicitudUsuarioErrors } from "../Models/Formato
 import { useAuth } from "../auth/authContext";
 import { FlowClient } from "./FlowClient";
 import type { SoliictudServiciosFlow } from "../Models/FlujosPA";
+import type { TicketsService } from "../Services/Tickets.service";
+import { calcularFechaSolucion } from "../utils/ans";
+import type { Holiday } from "festivos-colombianos";
+import { fetchHolidays } from "../Services/Festivos";
+import { toGraphDateTime } from "../utils/Date";
 
 export type SubmitFn = (payload: any) => Promise<void> | void;
 
-export function useSolicitudServicios() {
-  type FlowResponse = { ok: boolean; [k: string]: any };
+export function useSolicitudServicios(TicketSvc: TicketsService) {
+  type FlowResponse = { ok: boolean; [k: string]: any, createdTicket: string };
   const { account, } = useAuth();
   const [state, setState] = React.useState<SolicitudUsuario>({
     contratacion: "",
@@ -90,8 +95,11 @@ export function useSolicitudServicios() {
       const payload: SoliictudServiciosFlow = {Datos: clean, User: account?.name ?? "", userEmail: account?.username ?? "",};
 
       const flow = await notifyFlow.invoke<SoliictudServiciosFlow, FlowResponse>(payload);
-
+      
       if (flow?.ok) {
+        const holiday: Holiday[] = await fetchHolidays()
+        const FechaSolucion = await calcularFechaSolucion(new Date(), 8, holiday)
+        TicketSvc.update(flow.createdTicket, {TiempoSolucion: toGraphDateTime(FechaSolucion)})
         alert("Se ha creado con éxito su ticket de solicitud de servicio.");
       } else {
         alert(
