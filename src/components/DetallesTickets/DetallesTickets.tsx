@@ -9,6 +9,9 @@ import AsignarObservador from "./Observador/Observador";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
 import { ParseDateShow } from "../../utils/Date";
 import Trunc from "../Trunc/trunc";
+import { useGraphServices } from "../../graph/GrapServicesContext";
+import type { TicketsService } from "../../Services/Tickets.service";
+import { useTicketsAttachments } from "../../Funcionalidades/AttachmentsTickets";
 
 /* ================== Helpers y tipos ================== */
 const hasRecatRole = (r?: string) => {
@@ -35,6 +38,8 @@ function Row({label, children, className = "",}: {label: string; children: React
   );
 }
 export function CaseDetail({ ticket, onVolver, role }: Props) {
+  const { Tickets: TicketsSvc} = (useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;})
+  const {loadAttchments} = useTicketsAttachments(TicketsSvc, ticket.ID ?? "");
   // === Estado local del ticket seleccionado
   const [selected, setSelected] = React.useState<Ticket>(ticket);
   React.useEffect(() => {
@@ -47,6 +52,10 @@ export function CaseDetail({ ticket, onVolver, role }: Props) {
     setShowReasig(false);
     setShowObservador(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticket?.ID]);
+
+  React.useEffect(() => {
+    loadAttchments
   }, [ticket?.ID]);
 
   const [showSeg, setShowSeg] = React.useState(false);

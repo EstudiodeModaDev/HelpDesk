@@ -1,8 +1,7 @@
 // src/Services/Tickets.service.ts
 import { GraphRest } from '../graph/GraphRest';
 import type { GetAllOpts, PageResult } from '../Models/Commons';
-import type { Ticket } from '../Models/Tickets';
-import { ensureIds, esc } from '../utils/Commons';
+import type { AttachmentLite, Ticket } from '../Models/Tickets';
 
 export class TicketsService {
   private graph!: GraphRest;
@@ -107,21 +106,6 @@ export class TicketsService {
     };
   }
 
-  // ---------- ids ----------
-  private async ensure(): Promise<void> {
-    // Asegura y persiste los IDs resueltos
-    const ids = await ensureIds(
-      this.siteId,
-      this.listId,
-      this.graph,
-      this.hostname,
-      this.sitePath,
-      this.listName
-    );
-    this.siteId = ids.siteId;
-    this.listId = ids.listId;
-  }
-
   // ---------- CRUD ----------
   async create(record: Omit<Ticket, 'ID'>) {
     await this.ensureIds();
@@ -185,21 +169,36 @@ export class TicketsService {
     const nextLink = res?.['@odata.nextLink'] ? String(res['@odata.nextLink']) : null;
     return { items, nextLink };
   }
-  // ---------- helpers de consulta ----------
-  async findById(itemId: string | number, top = 1) {
-    await this.ensure();
-    // Mejor filtrar por el id del listItem (numérico) en top-level, no en fields/*
-    const idNum = Number(itemId);
-    const qs = new URLSearchParams({
-      $expand: 'fields',
-      $filter: Number.isFinite(idNum) ? `id eq ${idNum}` : `id eq ${esc(String(itemId))}`,
-      $top: String(top),
-    });
-    const res = await this.graph.get<any>(
-      `/sites/${this.siteId}/lists/${this.listId}/items?${qs.toString()}`
-    );
-    return (res.value ?? []).map((x: any) => this.toModel(x));
+
+  async listAttachments(itemId: string | number): Promise<AttachmentLite[]> {
+    await this.ensureIds();
+    try {
+      const url =
+        `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
+        `/driveItem/children?$select=id,name,size,webUrl,lastModifiedDateTime,@microsoft.graph.downloadUrl`;
+
+      const res = await this.graph.get<any>(url);
+      const rows = Array.isArray(res?.value) ? res.value : [];
+
+      return rows.map((x: any) => ({
+        id: String(x.id),
+        name: String(x.name ?? ""),
+        size: Number(x.size ?? 0),
+        webUrl: String(x.webUrl ?? ""),
+        downloadUrl: (x['@microsoft.graph.downloadUrl'] as string) ?? null,
+        lastModifiedDateTime: x.lastModifiedDateTime,
+      }));
+    } catch (err: any) {
+      // Si el item no tiene carpeta de adjuntos, Graph puede responder 404
+      if (String(err?.status || err).includes("404")) return [];
+      throw err;
+    }
   }
+
+    /*async downloadAttachment(downloadUrl: string): Promise<Blob> {
+      return await this.graph.fetchBlobAbsolute(downloadUrl);
+    }*/
+
 }
 
 

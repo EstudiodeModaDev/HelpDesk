@@ -42,6 +42,15 @@ export type ticketOption = {
   label: string;      //Nombre del ticket
 };
 
+export type AttachmentLite = {
+  id: string;
+  name: string;
+  size: number;
+  webUrl: string;
+  downloadUrl: string | null;
+  lastModifiedDateTime?: string;
+};
+
 // Para filtros locales
 export type SortDir = 'asc' | 'desc';
 export type SortField = 'id' | 'FechaApertura' | 'TiempoSolucion' | 'Title' | 'resolutor';

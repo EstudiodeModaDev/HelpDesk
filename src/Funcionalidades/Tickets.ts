@@ -82,7 +82,6 @@ export function calcularColorEstado(ticket: Ticket): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-
 export function useTickets(TicketsSvc: TicketsService, userMail: string, isAdmin: boolean) {
   const [rows, setRows] = React.useState<Ticket[]>([]);
   const [loading, setLoading] = React.useState(false);
