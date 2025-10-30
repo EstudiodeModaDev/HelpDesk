@@ -24,9 +24,9 @@ export default function FacturaDistribuidaModal({ distribucion, onClose }: Props
 
   // Distribución del cargo fijo según tus fórmulas
   const cedi = canonFijo / 3;
-  const resta = (2 / 3) * canonFijo; // parte restante del cargo fijo
-  const palms = resta / 3;
-  const calle = resta / 3;
+  // const resta = (2 / 3) * canonFijo; // parte restante del cargo fijo
+  const palms = canonFijo / 3;
+  const calle = canonFijo / 3;
 
   // Totales por CO (los valores ya los provees en la distribución)
   const marcasNac = distribucion.CosTotMarNacionales ?? 0;
