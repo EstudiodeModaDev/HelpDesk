@@ -1,3 +1,5 @@
+import type { SolicitudUsuario } from "./Formatos";
+
 export type FormStateCajeros = {
     solicitante: string;
     usuario: string;
@@ -69,4 +71,10 @@ export type MasiveFlow = {
     contentType: string
     contentBase64: string
   };
+}
+
+export type SoliictudServiciosFlow = {
+  User: string;
+  userEmail: string;
+  Datos: SolicitudUsuario
 }
