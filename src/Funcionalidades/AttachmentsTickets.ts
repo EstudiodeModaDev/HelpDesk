@@ -12,7 +12,7 @@ export function useTicketsAttachments(TicketsSvc: TicketsService, id: string) {
   const loadAttchments = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const attachments = notifyFlow.invoke({itemId: id})
+      const attachments = notifyFlow.invoke({itemId: Number(id)})
       console.log(attachments)
       
     } catch (e: any) {

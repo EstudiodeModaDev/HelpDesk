@@ -39,7 +39,7 @@ function Row({label, children, className = "",}: {label: string; children: React
 }
 export function CaseDetail({ ticket, onVolver, role }: Props) {
   const { Tickets: TicketsSvc} = (useGraphServices() as ReturnType<typeof useGraphServices> & {Tickets: TicketsService;})
-  const {loadAttchments} = useTicketsAttachments(TicketsSvc, ticket.ID ?? "");
+  const {loadAttchments, rows} = useTicketsAttachments(TicketsSvc, ticket.ID ?? "");
   // === Estado local del ticket seleccionado
   const [selected, setSelected] = React.useState<Ticket>(ticket);
   React.useEffect(() => {
