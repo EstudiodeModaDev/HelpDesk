@@ -170,35 +170,33 @@ export class TicketsService {
     return { items, nextLink };
   }
 
-  async listAttachments(itemId: string | number): Promise<AttachmentLite[]> {
+  async listAttachments_SP(itemId: string | number): Promise<AttachmentLite[]> {
     await this.ensureIds();
 
-    const url = `https://${this.hostname}/_api/web/lists/getbytitle('${this.listName}')/items(${itemId})?$expand=AttachmentFiles `;
+    // Por ID de lista (más robusto que por título)
+    const api =
+      `https://${this.hostname}${this.sitePath}/_api/web/lists/getById('${this.listId}')/` +
+      `items(${itemId})/AttachmentFiles`;
 
-    try {
-      const res = await this.graph.get<any>(url);
-      console.table(res)
-      const rows = Array.isArray(res?.value) ? res.value : [];
+    // *** CLAVE: usa getAbsolute, NO graph.get ***
+    const res = await this.graph.getAbsolute<any>(api, {
+      headers: { Accept: "application/json;odata=nometadata" }
+    });
 
-      return rows.map((x: any) => {
-        const attId = String(x.id); // id opaco, úsalo tal cual
-        const downloadPath =`https://${this.hostname}.sharepoint.com/_api/web/lists/getbytitle('${this.listName}')/items(${itemId})?$expand=AttachmentFiles `
+    const rows = Array.isArray(res?.value) ? res.value : [];
+    return rows.map((x: any) => {
+      const serverRelativeUrl = String(x.ServerRelativeUrl);
+      const dl =
+        `https://${this.hostname}${this.sitePath}/_api/web/` +
+        `GetFileByServerRelativeUrl('${encodeURIComponent(serverRelativeUrl)}')/$value`;
 
-        return {
-          id: attId,
-          name: String(x.name ?? ""),
-          size: Number(x.size ?? 0),
-          contentType: x.contentType,
-          lastModifiedDateTime: x.lastModifiedDateTime,
-          downloadPath,
-        } as AttachmentLite;
-      });
-    } catch (err: any) {
-      // Si la lista no tiene adjuntos habilitados o el item no tiene ninguno, puede devolver 404
-      const status = err?.status ?? err?.response?.status ?? 0;
-      if (String(status) === "404") return [];
-      throw err;
-    }
+      return {
+        name: String(x.FileName),
+        length: Number(x.Length ?? 0),
+        serverRelativeUrl,
+        downloadUrl: dl,
+      };
+    });
   }
 
  /* async downloadAttachment(itemId: string | number, attachmentId: string): Promise<Blob> {

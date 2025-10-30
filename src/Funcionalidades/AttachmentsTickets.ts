@@ -10,7 +10,7 @@ export function useTicketsAttachments(TicketsSvc: TicketsService, id: string) {
   const loadAttchments = React.useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const attchments = await TicketsSvc.listAttachments(Number(id));
+      const attchments = await TicketsSvc.listAttachments_SP(Number(id));
       attchments.forEach(a => {
         console.log("[Attachments]", a.name, a.size, a.contentType,);
         
