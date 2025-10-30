@@ -173,19 +173,16 @@ export class TicketsService {
   async listAttachments(itemId: string | number): Promise<AttachmentLite[]> {
     await this.ensureIds();
 
-    const url =
-      `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
-      `/attachments?$select=id,name,contentType,size,lastModifiedDateTime`;
+    const url = `https://${this.hostname}.sharepoint.com/_api/web/lists/getbytitle('${this.listName}')/items(${itemId})?$expand=AttachmentFiles `;
 
     try {
       const res = await this.graph.get<any>(url);
+      console.table(res)
       const rows = Array.isArray(res?.value) ? res.value : [];
 
       return rows.map((x: any) => {
         const attId = String(x.id); // id opaco, úsalo tal cual
-        const downloadPath =
-          `/sites/${this.siteId}/lists/${this.listId}/items/${itemId}` +
-          `/attachments/${encodeURIComponent(attId)}/$value`;
+        const downloadPath =`https://${this.hostname}.sharepoint.com/_api/web/lists/getbytitle('${this.listName}')/items(${itemId})?$expand=AttachmentFiles `
 
         return {
           id: attId,
