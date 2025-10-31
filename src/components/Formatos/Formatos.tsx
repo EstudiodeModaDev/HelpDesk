@@ -1,14 +1,11 @@
 // src/components/Formatos/Formatos.tsx
 import { useState } from "react";
 import "./Formatos.css";
-
 import SolicitudUsuarioForm from "./ServiciosTI/ServiciosTI";
 import SolicitudesRed from "./Seguridad de red/SeguridadRed";
 import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
-
 import type { OpcionSolicitud } from "../../Models/Formatos";
-import type { FilaSolicitudERP } from "../../Models/Formatos";
 import type { FilaPermisoNav } from "../../Funcionalidades/PermisosNavegacion";
 
 /** Opciones del selector */
@@ -80,10 +77,7 @@ export default function Formatos() {
     }
 
     if (opcion === "FR Administrador seguridad ERP") {
-      const handleSubmitERP = async (payload: Omit<FilaSolicitudERP, "id">[]) => {
-        console.log("ERP → payload", payload);
-      };
-      return <SolicitudERP onSubmit={handleSubmitERP} />;
+      return <SolicitudERP  />;
     }
 
     if (opcion === "Permisos de navegacion") {
