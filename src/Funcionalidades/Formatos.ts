@@ -479,20 +479,7 @@ export function usePermisosERP(TicketSvc: TicketsService) {
 type PayloadNav = {
   user: string;
   userEmail: string;
-  filas: Array<{
-    nombreEmpleado: string;
-    Jefe: string;
-    youtube: boolean;
-    facebook: boolean;
-    twitter: boolean;
-    instagram: boolean;
-    whatsapp: boolean;
-    wetransfer: boolean;
-    pinterest: boolean;
-    analytics: boolean;
-    drive: boolean;
-    otro: string;
-  }>;
+  filas: Array<{ }>;
 };
 
 type StateNavegacion = {
@@ -602,23 +589,23 @@ export function usePermisosNavegacion(TicketSvc: TicketsService) {
         if (!user || !userEmail) throw new Error("Faltan user o userEmail del usuario autenticado.");
 
         // Mapear modelo → payload (nombres esperados por el flujo)
-        const filasPayload: PayloadNav["filas"] = state.filas.map((f) => ({
-          nombreEmpleado: f.Empleado?.trim() ?? "",
-          Jefe: f["Jefe / Quien autoriza"]?.trim() ?? "",
-          youtube: !!f.Youtube,
-          facebook: !!f.Facebook,
-          twitter: !!f.Twitter,
-          instagram: !!f.Instagram,
-          whatsapp: !!f.Whatsapp,
-          wetransfer: !!f.Wetransfer,
-          pinterest: !!f.Pinterest,
-          analytics: !!f["Google Anatytics"], // ojo al nombre original
-          drive: !!f["Google Drive"],
-          otro: f["Otro (Link de la pagina )"] ?? "",
+        const filasPayload = state.filas.map((f) => ({
+          Empleado: f.Empleado?.trim() ?? "",
+          "Jefe / Quien autoriza": f["Jefe / Quien autoriza"]?.trim() ?? "",
+          Youtube: !!f.Youtube,
+          Facebook: !!f.Facebook,
+          Twitter: !!f.Twitter,
+          Instagram: !!f.Instagram,
+          Whatsapp: !!f.Whatsapp,
+          Wetransfer: !!f.Wetransfer,
+          Pinterest: !!f.Pinterest,
+          "Google Anatytics": !!f["Google Anatytics"], // ojo al nombre original
+          "Google Drive": !!f["Google Drive"],
+          "Otro (Link de la pagina )": f["Otro (Link de la pagina )"] ?? "",
         }));
 
         // Validación rápida
-        const faltantes = filasPayload.filter((x) => !x.nombreEmpleado || !x.Jefe);
+        const faltantes = filasPayload.filter((x) => !x.Empleado || !x["Jefe / Quien autoriza"]);
         if (faltantes.length > 0) {
           throw new Error("Hay filas con Empleado/Jefe vacíos.");
         }
