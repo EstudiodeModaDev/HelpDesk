@@ -76,5 +76,5 @@ export type MasiveFlow = {
 export type SoliictudServiciosFlow = {
   User: string;
   userEmail: string;
-  Datos: SolicitudUsuario
+  Datos: SolicitudUsuario 
 }

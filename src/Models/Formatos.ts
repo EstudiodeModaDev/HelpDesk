@@ -22,7 +22,7 @@ export interface FilaSolicitudRed {
   carpeta1: string;
   subcarpeta1: string;
   subcarpeta2: string;
-  personas: string;    // puedes cambiar a string[] si usas multiselect real
+  personas: string;    
   permiso: PermisoRed | "";
   observaciones: string;
 }
@@ -34,12 +34,12 @@ export type State = {
 };
 
 export type Action =
-  | { type: "ADD" }
+  | { type: "ADD"; initial?: Partial<Omit<FilaSolicitudRed, "id">> }
   | { type: "REMOVE"; id: string }
-  | { type: "SET"; id: string; key: keyof FilaSolicitudRed; value: any }
+  | { type: "SET"; id: string; key: keyof FilaSolicitudRed; value: FilaSolicitudRed[keyof FilaSolicitudRed] }
   | { type: "RESET" }
   | { type: "SENDING"; value: boolean }
-  | { type: "ERROR"; message?: string };
+  | { type: "ERROR"; message: string | null };
 
   //Modelo seguridad de reERP
 export interface FilaSolicitudERP {

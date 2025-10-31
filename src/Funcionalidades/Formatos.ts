@@ -1,5 +1,5 @@
 import React from "react";
-import type { SolicitudUsuario, SolicitudUsuarioErrors } from "../Models/Formatos";
+import type { Action, FilaSolicitudRed, SolicitudUsuario, SolicitudUsuarioErrors } from "../Models/Formatos";
 import { useAuth } from "../auth/authContext";
 import { FlowClient } from "./FlowClient";
 import type { SoliictudServiciosFlow } from "../Models/FlujosPA";
@@ -10,10 +10,24 @@ import { fetchHolidays } from "../Services/Festivos";
 import { toGraphDateTime } from "../utils/Date";
 
 export type SubmitFn = (payload: any) => Promise<void> | void;
+const { account, } = useAuth();
+type FlowResponse = { ok: boolean; [k: string]: any, createdTicket: string };
+
+type Payload = {
+  filas: Omit<FilaSolicitudRed, "id">[];  // limpio
+  user: string;
+  userEmail: string;
+};
+
+type State = {
+  filas: FilaSolicitudRed[];
+  sending: boolean;
+  error: string | null;
+};
+
 
 export function useSolicitudServicios(TicketSvc: TicketsService) {
-  type FlowResponse = { ok: boolean; [k: string]: any, createdTicket: string };
-  const { account, } = useAuth();
+  
   const [state, setState] = React.useState<SolicitudUsuario>({
     contratacion: "",
     nombre: "",
@@ -120,3 +134,175 @@ export function useSolicitudServicios(TicketSvc: TicketsService) {
     setField, handleSubmit
   };
 }
+
+const uuid = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
+
+const defaultFila = (seed?: Partial<Omit<FilaSolicitudRed, "id">>): FilaSolicitudRed => ({
+  id: uuid(),
+  carpeta1: "",
+  subcarpeta1: "",
+  subcarpeta2: "",
+  personas: "",
+  permiso: "",
+  observaciones: "",
+  ...(seed ?? {}),
+});
+
+const initialState: State = {
+  filas: [defaultFila()],
+  sending: false,
+  error: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "ADD":
+      return { ...state, filas: [...state.filas, defaultFila(action.initial)] };
+
+    case "REMOVE": {
+      const next = state.filas.filter(f => f.id !== action.id);
+      // nunca dejes la lista vacía: deja al menos una fila
+      return { ...state, filas: next.length ? next : [defaultFila()] };
+    }
+
+    case "SET": {
+      const filas = state.filas.map(f =>
+        f.id === action.id ? { ...f, [action.key]: action.value } : f
+      );
+      return { ...state, filas };
+    }
+
+    case "RESET":
+      return initialState;
+
+    case "SENDING":
+      return { ...state, sending: action.value };
+
+    case "ERROR":
+      return { ...state, error: action.message };
+
+    default:
+      return state;
+  }
+}
+
+const filaMinimaLlena = (f: FilaSolicitudRed) =>!!(f.carpeta1.trim() || f.subcarpeta1.trim() || f.subcarpeta2.trim());
+
+export function useSolicitudesRed(TicketSvc: TicketsService) {
+  const [state, dispatch] = React.useReducer(reducer, initialState);
+    const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1eecfd81de164fd7bda5cc9e524a0faf/triggers/manual/paths/invoke?api-version=1")
+
+  const requiredOk = React.useMemo(
+    () => state.filas.every(filaMinimaLlena),
+    [state.filas]
+  );
+
+  const addFila = React.useCallback(
+    (initial?: Partial<Omit<FilaSolicitudRed, "id">>) => dispatch({ type: "ADD", initial }),
+    []
+  );
+
+  const removeFila = React.useCallback((id: string) => {
+    dispatch({ type: "REMOVE", id });
+  }, []);
+
+  const setCampo = React.useCallback(
+    <K extends keyof FilaSolicitudRed>(id: string, key: K, value: FilaSolicitudRed[K]) => {
+      dispatch({ type: "SET", id, key, value });
+    },
+    []
+  );
+
+
+const submit = React.useCallback(
+  async (e?: React.FormEvent) => {
+    e?.preventDefault?.();
+
+    if (!requiredOk) {
+      dispatch({
+        type: "ERROR",
+        message: "Hay filas sin datos mínimos (carpeta o subcarpetas).",
+      });
+      return;
+    }
+
+    try {
+      dispatch({ type: "ERROR", message: null });
+      dispatch({ type: "SENDING", value: true });
+
+      // Limpia ids internos antes de enviar
+      const filasLimpias = state.filas.map(({ id, ...rest }) => rest);
+
+      // Email desde MSAL puede venir en distintos campos
+      const email =
+        (account as any)?.username ??
+        (account as any)?.userName ??
+        (account as any)?.idTokenClaims?.preferred_username ??
+        "";
+
+      const payload: Payload = {
+        filas: filasLimpias,
+        user: account?.name ?? "",
+        userEmail: email,
+      };
+
+      // Generics: <Respuesta, Payload>
+      const flow = await notifyFlow.invoke<Payload, FlowResponse>(payload);
+
+      if (!flow?.ok) {
+        const msg = flow?.message ?? "El flujo respondió con error.";
+        throw new Error(msg);
+      }
+
+      // Cálculo de la fecha de solución y actualización del ticket
+      const holidays: Holiday[] = await fetchHolidays();
+      const fechaSolucion = await calcularFechaSolucion(new Date(), 8, holidays);
+
+      // Asegura esperar el update y capturar fallo
+      await TicketSvc.update(flow.createdTicket!, {TiempoSolucion: toGraphDateTime(fechaSolucion),});
+
+      alert("✅ Se ha creado con éxito su ticket de solicitud de servicio.");
+      dispatch({ type: "RESET" });
+    } catch (err: any) {
+      console.error("Error con el flujo", err);
+      dispatch({
+        type: "ERROR",
+        message:
+          err?.message ??
+          "No pudimos enviar la solicitud. Verifica tu conexión e inténtalo de nuevo.",
+      });
+      alert(
+        "⚠️ No pudimos enviar la solicitud. Verifica tu conexión e inténtalo de nuevo."
+      );
+    } finally {
+      dispatch({ type: "SENDING", value: false });
+    }
+  },
+  [
+    requiredOk,
+    state.filas,
+    account?.name,
+    (account as any)?.username,
+    notifyFlow,
+    fetchHolidays,
+    calcularFechaSolucion,
+    TicketSvc,
+    toGraphDateTime,
+  ]
+);
+
+
+
+  return {
+    filas: state.filas,
+    sending: state.sending,
+    error: state.error,
+    requiredOk,
+    addFila,
+    removeFila,
+    setCampo,
+    submit,
+  };
+}
+
+
