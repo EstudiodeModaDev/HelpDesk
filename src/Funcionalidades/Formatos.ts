@@ -189,7 +189,7 @@ const filaMinimaLlena = (f: FilaSolicitudRed) =>!!(f.carpeta1.trim() || f.subcar
 
 export function useSolicitudesRed(TicketSvc: TicketsService) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1eecfd81de164fd7bda5cc9e524a0faf/triggers/manual/paths/invoke?api-version=1")
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1eecfd81de164fd7bda5cc9e524a0faf/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=WhieSqa0IMJwfZa8_5w0uTwgD_JKzbUh8Z4kZG_fzQY")
   const { account, } = useAuth();
 
   const requiredOk = React.useMemo(
