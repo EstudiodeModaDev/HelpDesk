@@ -8,7 +8,7 @@ import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
 
 import type { OpcionSolicitud } from "../../Models/Formatos";
-import type { FilaSolicitudRed, FilaSolicitudERP } from "../../Models/Formatos";
+import type {  FilaSolicitudERP } from "../../Models/Formatos";
 import type { FilaPermisoNav } from "../../Funcionalidades/PermisosNavegacion";
 
 /** Opciones del selector */
@@ -76,10 +76,7 @@ export default function Formatos() {
     }
 
     if (opcion === "FR Admin seguridad unidad de red") {
-      const handleSubmitPermisosRed = async (payload: Omit<FilaSolicitudRed, "id">[]) => {
-        console.log("Permisos de red → payload", payload);
-      };
-      return <SolicitudesRed onSubmit={handleSubmitPermisosRed} />;
+      return <SolicitudesRed />;
     }
 
     if (opcion === "FR Administrador seguridad ERP") {
