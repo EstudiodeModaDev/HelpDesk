@@ -138,7 +138,7 @@ export function useSolicitudesRed(TicketSvc: TicketsService) {
 
         if (!user || !userEmail) throw new Error("Faltan nombre o email del usuario autenticado.");
 
-        const payload: PayloadRed = { filas: filasLimpias, user, userEmail };
+        const payload: PayloadRed = { filas: filasLimpias, user:user, userEmail: userEmail };
 
         // invoke<Respuesta, Payload>
         const flow = await notifyFlow.invoke<any, FlowResponse>(payload);
