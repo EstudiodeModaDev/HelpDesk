@@ -8,7 +8,7 @@ import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
 
 import type { OpcionSolicitud } from "../../Models/Formatos";
-import type {  FilaSolicitudERP } from "../../Models/Formatos";
+import type { FilaSolicitudERP } from "../../Models/Formatos";
 import type { FilaPermisoNav } from "../../Funcionalidades/PermisosNavegacion";
 
 /** Opciones del selector */

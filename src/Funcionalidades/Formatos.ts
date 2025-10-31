@@ -10,7 +10,6 @@ import { fetchHolidays } from "../Services/Festivos";
 import { toGraphDateTime } from "../utils/Date";
 
 export type SubmitFn = (payload: any) => Promise<void> | void;
-const { account, } = useAuth();
 type FlowResponse = { ok: boolean; [k: string]: any, createdTicket: string };
 
 type Payload = {
@@ -27,7 +26,7 @@ type State = {
 
 
 export function useSolicitudServicios(TicketSvc: TicketsService) {
-  
+  const { account, } = useAuth();
   const [state, setState] = React.useState<SolicitudUsuario>({
     contratacion: "",
     nombre: "",
@@ -190,7 +189,8 @@ const filaMinimaLlena = (f: FilaSolicitudRed) =>!!(f.carpeta1.trim() || f.subcar
 
 export function useSolicitudesRed(TicketSvc: TicketsService) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-    const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1eecfd81de164fd7bda5cc9e524a0faf/triggers/manual/paths/invoke?api-version=1")
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1eecfd81de164fd7bda5cc9e524a0faf/triggers/manual/paths/invoke?api-version=1")
+  const { account, } = useAuth();
 
   const requiredOk = React.useMemo(
     () => state.filas.every(filaMinimaLlena),
