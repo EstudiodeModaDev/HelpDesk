@@ -14,7 +14,7 @@ export type ExtensionTelefonica =
   | "Solicitud nueva"
   | "Traslado";
 
-  export type PermisoRed = "Lectura" | "Escritura" | "Lectura y escritura";
+export type PermisoRed = "Lectura" | "Escritura" | "Lectura y escritura";
 
   //Modelo solicitud de permisos de red
 export interface FilaSolicitudRed {
@@ -87,3 +87,19 @@ export type SolicitudUsuario = {
 };
 
 export type SolicitudUsuarioErrors = Partial<Record<keyof SolicitudUsuario, string>>;
+
+export interface FilaPermisoNav {
+  id: string;
+  Empleado: string,
+  "Jefe / Quien autoriza": string,
+  Youtube: boolean,
+  Facebook: boolean,
+  Twitter: boolean,
+  Instagram: boolean,
+  Whatsapp: boolean,
+  Pinterest: boolean,
+  "Google Anatytics": boolean,
+  "Google Drive": boolean,
+  Wetransfer: boolean,
+  "Otro (Link de la pagina )": string
+}

@@ -6,12 +6,9 @@ import SolicitudesRed from "./Seguridad de red/SeguridadRed";
 import SolicitudERP from "./SeguridadERP/SeguridadERP";
 import PermisosNavegacion from "./PermisosNavegacion/PermisosNavegacion";
 import type { OpcionSolicitud } from "../../Models/Formatos";
-import type { FilaPermisoNav } from "../../Funcionalidades/PermisosNavegacion";
 
-/** Opciones del selector */
 const OPCIONES: OpcionSolicitud[] = ["Solicitud de servicios de TI", "FR Admin seguridad unidad de red", "FR Administrador seguridad ERP", "Permisos de navegacion",] as const;
 
-/** TyC por opción (HTML controlado por nosotros) */
 const TYC_BY_OPCION: Record<OpcionSolicitud, string> = {
   "Solicitud de servicios de TI": `
     <p>Importante:</p>
@@ -81,10 +78,7 @@ export default function Formatos() {
     }
 
     if (opcion === "Permisos de navegacion") {
-      const handleSubmitNav = async (payload: Omit<FilaPermisoNav, "id">[]) => {
-        console.log("Permisos de navegación → payload", payload);
-      };
-      return <PermisosNavegacion onSubmit={handleSubmitNav} jefeDefault="Practicante Listo" />;
+      return <PermisosNavegacion/>;
     }
   }
 

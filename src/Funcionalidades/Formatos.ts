@@ -1,14 +1,8 @@
 // hooks/solicitudes.tsx
 import * as React from "react";
-import type {
-  FilaSolicitudERP,
-  FilaSolicitudRed,
-  SolicitudUsuario,
-  SolicitudUsuarioErrors,
-} from "../Models/Formatos";
+import type {FilaPermisoNav, FilaSolicitudERP, FilaSolicitudRed, SolicitudUsuario, SolicitudUsuarioErrors,}from "../Models/Formatos";
 import { useAuth } from "../auth/authContext";
 import { FlowClient } from "./FlowClient";
-
 import type { TicketsService } from "../Services/Tickets.service";
 import { calcularFechaSolucion } from "../utils/ans";
 import type { Holiday } from "festivos-colombianos";
@@ -447,8 +441,10 @@ export function usePermisosERP(TicketSvc: TicketsService) {
 
         const holidays: Holiday[] = await fetchHolidays();
         const fechaSolucion = await calcularFechaSolucion(new Date(), 8, holidays);
+        console.log(fechaSolucion)
 
         if (flow.createdTicket != null) {
+          alert(flow.createdTicket)
           await TicketSvc.update(String(flow.createdTicket), { TiempoSolucion: toGraphDateTime(fechaSolucion) });
         }
 
@@ -477,5 +473,188 @@ export function usePermisosERP(TicketSvc: TicketsService) {
     removeFila,
     setCampo,
     submit,
+  };
+}
+
+type PayloadNav = {
+  user: string;
+  userEmail: string;
+  filas: Array<{
+    nombreEmpleado: string;
+    Jefe: string;
+    youtube: boolean;
+    facebook: boolean;
+    twitter: boolean;
+    instagram: boolean;
+    whatsapp: boolean;
+    wetransfer: boolean;
+    pinterest: boolean;
+    analytics: boolean;
+    drive: boolean;
+    otro: string;
+  }>;
+};
+
+type StateNavegacion = {
+  filas: FilaPermisoNav[];
+  sending: boolean;
+  error: string | null;
+};
+
+const initialStateNavegacion: StateNavegacion = {
+  filas: [],
+  sending: false,
+  error: null,
+};
+
+type ActionNavegacion = ActionOf<FilaPermisoNav>;
+
+const defaultFilaNav = (jefe: string, seed?: Partial<Omit<FilaPermisoNav, "id">>): FilaPermisoNav => ({
+  id: uuid(),
+  Empleado: "",
+  "Jefe / Quien autoriza": jefe ?? "",
+  Youtube: false,
+  Facebook: false,
+  Twitter: false,
+  Instagram: false,
+  Whatsapp: false,
+  Pinterest: false,
+  "Google Anatytics": false,
+  "Google Drive": false,
+  Wetransfer: false,
+  "Otro (Link de la pagina )": "",
+  ...(seed ?? {}),
+});
+
+const filaMinimaNavegacionLlena = (f: FilaPermisoNav) => !!(f?.["Jefe / Quien autoriza"] || "").trim() && !!(f?.Empleado || "").trim();
+
+function reducerNavegacion(state: StateNavegacion, action: ActionNavegacion): StateNavegacion {
+  switch (action.type) {
+    case "ADD": {
+      // La fila base se crea fuera (en el hook) para inyectar el nombre del jefe actual
+      return { ...state, filas: [...state.filas, action.initial as FilaPermisoNav] };
+    }
+    case "REMOVE":
+      return { ...state, filas: state.filas.filter((f) => f.id !== action.id) };
+    case "SET": {
+      const filas = state.filas.map((f) => (f.id === action.id ? { ...f, [action.key]: action.value } : f));
+      return { ...state, filas };
+    }
+    case "ERROR":
+      return { ...state, error: action.message };
+    case "SENDING":
+      return { ...state, sending: action.value };
+    case "RESET":
+      return initialStateNavegacion;
+    default:
+      return state;
+  }
+}
+
+// ── Hook principal ───────────────────────────────────────────────────────
+export function usePermisosNavegacion(TicketSvc: TicketsService) {
+  const [state, dispatch] = React.useReducer(reducerNavegacion, initialStateNavegacion);
+  const notifyFlow = new FlowClient("https://defaultcd48ecd97e154f4b97d9ec813ee42b.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2957c736b1744b34ab2119e472ad5ddc/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XCJ4TPle8dp8eaRKo3klO7gFJZTeosZ8POpLJidvAV4");
+  const { account } = useAuth();
+
+  const jefeActual = account?.name ?? (account as any)?.idTokenClaims?.name ?? "";
+
+  const requiredOk = React.useMemo(() => state.filas.every(filaMinimaNavegacionLlena), [state.filas]);
+
+  const addFila = React.useCallback(
+    (initial?: Partial<Omit<FilaPermisoNav, "id">>) => {
+      const fila = defaultFilaNav(jefeActual, initial);
+      dispatch({ type: "ADD", initial: fila });
+    },
+    [jefeActual]
+  );
+
+  const removeFila = React.useCallback((id: string) => dispatch({ type: "REMOVE", id }), []);
+
+  const setCampo = React.useCallback(
+    <K extends keyof FilaPermisoNav>(id: string, key: K, value: FilaPermisoNav[K]) =>
+      dispatch({ type: "SET", id, key, value }),
+    []
+  );
+
+  const submit = React.useCallback(
+    async (e?: React.FormEvent) => {
+      e?.preventDefault?.();
+
+      if (!requiredOk) {
+        dispatch({ type: "ERROR", message: "Hay filas sin datos mínimos (Empleado y Jefe)." });
+        alert("⚠️ Hay filas sin datos mínimos (Empleado y Jefe).");
+        return;
+      }
+
+      try {
+        dispatch({ type: "ERROR", message: null });
+        dispatch({ type: "SENDING", value: true });
+
+        // Top-level user/email
+        const userEmail: string =
+          (account as any)?.username ??
+          (account as any)?.userName ??
+          (account as any)?.idTokenClaims?.preferred_username ??
+          "";
+        const user: string = account?.name ?? "";
+
+        if (!user || !userEmail) throw new Error("Faltan user o userEmail del usuario autenticado.");
+
+        // Mapear modelo → payload (nombres esperados por el flujo)
+        const filasPayload: PayloadNav["filas"] = state.filas.map((f) => ({
+          nombreEmpleado: f.Empleado?.trim() ?? "",
+          Jefe: f["Jefe / Quien autoriza"]?.trim() ?? "",
+          youtube: !!f.Youtube,
+          facebook: !!f.Facebook,
+          twitter: !!f.Twitter,
+          instagram: !!f.Instagram,
+          whatsapp: !!f.Whatsapp,
+          wetransfer: !!f.Wetransfer,
+          pinterest: !!f.Pinterest,
+          analytics: !!f["Google Anatytics"], // ojo al nombre original
+          drive: !!f["Google Drive"],
+          otro: f["Otro (Link de la pagina )"] ?? "",
+        }));
+
+        // Validación rápida
+        const faltantes = filasPayload.filter((x) => !x.nombreEmpleado || !x.Jefe);
+        if (faltantes.length > 0) {
+          throw new Error("Hay filas con Empleado/Jefe vacíos.");
+        }
+
+        const payload: PayloadNav = { user, userEmail, filas: filasPayload };
+
+        // invoke<Respuesta, Payload>
+        const flow = await notifyFlow.invoke<any, FlowResponse>(payload);
+
+        if (!flow?.ok) throw new Error(flow?.message ?? "El flujo respondió con error.");
+
+        // Post: fecha de solución y update de ticket (si aplica)
+        const holidays: Holiday[] = await fetchHolidays();
+        const fechaSolucion = await calcularFechaSolucion(new Date(), 8, holidays);
+
+        if (flow.createdTicket != null) {
+          await TicketSvc.update(String(flow.createdTicket), { TiempoSolucion: toGraphDateTime(fechaSolucion) });
+        }
+
+        alert("✅ Se ha creado con éxito su ticket de solicitud de navegación.");
+        dispatch({ type: "RESET" });
+      } catch (err: any) {
+        console.error("Error con el flujo (Navegación)", err);
+        dispatch({
+          type: "ERROR",
+          message: err?.message ?? "No pudimos enviar la solicitud. Verifica tu conexión e inténtalo de nuevo.",
+        });
+        alert("⚠️ No pudimos enviar la solicitud. Verifica tu conexión e inténtalo de nuevo.");
+      } finally {
+        dispatch({ type: "SENDING", value: false });
+      }
+    },
+    [requiredOk, state.filas, account, notifyFlow, TicketSvc]
+  );
+
+  return {filas: state.filas, sending: state.sending, error: state.error, requiredOk,
+    addFila, removeFila, setCampo, submit,
   };
 }
