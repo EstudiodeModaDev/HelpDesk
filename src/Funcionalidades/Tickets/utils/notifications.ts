@@ -8,7 +8,7 @@ type MailProps = {
 };
 
 export async function sendMail({ payload, senderMail }: MailProps) {
-  const sended = await fetch(
+  const response = await fetch(
     "https://api-envio-correos-bchfaebqdhfcbdgw.canadacentral-01.azurewebsites.net/mail/send",
     {
       method: "POST",
@@ -22,8 +22,164 @@ export async function sendMail({ payload, senderMail }: MailProps) {
     }
   );
 
-  console.log(sended);
-  return sended;
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(
+      `sendMail failed with ${response.status} ${response.statusText}${detail ? `: ${detail}` : ""}`,
+    );
+  }
+
+  return response;
+}
+
+type ConversationCommentNotificationParams = {
+  ticket: Pick<Ticket, "ID" | "AsuntoTicket">;
+  authorName: string;
+  authorEmail?: string | null;
+  commentText: string;
+  recipients: string[];
+};
+
+type MentionNotificationParams = {
+  ticket: Pick<Ticket, "ID" | "AsuntoTicket">;
+  authorName: string;
+  authorEmail?: string | null;
+  commentText: string;
+  recipients: string[];
+};
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function normalizeEmails(emails: readonly string[]): string[] {
+  return [...new Set(
+    emails
+      .map((email) => String(email ?? "").trim().toLowerCase())
+      .filter(Boolean),
+  )];
+}
+
+function buildRecipients(emails: readonly string[]): GraphRecipient[] {
+  return normalizeEmails(emails).map((address) => ({
+    emailAddress: { address },
+  }));
+}
+
+function buildCommentSnippet(commentText: string): string {
+  const trimmed = String(commentText ?? "").trim();
+  const compact = trimmed.replace(/\s+/g, " ");
+  const shortened = compact.length > 500 ? `${compact.slice(0, 497)}...` : compact;
+  return escapeHtml(shortened || "Sin contenido");
+}
+
+function buildTicketUrl(ticketId: string | number | undefined): string {
+  const baseUrl = "https://prisma.estudiodemoda.co/ticket";
+  const safeTicketId = String(ticketId ?? "").trim();
+
+  if (!safeTicketId) {
+    return baseUrl;
+  }
+
+  return `${baseUrl}/${encodeURIComponent(safeTicketId)}`;
+}
+
+function buildOpenTicketButton(ticketId: string | number | undefined): string {
+  const ticketUrl = buildTicketUrl(ticketId);
+  return `
+    <div style="margin-top:18px;">
+      <a
+        href="${escapeHtml(ticketUrl)}"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="display:inline-block;padding:12px 18px;border-radius:10px;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;"
+      >
+        Ver ticket en Prisma
+      </a>
+    </div>
+  `.trim();
+}
+
+export async function notifyConversationComment(
+  params: ConversationCommentNotificationParams,
+): Promise<void> {
+  const to = buildRecipients(params.recipients);
+
+  if (!to.length) {
+    return;
+  }
+
+  const subject = `Nuevo comentario en el ticket ${params.ticket.ID}`;
+  const body = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#111827;line-height:1.5;">
+      <p>Hola,</p>
+      <p>Se agrego un nuevo comentario en el ticket <strong>${escapeHtml(String(params.ticket.ID ?? "-"))}</strong>.</p>
+      <div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>Ticket:</strong> ${escapeHtml(String(params.ticket.AsuntoTicket ?? "Sin asunto"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Autor:</strong> ${escapeHtml(params.authorName)}${params.authorEmail ? ` (${escapeHtml(params.authorEmail)})` : ""}</p>
+        <p style="margin:0;"><strong>Comentario:</strong><br>${buildCommentSnippet(params.commentText)}</p>
+      </div>
+      ${buildOpenTicketButton(params.ticket.ID)}
+      <p style="margin-top:16px;">Este es un mensaje automatico, por favor no respondas.</p>
+    </div>
+  `.trim();
+
+  await sendMail({
+    payload: {
+      message: {
+        subject,
+        body: {
+          contentType: "HTML",
+          content: body,
+        },
+        toRecipients: to,
+      },
+    },
+    senderMail: "listo@estudiodemoda.com.co",
+  });
+}
+
+export async function notifyCommentMention(
+  params: MentionNotificationParams,
+): Promise<void> {
+  const to = buildRecipients(params.recipients);
+
+  if (!to.length) {
+    return;
+  }
+
+  const subject = `Te mencionaron en el ticket ${params.ticket.ID}`;
+  const body = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#111827;line-height:1.5;">
+      <p>Hola,</p>
+      <p><strong>${escapeHtml(params.authorName)}</strong>${params.authorEmail ? ` (${escapeHtml(params.authorEmail)})` : ""} te menciono en el ticket <strong>${escapeHtml(String(params.ticket.ID ?? "-"))}</strong>.</p>
+      <div style="border:1px solid #dbeafe;border-radius:12px;padding:16px;background:#eff6ff;">
+        <p style="margin:0 0 8px 0;"><strong>Asunto:</strong> ${escapeHtml(String(params.ticket.AsuntoTicket ?? "Sin asunto"))}</p>
+        <p style="margin:0;"><strong>Comentario:</strong><br>${buildCommentSnippet(params.commentText)}</p>
+      </div>
+      ${buildOpenTicketButton(params.ticket.ID)}
+      <p style="margin-top:16px;">Este es un mensaje automatico, por favor no respondas.</p>
+    </div>
+  `.trim();
+
+  await sendMail({
+    payload: {
+      message: {
+        subject,
+        body: {
+          contentType: "HTML",
+          content: body,
+        },
+        toRecipients: to,
+      },
+    },
+    senderMail: "listo@estudiodemoda.com.co",
+  });
 }
 
 export async function notifyTicketCreatedSolicitante(ticket: Ticket): Promise<void> {

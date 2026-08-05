@@ -3,7 +3,6 @@ import { parseDateFlex } from "../../../utils/Date";
 
 export function calcularColorEstado(ticket: Ticket): string {
   const estado = (ticket.Estadodesolicitud ?? "").toLowerCase();
-  console.log(estado)
 
   if (estado === "cerrado" || estado === "cerrado fuera de tiempo") {
     return "rgb(32, 32, 32)";

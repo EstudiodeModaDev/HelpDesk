@@ -23,8 +23,6 @@ export class AttachmentFromSupabase implements AttachmentRepository {
         query = query.eq("seguimiento_id", filter.id_seguimiento)
       }
 
-      console.log(query)
-
       const { data, error, } = await query;
 
       if (error) {

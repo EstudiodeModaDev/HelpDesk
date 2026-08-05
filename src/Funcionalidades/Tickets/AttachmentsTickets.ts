@@ -60,8 +60,6 @@ export function useTicketsAttachments() {
       const unique = Array.from(new Map(normalized.map((a) => [a.link, a])).values())
         .sort((a, b) => a.name.localeCompare(b.name));
 
-      console.log(unique)
-
       setRows(unique);
     } catch (e: any) {
       setRows([]);

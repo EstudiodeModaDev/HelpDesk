@@ -82,14 +82,11 @@ export function useInventario(services: Svc) {
         UbicacionAnterior: "Proveedor"
       };
 
-      let createdId: string | number = "";
       if (!Inventario?.create) {
         console.error("Tickets service no disponible. Verifica el GraphServicesProvider.");
       } else {
-        const created = await Inventario.create(payload);
+        await Inventario.create(payload);
 
-        createdId = created?.Id ?? "";
-        console.log("Ticket creado con ID:", createdId);
         setState({...EMPTY})
         setErrors({})
       }

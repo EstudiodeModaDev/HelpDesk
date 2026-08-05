@@ -247,10 +247,8 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
 
     let cancelled = false;
     try {
-      const res = await usuariosSvc.delete(id);
+      await usuariosSvc.delete(id);
       if (cancelled) return;
-
-      console.log(res)
     } catch (e: any) {
       if (!cancelled) {
         setError(e?.message ?? "Error eliminado usuarios");
@@ -278,10 +276,8 @@ export function useUsuarios(usuariosSvc: UsuariosSPService) {
 
     let cancelled = false;
     try {
-      const res = await usuariosSvc.create(state);
+      await usuariosSvc.create(state);
       if (cancelled) return;
-
-      console.log(res)
     } catch (e: any) {
       if (!cancelled) {
         setError(e?.message ?? "Error eliminado usuarios");

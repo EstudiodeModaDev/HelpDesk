@@ -48,7 +48,6 @@ export function useDashboard(TicketsSvc: TicketsRepository) {
         //Casos finalizados
         const casosFinalizados = casos.filter((t) => t.Estadodesolicitud?.toLocaleLowerCase() === "cerrado")
         const totalFinalizados = Array.isArray(casosFinalizados) ? casosFinalizados.length : Array.isArray((casosFinalizados as any)?.value) ? (casosFinalizados as any).value.length : 0;
-        console.log(casosFinalizados)
         
         //Casos fuera de tiempo
         const casosVencidos = casos.filter((t) => t.Estadodesolicitud?.toLocaleLowerCase().includes("fuera de tiempo"))
@@ -172,7 +171,6 @@ export function useDashboard(TicketsSvc: TicketsRepository) {
         setError(null);
         try {
           const filter  = buildFilterTickets(mode);
-          console.log(filter)
           const res = await TicketsSvc.loadTickets(filter);
 
           const tickets: any[] = Array.isArray(res?.data)

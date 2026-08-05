@@ -238,7 +238,6 @@ export function useNuevoTicketForm(services: Svc) {
         createdId = created.data?.ID ?? ""
         await updateTicketsNumber(state.resolutor?.email ?? "")
 
-        console.log(state.archivo)
         if(state.archivo.length > 0){
           await Promise.all(
             state.archivo.map(async (file) => {
@@ -380,7 +379,6 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
       const tiempoSolISO = toGraphDateTime(solucion as any);
 
       const resolutor = await pickTecnicoConMenosCasos(Usuarios);
-      console.log(resolutor);
 
       const payload: Ticket = {
         AsuntoTicket: state.motivo,
@@ -414,8 +412,6 @@ export function useNuevoUsuarioTicketForm(services: Svc) {
         )
       }
 
-
-      console.log(ticketCreated);
       if (resolutor) {
         const casosActuales = Number(resolutor.Numerodecasos ?? 0); // ← default 0 ANTES de Number()
         const nuevoTotal = casosActuales + 1;

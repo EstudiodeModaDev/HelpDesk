@@ -6,10 +6,12 @@ import HtmlContent from "../Renderizador/Renderizador";
 import Recategorizar from "./Modals/Recategorizar";
 import Reasignar from "./Modals/Reasignar";
 import AsignarObservador from "./Modals/Observador";
+import { MensajesModal } from "./Modals/Messages/Mensajes";
 import { ParseDateShow } from "../../utils/Date";
 import Trunc from "../Trunc/trunc";
 import { useTicketsAttachments } from "../../Funcionalidades/Tickets/AttachmentsTickets";
 import TicketsAsociados from "./TicketsRelacionados/Relacionados";
+import TimeCounter from "../TimeCounter/TimeCounter";
 
 
 /* ================== Helpers y tipos ================== */
@@ -81,6 +83,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
     setShowRecat(false);
     setShowReasig(false);
     setShowObservador(false);
+    setShowMessages(false);
     setSelectedAttachment(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticket?.ID]);
@@ -97,6 +100,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
   const [showRecat, setShowRecat] = React.useState(false);
   const [showReasig, setShowReasig] = React.useState(false);
   const [showObservador, setShowObservador] = React.useState(false);
+  const [showMessages, setShowMessages] = React.useState(false);
   const [showBotton, setShowBotton] = React.useState(true)
 
   const canRecategorizar = hasRecatRole?.(role) ?? false;
@@ -132,6 +136,10 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
   const previewKind = React.useMemo(
     () => getPreviewKind(selectedAttachment ?? undefined),
     [selectedAttachment]
+  );
+  const isDisponibilidadTicket = React.useMemo(
+    () => String(selected?.Fuente ?? "").trim().toLowerCase() === "disponibilidad",
+    [selected?.Fuente]
   );
 
   if (!selected) return <div>Ticket no encontrado</div>;
@@ -226,6 +234,15 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
           </div>
         </Row>
       </div>
+
+      {isDisponibilidadTicket && (
+        <div className="seccion">
+          <TimeCounter
+            subtitle={`Seguimiento del ticket #${selected.ID ?? ""}`}
+            ticketId={selected.ID ? Number(selected.ID) : undefined}
+          />
+        </div>
+      )}
 
       {/* ===== Adjuntos ===== */}
       {Array.isArray(rows) && (
@@ -353,6 +370,9 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       {/* ===== Botón de Seguimiento ===== */}
       {showBotton ?
         <div>
+          <button type="button" className="btn btn-terciary" onClick={() => setShowMessages(true)} style={{ marginRight: 8 }}>
+            Comentarios
+          </button>
           <button type="button" className="btn btn-secondary-final" onClick={() => {setShowSeg((v) => !v); setShowBotton(false)}} >
             {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
           </button>
@@ -413,8 +433,12 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
           </div>
         </div>
       )}
+
+      <MensajesModal
+        ticket={selected}
+        isOpen={showMessages}
+        onClose={() => setShowMessages(false)}
+      />
     </section>
   );
 }
-
-

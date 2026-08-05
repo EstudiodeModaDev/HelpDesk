@@ -155,9 +155,7 @@ export class InternetTiendasService {
 
     try {
       const res = await this.graph.get<any>(url);
-      console.log(res)
       const mapped = (res.value ?? []).map((x: any) => this.toModel(x));
-      console.log(mapped)
       return mapped
     } catch (e: any) {
       // Si la ruta es válida pero el $filter rompe, reintenta sin $filter para diagnóstico

@@ -108,7 +108,7 @@ export function useDocumentarTicket(services: Svc) {
         const nuevoEstado = ticket.Estadodesolicitud === "En Atención" ? "Cerrado" : "Cerrado fuera de tiempo";
         toast.success("Caso cerrado. Enviando notificación al solicitante")
         const minutos = await calcularMinutos(new Date(ticket.FechaApertura!))
-        const updated = await Tickets.updateTicket(ticket.ID!, { 
+        await Tickets.updateTicket(ticket.ID!, { 
           ticket_solvi_estado: nuevoEstado, 
           FechaCierreReal: new Date(), 
           MinutosNocturnos: minutos.nocturnos,
@@ -116,7 +116,6 @@ export function useDocumentarTicket(services: Svc) {
           MinutosDominicales: minutos.dominicales,
           MinutosTotales: minutos.total
          });
-         console.log(updated)
         const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
         const casodeentrega = await ComprasSvc.getAll({filter:  `fields/IdEntrega eq '${ticket.ID}'`})
         await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));

@@ -1,37 +1,28 @@
 import type { Holiday } from "../Models/Holiday";
-const key = "fs_d2GxwBZHt6Ba8pZQh4UFALrajvV9TOiK"
+import { supabase } from "./Supabase.service";
 
-interface HolidayApi {
-  date: string;
-  day_of_week_es: string;
-  name_es: string;
-}
-
-interface HolidayResponse {
-  data: HolidayApi[];
-}
+type HolidayRow = {
+  fecha_festivo: string;
+  dia_semana: string;
+  nombre_festivo: string;
+  source_year: number;
+};
 
 export async function fetchHolidays(): Promise<Holiday[]> {
   const year = new Date().getFullYear();
+  const { data, error } = await supabase
+    .from("TBL_Festivos_Solvi")
+    .select("fecha_festivo, dia_semana, nombre_festivo, source_year")
+    .eq("source_year", year)
+    .order("fecha_festivo", { ascending: true });
 
-  const request = await fetch(
-    `https://www.festivos.com.co/api/v1/festivos?year=${year}`,
-    {
-      headers: {
-        Authorization: `Bearer ${key}`,
-      },
-    }
-  );
-
-  if (!request.ok) {
-    throw new Error(`Error ${request.status}: ${request.statusText}`);
+  if (error) {
+    throw new Error(`Error loading holidays from Supabase: ${error.message}`);
   }
 
-  const response: HolidayResponse = await request.json();
-
-  return response.data.map((r) => ({
-    date: r.date,
-    day_of_week: r.day_of_week_es,
-    festivo_name: r.name_es,
+  return ((data ?? []) as HolidayRow[]).map((row) => ({
+    date: row.fecha_festivo,
+    day_of_week: row.dia_semana,
+    festivo_name: row.nombre_festivo,
   }));
 }

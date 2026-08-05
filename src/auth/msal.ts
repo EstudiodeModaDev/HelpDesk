@@ -163,7 +163,6 @@ export async function getAccessToken(opts?: {
 
   try {
     const res = await msal.acquireTokenSilent(silentReq);
-    console.log(res.accessToken)
     return res.accessToken;
   } catch (e) {
     if (opts?.forceSilent) throw e; // solicitado explícitamente

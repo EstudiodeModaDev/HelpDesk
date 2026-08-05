@@ -209,8 +209,6 @@ export class SupabaseTicketRepository implements TicketsRepository {
         ticket_solvi_attachment_name: "",
       }
 
-      console.log(supabaseTicket)
-
       const { data, error } = await supabase
         .from(this.tableName)
         .insert(supabaseTicket)
@@ -300,7 +298,6 @@ export class SupabaseTicketRepository implements TicketsRepository {
   }
 
   async countTickets(resolutorMail: string, status: "En Atención" | "Fuera de tiempo"): Promise<number> {
-    console.log(resolutorMail)
     let query = supabase
       .from(this.tableName)
       .select("*", { count: "exact", head: true })

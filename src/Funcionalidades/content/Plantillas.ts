@@ -40,8 +40,8 @@ export function usePlantillas(
         CamposPlantilla: state.HTLM,
         Title: state.Titulo
       }
-      const created = await PlantillasSvc.create(payload)
-      console.log("Plantilla creada", created)
+      await PlantillasSvc.create(payload)
+      
       setSubmiting(false);
       setState({HTLM: "",Titulo: ""})
     } catch (e: any) {

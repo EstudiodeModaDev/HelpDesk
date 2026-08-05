@@ -59,10 +59,7 @@ function mapSPRowToWorker(r: any): Worker {
   };
 }
 
-async function fetchUsersFromGraph(graph: GraphRest, opts: Options): Promise<Worker[]> {
-  const onlyEnabled = opts.onlyEnabled ?? true;
-  console.log(onlyEnabled)
-
+async function fetchUsersFromGraph(graph: GraphRest,): Promise<Worker[]> {
   const select = encodeURIComponent(
     'id,displayName,mail,userPrincipalName,jobTitle,accountEnabled'
   );
@@ -163,7 +160,7 @@ export function useWorkers(options: Options = {}) {
 
         cache[key]!.promise = (async () => {
           const [fromGraph, fromSP] = await Promise.all([
-            fetchUsersFromGraph(graph, options),
+            fetchUsersFromGraph(graph,),
             fetchUsersFromSharePoint(options),
           ]);
 

@@ -90,8 +90,7 @@ export function useCajerosPOS(services: Svc) {
           seguimientos_solvi_action_date: new Date()
         }
         
-        const createdLog = Logs.createLog(payloadLog)
-        console.log(createdLog)
+        Logs.createLog(payloadLog)
       }
 
 

@@ -103,12 +103,10 @@ export class PrestamosService {
   // ---------- CRUD ----------
   async create(record: Omit<prestamos, 'ID'>) {
     await this.ensureIds();
-    console.log(record)
     const res = await this.graph.post<any>(
     `/sites/${this.siteId}/lists/${this.listId}/items`,
     { fields: record }
     );
-    console.log(res)
     return this.toModel(res);
 }
 

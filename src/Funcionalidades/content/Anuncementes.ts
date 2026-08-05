@@ -36,8 +36,7 @@ export function useTips(TipsSvc?: TipsService) {
                     TipoAnuncio: state.TipoAnuncio,
                     Title: state.Title
                 }
-                const created = await TipsSvc.create(payload);
-                console.log("Tip creado ", created)
+                await TipsSvc.create(payload);
                 setState({Activa: false, Subtitulo: "", TipoAnuncio: "", Title: ""})
             }
         } catch (e: any) {

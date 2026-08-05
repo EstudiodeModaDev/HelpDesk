@@ -112,8 +112,7 @@ export function calcularFechaSolucion(
       );
     }
   }
-
-  console.log("Fecha de solucion ", actual)
+  
   return actual;
 }
 

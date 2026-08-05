@@ -44,10 +44,8 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
 
     let cancelled = false;
     try {
-      const res = await FranquiciasSvc.create(state);
+      await FranquiciasSvc.create(state);
       if (cancelled) return;
-
-      console.log(res)
     } catch (e: any) {
       if (!cancelled) {
         setError(e?.message ?? "Error eliminado usuarios");

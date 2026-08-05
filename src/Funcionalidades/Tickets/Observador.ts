@@ -35,8 +35,7 @@ export function useAsignarObservador(services: Svc, ticket: Ticket) {
     setSubmitting(true);
     try {
       // 1) Asignar observador
-      const res =  await Tickets.updateTicket(ticket.ID ?? "", {Observador: state.observador?.label, CorreoObservador: state.observador?.email})
-      console.log("[Flow] Observador asignado:", res);
+      await Tickets.updateTicket(ticket.ID ?? "", {Observador: state.observador?.label, CorreoObservador: state.observador?.email})
 
       // 2) Registrar Log (si falla, que no bloquee la UI)
       const payloadLog: LogDTO = {
@@ -49,7 +48,6 @@ export function useAsignarObservador(services: Svc, ticket: Ticket) {
       };
       try {
         const created = await Logs.createLog(payloadLog);
-        console.log(created)
         if (!created) console.warn("[Logs.create] respuesta vacía/inesperada", { payloadLog });
       } catch (logErr) {
         console.error("[Logs.create] error:", logErr, { payloadLog });

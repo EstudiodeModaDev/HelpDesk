@@ -11,6 +11,8 @@ import type { LogRepository } from "./LogRepository/LogRespository";
 import { LogFromSupabase } from "./LogRepository/LogFromSupabase";
 import type { ANSRepository } from "./AnsRepository/AnsRepository";
 import { SharepointANS } from "./AnsRepository/SharepointANS";
+import type { MessagesRepository } from "./ParticipantsRepository/MessagesRepository";
+import { SupabaseMessageRepository } from "./ParticipantsRepository/SupabaseMessageRepository";
 
 type RepositorySource = "supabase" | "sharepoint";
 
@@ -20,6 +22,7 @@ export type AppRepositories = {
   attachments: AttachmentRepository | null
   logs: LogRepository | null
   ans: ANSRepository
+  messages: MessagesRepository
 };
 
 type RepositoriesProviderProps = {
@@ -53,7 +56,8 @@ export const RepositoriesProvider: React.FC<RepositoriesProviderProps> = ({
       usuarios: usuariosSource === "sharepoint" ? new UsuariosSPFromSharepoint(graph) : null,
       attachments: attachmentsSource === "supabase" ? new AttachmentFromSupabase() : null,
       logs: logsSource === "supabase" ? new LogFromSupabase() : null,
-      ans: new SharepointANS(graph) 
+      ans: new SharepointANS(graph),
+      messages: new SupabaseMessageRepository()
     };
   }, [graph, sources?.tickets, sources?.usuarios]);
 

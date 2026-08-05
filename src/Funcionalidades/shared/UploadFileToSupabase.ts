@@ -9,32 +9,32 @@ import { supabase } from "../../Services/Supabase.service";
     return mimeExtension || "png";
   };
 
-export async function uploadImageToSupabase(file: File, bucket: string, path: string): Promise<{ok: boolean, url: string}>{
-  const extension = getFileExtension(file);;
-  const finalPath = `${path}.${crypto.randomUUID()}.${extension}`
+  export async function uploadImageToSupabase(file: File, bucket: string, path: string): Promise<{ok: boolean, url: string}>{
+    const extension = getFileExtension(file);;
+    const finalPath = `${path}.${crypto.randomUUID()}.${extension}`
 
-  const { error } = await supabase.storage
-      .from(bucket)
-      .upload(finalPath, file, {
-        cacheControl: "3600",
-        contentType: file.type || undefined,
-        upsert: false,
-      });
+    const { error } = await supabase.storage
+        .from(bucket)
+        .upload(finalPath, file, {
+          cacheControl: "3600",
+          contentType: file.type || undefined,
+          upsert: false,
+        });
 
-    if (error) {
-      toast.error("Algo ha salido mal subiendo el archivo " + error.message)
-      throw new Error(error.message || "No se pudo subir la imagen a Supabase.");
-    }
+      if (error) {
+        toast.error("Algo ha salido mal subiendo el archivo " + error.message)
+        throw new Error(error.message || "No se pudo subir la imagen a Supabase.");
+      }
 
-    const data = await getPubliURLFromSupabase(bucket, finalPath)
+      const data = await getPubliURLFromSupabase(bucket, finalPath)
 
-    return {
-      ok: true,
-      url: data.url
+      return {
+        ok: true,
+        url: data.url
+      };
     };
-  };
 
-export async function getPubliURLFromSupabase(bucket: string, path: string): Promise<{url: string}>{
+  export async function getPubliURLFromSupabase(bucket: string, path: string): Promise<{url: string}>{
     const { data } = supabase.storage.from(bucket).getPublicUrl(path);
 
     if (!data?.publicUrl) {

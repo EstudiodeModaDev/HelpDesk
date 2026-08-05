@@ -236,14 +236,12 @@ export function useActaEntrega(ticketId: string) {
 
       // (Opcional) solo para inspección en consola
       const entregasSeleccionadas = Object.keys(state.entregas).filter((k) => state.entregas[k]);
-      const coleccion = entregasSeleccionadas.map((k, i) => ({ ID: i + 1, ...state.detalles[k] }));
-      console.log("[ACTA] Colección (debug):", coleccion);
+       entregasSeleccionadas.map((k, i) => ({ ID: i + 1, ...state.detalles[k] }));
 
       // === Invoca el flujo y crea el acta en SharePoint desde emitirActa ===
-      const flowResp = await emitirActa();
+      await emitirActa();
 
       alert("Se ha generado el acta con éxito. Ingrese a su correo y fírmela.");
-      console.log("[Flow] Respuesta:", flowResp);
       // navigate("/seguimiento"); // si aplica
 
     } catch (e: any) {
@@ -291,12 +289,10 @@ export function useActaEntrega(ticketId: string) {
 
     try{
       const resp = await notifyFlow.invoke<typeof body, any>(body);
-      console.log(resp) 
       return resp;
     } catch (e) {
       if (e instanceof Response) {
         const errorBody = await e.json();
-        console.log(errorBody);
         throw new Error(errorBody.message ?? "Error en la petición");
       }
 

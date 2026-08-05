@@ -77,8 +77,6 @@ export class ReFacturasService {
       Observaciones: record.Observaciones,
     };
 
-    console.log("📤 Enviando a SharePoint:", fields);
-
     const res = await this.graph.post<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items`,
       { fields }
@@ -145,8 +143,6 @@ export class ReFacturasService {
       ...(changed.DocERP && { DocERP: changed.DocERP }),
       ...(changed.Observaciones && { Observaciones: changed.Observaciones }),
     };
-
-    console.log("✏️ Actualizando en SharePoint:", fields);
 
     const res = await this.graph.patch<any>(
       `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,

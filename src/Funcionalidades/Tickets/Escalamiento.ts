@@ -189,7 +189,7 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
         setLoading(true);
         setError(null);
         try {
-            const created = LogSvc.createLog({
+            LogSvc.createLog({
                 seguimientos_solvi_actor: account?.name ?? "",
                 seguimientos_solvi_correo_actor: account?.username ?? "",
                 seguimientos_solvi_tipo_de_accion: "seguimiento",
@@ -197,7 +197,6 @@ export function useEscalamiento(correoSolicitante: string, ticketId: string) {
                 seguimientos_solvi_id_ticket: Number(ticketId),
                 seguimientos_solvi_action_date: new Date()
             })
-            console.log(created)
             alert("Se ha iniciado el escalamiento de servicio de internet")
             const correoPara =   state.proveedor.toLowerCase() === "tigo" ? "soportecnicoempresarial@tigo.com.co" : "cliente.co@claro.com.co";
             try {

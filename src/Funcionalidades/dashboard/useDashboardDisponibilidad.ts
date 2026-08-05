@@ -109,8 +109,6 @@ function sumTicketMetrics(tickets: Ticket[]): DashboardDisponibilidadState {
   const totalTickets = tickets.length;
   const promedioMinutos = totalTickets ? totalMinutos / totalTickets : 0;
 
-  console.log(tickets)
-
   return {
     totalTickets,
     totalMinutos,
@@ -225,7 +223,6 @@ export function useDashboardDisponibilidad(TicketsSvc: TicketsRepository) {
     setError(null);
 
     try {
-      console.log(selectedResolutor)
       const response = await TicketsSvc.loadTickets(buildRangeFilter(range, selectedResolutor));
       const tickets = Array.isArray(response?.data) ? response.data : [];
 

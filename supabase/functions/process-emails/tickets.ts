@@ -24,8 +24,6 @@ function buildTicketPayload(
   const fechaMaxima = new Date(fechaActual);
   fechaMaxima.setHours(fechaMaxima.getHours() + 2);
 
-  console.log(requester)
-
   return {
     ticket_solvi_titulo: titulo,
     ticket_solvi_descripcion: descripcion,

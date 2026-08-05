@@ -441,7 +441,6 @@ export function usePermisosERP(TicketSvc: TicketsRepository) {
 
         const holidays: Holiday[] = await fetchHolidays();
         const fechaSolucion = await calcularFechaSolucion(new Date(), 8, holidays);
-        console.log(fechaSolucion)
 
         if (flow.createdTicket != null) {
           alert(flow.createdTicket)

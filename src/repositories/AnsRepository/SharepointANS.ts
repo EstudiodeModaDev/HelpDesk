@@ -100,7 +100,6 @@ export class SharepointANS implements ANSRepository {
 
     try {
       const res = await this.graph.get<any>(url);
-      console.log(res)
       const toReturn = (res.value ?? []).map((x: any) => this.toModel(x));
       return {
         data: toReturn[0],

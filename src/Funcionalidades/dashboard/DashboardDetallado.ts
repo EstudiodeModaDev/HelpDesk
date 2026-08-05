@@ -232,11 +232,7 @@ export function useDetallado(TicketsSvc: TicketsRepository) {
         setopSolicitante([]);
         return;
       }
-
-      // Debug útil: mira qué está yendo al endpoint
-      // console.log("RANGE:", range.from, range.to);
-      // console.log("FILTER:", filter);
-
+      
       const res = await TicketsSvc.loadTickets(filter);
 
       const list: Ticket[] = Array.isArray(res?.data)

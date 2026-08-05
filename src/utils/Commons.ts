@@ -103,10 +103,6 @@ export async function pickTecnicoConMenosCasos(Usuarios: UsuariosSPService): Pro
 
   const elegido = candidatos[Math.floor(Math.random() * candidatos.length)] ?? null;
 
-  if (elegido) {
-    console.log(`Asignar a: ${elegido.Title} (casos activos: ${elegido.Numerodecasos ?? 0})`);
-  }
-
   return elegido;
 };
 

@@ -116,12 +116,10 @@ export class ComprasService {
   // ---------- CRUD ----------
   async create(record: Omit<Compra, 'ID'>) {
     await this.ensureIds();
-    console.log(record)
     const res = await this.graph.post<any>(
     `/sites/${this.siteId}/lists/${this.listId}/items`,
     { fields: record }
     );
-    console.log(res)
     return this.toModel(res);
 }
 

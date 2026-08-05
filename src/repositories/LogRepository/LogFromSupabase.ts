@@ -20,8 +20,6 @@ export class LogFromSupabase implements LogRepository {
         query = query.eq("seguimientos_solvi_descripcion", filter.seguimientos_solvi_id_ticket);
       }
 
-      console.log(query)
-
       const { data, error, } = await query;
 
       if (error) {

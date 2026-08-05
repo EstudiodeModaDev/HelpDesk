@@ -45,11 +45,6 @@ export default function DashboardResumen() {
     obtenerCasosPorDia("resumen", true, );
   }, [range.from, range.to]); 
 
-
-    React.useEffect(() => {
-      console.log(resolutores)
-  }, [resolutores]); 
-
   if (loading) {
     return (
       <section className="dash">

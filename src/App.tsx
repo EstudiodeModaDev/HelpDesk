@@ -372,7 +372,6 @@ function LoggedApp({ user }: { user: User }) {
 
   return (
     <div className={`page layout layout--withSidebar ${collapsed ? "is-collapsed" : ""}`}>
-      
       <Sidebar navs={navs} selected={selected} onSelect={handleSelect} user={user} role={role} collapsed={collapsed} onToggle={toggleCollapsed} />
       <main className="content content--withSidebar">
         <div className="page-viewport">

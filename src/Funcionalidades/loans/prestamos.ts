@@ -317,7 +317,6 @@ export function useDispositivos() {
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
-        console.log(all)
       } while (nextLink);
 
       setRows(all);
@@ -489,7 +488,6 @@ export function usePruebas() {
 
         all.push(...(res.items ?? []));
         nextLink = res.nextLink ? res.nextLink : "";
-        console.log(all)
       } while (nextLink);
 
       setPruebasRows(all);

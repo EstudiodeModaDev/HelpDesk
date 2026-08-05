@@ -1,0 +1,134 @@
+.time-counter-widget {
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+}
+
+.time-counter {
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 310px);
+  padding: 1px;
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--primary) 40%, transparent),
+      color-mix(in oklab, var(--sb-bg) 72%, transparent)
+    );
+  box-shadow: var(--shadow);
+}
+
+.time-counter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, color-mix(in oklab, var(--primary) 20%, transparent), transparent 42%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--surface-elev) 98%, transparent),
+      color-mix(in oklab, var(--surface) 94%, transparent)
+    );
+}
+
+.time-counter__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.time-counter__content:active {
+  cursor: grabbing;
+}
+
+.time-counter__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.time-counter__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.time-counter__eyebrow {
+  color: var(--primary);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.time-counter__drag-hint {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.time-counter__title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.time-counter__subtitle {
+  margin: 0;
+  max-width: 28ch;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.time-counter__display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in oklab, var(--primary) 38%, var(--bd) 62%);
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--field-bg) 88%, var(--surface-elev) 12%);
+  color: var(--ink);
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.55rem, 4vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  box-sizing: border-box;
+}
+
+.time-counter__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.time-counter__actions .btn {
+  flex: 0 0 auto;
+  max-width: none !important;
+  min-height: 34px;
+}
+
+@media (max-width: 640px) {
+  .time-counter {
+    width: min(100%, 290px);
+  }
+
+  .time-counter__display {
+    font-size: clamp(1.4rem, 9vw, 1.9rem);
+    letter-spacing: 0.05em;
+  }
+
+  .time-counter__actions {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+}
