@@ -42,15 +42,28 @@ type Props = {
 
 export function MensajesModal({ticket, onClose, isOpen,}: Props) {
   const ticketId = Number(ticket.ID);
-  const {data: comments = [], isLoading: isLoadingComments,} = useSolviComments(ticketId);
+  const {
+    data: comments = [],
+    isLoading: isLoadingComments,
+    error: commentsError,
+  } = useSolviComments(ticketId);
   const { mutate: createComment, isPending: sending,} = useCreateSolviComment();
   const {mutate: deleteComment,} = useDeleteSolviComment();
   const {data: allUsers = [], isLoading: isLoadingUsers,} = useUsers();
-  const {data: currentUser, isLoading: isLoadingCurrentUser,} = useCurrentUser();
-  const {data: participants = [], isLoading: isLoadingParticipants,} = useSolviParticipants(ticketId);
+  const {
+    data: currentUser,
+    isLoading: isLoadingCurrentUser,
+    error: currentUserError,
+  } = useCurrentUser();
+  const {
+    data: participants = [],
+    isLoading: isLoadingParticipants,
+    error: participantsError,
+  } = useSolviParticipants(ticketId);
   const auth = useAuth()
 
   const isLoading = isLoadingComments || isLoadingUsers || isLoadingCurrentUser || isLoadingParticipants;
+  const loadError = commentsError ?? currentUserError ?? participantsError;
 
   const myEmail = auth.account?.username.trim().toLowerCase() ?? '';
   const requesterEmail = String(ticket.CorreoSolicitante ?? '').toLowerCase().trim();
@@ -311,6 +324,24 @@ export function MensajesModal({ticket, onClose, isOpen,}: Props) {
             </div>
           ) : (
             <>
+              {loadError && (
+                <div
+                  style={{
+                    margin: '16px 22px 0',
+                    padding: '12px 14px',
+                    borderRadius: 10,
+                    border: '1px solid #fecaca',
+                    background: '#fef2f2',
+                    color: '#991b1b',
+                    fontSize: 12,
+                  }}
+                >
+                  {loadError instanceof Error
+                    ? loadError.message
+                    : 'No se pudieron cargar los comentarios del ticket.'}
+                </div>
+              )}
+
               {/* Participantes */}
               {currentUser && (
                 <ParticipantsPanel

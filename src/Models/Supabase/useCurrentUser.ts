@@ -9,6 +9,7 @@ import { supabase } from '../../Services/Supabase.service';
 export async function getCurrentUserFromSolvi(
   email: string
 ): Promise<PrismaUserProfile> {
+  const normalizedEmail = email.trim().toLowerCase();
   const { data, error } = await supabase
     .from('TBL_Users')
     .select(`
@@ -29,7 +30,7 @@ export async function getCurrentUserFromSolvi(
         Department_Code
       )
     `)
-    .eq('User_Email', email)
+    .ilike('User_Email', normalizedEmail)
     .maybeSingle();
 
   if (error) {

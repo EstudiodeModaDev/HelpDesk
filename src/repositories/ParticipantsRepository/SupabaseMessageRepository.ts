@@ -15,10 +15,11 @@ export class SupabaseMessageRepository implements MessagesRepository {
     mentionedUserIds?: number[],
   ): Promise<SolviComment> {
     const trimmed = text.trim();
+    const normalizedUserMail = userMail.trim().toLowerCase();
     const { data: user } = await supabase
       .from("TBL_Users")
       .select("User_ID, User_Email, User_Role")
-      .eq("User_Email", userMail)
+      .ilike("User_Email", normalizedUserMail)
       .single();
 
     {
@@ -36,7 +37,7 @@ export class SupabaseMessageRepository implements MessagesRepository {
           .single(),
       ]);
 
-      const myEmail = (userMail ?? "").toLowerCase().trim();
+      const myEmail = normalizedUserMail;
       const reqEmail = String(ticket?.ticket_solvi_correo_solicitante ?? "").toLowerCase().trim();
       const resEmail = String(ticket?.ticket_solvi_correo_resolutor ?? "").toLowerCase().trim();
       const isAdmin = user?.User_Role === "admin";
