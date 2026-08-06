@@ -103,6 +103,21 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
   const [showMessages, setShowMessages] = React.useState(false);
   const [showBotton, setShowBotton] = React.useState(true)
 
+  const closeSeguimiento = React.useCallback(() => {
+    setShowSeg(false);
+    setShowBotton(true);
+  }, []);
+
+  const openMessages = React.useCallback(() => {
+    setShowMessages(true);
+    setShowBotton(false);
+  }, []);
+
+  const closeMessages = React.useCallback(() => {
+    setShowMessages(false);
+    setShowBotton(true);
+  }, []);
+
   const canRecategorizar = hasRecatRole?.(role) ?? false;
 
   React.useEffect(() => {
@@ -152,7 +167,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
         <span className={`cd-badge ${selected.Estadodesolicitud === "Cerrado" ? "is-closed" : selected.Estadodesolicitud === "En Atención" ? "is-open" : "is-out"}`} title={selected.Estadodesolicitud ?? ""}>
           {selected.Estadodesolicitud}
         </span>
-        <button type="button" className="btn-primary" onClick={onVolver}>← Volver</button>
+        <button type="button" className="btn-primary" onClick={() => {onVolver(); setShowBotton(true)}}>← Volver</button>
       </header>
 
       {/* ===== GRID ===== */}
@@ -238,8 +253,8 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       {isDisponibilidadTicket && (
         <div className="seccion">
           <TimeCounter
-            subtitle={`Seguimiento del ticket #${selected.ID ?? ""}`}
-            ticketId={selected.ID ? Number(selected.ID) : undefined}
+            subtitle={`Tiempo del ticket #${selected.ID ?? ""}`}
+            ticket={selected}
           />
         </div>
       )}
@@ -370,7 +385,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       {/* ===== Botón de Seguimiento ===== */}
       {showBotton ?
         <div>
-          <button type="button" className="btn btn-terciary" onClick={() => setShowMessages(true)} style={{ marginRight: 8 }}>
+          <button type="button" className="btn btn-terciary" onClick={openMessages} style={{ marginRight: 8 }}>
             Comentarios
           </button>
           <button type="button" className="btn btn-secondary-final" onClick={() => {setShowSeg((v) => !v); setShowBotton(false)}} >
@@ -383,7 +398,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       {/* ===== Historial (toggle) ===== */}
       {showSeg && (
         <div className="seccion">
-          <TicketHistorial role={role ?? "Usuario"} onVolver={() => setShowSeg(false)} ticketId={selected.ID!} ticket={selected} onAdd={() => setShowBotton(true)} onAddClick={onDocumentar}/>
+          <TicketHistorial role={role ?? "Usuario"} onVolver={closeSeguimiento} ticketId={selected.ID!} ticket={selected} onAdd={() => setShowBotton(true)} onAddClick={onDocumentar}/>
         </div>
       )}
 
@@ -437,7 +452,7 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
       <MensajesModal
         ticket={selected}
         isOpen={showMessages}
-        onClose={() => setShowMessages(false)}
+        onClose={closeMessages}
       />
     </section>
   );

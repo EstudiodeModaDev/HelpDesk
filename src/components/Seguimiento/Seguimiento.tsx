@@ -131,7 +131,7 @@ export default function TicketHistorial({
 
         <div style={{ marginLeft: "auto" }}>
           <button type="button" className="btn btn-terciary btn-xs" onClick={() => { onVolver(); }}>
-            <span className="th-back-icon" aria-hidden>â†</span> Volver
+            Volver
           </button>
         </div>
       </div>

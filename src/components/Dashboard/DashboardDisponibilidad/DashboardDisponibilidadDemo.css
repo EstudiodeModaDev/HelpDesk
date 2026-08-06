@@ -1,23 +1,15 @@
 .dispo-board{
   background: var(--surface);
-  grid-template-columns: clamp(250px, 26vw, 320px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
 }
 
-.dispo-board .dash-left,
 .dispo-board .dash-center{
   display: grid;
   align-content: start;
   gap: 12px;
-}
-
-.dispo-board .dash-left{
-  position: sticky;
-  top: 0;
-}
-
-.dispo-board .dash-center{
   min-width: 0;
+  border-left: 0;
 }
 
 .dispo-board .panel{
@@ -27,8 +19,8 @@
 .dispo-kpi{
   min-height: 200px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
   background:
     radial-gradient(circle at 50% 30%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 46%),
     color-mix(in oklab, var(--surface) 96%, transparent);
@@ -50,6 +42,7 @@
 }
 
 .dispo-kpi .big{
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(2rem, 3vw, 2.5rem);
 }
 
@@ -58,14 +51,15 @@
 }
 
 .dispo-panel{
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
   background: color-mix(in oklab, var(--surface) 96%, transparent);
   box-shadow: none;
 }
 
 .dispo-mainMetric{
   margin-top: 6px;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.8rem, 2.5vw, 2.35rem);
   font-weight: 900;
   letter-spacing: -.03em;
@@ -93,8 +87,8 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
   background: color-mix(in oklab, var(--surface) 96%, transparent);
 }
 
@@ -160,75 +154,18 @@
 
 .dispo-resList{
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-.dispo-resCard{
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  background: color-mix(in oklab, var(--surface) 96%, transparent);
-  min-width: 0;
-}
-
-.dispo-resCard__top{
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.dispo-resCard__top h5{
-  margin: 0;
-  font-size: 1rem;
-}
-
-.dispo-resCard__top p{
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: .88rem;
-}
-
-.dispo-pill{
-  align-self: flex-start;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--surface-elev) 88%, transparent);
-  border: 1px solid var(--border);
-  font-weight: 800;
-  white-space: nowrap;
-  color: var(--ink);
-}
-
-.dispo-resGrid{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.dispo-resGrid div{
-  padding: 10px;
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--surface) 94%, var(--surface-elev) 6%);
-  border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
-}
-
-.dispo-resGrid span{
-  display: block;
-  color: var(--muted);
-  font-size: .82rem;
-  margin-bottom: 6px;
-}
-
-.dispo-resGrid strong{
-  font-size: .95rem;
+.dispo-resList .ric-card{
+  width: 100%;
 }
 
 .dispo-tableWrap{
   overflow: auto;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
   background: color-mix(in oklab, var(--surface) 98%, transparent);
 }
 
@@ -241,7 +178,7 @@
 .dispo-table th,
 .dispo-table td{
   padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--bd);
   text-align: left;
   vertical-align: middle;
   white-space: nowrap;
@@ -288,36 +225,12 @@
 }
 
 @media (max-width: 1200px){
-  .dispo-board{
-    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
-  }
-
   .dispo-filters{
     grid-template-columns: repeat(2, minmax(160px, 1fr));
   }
 
   .dispo-reset{
     justify-self: stretch;
-  }
-
-  .dispo-resGrid{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1100px){
-  .dispo-board{
-    grid-template-columns: 1fr;
-  }
-
-  .dispo-board .dash-left,
-  .dispo-board .dash-center{
-    position: static;
-  }
-
-  .dispo-board .dash-center{
-    border-left: 0;
-    border-top: 1px solid var(--border);
   }
 }
 
@@ -331,14 +244,6 @@
   .dispo-reset{
     width: 100%;
     margin-left: 0;
-  }
-
-  .dispo-resCard__top{
-    flex-direction: column;
-  }
-
-  .dispo-resGrid{
-    grid-template-columns: 1fr;
   }
 
   .dispo-panel__head{

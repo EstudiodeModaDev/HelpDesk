@@ -40,6 +40,7 @@ import ReportsPage from "./components/Reports/ReportsPage";
 import { useRepositories } from "./repositories/repositoriesContext";
 import type { TicketsRepository } from "./repositories/TicketsRepository/TicketRepository";
 import type { LogRepository } from "./repositories/LogRepository/LogRespository";
+import { useContador } from "./Funcionalidades/timeCounter/hooks/useCounter";
 /* ============================================================
    Tipos de navegación y contexto de visibilidad
    ============================================================ */
@@ -298,6 +299,7 @@ function LoggedApp({ user }: { user: User }) {
   const services = useGraphServices()
   const repositories = useRepositories()
   const { theme, toggle } = useTheme();
+  const {heartBeatControl} = useContador()
 
   const navCtx = React.useMemo<NavContext>(() => {
     const safeRole: string = role === "Administrador" || role === "Tecnico" || role === "Jefe de zona" || role === "Usuario" ? (role as string) : "Usuario";
@@ -321,6 +323,18 @@ function LoggedApp({ user }: { user: User }) {
   React.useEffect(() => {
     if (!findById(navs, selected)) setSelected(firstLeafId(navs));
   }, [navs, selected]);
+
+  React.useEffect(() => {
+    const runHeartbeat = () => {
+      heartBeatControl().catch(console.error);
+    };
+
+    runHeartbeat();
+
+    const interval = window.setInterval(runHeartbeat, 4.5 * 60 * 1000);
+
+    return () => window.clearInterval(interval);
+  }, [heartBeatControl]);
 
   const item = React.useMemo(() => findById(navs, selected), [navs, selected]);
   const element = React.useMemo(() => {

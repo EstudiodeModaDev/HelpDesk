@@ -1,5 +1,6 @@
 import { useGetSessions } from "./useGetSessions";
 import { usePauseCounter } from "./usePauseCounter";
+import { useSendHeartBeat } from "./useSendHeartBeat";
 import { useStartCounter } from "./useStartCounter";
 import { useStopCounter } from "./useStopCounter";
 
@@ -21,10 +22,10 @@ export type Session = {
 
 export function useContador() {
   const { loading: isPausing, pauseCounter } = usePauseCounter();
-  const { loading: isStopping, stopCounter } = useStopCounter();
+  const { loading: isStopping, stopCounter, stopFinishedTicketCounter } = useStopCounter();
   const { loading: isStarting, startCounter, resumeCounter } = useStartCounter();
   const {loading: isGettingSessions, getTicketSessions, getResolutorSessions, hasAnySession} = useGetSessions();
-
+  const {heartBeatControl} = useSendHeartBeat()
   return {
     startCounter,
     resumeCounter,
@@ -33,10 +34,12 @@ export function useContador() {
     isStarting,
     isPausing,
     isStopping,
-    isBusy: isStarting || isPausing || isStopping,
+    isBusy: isStarting || isPausing || isStopping || isGettingSessions,
     getTicketSessions,
     getResolutorSessions,
     isGettingSessions,
-    hasAnySession
+    hasAnySession,
+    stopFinishedTicketCounter,
+    heartBeatControl
   };
 }

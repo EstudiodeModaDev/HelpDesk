@@ -6,6 +6,14 @@ export type CodigoInicioContadorError =
 | "TICKET_NO_ENCONTRADO"
 
 
+type minutos = {
+  normal: number;
+  nocturno: number;
+  dominical_festivo: number ;
+  nocturno_dominical_festivo: number;
+  total: number;
+}
+
 export interface Sesiones {
   sesion_id: string;
   ticket_id: number;
@@ -13,11 +21,7 @@ export interface Sesiones {
   inicio: string;
   ultimo_inicio: string;
   fin: string;
-  normal: number;
-  nocturno: number;
-  dominical_festivo: number ;
-  nocturno_dominical_festivo: number;
-  total: number;
+  minutos: minutos
 }
 
 export interface GetSessionSuccess {

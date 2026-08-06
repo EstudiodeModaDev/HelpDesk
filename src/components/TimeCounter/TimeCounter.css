@@ -1,4 +1,4 @@
-.time-counter-widget {
+unter.time-counter-widget {
   position: relative;
   z-index: 2;
   width: fit-content;
@@ -10,26 +10,15 @@
   width: min(100%, 310px);
   padding: 1px;
   border-radius: 22px;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--primary) 40%, transparent),
-      color-mix(in oklab, var(--sb-bg) 72%, transparent)
-    );
   box-shadow: var(--shadow);
+  border: 1px solid black;
 }
 
 .time-counter::before {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at top right, color-mix(in oklab, var(--primary) 20%, transparent), transparent 42%),
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--surface-elev) 98%, transparent),
-      color-mix(in oklab, var(--surface) 94%, transparent)
-    );
+  background: white;
 }
 
 .time-counter__content {

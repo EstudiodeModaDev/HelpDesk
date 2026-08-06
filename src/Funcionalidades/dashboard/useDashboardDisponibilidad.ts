@@ -2,8 +2,47 @@ import React from "react";
 import type { DateRange } from "../../Models/Filtros";
 import type { Ticket } from "../../Models/Tickets";
 import type { TopCategoria } from "../../Models/Dashboard";
-import type { TicketsRepository, filterTickets } from "../../repositories/TicketsRepository/TicketRepository";
-import { getXMonthsBackRange, parseDateFlex, toGraphDateTime } from "../../utils/Date";
+import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
+import { getXMonthsBackRange } from "../../utils/Date";
+import { supabase } from "../../Services/Supabase.service";
+
+type TotalDashboard = {
+  horas_totales: number;
+  minutos_normal: number;
+  minutos_totales: number;
+  minutos_nocturno: number;
+  sesiones_activas: number;
+  cantidad_sesiones: number;
+  sesiones_pausadas: number;
+  resolutores_activos: number;
+  sesiones_finalizadas: number;
+  minutos_dominical_festivo: number;
+  minutos_nocturno_dominical_festivo: number;
+};
+
+type ResolutorDetalle = {
+  correo: string;
+  nombre: string;
+  resolutor_id: string;
+  horas_totales: number;
+  sharepoint_id: number;
+  minutos_normal: number;
+  minutos_totales: number;
+  minutos_nocturno: number;
+  sesiones_activas: number;
+  cantidad_sesiones: number;
+  sesiones_pausadas: number;
+  sesiones_finalizadas: number;
+  minutos_dominical_festivo: number;
+  minutos_nocturno_dominical_festivo: number;
+};
+
+interface DashboardApiResponse {
+  ok: boolean;
+  codigo: string;
+  resumen: TotalDashboard;
+  resolutores: ResolutorDetalle[];
+}
 
 export type SemanaDisponibilidad = {
   label: string;
@@ -16,279 +55,156 @@ export type ResolutorDisponibilidadAgg = {
   correo: string;
   totalTickets: number;
   minutosPromedio: number;
+  minutosTotales: number;
+  minutosNormales: number;
   minutosNocturnos: number;
   minutosDominicales: number;
   minutosFestivos: number;
-  porcentajeDelTotal: number;
+  minutos_nocturno_dominical_festivo: number;
+  sesionesActivas: number;
+  sesionesPausadas: number;
+  sesionesFinalizadas: number;
 };
 
-type DashboardDisponibilidadState = {
-  totalTickets: number;
-  totalMinutos: number;
-  promedioMinutos: number;
-  promedioHoras: number;
-  minutosNocturnos: number;
-  minutosDominicales: number;
-  minutosFestivos: number;
+const EMPTY_TOTAL: TotalDashboard = {
+  horas_totales: 0,
+  minutos_normal: 0,
+  minutos_totales: 0,
+  minutos_nocturno: 0,
+  sesiones_activas: 0,
+  cantidad_sesiones: 0,
+  sesiones_pausadas: 0,
+  resolutores_activos: 0,
+  sesiones_finalizadas: 0,
+  minutos_dominical_festivo: 0,
+  minutos_nocturno_dominical_festivo: 0,
 };
 
-const EMPTY_METRICS: DashboardDisponibilidadState = {
-  totalTickets: 0,
-  totalMinutos: 0,
-  promedioMinutos: 0,
-  promedioHoras: 0,
-  minutosNocturnos: 0,
-  minutosDominicales: 0,
-  minutosFestivos: 0,
+const EMPTY_DASHBOARD: DashboardApiResponse = {
+  ok: true,
+  codigo: "",
+  resumen: EMPTY_TOTAL,
+  resolutores: [],
 };
 
-function parseTicketDate(value?: string | Date | null): Date | null {
-  return parseDateFlex(value ?? null);
+function toNumber(value: unknown): number {
+  const numberValue = Number(value ?? 0);
+  return Number.isFinite(numberValue) ? numberValue : 0;
 }
 
-function diffMinutes(start?: string | Date | null, end?: string | Date | null): number {
-  const inicio = parseTicketDate(start);
-  const fin = parseTicketDate(end);
-  if (!inicio || !fin || fin <= inicio) return 0;
-  return Math.round((fin.getTime() - inicio.getTime()) / 60000);
-}
+function normalizeDashboard(data: DashboardApiResponse | DashboardApiResponse[] | null): DashboardApiResponse {
+  const response = Array.isArray(data) ? data[0] : data;
 
-function getTicketTotalMinutes(ticket: Ticket): number {
-  const stored = Number(ticket.MinutosTotales ?? 0);
-  if (Number.isFinite(stored) && stored > 0) return stored;
-  return diffMinutes(ticket.FechaApertura, ticket.FechaCierreReal);
-}
-
-function pickResolutorIdentity(ticket: Ticket): { correo: string; nombre: string } {
-  const correo = String(ticket.Correoresolutor ?? "").trim().toLowerCase();
-  const nombre = String(ticket.Nombreresolutor ?? "").trim();
-
-  if (correo) {
-    return {
-      correo,
-      nombre: nombre || correo.split("@")[0] || "(Sin resolutor)",
-    };
-  }
-
-  if (nombre) {
-    return {
-      correo: "",
-      nombre,
-    };
-  }
+  if (!response) return EMPTY_DASHBOARD;
 
   return {
-    correo: "",
-    nombre: "(Sin resolutor)",
+    ...EMPTY_DASHBOARD,
+    ...response,
+    resumen: { ...EMPTY_TOTAL, ...response.resumen },
+    resolutores: Array.isArray(response.resolutores) ? response.resolutores : [],
   };
 }
 
-function getIsoWeekKey(date: Date): string {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const day = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-  return `${d.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+function aggregateResolutores(resolutores: ResolutorDetalle[]): ResolutorDisponibilidadAgg[] {
+  return resolutores
+    .map((resolutor) => {
+      const totalTickets = toNumber(resolutor.cantidad_sesiones);
+      const minutosTotales = toNumber(resolutor.minutos_totales);
+
+      return {
+        nombre: resolutor.nombre || "(Sin resolutor)",
+        correo: resolutor.correo || "",
+        totalTickets,
+        minutosPromedio: totalTickets ? minutosTotales / totalTickets : 0,
+        minutosTotales,
+        minutosNormales: toNumber(resolutor.minutos_normal),
+        minutosNocturnos: toNumber(resolutor.minutos_nocturno),
+        // La RPC agrupa dominicales y festivos en un solo campo.
+        minutosDominicales: toNumber(resolutor.minutos_dominical_festivo),
+        minutosFestivos: 0,
+        minutos_nocturno_dominical_festivo: toNumber(resolutor.minutos_nocturno_dominical_festivo),
+        sesionesActivas: toNumber(resolutor.sesiones_activas),
+        sesionesPausadas: toNumber(resolutor.sesiones_pausadas),
+        sesionesFinalizadas: toNumber(resolutor.sesiones_finalizadas),
+      };
+    })
+    .sort((a, b) => b.totalTickets - a.totalTickets || a.nombre.localeCompare(b.nombre, "es"));
 }
 
-function getWeekLabel(ticket: Ticket): string {
-  const cierre = parseTicketDate(ticket.FechaCierreReal);
-  const apertura = parseTicketDate(ticket.FechaApertura);
-  const base = cierre ?? apertura;
-  return base ? getIsoWeekKey(base) : "Sin semana";
-}
-
-function sumTicketMetrics(tickets: Ticket[]): DashboardDisponibilidadState {
-  if (!tickets.length) return EMPTY_METRICS;
-
-  const totalMinutos = tickets.reduce((acc, ticket) => acc + getTicketTotalMinutes(ticket), 0);
-  const minutosNocturnos = tickets.reduce((acc, ticket) => acc + Number(ticket.MinutosNocturnos ?? 0), 0);
-  const minutosDominicales = tickets.reduce((acc, ticket) => acc + Number(ticket.MinutosDominicales ?? 0), 0);
-  const minutosFestivos = tickets.reduce((acc, ticket) => acc + Number(ticket.MinutosFestivos ?? 0), 0);
-  const totalTickets = tickets.length;
-  const promedioMinutos = totalTickets ? totalMinutos / totalTickets : 0;
-
-  return {
-    totalTickets,
-    totalMinutos,
-    promedioMinutos,
-    promedioHoras: promedioMinutos / 60,
-    minutosNocturnos,
-    minutosDominicales,
-    minutosFestivos,
-  };
-}
-
-function aggregateWeeks(tickets: Ticket[]): SemanaDisponibilidad[] {
-  const grouped = new Map<string, { total: number; totalMinutos: number }>();
-
-  for (const ticket of tickets) {
-    const key = getWeekLabel(ticket);
-    const current = grouped.get(key) ?? { total: 0, totalMinutos: 0 };
-    current.total += 1;
-    current.totalMinutos += getTicketTotalMinutes(ticket);
-    grouped.set(key, current);
-  }
-
-  return Array.from(grouped, ([label, data]) => ({
-    label,
-    total: data.total,
-    minutosPromedio: data.total ? data.totalMinutos / data.total : 0,
-  })).sort((a, b) => a.label.localeCompare(b.label, "es", { sensitivity: "base" }));
-}
-
-function aggregateResolutores(tickets: Ticket[]): ResolutorDisponibilidadAgg[] {
-  const total = tickets.length;
-  const grouped = new Map<string, {
-    nombre: string;
-    correo: string;
-    totalTickets: number;
-    totalMinutos: number;
-    minutosNocturnos: number;
-    minutosDominicales: number;
-    minutosFestivos: number;
-  }>();
-
-  for (const ticket of tickets) {
-    const resolutor = pickResolutorIdentity(ticket);
-    const key = resolutor.correo || resolutor.nombre.toLowerCase();
-    const entry = grouped.get(key) ?? {
-      nombre: resolutor.nombre,
-      correo: resolutor.correo,
-      totalTickets: 0,
-      totalMinutos: 0,
-      minutosNocturnos: 0,
-      minutosDominicales: 0,
-      minutosFestivos: 0,
-    };
-
-    entry.totalTickets += 1;
-    entry.totalMinutos += getTicketTotalMinutes(ticket);
-    entry.minutosNocturnos += Number(ticket.MinutosNocturnos ?? 0);
-    entry.minutosDominicales += Number(ticket.MinutosDominicales ?? 0);
-    entry.minutosFestivos += Number(ticket.MinutosFestivos ?? 0);
-
-    grouped.set(key, entry);
-  }
-
-  return Array.from(grouped.values())
-    .map((entry) => ({
-      nombre: entry.nombre,
-      correo: entry.correo,
-      totalTickets: entry.totalTickets,
-      minutosPromedio: entry.totalTickets ? entry.totalMinutos / entry.totalTickets : 0,
-      minutosNocturnos: entry.minutosNocturnos,
-      minutosDominicales: entry.minutosDominicales,
-      minutosFestivos: entry.minutosFestivos,
-      porcentajeDelTotal: total ? entry.totalTickets / total : 0,
-    }))
-    .sort((a, b) => b.totalTickets - a.totalTickets || a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }));
-}
-
-function buildRangeFilter(range: DateRange, resolutor: string): filterTickets {
-  return {
-    range: {
-      from: toGraphDateTime(range.from) ?? range.from,
-      to: toGraphDateTime(range.to) ?? range.to,
-    },
-    fuente: "Disponibilidad",
-    resolutor
-  };
-}
-
-export function useDashboardDisponibilidad(TicketsSvc: TicketsRepository) {
+export function useDashboardDisponibilidad(_ticketsSvc: TicketsRepository) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [range, setRange] = React.useState<DateRange>(getXMonthsBackRange({ MonthQuantity: 1 }));
-
   const [selectedFuente, setSelectedFuente] = React.useState<string>("all");
   const [selectedResolutor, setSelectedResolutor] = React.useState<string>("all");
   const [selectedSemana, setSelectedSemana] = React.useState<string>("all");
-
-  const [ticketsDisponibilidad, setTicketsDisponibilidad] = React.useState<Ticket[]>([]);
-  const [totalTickets, setTotalTickets] = React.useState<number>(0);
-  const [totalMinutos, setTotalMinutos] = React.useState<number>(0);
-  const [promedioMinutos, setPromedioMinutos] = React.useState<number>(0);
-  const [promedioHoras, setPromedioHoras] = React.useState<number>(0);
-  const [minutosNocturnos, setMinutosNocturnos] = React.useState<number>(0);
-  const [minutosDominicales, setMinutosDominicales] = React.useState<number>(0);
-  const [minutosFestivos, setMinutosFestivos] = React.useState<number>(0);
-  const [resolutores, setResolutores] = React.useState<ResolutorDisponibilidadAgg[]>([]);
-  const [semanas, setSemanas] = React.useState<SemanaDisponibilidad[]>([]);
-  const [topResolutores, setTopResolutores] = React.useState<TopCategoria[]>([]);
+  const [dashboard, setDashboard] = React.useState<DashboardApiResponse>(EMPTY_DASHBOARD);
 
   const loadDashboardDisponibilidad = React.useCallback(async (): Promise<Ticket[]> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await TicketsSvc.loadTickets(buildRangeFilter(range, selectedResolutor));
-      const tickets = Array.isArray(response?.data) ? response.data : [];
+      const { data, error: rpcError } = await supabase.rpc("fn_obtener_dashboard_equipo", {
+        p_inicio: range.from,
+        p_fin: range.to,
+      });
 
-      setTicketsDisponibilidad(tickets);
-      return tickets;
-    } catch (e: any) {
-      setError(e?.message ?? "Error al cargar métricas de disponibilidad");
-      setTicketsDisponibilidad([]);
+      if (rpcError) throw rpcError;
+
+      setDashboard(normalizeDashboard(data as DashboardApiResponse | DashboardApiResponse[] | null));
+      return [];
+    } catch (caughtError: any) {
+      setError(caughtError?.message ?? "Error al cargar metricas de disponibilidad");
+      setDashboard(EMPTY_DASHBOARD);
       return [];
     } finally {
       setLoading(false);
     }
-  }, [TicketsSvc, range, selectedResolutor]);
+  }, [range.from, range.to]);
 
   React.useEffect(() => {
     void loadDashboardDisponibilidad();
   }, [loadDashboardDisponibilidad]);
 
-  React.useEffect(() => {
-    const metrics = sumTicketMetrics(ticketsDisponibilidad);
-    setTotalTickets(metrics.totalTickets);
-    setTotalMinutos(metrics.totalMinutos);
-    setPromedioMinutos(metrics.promedioMinutos);
-    setPromedioHoras(metrics.promedioHoras);
-    setMinutosNocturnos(metrics.minutosNocturnos);
-    setMinutosDominicales(metrics.minutosDominicales);
-    setMinutosFestivos(metrics.minutosFestivos);
-    setResolutores(aggregateResolutores(ticketsDisponibilidad));
-    setSemanas(aggregateWeeks(ticketsDisponibilidad));
-    setTopResolutores(
-      aggregateResolutores(ticketsDisponibilidad)
-        .slice(0, 5)
-        .map((item) => ({ nombre: item.nombre, total: item.totalTickets }))
-    );
-  }, [ticketsDisponibilidad, ticketsDisponibilidad]);
-
-  React.useEffect(() => {
-    const metrics = sumTicketMetrics(ticketsDisponibilidad);
-    setTotalTickets(metrics.totalTickets);
-    setTotalMinutos(metrics.totalMinutos);
-    setPromedioMinutos(metrics.promedioMinutos);
-    setPromedioHoras(metrics.promedioHoras);
-    setMinutosNocturnos(metrics.minutosNocturnos);
-    setMinutosDominicales(metrics.minutosDominicales);
-    setMinutosFestivos(metrics.minutosFestivos);
-    setResolutores(aggregateResolutores(ticketsDisponibilidad));
-    setSemanas(aggregateWeeks(ticketsDisponibilidad));
-    setTopResolutores(
-      aggregateResolutores(ticketsDisponibilidad)
-        .slice(0, 5)
-        .map((item) => ({ nombre: item.nombre, total: item.totalTickets }))
-    );
-  }, [ticketsDisponibilidad, ticketsDisponibilidad]);
-
-  const resolutorOptions = React.useMemo(
-    () =>
-      aggregateResolutores(ticketsDisponibilidad).map((item) => ({
-        label: item.nombre,
-        value: item.correo || item.nombre,
-      })),
-    [ticketsDisponibilidad]
+  const allResolutores = React.useMemo(
+    () => aggregateResolutores(dashboard.resolutores),
+    [dashboard]
   );
 
-  const semanaOptions = React.useMemo(
-    () => aggregateWeeks(ticketsDisponibilidad).map((item) => item.label),
-    [ticketsDisponibilidad]
+  const resolutores = React.useMemo(() => {
+    if (selectedResolutor === "all") return allResolutores;
+
+    return allResolutores.filter(
+      (resolutor) => resolutor.correo === selectedResolutor || resolutor.nombre === selectedResolutor
+    );
+  }, [allResolutores, selectedResolutor]);
+
+  const resumen = React.useMemo(() => {
+    if (selectedResolutor === "all") return dashboard.resumen;
+
+    return resolutores.reduce<TotalDashboard>((total, resolutor) => ({
+      ...total,
+      cantidad_sesiones: total.cantidad_sesiones + resolutor.totalTickets,
+      minutos_totales: total.minutos_totales + resolutor.minutosTotales,
+      minutos_normal: total.minutos_normal + resolutor.minutosNormales,
+      minutos_nocturno: total.minutos_nocturno + resolutor.minutosNocturnos,
+      minutos_dominical_festivo: total.minutos_dominical_festivo + resolutor.minutosDominicales,
+    }), { ...EMPTY_TOTAL });
+  }, [dashboard.resumen, resolutores, selectedResolutor]);
+
+  const totalTickets = toNumber(resumen.cantidad_sesiones);
+  const totalMinutos = toNumber(resumen.minutos_totales);
+  const promedioMinutos = totalTickets ? totalMinutos / totalTickets : 0;
+
+  const resolutorOptions = React.useMemo(
+    () => allResolutores.map((item) => ({ label: item.nombre, value: item.correo || item.nombre })),
+    [allResolutores]
+  );
+
+  const topResolutores = React.useMemo<TopCategoria[]>(
+    () => resolutores.slice(0, 5).map((item) => ({ nombre: item.nombre, total: item.totalTickets })),
+    [resolutores]
   );
 
   const resetFilters = React.useCallback(() => {
@@ -304,26 +220,25 @@ export function useDashboardDisponibilidad(TicketsSvc: TicketsRepository) {
     setRange,
     loadDashboardDisponibilidad,
     resetFilters,
-
     selectedFuente,
     setSelectedFuente,
     selectedResolutor,
     setSelectedResolutor,
     selectedSemana,
     setSelectedSemana,
-
-    ticketsDisponibilidad,
+    // La RPC es agregada y no devuelve el detalle de tickets.
+    ticketsDisponibilidad: [] as Ticket[],
     totalTickets,
     totalMinutos,
     promedioMinutos,
-    promedioHoras,
-    minutosNocturnos,
-    minutosDominicales,
-    minutosFestivos,
+    promedioHoras: promedioMinutos / 60,
+    minutosNocturnos: toNumber(resumen.minutos_nocturno),
+    minutosDominicales: toNumber(resumen.minutos_dominical_festivo),
+    minutosFestivos: 0,
     resolutores,
-    semanas,
+    semanas: [] as SemanaDisponibilidad[],
     topResolutores,
     resolutorOptions,
-    semanaOptions,
+    semanaOptions: [] as string[],
   };
 }

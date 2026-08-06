@@ -25,7 +25,7 @@ export default function TablaTickets() {
   const isPrivileged = userRole.role === "Administrador" || userRole.role === "Tecnico" || userRole.role === "Técnico";
   const { graph } = useGraphServices();
   const {tickets} = useRepositories()
-  const {fuenteFilter, setFuenteFilter, inProgressTickets, loadAll, search, setSearch, me, setMe, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, prevPage, toggleSort, outOfTimeTickets} = useTickets({graph, TicketsSvc: tickets!, userMail, role: userRole.role});
+  const {fuenteFilter, setFuenteFilter, inProgressTickets, loadAll, search, setSearch, rows, loading, error, filterMode, range, pageSize, pageIndex, hasNext, sorts, setFilterMode, setRange, setPageSize, updateSelectedTicket, nextPage, prevPage, toggleSort, outOfTimeTickets} = useTickets({graph, TicketsSvc: tickets!, userMail, role: userRole.role});
 
   // Búsqueda local SOLO sobre la página visible (si quieres global, hay que mover a OData)
 
@@ -51,10 +51,6 @@ export default function TablaTickets() {
   }, [rows]); 
   return (
     <div className="tabla-tickets">
-
-      {account?.username === "dpalacios@estudiodemoda.com.co" ?
-        <button onClick={() => {setMe((prev) => !prev)}}>{me ? "Ver todos" : "Ver mis tickets"}</button> : null
-      }
 
       {!ticketSeleccionado && (
         <div className="tickets-filtros">

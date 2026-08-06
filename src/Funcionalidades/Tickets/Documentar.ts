@@ -10,7 +10,7 @@ import { useRepositories } from "../../repositories/repositoriesContext";
 import { notifyClosedSolicitante } from "./utils/notifications";
 import type { LogDTO } from "../../Models/DTO/Log";
 import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
-import { calcularMinutos } from "./utils/CalcularMinutos";
+import { useContador } from "../timeCounter/hooks/useCounter";
 
 type Svc = { Tickets?: TicketsRepository; Logs: LogRepository; ComprasSvc: ComprasService };
 
@@ -27,6 +27,7 @@ const TICKETS_ATTACHMENTS_BUCKET = "ticket-attachments"
 
 export function useDocumentarTicket(services: Svc) {
   const { Tickets, Logs, ComprasSvc } = services;
+  const {stopFinishedTicketCounter, getTicketSessions} = useContador()
   const {attachments} = useRepositories()
   const [state, setState] = useState<FormDocumentarState>({
     resolutor: "",
@@ -52,6 +53,7 @@ export function useDocumentarTicket(services: Svc) {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
+
     if(!ticket.Categoria){
       alert("No puedes hacer ninguna acción en el ticket antes de categorizarlo")
       return
@@ -107,15 +109,15 @@ export function useDocumentarTicket(services: Svc) {
 
         const nuevoEstado = ticket.Estadodesolicitud === "En Atención" ? "Cerrado" : "Cerrado fuera de tiempo";
         toast.success("Caso cerrado. Enviando notificación al solicitante")
-        const minutos = await calcularMinutos(new Date(ticket.FechaApertura!))
         await Tickets.updateTicket(ticket.ID!, { 
           ticket_solvi_estado: nuevoEstado, 
           FechaCierreReal: new Date(), 
-          MinutosNocturnos: minutos.nocturnos,
-          MinutosFestivos: minutos.festivos,
-          MinutosDominicales: minutos.dominicales,
-          MinutosTotales: minutos.total
          });
+
+         if(ticket.Fuente?.toLocaleLowerCase().trim() === "disponibilidad"){
+           await stopFinishedTicketCounter(ticket, account, getTicketSessions)
+         }
+
         const casodecompra = await ComprasSvc.getAll({filter:  `fields/IdCreado eq '${ticket.ID}'`})
         const casodeentrega = await ComprasSvc.getAll({filter:  `fields/IdEntrega eq '${ticket.ID}'`})
         await Promise.allSettled( casodecompra.items.map((it) => { const id = String(it.Id);    return ComprasSvc.update(id, { Estado: "Pendiente por registro de factura" });}));
@@ -126,6 +128,7 @@ export function useDocumentarTicket(services: Svc) {
         if (ticket.CorreoSolicitante) {
           await notifyClosedSolicitante(ticket, solucion.data[0].Descripcion)
         }
+
       } 
     } catch (err) {
       console.error("Error en handleSubmit:", err);

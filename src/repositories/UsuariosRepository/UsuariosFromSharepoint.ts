@@ -209,7 +209,7 @@ export class UsuariosSPFromSharepoint implements UsuariosSPRepository {
   async getByEmail(email: string): Promise<{ data: UsuariosSP | null; status: boolean; message: string; }> {
     const safeEmail = esc(email)
     try{
-      const founded = ((await this.getAll({filter: `Correo eq '${safeEmail}'`})).items)[0]
+      const founded = ((await this.getAll({filter: `fields/Correo eq '${safeEmail}'`})).items)[0]
       return{
         data: founded,
         message: "",
