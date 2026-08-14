@@ -435,3 +435,9 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/obtener-disponibilidad-teams/deno.json"
 entrypoint = "./functions/obtener-disponibilidad-teams/index.ts"
+
+[functions.obtener-disponibilidad-hoy]
+enabled = true
+verify_jwt = false
+import_map = "./functions/obtener-disponibilidad-hoy/deno.json"
+entrypoint = "./functions/obtener-disponibilidad-hoy/index.ts"

@@ -13,8 +13,17 @@ const getAttachmentUrl = (path?: string, bucket?: string) => {
   return data?.publicUrl ?? path;
 };
 
+export interface TicketAttachment {
+  name: string;
+  link: string;
+  attachment_type: string;
+  id_ticket: number | null;
+  id_seguimiento: number | null;
+  storage_bucket: string;
+}
+
 export function useTicketsAttachments() {
-  const [rows, setRows] = React.useState<any[]>([]);
+  const [rows, setRows] = React.useState<TicketAttachment[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { attachments } = useRepositories();
