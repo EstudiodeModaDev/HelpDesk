@@ -1,0 +1,124 @@
+# Componentes de Tickets
+
+## Descripción general
+Este grupo cubre la lista principal de tickets (`Tickets.tsx`), el detalle completo de un ticket (`DetallesTickets/*`) con sus modales de acción (reasignar, recategorizar, asignar observador, cambiar fuente), el panel de mensajes/comentarios con menciones (`Modals/Messages/*`), la gestión de tickets relacionados (padre/hijo/masiva), y los formularios de creación de tickets (individual, de usuario final y masiva por Excel). En conjunto forman el flujo completo: crear ticket → listar/buscar → abrir detalle → actuar sobre el ticket → conversar con los involucrados.
+
+## Archivos
+| Archivo | Qué renderiza/hace |
+|---|---|
+| `Tickets.tsx` | Tabla paginada y ordenable de tickets con filtros (búsqueda, estado, fuente, rango de fechas); al seleccionar una fila muestra `CaseDetail` en lugar de la tabla. |
+| `CaseAttachments.tsx` | Lista de adjuntos del ticket y visor inline (imagen, PDF/texto en iframe, video, audio) o enlace de descarga si no hay preview soportado. |
+| `CaseHeader.tsx` | Encabezado del detalle: título "Caso – ID", badge de estado y botón "Volver". |
+| `CaseInfoGrid.tsx` | Grid de datos del ticket (fechas, fuente, categoría, ANS, solicitante/observador/resolutor, título, descripción HTML); expone botones clicables para abrir modales cuando el rol lo permite. |
+| `DetallesTickets.helpers.ts` | Funciones puras: `hasRecatRole`, `getPreviewKind` (detección de tipo de archivo por extensión), `openAttachmentDownload`. |
+| `DetallesTickets.tsx` (`CaseDetail`) | Orquestador del detalle de ticket: compone header, info grid, adjuntos, tickets relacionados, seguimiento/historial, botones de acción y todos los modales. |
+| `ModalShell.tsx` | Contenedor genérico de modal (overlay + card + botón cerrar) reutilizado por los modales de acción. |
+| `Modals/ChangeFuente.tsx` (`CambiarFuente`) | Formulario para cambiar la "Fuente solicitante" del ticket (select de 4 opciones) y registrar un log de seguimiento. |
+| `Modals/Messages/CommentComposer.tsx` | Editor de comentarios basado en Tiptap con soporte de menciones `@usuario` y envío con Ctrl+Enter. |
+| `Modals/Messages/CommentText.tsx` | Renderiza el texto de un comentario resolviendo los tokens `@[id]` a "chips" con el nombre corto del usuario mencionado. |
+| `Modals/Messages/Mensajes.tsx` (`MensajesModal`) | Modal completo de comentarios del ticket: header, panel de participantes, lista de comentarios (con borrado) y composer; controla quién puede comentar. |
+| `Modals/Messages/MentionList.tsx` | Lista flotante de sugerencias de menciones agrupadas por departamento, navegable con teclado (usada por Tiptap `Suggestion`). |
+| `Modals/Messages/ParticipantPanel.tsx` (`ParticipantsPanel`) | Fila de avatares de "quienes participan en la conversación" (solicitante, resolutor, mencionados) con tooltip al pasar el mouse. |
+| `Modals/Observador.tsx` (`AsignarObservador`) | Formulario para asignar un observador al ticket, combinando opciones de empleados y franquicias en un `react-select`. |
+| `Modals/Reasignar.tsx` | Formulario para reasignar el ticket a otro resolutor, con nota obligatoria (contador de caracteres). |
+| `Modals/Recategorizar.tsx` | Formulario para cambiar Categoría/Subcategoría/Artículo del ticket vía un único `Select` de árbol combinado, y registrar el log correspondiente. |
+| `TicketsRelacionados/Relacionados.tsx` (`TicketsAsociados`) | Panel de "Tickets Asociados": muestra ticket padre y tickets hijos (con expandir/colapsar) y permite abrir el relacionador inline. |
+| `TicketsRelacionados/RelacionarTickets/Relacionador.tsx` (`RelacionadorInline`) | Formulario inline para relacionar el ticket actual como padre/hijo de otro, o cargar una relación masiva vía Excel. |
+| `NuevoTicket/NuevoTicketForm.tsx` | Formulario completo de creación de ticket (para agentes/técnicos): fuente, asunto, solicitante, resolutor (con balanceo de carga), descripción rich-text, categoría, adjuntos; incluye alternancia a modo "Masivo". |
+| `NuevoTicketUsuario/NuevoTicketFormUsuario.tsx` | Formulario simplificado de creación de ticket para usuario final (solo asunto, descripción y adjuntos). |
+| `MasiveNonFather/masiva.tsx` (`RelacionadorMasiva`) | Carga masiva de tickets desde una plantilla Excel, con descarga de plantilla y validación de tamaño de archivo. |
+
+## Funciones y constantes clave
+
+### Tickets.tsx
+- Hooks de Funcionalidades: `useUserRole` (`Funcionalidades/auth/Usuarios`), `useTickets` (`Funcionalidades/Tickets/hooks/useTickets`, que compone `useTicketsLists` + `useTicketForm` + `useTicketActions`), `calcularColorEstado` (`Funcionalidades/Tickets/utils/ticketsColors`).
+- Estado local: `ticketSeleccionado` (ticket abierto en detalle).
+- Efecto: al cambiar `rows` (refetch de la página), si hay un ticket seleccionado se refresca su versión remota vía `updateSelectedTicket`.
+- Handler clave: `handleTicketChanged` (memoizado con `useCallback`) llama `loadAll()` tras documentar un ticket.
+- Constantes UI: tamaños de página `[10, 15, 20, 50, 100]`, opciones de filtro de estado (`En curso`/`Cerrados`/`Todos`) y de fuente (`Todos`/`Disponibilidad`).
+- Ordenamiento por columnas (`toggleSort`) con indicador visual y soporte de multi-orden con Shift+click.
+
+### CaseAttachments.tsx / CaseHeader.tsx / CaseInfoGrid.tsx
+- Son "dumb components": reciben todo por props (`rows`, `selected`, `onSelect`, `ticket`, `onVolver`, `canRecategorizar`, `onOpenCategoria/Observador/Resolutor/Fuente`) y no consumen hooks de Funcionalidades directamente.
+- `CaseInfoGrid` usa el subcomponente interno `Row` y determina condicionalmente si un campo es "clicable" (botón) según `canRecategorizar`.
+
+### DetallesTickets.tsx (`CaseDetail`)
+- Hook de Funcionalidades: `useTicketsAttachments` (`Funcionalidades/Tickets/AttachmentsTickets`).
+- Estado local: `selected` (ticket activo, puede diferir del prop tras navegar a un relacionado), `selectedAttachment`, `showSeg`, `showBotton`, `showMessages`, `activeModal` (`"recategorizar" | "reasignar" | "observador" | "fuente" | null`).
+- Efectos: reset de paneles al cambiar `ticket.ID`; sincronización de `selected` con el prop `ticket`; carga de adjuntos (`attachment_type: "Creacion"`) al cambiar de ticket; selección automática del primer adjunto previsualizable cuando cambian `rows`.
+- Handlers memoizados: `handleVolver`, `closeModal`, `handleFuenteChanged`, `closeSeguimiento`, `toggleSeguimiento`, `openMessages`, `closeMessages`, `handleSelectRelacionado`.
+- Es el punto central que decide qué modal mostrar (`activeModal`) y pasa `ticket`/`onDone` a cada uno.
+
+### Modals/ChangeFuente.tsx, Reasignar.tsx, Recategorizar.tsx, Observador.tsx
+- Cada uno sigue el mismo patrón: hook de `Funcionalidades/Tickets/*` (`useCambiarFuenteSolicitante`, `useReasignarTicket`, `useRecategorizarTicket`, `useAsignarObservador`) que expone `{state, errors, submitting, setField, handle...}`.
+- Todos usan `react-select` con filtro insensible a acentos (`norm` de `utils/Commons`) y componente `Option` personalizado casi idéntico (duplicado) para mostrar email/jobTitle/fuente en Reasignar y Observador.
+- `ChangeFuente` y `Recategorizar` registran manualmente un log de seguimiento (`logs.createLog(...)`) después de una recategorización exitosa — lógica de negocio (armar el mensaje del log) ubicada en el componente, no en el hook.
+- Constantes UI: opciones fijas de "fuente" (`Aplicativo`, `Correo`, `Disponibilidad`, `Teams` en `ChangeFuente`; agrega `Presencial`, `WhatsApp` en `NuevoTicketForm`), `maxLen = 500` para la nota de reasignación.
+
+### Modals/Messages (Mensajes, CommentComposer, CommentText, MentionList, ParticipantPanel)
+- `MensajesModal` combina hooks de `Funcionalidades/comments/hooks/useSolviComments` (`useSolviComments`, `useCreateSolviComment`, `useDeleteSolviComment`) y de `Models/Supabase` (`useUsers`, `useCurrentUser`, `useSolviParticipants`).
+- Estado derivado (no hooks): `isClosed`, `isRequester`, `isResolver`, `isParticipant`, `canComment` — reglas de permisos de comentario calculadas inline en el componente.
+- `extraPeople` (useMemo): intenta emparejar solicitante/resolutor de SOLVI con usuarios de PRISMA por correo.
+- Efecto: `useEffect(() => console.log(comments), [comments])` — log de depuración dejado en el código.
+- Handlers: `handleDeleteComment`, `handleCreateComment`.
+- `CommentComposer` usa Tiptap (`useEditor`, `StarterKit`, `Mention`, `Placeholder`) y `useEditorState` para saber si el editor está vacío; `PANEL_MAX_H`, `GAP`, `MARGIN` controlan el posicionamiento del panel de menciones.
+- `MentionList` usa `useImperativeHandle` para exponer `onKeyDown` (Arrow Up/Down, Enter/Tab) al `Suggestion` de Tiptap.
+- `CommentText` parsea el texto con regex `/@\[(\d+)\]/g` para reemplazar ids de mención por chips con nombre.
+
+### TicketsRelacionados/Relacionados.tsx y Relacionador.tsx
+- `TicketsAsociados` usa `useUserRole` y `useTicketsRelacionados` (`Funcionalidades/Tickets/TicketsRelaciones`).
+- Estado local: `showRel`, `loadingOpts`, `shoAll` (mostrar todos los hijos vs. los primeros 2).
+- `RelacionadorInline` reutiliza el hook completo `useTickets` solo para acceder a `toTicketOptions`, `state`, `setField`, `handleCreateRelation`, `uploadMasiva` — trae mucho más de lo que necesita.
+- Estado local: `mode` (`"padre" | "hijo" | "masiva"`), `tickets` (opciones cargadas de forma asíncrona en un efecto con guarda `alive`).
+
+### NuevoTicketForm.tsx / NuevoTicketFormUsuario.tsx / masiva.tsx
+- `NuevoTicketForm` combina `useNuevoTicketForm`, `useFranquicias`, `useWorkers`, `useUsuarios`, `useUserRole` y arma tres listas combinadas: `combinedOptions` (empleados+franquicias), `treeOptions` (categoría>subcategoría>artículo) y `opcionesFuentes` (constante embebida con 5 fuentes).
+- Estado local: `masiva` (alterna a `RelacionadorMasiva`), `categoriasProps` (ids numéricos de categoría/sub/artículo, paralelos a los títulos guardados en `state`).
+- Handler de resolutor con lógica de negocio embebida: si `opt.jobTitle === "Tecnico"`, llama `balanceCharge` y bloquea la selección con un `toast.error` si el resolutor tiene demasiados casos — excepto un correo hardcodeado (`mamartinez@estudiodemoda.com.co`) que se salta la validación. Contiene además un `console.table(opt)` de depuración.
+- `NuevoTicketFormUsuario` usa `useNuevoUsuarioTicketForm`; formulario mucho más simple (solo asunto, descripción, adjuntos).
+- `RelacionadorMasiva` reutiliza `useTickets` completo solo por `state`, `setField`, `uploadMasiva`; genera la descarga de la plantilla creando un `<a>` temporal.
+
+## Flujo del módulo
+1. El usuario entra a `Tickets.tsx`, filtra/busca/pagina la tabla de tickets (server-side vía `useTicketsLists`).
+2. Al hacer click (o Enter/Espacio) en una fila, `ticketSeleccionado` se setea y se renderiza `CaseDetail` (`DetallesTickets.tsx`) en lugar de la tabla.
+3. `CaseDetail` muestra `CaseHeader` + `CaseInfoGrid` (con datos y botones condicionados por rol) + `CaseAttachments` + `TicketsAsociados`.
+4. Si el usuario tiene rol privilegiado y hace click en Categoría/Observador/Resolutor/Fuente dentro de `CaseInfoGrid`, `CaseDetail` cambia `activeModal` y monta el modal correspondiente (`Recategorizar`, `Reasignar`, `AsignarObservador`, `CambiarFuente`) dentro de `ModalShell`.
+5. Cada modal ejecuta su hook de `Funcionalidades/Tickets/*` al enviar el formulario; al terminar llama a `onDone` (o, en el caso de `ChangeFuente`, a `handleFuenteChanged`) que cierra el modal y dispara `onDocumentar` — este último sube hasta `Tickets.tsx` como `handleTicketChanged`, que ejecuta `loadAll()` para refrescar la tabla.
+6. El botón "Comentarios" abre `MensajesModal` (overlay independiente, no usa `ModalShell`) que carga comentarios/participantes/usuario actual desde Supabase y permite comentar con menciones (`CommentComposer` → Tiptap → `MentionList`).
+7. El botón "Seguimiento ticket" alterna `TicketHistorial` (`Seguimiento.tsx`, fuera del alcance leído aquí) que internamente monta `Documentar`, el cual al finalizar llama `onAdd()` y `onAddClick()` (= `onDocumentar` de `CaseDetail`), cerrando el círculo de refresco.
+8. Desde `TicketsAsociados`, el botón "+" abre `RelacionadorInline` para vincular el ticket actual como padre/hijo de otro (o cargar una relación masiva por Excel); al confirmar, llama `reload()` (= `loadRelateds` del hook) y se cierra.
+9. La creación de tickets ocurre fuera del detalle: `NuevoTicketForm` (agentes) o `NuevoTicketFormUsuario` (usuario final); ambos pueden alternar a carga masiva (`RelacionadorMasiva` / modo "masiva" embebido).
+
+Navegación entre componentes: mayormente props drilling explícito (`ticket`, `onDone`, `onSelect`, `onVolver`) sin Context ni Redux; el único contexto usado es de infraestructura (`AuthContext`, `GraphServicesContext`, `RepositoriesContext`), no de UI/flujo.
+
+## Dependencias
+
+| Componente | Funcionalidades / Models | Librerías externas |
+|---|---|---|
+| Tickets.tsx | `Funcionalidades/auth/Usuarios` (useUserRole), `Funcionalidades/Tickets/hooks/useTickets`, `Funcionalidades/Tickets/utils/ticketsColors`, `Models/Tickets`, `auth/authContext`, `graph/GrapServicesContext`, `repositories/repositoriesContext` | React |
+| CaseAttachments/Header/InfoGrid | `Models/Tickets`, `Funcionalidades/Tickets/AttachmentsTickets` (tipo) | — |
+| DetallesTickets.tsx | `Funcionalidades/Tickets/AttachmentsTickets` (useTicketsAttachments) | — |
+| ChangeFuente | `Funcionalidades/Tickets/CambiarFuente`, `repositories/repositoriesContext`, `auth/authContext` | `react-select` |
+| Reasignar | `Funcionalidades/Tickets/Reasignar`, `Funcionalidades/auth/Usuarios` (useUsuarios), `graph/GrapServicesContext` | `react-select` |
+| Recategorizar | `Funcionalidades/Tickets/Recategorizar`, `auth/authContext` | `react-select` |
+| Observador | `Funcionalidades/Tickets/Observador`, `Funcionalidades/access/Workers`, `Funcionalidades/access/Franquicias` | `react-select` |
+| Mensajes.tsx / CommentComposer / MentionList / ParticipantPanel | `Funcionalidades/comments/hooks/useSolviComments`, `Models/Supabase/useUsers`, `Models/Supabase/useCurrentUser`, `Models/Supabase/useSolviParticipants`, `repositories/ParticipantsRepository/MessagesRepository`, `utils/mentions` | `@tiptap/react`, `@tiptap/extension-mention`, `@tiptap/suggestion`, `@tiptap/starter-kit`, `@tiptap/extensions`, `lucide-react` |
+| Relacionados.tsx / Relacionador.tsx | `Funcionalidades/Tickets/TicketsRelaciones`, `Funcionalidades/Tickets/hooks/useTickets`, `Funcionalidades/auth/Usuarios` | `react-select` |
+| NuevoTicketForm.tsx | `Funcionalidades/Tickets/NuevoTicket`, `Funcionalidades/access/Franquicias`, `Funcionalidades/access/Workers`, `Funcionalidades/auth/Usuarios` | `react-select`, `react-hot-toast` |
+| NuevoTicketFormUsuario.tsx | `Funcionalidades/Tickets/NuevoTicket` (useNuevoUsuarioTicketForm) | — |
+| MasiveNonFather/masiva.tsx | `Funcionalidades/Tickets/hooks/useTickets` | — |
+| Común a formularios | `RichTextBase64` (componente propio, editor rich text con imágenes base64), `Trunc` (`components/Trunc/trunc`), `HtmlContent` (`components/Renderizador/Renderizador`) | — |
+
+## Oportunidades de mejora
+- **Residuo de refactor/copy-paste en rutas y comentarios**: `CommentComposer.tsx`, `CommentText.tsx`, `MentionList.tsx` y `ParticipantPanel.tsx` (en `src/components/DetallesTickets/Modals/Messages/`) empiezan con comentarios de cabecera `// src/features/requests/components/mentions/...`, indicando que fueron copiados de otra estructura de proyecto sin actualizar. Puede confundir a quien navegue el código.
+- **Debug leftovers en producción**: `Mensajes.tsx` línea ~157 tiene `useEffect(() => console.log(comments), [comments])`; `NuevoTicketForm.tsx` línea ~216 tiene `console.table(opt)` dentro del `onChange` del resolutor. Ambos deberían eliminarse.
+- **Lógica de negocio filtrada en componentes**: `ChangeFuente.tsx` y `Recategorizar.tsx` arman manualmente el texto del log de seguimiento (`"El resolutor cambió la fuente solicitante a: " + fuente`) y llaman `logs.createLog(...)` directamente desde el componente en vez de que esto viva dentro de `useCambiarFuenteSolicitante`/`useRecategorizarTicket`. La regla de "correo exento de balanceo de carga" (`mamartinez@estudiodemoda.com.co`) en `NuevoTicketForm.tsx` está hardcodeada en JSX, no en configuración ni en el hook `balanceCharge`.
+- **Reglas de permisos de UI dentro del componente**: en `Mensajes.tsx`, `isClosed/isRequester/isResolver/isParticipant/canComment` se calculan con múltiples líneas de normalización de strings directamente en el componente; sería más testeable extraerlas a `Funcionalidades/comments`.
+- **Duplicación entre modales similares**: `Reasignar.tsx` y `Observador.tsx` repiten casi textualmente el mismo `userFilter` (normalización con `norm`) y el mismo componente `Option` de `react-select` (email/jobTitle/tag de fuente). Es candidato claro a extraer un componente/hook compartido (`useUserSelectOptions`, `<UserSelectOption/>`).
+- **Sobre-consumo de hooks grandes para necesitar poco**: `RelacionadorInline` y `RelacionadorMasiva` invocan el hook compuesto completo `useTickets(...)` (que trae listados, acciones y formulario) solo para usar `state/setField/uploadMasiva` (y `toTicketOptions/handleCreateRelation` en el primero). Esto dispara side-effects/loads innecesarios de listas de tickets que no se usan en esos componentes.
+- **Falta de manejo de error/carga consistente**: `RelacionadorInline.tsx` solo hace `console.error` si falla `toTicketOptions()`, sin mostrar nada al usuario; en varios formularios (`ChangeFuente`, `Reasignar`, `Recategorizar`) los errores de red al enviar no se distinguen de errores de validación (`errors.*`), y usan `alert()` nativo en vez de un componente de notificación consistente con `react-hot-toast` (que sí se usa en `NuevoTicketForm.tsx`).
+- **Accesibilidad de modales**: `ModalShell.tsx` no hace focus-trap ni cierra con tecla `Escape`, ni retorna el foco al elemento que abrió el modal; el botón de cerrar de `Mensajes.tsx` (que no usa `ModalShell`, es un overlay separado) tampoco maneja `Escape`. `CaseAttachments.tsx` marca `aria-hidden` en el ícono de extensión pero el `<span className="cd-file-ico ext-...">` no tiene contenido textual alternativo.
+- **Nombres inconsistentes ES/EN**: mezcla de convenciones — `AsignarObservador`/`Observador` vs. `AttachmentsTickets`/`useTicketsAttachments`; variables como `shoAll` (typo de `showAll`) en `Relacionados.tsx`; el prop `role` en `RelacionadorInline` en realidad recibe `userRole.role` mientras que `userMail` recibe el correo — pero en `TicketsAsociados.tsx` se invoca `<RelacionadorInline ... userMail={userRole.role} role=""/>`, es decir los props `userMail` y `role` están intercambiados/mal poblados (bug potencial: `userMail` recibe un rol, no un correo, y `role` queda vacío).
+- **Sanitización de contenido**: `CaseInfoGrid.tsx` renderiza `ticket.Descripcion` a través de `HtmlContent` (HTML crudo del backend) sin evidencia de sanitización visible en este componente; `CommentText.tsx` solo interpola texto plano (no HTML), lo cual es más seguro, pero conviene confirmar que `HtmlContent`/`RichTextBase64` sanitizan HTML antes de inyectarlo (riesgo de XSS si el HTML viene de usuarios).
+- **Componentes grandes con múltiples responsabilidades**: `DetallesTickets.tsx` (`CaseDetail`) concentra estado de 5+ paneles/modales, efectos de sincronización y composición visual; sería más mantenible dividir el manejo de modales en un hook `useCaseModals()`. `NuevoTicketForm.tsx` mezcla combinación de opciones de usuarios, árbol de categorías, balanceo de carga y alternancia a modo masivo en un solo archivo de 300+ líneas.
+- **Re-renders**: `Mensajes.tsx` recalcula estilos inline en cada render (objetos `style={{...}}` creados en cada renderizado de cada comentario); no usa `React.memo` para las filas de comentario, lo que puede ser costoso con hilos largos. `MentionList` sí usa `useMemo` correctamente para `groups`/`flat`.

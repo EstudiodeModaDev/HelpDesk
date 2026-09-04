@@ -3,17 +3,17 @@ import { useState, useEffect } from "react";
 import { calcularFechaSolucion, calculoANS } from "../../utils/ans";
 import { fetchHolidays } from "../../Services/Festivos";
 import type { FormErrors } from "../../Models/nuevoTicket";
-import type { Articulo, Categoria, Subcategoria } from "../../Models/Categorias";
 import type { TZDate } from "@date-fns/tz";
 import { toGraphDateTime /* o toUtcIso */ } from "../../utils/Date";
 import type { FormRecategorizarState, Ticket } from "../../Models/Tickets";
-import { first } from "./NuevoTicket";
 import type { TicketsRepository } from "../../repositories/TicketsRepository/TicketRepository";
 import toast from "react-hot-toast";
 import { notifySolicitanteCategoryChange } from "./utils/notifications";
 import type { SupabaseTickets } from "../../Models/DTO/Tickets";
 import type { Holiday } from "../../Models/Holiday";
 import type { ANSRepository } from "../../repositories/AnsRepository/AnsRepository";
+import { horasPorANS } from "./utils/ticketConstants";
+import { useCatalogoServicio } from "./hooks/useCatalogoServicio";
 
 type Svc = {
   Categorias: { getAll: (opts?: any) => Promise<any[]> };
@@ -35,57 +35,10 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([]);
-  const [articulosAll, setArticulosAll] = useState<Articulo[]>([]);
-  const [loadingCatalogos, setLoadingCatalogos] = useState(false);
-  const [errorCatalogos, setErrorCatalogos] = useState<string | null>(null);
+  const { categorias, subcategoriasAll, articulosAll, loadingCatalogos, errorCatalogos } =
+    useCatalogoServicio({ Categorias, SubCategorias, Articulos });
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null); // inicia en null
-
-  // Catálogos
-  useEffect(() => {
-    let cancel = false;
-    (async () => {
-      try {
-        setLoadingCatalogos(true);
-        setErrorCatalogos(null);
-
-        const [catsRaw, subsRaw, artsRaw] = await Promise.all([
-          Categorias.getAll({ orderby: "fields/Title asc" }),
-          SubCategorias.getAll({ orderby: "fields/Title asc", top: 5000 }),
-          Articulos.getAll({ orderby: "fields/Title asc", top: 5000 }),
-        ]);
-        if (cancel) return;
-
-        const cats: Categoria[] = (catsRaw ?? []).map((r: any) => ({
-          ID: String(first(r.ID, r.Id, r.id)),
-          Title: String(first(r.Title, "No mapeado")),
-        }));
-
-        const subs: Subcategoria[] = (subsRaw ?? []).map((r: any) => ({
-          ID: String(first(r.ID, r.Id, r.id)),
-          Title: String(first(r.Title, "No mapeado")),
-          Id_categoria: String(first(r.Id_categoria, "")),
-        }));
-
-        const arts: Articulo[] = (artsRaw ?? []).map((r: any) => ({
-          ID: String(first(r.ID, r.Id, r.id)),
-          Title: String(first(r.Title, "")),
-          Id_subCategoria: String(first(r.Id_Subcategoria, r.Id_subcategoria, "")),
-        }));
-
-        setCategorias(cats);
-        setSubcategorias(subs);
-        setArticulosAll(arts);
-      } catch (e: any) {
-        if (!cancel) setErrorCatalogos(e?.message ?? "Error cargando catálogos");
-      } finally {
-        if (!cancel) setLoadingCatalogos(false);
-      }
-    })();
-    return () => { cancel = true; };
-  }, [Categorias, SubCategorias, Articulos]);
 
   // Festivos
   useEffect(() => {
@@ -119,14 +72,6 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
     setSubmitting(true);
     try {
       const apertura = ticket.FechaApertura ? new Date(ticket.FechaApertura) : new Date();
-
-      const horasPorANS: Record<string, number> = {
-        "ANS 1": 2,
-        "ANS 2": 4,
-        "ANS 3": 8,
-        "ANS 4": 56,
-        "ANS 5": 240,
-      };
 
       const ans = await calculoANS({art: ANSprops.artId, catId: ANSprops.catId, subId: ANSprops.subId}, Ans);
       const horasAns = horasPorANS[ans] ?? 0;
@@ -179,7 +124,7 @@ export function useRecategorizarTicket(services: Svc, ticket: Ticket) {
     submitting,
     fechaSolucion,
     categorias,
-    subcategoriasAll: subcategorias,
+    subcategoriasAll,
     articulosAll,
     loadingCatalogos,
     errorCatalogos,

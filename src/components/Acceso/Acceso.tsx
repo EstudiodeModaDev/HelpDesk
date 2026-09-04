@@ -3,18 +3,13 @@ import * as React from 'react';
 import styles from './colaboradores.module.css';
 import { /*addMemberByUserId,*/ useGroupMembers } from '../../Funcionalidades/access/GroupMembers';
 import { useWorkers } from '../../Funcionalidades/access/Workers'
-import { getAccessToken } from '../../auth/msal';
 //import ModalOtorgarPermiso from '../AddGraphUsers/ModalAgregarPermiso';
-
-
-// ⬇️ Importa el remove desde tu servicio Graph
-import { removeMemberByUserId, removeMemberByEmail } from '../../Services/GraphUsers.service'
 import NuevaFranquicia from './OtorgarAcceso/AgregarFranquicias';
 
 const UsuariosApp: React.FC = () => {
   const GroupID = '003ae091-49b2-415b-a285-35fca3bca9f3';
 
-  const {rows, loading, error, search, setSearch, pageSize, setPageSize, pageIndex, hasNext, nextPage, prevPage, refresh,} = useGroupMembers(GroupID);
+  const {rows, loading, error, search, setSearch, pageSize, setPageSize, pageIndex, hasNext, nextPage, prevPage, deleteByUserId, deleteByEmail,} = useGroupMembers(GroupID);
   const { workers, refresh: refreshWorkers } = useWorkers();
 
   const viewRows = rows;
@@ -55,11 +50,10 @@ const UsuariosApp: React.FC = () => {
     try {
       setDeletingId(user.id);
       if (user.id) {
-        await removeMemberByUserId(GroupID, user.id, getAccessToken);
+        await deleteByUserId(user.id);
       } else if (user.correo) {
-        await removeMemberByEmail(GroupID, user.correo, getAccessToken);
+        await deleteByEmail(user.correo);
       }
-      await refresh();
     } catch (e) {
       console.error('No se pudo eliminar del grupo:', e);
       alert('No se pudo eliminar del grupo. Revisa permisos Group.ReadWrite.All y que sea miembro directo.');

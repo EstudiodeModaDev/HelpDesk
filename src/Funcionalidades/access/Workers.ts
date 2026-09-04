@@ -59,13 +59,13 @@ function mapSPRowToWorker(r: any): Worker {
   };
 }
 
-async function fetchUsersFromGraph(graph: GraphRest,): Promise<Worker[]> {
+async function fetchUsersFromGraph(graph: GraphRest, onlyEnabled?: boolean): Promise<Worker[]> {
   const select = encodeURIComponent(
     'id,displayName,mail,userPrincipalName,jobTitle,accountEnabled'
   );
   const top = 999;
   const filters: string[] = [];
-  //if (onlyEnabled) filters.push('accountEnabled eq true');
+  (onlyEnabled) && filters.push('accountEnabled eq true');
 
   let url =
     `/users?$select=${select}&$top=${top}` +

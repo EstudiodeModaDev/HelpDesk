@@ -25,6 +25,21 @@ export type GraphSendMailPayload = {
   saveToSentItems?: boolean;
 };
 
+// Error tipado de Graph: expone `status` y, cuando la respuesta lo trae,
+// el `error.code` de Graph, en vez de obligar a los consumidores a
+// parsear esa información desde el texto de `message`.
+export class GraphError extends Error {
+  readonly status: number;
+  readonly code?: string;
+
+  constructor(status: number, message: string, code?: string) {
+    super(message);
+    this.name = "GraphError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 export class GraphRest {
   private getToken: () => Promise<string>;
   private base = 'https://graph.microsoft.com/v1.0';
@@ -60,18 +75,24 @@ export class GraphRest {
 
     if (!res.ok) {
       let detail = '';
+      let code: string | undefined;
       try {
         const txt = await res.text();
         if (txt) {
           try {
             const j = JSON.parse(txt);
             detail = j?.error?.message || j?.message || txt;
+            code = j?.error?.code;
           } catch {
             detail = txt;
           }
         }
       } catch {}
-      throw new Error(`${method} ${path} → ${res.status} ${res.statusText}${detail ? `: ${detail}` : ''}`);
+      throw new GraphError(
+        res.status,
+        `${method} ${path} → ${res.status} ${res.statusText}${detail ? `: ${detail}` : ''}`,
+        code
+      );
     }
 
     if (res.status === 204) return undefined as unknown as T;

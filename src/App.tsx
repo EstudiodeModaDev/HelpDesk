@@ -10,7 +10,7 @@ import CrearPlantilla from "./components/NuevaPlantilla/NuevaPlantilla";
 import UsuariosPanel from "./components/Usuarios/Usuarios";
 import CajerosPOSForm from "./components/CajerosPOS/CajerosPOS";
 import type { User } from "./Models/User";
-import { AuthProvider, useAuth } from "./auth/authContext";
+import { useAuth } from "./auth/authContext";
 import { useUserRole } from "./Funcionalidades/auth/Usuarios";
 import { GraphServicesProvider, useGraphServices } from "./graph/GrapServicesContext";
 import type { UsuariosSPService } from "./Services/Usuarios.Service";
@@ -431,11 +431,9 @@ function LoggedApp({ user }: { user: User }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <GraphServicesGate>
-        <Shell />
-      </GraphServicesGate>
-    </AuthProvider>
+    <GraphServicesGate>
+      <Shell />
+    </GraphServicesGate>
   );
 }
 

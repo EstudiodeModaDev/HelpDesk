@@ -2,46 +2,33 @@
 import * as React from "react";
 import type { GraphListResponse, GraphUser } from "../../Models/GraphUsers"
 import { useAuth } from "../../auth/authContext";
+import { GraphRest, GraphError } from "../../graph/GraphRest";
 
 /* ============================
-   Utilidades HTTP contra Graph
+   Detección de errores de membresía
    ============================ */
-type GetTokenFn = () => Promise<string>;
-
-async function graphGet<T>(url: string, getToken: GetTokenFn): Promise<T> {
-  const token = await getToken();
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "ConsistencyLevel": "eventual",
-    },
-  });
-  if (!res.ok) throw new Error(`Graph ${res.status}: ${await res.text()}`);
-  return (await res.json()) as T;
+// Graph no expone un `error.code` propio para distinguir "ya es miembro" /
+// "ya no es miembro" de un grupo: para el 404 de un $ref inexistente el
+// status alcanza, pero para el 400 de "ya es miembro" hay que apoyarse en
+// el texto del mensaje porque Graph no da nada mejor. Se deja centralizado
+// aquí (en vez de repetido en cada función) para que, si Graph cambia la
+// redacción, solo haya que tocar un lugar; mientras tanto el error se
+// propaga visible en vez de fallar en silencio.
+function isAlreadyMemberError(e: unknown): boolean {
+  if (!(e instanceof GraphError)) return false;
+  return (
+    e.status === 400 &&
+    /added object references already exist|ObjectReferencesAlreadyExist/i.test(e.message)
+  );
 }
 
-async function graphPost(url: string, body: any, getToken: GetTokenFn) {
-  const token = await getToken();
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`Graph ${res.status}: ${await res.text()}`);
-  return res.status; // 204 esperado
-}
-
-async function graphDelete(url: string, getToken: GetTokenFn): Promise<number> {
-  const token = await getToken();
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Graph ${res.status}: ${text || res.statusText}`);
-  }
-  return res.status; // 204
+function isNotAMemberError(e: unknown): boolean {
+  if (!(e instanceof GraphError)) return false;
+  if (e.status === 404) return true;
+  return (
+    e.status === 400 &&
+    /ObjectReferencesDoNotExist|removed object references/i.test(e.message)
+  );
 }
 
 /* ============================
@@ -51,19 +38,22 @@ async function graphDelete(url: string, getToken: GetTokenFn): Promise<number> {
 // === Listar miembros (transitivos o directos). Ojo: /transitiveMembers puede devolver grupos/devices
 async function fetchGroupMembers(
   groupId: string,
-  getToken: GetTokenFn,
+  graph: GraphRest,
   transitive = true
 ): Promise<GraphUser[]> {
-  let url =
-    `https://graph.microsoft.com/v1.0/groups/${groupId}/` +
-    `${transitive ? "transitiveMembers" : "members"}` +
-    `?$select=id,displayName,mail,userPrincipalName,jobTitle&$top=999`;
+  const select = "id,displayName,mail,userPrincipalName,jobTitle";
+  let path: string | undefined =
+    `/groups/${groupId}/${transitive ? "transitiveMembers" : "members"}` +
+    `?$select=${select}&$top=999`;
 
   const all: any[] = [];
-  while (url) {
-    const data = await graphGet<GraphListResponse<any>>(url, getToken);
+  while (path) {
+    const data: GraphListResponse<any> = await graph.get(path, {
+      headers: { ConsistencyLevel: "eventual" },
+    });
     all.push(...(data.value ?? []));
-    url = data["@odata.nextLink"] ?? "";
+    const next: string | undefined = data["@odata.nextLink"];
+    path = next ? next.replace("https://graph.microsoft.com/v1.0", "") : undefined;
   }
 
   // Filtrar solo usuarios (en transitive pueden venir grupos o devices)
@@ -82,18 +72,15 @@ async function fetchGroupMembers(
 export async function addMemberByUserId(
   groupId: string,
   userId: string,
-  getToken: GetTokenFn
+  graph: GraphRest
 ) {
-  const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref`;
+  const path = `/groups/${groupId}/members/$ref`;
   const body = { "@odata.id": `https://graph.microsoft.com/v1.0/users/${userId}` };
   try {
-    const status = await graphPost(url, body, getToken); // 204 No Content si OK
-    console.log("[addMemberByUserId] OK status:", status, "userId:", userId);
+    await graph.post(path, body);
     return { ok: true as const };
-  } catch (e: any) {
-    const msg = String(e?.message ?? "");
-    // Ya existe
-    if (msg.includes("added object references already exist") || msg.includes("ObjectReferencesAlreadyExist")) {
+  } catch (e) {
+    if (isAlreadyMemberError(e)) {
       return { ok: true as const, already: true as const };
     }
     throw e;
@@ -101,18 +88,14 @@ export async function addMemberByUserId(
 }
 
 // === Buscar userId por correo
-export async function getUserIdByEmail(email: string, getToken: GetTokenFn): Promise<string | null> {
+export async function getUserIdByEmail(email: string, graph: GraphRest): Promise<string | null> {
   const q = email.replace(/'/g, "''");
-  const url =
-    `https://graph.microsoft.com/v1.0/users` +
-    `?$select=id,mail,userPrincipalName` +
+  const path =
+    `/users?$select=id,mail,userPrincipalName` +
     `&$filter=mail eq '${q}' or userPrincipalName eq '${q}'`;
 
-  const token = await getToken();
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new Error(`Graph ${res.status}: ${await res.text()}`);
-  const data = await res.json();
-  const user = (data?.value ?? [])[0];
+  const data = await graph.get<GraphListResponse<any>>(path);
+  const user = (data.value ?? [])[0];
   return user?.id ?? null;
 }
 
@@ -120,16 +103,14 @@ export async function getUserIdByEmail(email: string, getToken: GetTokenFn): Pro
 export async function removeMemberByUserId(
   groupId: string,
   userId: string,
-  getToken: GetTokenFn
+  graph: GraphRest
 ): Promise<{ ok: true; already?: true }> {
-  const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${userId}/$ref`;
+  const path = `/groups/${groupId}/members/${userId}/$ref`;
   try {
-    await graphDelete(url, getToken); // 204 No Content si se elimina
+    await graph.delete(path); // 204 No Content
     return { ok: true };
-  } catch (e: any) {
-    const msg = String(e?.message ?? "");
-    // No es miembro directo o ya no existe la referencia
-    if (msg.includes("404") || msg.includes("ObjectReferencesDoNotExist") || msg.includes("removed object references")) {
+  } catch (e) {
+    if (isNotAMemberError(e)) {
       return { ok: true, already: true };
     }
     throw e;
@@ -140,21 +121,21 @@ export async function removeMemberByUserId(
 export async function removeMemberByEmail(
   groupId: string,
   email: string,
-  getToken: GetTokenFn
+  graph: GraphRest
 ): Promise<{ ok: true; already?: true }> {
-  const userId = await getUserIdByEmail(email, getToken);
+  const userId = await getUserIdByEmail(email, graph);
   if (!userId) {
     // Usuario no existe en el tenant: trátalo como "ya no miembro directo"
     return { ok: true, already: true };
   }
-  return removeMemberByUserId(groupId, userId, getToken);
+  return removeMemberByUserId(groupId, userId, graph);
 }
 
 // === Bulk remove (útil para UX)
 export async function removeMembersBulk(
   groupId: string,
   userIdsOrEmails: string[],
-  getToken: GetTokenFn
+  graph: GraphRest
 ): Promise<{ removed: string[]; already: string[]; errors: { id: string; error: string }[] }> {
   const removed: string[] = [];
   const already: string[] = [];
@@ -164,8 +145,8 @@ export async function removeMembersBulk(
     try {
       const looksLikeGuid = /^[0-9a-f-]{36}$/i.test(idOrEmail);
       const result = looksLikeGuid
-        ? await removeMemberByUserId(groupId, idOrEmail, getToken)
-        : await removeMemberByEmail(groupId, idOrEmail, getToken);
+        ? await removeMemberByUserId(groupId, idOrEmail, graph)
+        : await removeMemberByEmail(groupId, idOrEmail, graph);
 
       if (result.already) already.push(idOrEmail);
       else removed.push(idOrEmail);
@@ -191,6 +172,7 @@ export type AppUsers = {
    ============================ */
 export function useGroupMembers(groupId: string) {
   const { getToken } = useAuth();
+  const graph = React.useMemo(() => new GraphRest(getToken), [getToken]);
 
   const [rows, setRows] = React.useState<AppUsers[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -207,7 +189,7 @@ export function useGroupMembers(groupId: string) {
     setLoading(true);
     setError(null);
     try {
-      const users = await fetchGroupMembers(groupId, getToken, true); // transitivos
+      const users = await fetchGroupMembers(groupId, graph, true); // transitivos
       const mapped: AppUsers[] = users.map((u) => ({
         id: u.id,
         nombre: u.displayName ?? u.userPrincipalName ?? "(Sin nombre)",
@@ -220,7 +202,7 @@ export function useGroupMembers(groupId: string) {
     } finally {
       setLoading(false);
     }
-  }, [groupId, getToken]);
+  }, [groupId, graph]);
 
   React.useEffect(() => {
     refresh();
@@ -252,30 +234,30 @@ export function useGroupMembers(groupId: string) {
   const addCollaboratorByUserId = React.useCallback(
     async (userId: string) => {
       if (!groupId || !userId) return;
-      await addMemberByUserId(groupId, userId, getToken);
+      await addMemberByUserId(groupId, userId, graph);
       await refresh();
     },
-    [groupId, getToken, refresh]
+    [groupId, graph, refresh]
   );
 
   // Eliminar por userId (preferido si la tabla tiene id)
   const deleteByUserId = React.useCallback(
     async (userId: string) => {
       if (!groupId || !userId) return;
-      await removeMemberByUserId(groupId, userId, getToken);
+      await removeMemberByUserId(groupId, userId, graph);
       await refresh();
     },
-    [groupId, getToken, refresh]
+    [groupId, graph, refresh]
   );
 
   // Eliminar por correo (si tu tabla se maneja por email)
   const deleteByEmail = React.useCallback(
     async (email: string) => {
       if (!groupId || !email) return;
-      await removeMemberByEmail(groupId, email, getToken);
+      await removeMemberByEmail(groupId, email, graph);
       await refresh();
     },
-    [groupId, getToken, refresh]
+    [groupId, graph, refresh]
   );
 
   // API unificada para UI (acepta id o email)

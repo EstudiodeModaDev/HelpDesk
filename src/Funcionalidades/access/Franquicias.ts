@@ -19,19 +19,14 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
   const [submitting, setSubmitting] = React.useState<boolean>(false)
   const [errors, setErrors] = React.useState<FormFranquinciasError>({})
 
-  // paginación (si el service la soporta)
-  const [pageSize, setPageSize] = React.useState<number>(10); // = $top
-  const [pageIndex, setPageIndex] = React.useState<number>(1); // 1-based
-  const [nextLink, setNextLink] = React.useState<string | null>(null);
-
   const setField = <K extends keyof Franquicias>(k: K, v: Franquicias[K]) => setState((s) => ({ ...s, [k]: v }));
 
   const validate = () => {
     const e: FormFranquinciasError = {};
     if (!state.Title.trim()) e.Title = "Ingresa el nombre de la franquicia.";
     if (!state.Correo.trim()) e.Correo = "Ingresa el correo.";
-    if (!state.Celular.trim()) e.Correo = "Ingresa el celular.";
-    if (!state.Ciudad.trim()) e.Correo = "Ingresa la ciudad.";
+    if (!state.Celular.trim()) e.Celular = "Ingresa el celular.";
+    if (!state.Ciudad.trim()) e.Ciudad = "Ingresa la ciudad.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.Correo)) e.Correo = "Correo inválido.";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -48,10 +43,13 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
       if (cancelled) return;
     } catch (e: any) {
       if (!cancelled) {
-        setError(e?.message ?? "Error eliminado usuarios");
+        setError(e?.message ?? "Error agregando franquicia");
       }
     } finally {
-      if (!cancelled) setLoading(false);
+      if (!cancelled) {
+        setSubmitting(false);
+        setLoading(false);
+      }
     }
 
     return () => { cancelled = true; };
@@ -69,7 +67,7 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
       Correo: String(f.Correo ?? f.Email ?? "").trim(),
       Direccion: String(f.Direccion ?? f.Title ?? ""),
       Ciudad: String(f.Ciudad ?? ""),
-      Jefe_x0020_de_x0020_zona: String(row?.Jefe_x0020_de_x0020_zona ?? f.webUrl ?? ""),
+      Jefe_x0020_de_x0020_zona: String(row?.Jefe_x0020_de_x0020_zona ?? ""),
     } as Franquicias;
   }, []);
 
@@ -77,10 +75,10 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
   const mapFranqToOptions = React.useCallback((list: Franquicias[]): UserOption[] => {
     return (list ?? [])
       .map((f) => {
-        const nombre = String((f as any).Nombre1 ?? (f as any).Title ?? "—");
+        const nombre = String((f as any).Title ?? "—");
         const correo = String((f as any).Correo ?? "").trim();
-        const id     = String((f as any).ID ?? correo ?? nombre);
-        const cargo  = "Franquicia"; // si quieres mostrarlo como jobTitle
+        const id     = String((f as any).Id ?? correo ?? nombre);
+        const cargo  = "Franquicia";
         return {
           value: correo || id,     // correo como clave estable
           label: nombre,
@@ -99,34 +97,27 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
 
     let cancelled = false;
     try {
-      // Si conectas paginación real: const res = await FranquiciasSvc.getAll({ top: pageSize });
       const res = await FranquiciasSvc.getAll();
 
       // Soporta dos contratos
       const rawItems: any[] = Array.isArray(res) ? res : (res?.items ?? []);
-      const nLink: string | null = Array.isArray(res) ? null : (res?.nextLink ?? null);
 
       const items = rawItems.map(mapRowToFranquicia);
       if (cancelled) return;
 
       setFranquicias(items);
       setFranqOptions(mapFranqToOptions(items));
-      setNextLink(nLink);
-      setPageIndex(1);
     } catch (e: any) {
       if (!cancelled) {
         setError(e?.message ?? "Error cargando franquicias");
         setFranquicias([]);
-        setFranqOptions([]);
-        setNextLink(null);
-        setPageIndex(1);
       }
     } finally {
       if (!cancelled) setLoading(false);
     }
 
     return () => { cancelled = true; };
-  }, [FranquiciasSvc, /* pageSize, */ mapRowToFranquicia, mapFranqToOptions]);
+  }, [FranquiciasSvc, mapRowToFranquicia, mapFranqToOptions]);
 
   React.useEffect(() => {
     let cancel = false;
@@ -143,10 +134,9 @@ export function useFranquicias(FranquiciasSvc: FranquiciasService) {
 
     
 
-  const hasNext = !!nextLink;
 
   return {
-    franquicias, franqOptions, loading, error, pageSize, pageIndex, hasNext, nextLink, state, errors, submitting,
-    setPageSize, refresh, setField, addFranquicia, 
+    franquicias, franqOptions, loading, error, state, errors, submitting,
+   refresh, setField, addFranquicia, 
   };
 }

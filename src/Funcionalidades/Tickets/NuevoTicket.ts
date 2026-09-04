@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { calcularFechaSolucion, calculoANS } from "../../utils/ans";
 import { fetchHolidays} from "../../Services/Festivos";
 import type { FormState, FormErrors, UserFormState, FormUserErrors } from "../../Models/nuevoTicket";
-import type { Articulo, Categoria, Subcategoria } from "../../Models/Categorias";
 import type {  GetAllOpts, } from "../../Models/Commons";
+import { useCatalogoServicio } from "./hooks/useCatalogoServicio";
 import type { TZDate } from "@date-fns/tz";
 import { toGraphDateTime } from "../../utils/Date";
 import { UsuariosSPService } from "../../Services/Usuarios.Service";
@@ -19,6 +19,7 @@ import { uploadImageToSupabase } from "../shared/UploadFileToSupabase";
 import { useRepositories } from "../../repositories/repositoriesContext";
 import type { LogRepository } from "../../repositories/LogRepository/LogRespository";
 import type { Holiday } from "../../Models/Holiday";
+import { horasPorANS } from "./utils/ticketConstants";
 
 
 type Svc = {
@@ -29,8 +30,6 @@ type Svc = {
   Usuarios: UsuariosSPService
   Logs: LogRepository
 }; 
-
-export const first = (...vals: any[]) => vals.find((v) => v !== undefined && v !== null && v !== "");
 
 const TICKETS_ATTACHMENTS_BUCKET = "ticket-attachments"
 
@@ -56,11 +55,8 @@ export function useNuevoTicketForm(services: Svc) {
   const [submitting, setSubmitting] = useState(false);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [fechaSolucion, setFechaSolucion] = useState<Date | null>(null);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([]);
-  const [articulosAll, setArticulosAll] = useState<Articulo[]>([]);
-  const [loadingCatalogos, setLoadingCatalogos] = useState(false);
-  const [errorCatalogos, setErrorCatalogos] = useState<string | null>(null);
+  const { categorias, subcategoriasAll, articulosAll, loadingCatalogos, errorCatalogos } =
+    useCatalogoServicio({ Categorias, SubCategorias, Articulos });
 
   // Carga de festivos inicial
   useEffect(() => {
@@ -77,53 +73,6 @@ export function useNuevoTicketForm(services: Svc) {
       cancel = true;
     };
   }, []);
-
-  // Carga de catálogo de servicios
-  useEffect(() => {
-    let cancel = false;
-    (async () => {
-      try {
-        setLoadingCatalogos(true);
-        setErrorCatalogos(null);
-
-        const [catsRaw, subsRaw, artsRaw] = await Promise.all([
-          Categorias.getAll({ orderby: "fields/Title asc" }),
-          SubCategorias.getAll({ orderby: "fields/Title asc", top: 5000 }),
-          Articulos.getAll({ orderby: "fields/Title asc", top: 5000 }),
-        ]);
-
-        if (cancel) return;
-
-        const cats: Categoria[] = (catsRaw ?? []).map((r: any) => ({
-          ID: String(first(r.ID, r.Id, r.id)),
-          Title: String(first(r.Title, "No mapeado")),
-        }));
-
-        const subs: Subcategoria[] = (subsRaw ?? []).map((r: any) => ({
-          ID: String(first(r.ID, r.Id, r.id)),
-          Title: String(first(r.Title, "No mapeado")),
-          Id_categoria: String(first(r.Id_categoria, "")),
-        }));
-
-        const arts: Articulo[] = (artsRaw ?? []).map((r: any) => ({
-          ID: String(first(r.ID, r.Id, r.id)),
-          Title: String(first(r.Title, "")),
-          Id_subCategoria: String(first(r.Id_Subcategoria, r.Id_subcategoria, "")),
-        }));
-
-        setCategorias(cats);
-        setSubcategorias(subs);
-        setArticulosAll(arts);
-      } catch (e: any) {
-        if (!cancel) setErrorCatalogos(e?.message ?? "Error cargando catálogos");
-      } finally {
-        if (!cancel) setLoadingCatalogos(false);
-      }
-    })();
-    return () => {
-      cancel = true;
-    };
-  }, [Categorias, SubCategorias, Articulos]);
 
   /* ============================
      Helpers de formulario
@@ -189,13 +138,6 @@ export function useNuevoTicketForm(services: Svc) {
     setSubmitting(true);
       const apertura = state.usarFechaApertura && state.fechaApertura ? new Date(state.fechaApertura) : new Date();
 
-      const horasPorANS: Record<string, number> = {
-        "ANS 1": 2,
-        "ANS 2": 4,
-        "ANS 3": 8,
-        "ANS 4": 56,
-        "ANS 5": 240,
-      };
       let solucion: TZDate | null = null;
 
       const ANS = await calculoANS(ansProps, ans);
@@ -325,7 +267,7 @@ export function useNuevoTicketForm(services: Svc) {
   } 
 
   return {
-    state, errors, submitting, fechaSolucion, categorias, subcategoriasAll: subcategorias, articulosAll, loadingCatalogos, errorCatalogos,
+    state, errors, submitting, fechaSolucion, categorias, subcategoriasAll, articulosAll, loadingCatalogos, errorCatalogos,
     handleSubmit, setField, balanceCharge
   };
 }
