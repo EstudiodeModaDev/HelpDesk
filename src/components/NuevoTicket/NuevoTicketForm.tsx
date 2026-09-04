@@ -61,11 +61,11 @@ export default function NuevoTicketForm() {
   }, [workersOptions, franqOptions]);
 
   const treeOptions: TreeOption[] = React.useMemo(() => {
-    if (!categorias.length || !subcategoriasAll.length || !articulosAll.length) return [];
+    if (!categorias.length || !subcategoriasAll.length) return [];
     const subById = new Map(subcategoriasAll.map(s => [String(s.ID), s]));
     const catById = new Map(categorias.map(c => [String(c.ID), c]));
 
-    return articulosAll.map(a => {
+    const desdeArticulos = articulosAll.map(a => {
       const sub = subById.get(String(a.Id_subCategoria));
       const cat = sub ? catById.get(String(sub.Id_categoria)) : undefined;
 
@@ -85,7 +85,34 @@ export default function NuevoTicketForm() {
           artTitle,
         },
       } as TreeOption;
-    }).sort((x, y) => x.label.localeCompare(y.label));
+    });
+
+    // No todo el catálogo tiene artículo: las subcategorías sin ninguno se
+    // ofrecen igual como hoja seleccionable, para poder calcular el ANS con
+    // categoría + subcategoría solamente.
+    const subIdsConArticulo = new Set(articulosAll.map(a => String(a.Id_subCategoria)));
+    const desdeSubcategoriasSinArticulo = subcategoriasAll
+      .filter(s => !subIdsConArticulo.has(String(s.ID)))
+      .map(s => {
+        const cat = catById.get(String(s.Id_categoria));
+        const catTitle = cat?.Title ?? "(Sin categoría)";
+        const subTitle = s.Title ?? "(Sin subcategoría)";
+
+        return {
+          value: `sub-${s.ID}`,
+          label: `${catTitle} > ${subTitle} > (sin artículo)`,
+          meta: {
+            catId: s.Id_categoria ?? "",
+            subId: s.ID ?? "",
+            artId: "",
+            catTitle,
+            subTitle,
+            artTitle: "",
+          },
+        } as TreeOption;
+      });
+
+    return [...desdeArticulos, ...desdeSubcategoriasSinArticulo].sort((x, y) => x.label.localeCompare(y.label));
   }, [categorias, subcategoriasAll, articulosAll]);
 
   const treeValue: TreeOption | null = React.useMemo(() => {
@@ -151,7 +178,11 @@ export default function NuevoTicketForm() {
     setField("categoria", catTitle);
     setField("subcategoria", subTitle);
     setField("articulo", artTitle);
-    setCategoriasProps({artId: Number(opt.meta.artId), catId: Number(opt.meta.catId), subId: Number(opt.meta.subId)})
+    setCategoriasProps({
+      artId: opt.meta.artId ? Number(opt.meta.artId) : null,
+      catId: Number(opt.meta.catId),
+      subId: Number(opt.meta.subId),
+    })
   };
 
   const disabledCats = submitting || loadingCatalogos;

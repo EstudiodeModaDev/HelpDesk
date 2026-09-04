@@ -67,8 +67,17 @@ export class SharepointANS implements ANSRepository {
 
 
   async loadANS(filter: propsANS): Promise<ANSLoadResult> {
+    // id_articulo es opcional: no todo el catálogo tiene artículo, así que se
+    // omite del filtro en vez de generar "id_articulo eq undefined".
+    const clauses = [
+      `fields/id_categoria eq ${filter.id_categoria}`,
+      `fields/id_subcategoria eq ${filter.id_sub_categoria}`,
+    ];
+    if (filter.id_articulo != null) {
+      clauses.push(`fields/id_articulo eq ${filter.id_articulo}`);
+    }
     const filterFormated: GetAllOpts = {
-      filter: `fields/id_categoria eq ${filter.id_categoria} and fields/id_subcategoria eq ${filter.id_sub_categoria} and fields/id_articulo eq ${filter.id_articulo}`
+      filter: clauses.join(' and ')
     }
 
     await this.ensureIds()

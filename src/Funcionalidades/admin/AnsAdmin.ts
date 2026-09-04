@@ -2,7 +2,7 @@ import * as React from "react";
 import { useCatalogoServicio, type CatalogoServicioSvc } from "../Tickets/hooks/useCatalogoServicio";
 import type { ANSRepository } from "../../repositories/AnsRepository/AnsRepository";
 import type { ANS } from "../../Models/Tickets";
-import { HORAS_POR_ANS } from "../../utils/ans";
+import { horasPorANS } from "../Tickets/utils/ticketConstants";
 
 export type AnsAdminSvc = CatalogoServicioSvc & {
   Ans: ANSRepository;
@@ -21,7 +21,7 @@ export type AnsFormValues = {
   nivel: string;
 };
 
-export const NIVELES_ANS = Object.keys(HORAS_POR_ANS);
+export const NIVELES_ANS = Object.keys(horasPorANS);
 
 const NO_MAPEADO = (id: number) => `(sin catálogo, ID ${id})`;
 

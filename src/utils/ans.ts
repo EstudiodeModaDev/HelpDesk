@@ -3,7 +3,6 @@ import { addMinutes, isSaturday, isSunday } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import type { Holiday } from "../Models/Holiday";
 import type { ANSRepository } from "../repositories/AnsRepository/AnsRepository";
-export type ANSLevel = 'ANS 1' | 'ANS 2' | 'ANS 3' | 'ANS 4' | 'ANS 5' | '';
 
 const TIMEZONE = "America/Bogota";
 const WORK_START = 7;  // 7:00 am
@@ -125,24 +124,21 @@ export const norm = (s: string) =>
 export async function calculoANS(ansProps: {catId: number | null, subId: number | null, art: number | null}, ansService: ANSRepository): Promise<string> {
   const {catId, subId, art} = ansProps
 
-  if(!catId || !subId || !art){
+  // No todo el catálogo tiene artículo: con categoría + subcategoría ya se
+  // puede intentar el cálculo, el artículo solo afina la búsqueda si existe.
+  if(!catId || !subId){
     return "ANS 3"
   }
 
-  const response = await ansService.loadANS({id_categoria: catId, id_sub_categoria: subId, id_articulo: art})
-  
+  const response = await ansService.loadANS({
+    id_categoria: catId,
+    id_sub_categoria: subId,
+    ...(art ? { id_articulo: art } : {}),
+  })
+
   if(!response.status){
     return "ANS 3"
   }
 
   return response.data.Title
 }
-
-/** (Opcional) Mapa de horas por ANS para reuso. */
-export const HORAS_POR_ANS: Record<Exclude<ANSLevel, ''>, number> = {
-  'ANS 1': 4,
-  'ANS 2': 8,
-  'ANS 3': 16,
-  'ANS 4': 112,
-  'ANS 5': 480,
-};
