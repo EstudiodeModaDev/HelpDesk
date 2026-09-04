@@ -132,8 +132,47 @@ export class SharepointANS implements ANSRepository {
         Title: f.Title, //ANS
         id_articulo: f.id_articulo,
         id_categoria: f.id_categoria,
-        id_subcategoria: f.id_subcategoria, 
+        id_subcategoria: f.id_subcategoria,
     };
+  }
+
+  async getAllANS(): Promise<ANS[]> {
+    await this.ensureIds();
+
+    const qs = new URLSearchParams();
+    qs.set('$expand', 'fields');
+    qs.set('$select', 'id,webUrl');
+    qs.set('$top', '5000');
+
+    const url = `/sites/${encodeURIComponent(this.siteId!)}/lists/${encodeURIComponent(this.listId!)}/items?${qs.toString()}`;
+    const res = await this.graph.get<any>(url);
+    return (res.value ?? []).map((x: any) => this.toModel(x));
+  }
+
+  async createANS(record: Omit<ANS, 'Id'>): Promise<ANS> {
+    await this.ensureIds();
+    const res = await this.graph.post<any>(
+      `/sites/${this.siteId}/lists/${this.listId}/items`,
+      { fields: record }
+    );
+    return this.toModel(res);
+  }
+
+  async updateANS(id: string, changed: Partial<Omit<ANS, 'Id'>>): Promise<ANS> {
+    await this.ensureIds();
+    await this.graph.patch<any>(
+      `/sites/${this.siteId}/lists/${this.listId}/items/${id}/fields`,
+      changed
+    );
+    const res = await this.graph.get<any>(
+      `/sites/${this.siteId}/lists/${this.listId}/items/${id}?$expand=fields`
+    );
+    return this.toModel(res);
+  }
+
+  async deleteANS(id: string): Promise<void> {
+    await this.ensureIds();
+    await this.graph.delete(`/sites/${this.siteId}/lists/${this.listId}/items/${id}`);
   }
 
 }

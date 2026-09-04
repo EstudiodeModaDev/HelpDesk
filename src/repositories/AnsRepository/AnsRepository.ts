@@ -14,4 +14,8 @@ export type ANSLoadResult = {
 
 export interface ANSRepository {
   loadANS(filter: propsANS): Promise<ANSLoadResult>;
+  getAllANS(): Promise<ANS[]>;
+  createANS(record: Omit<ANS, "Id">): Promise<ANS>;
+  updateANS(id: string, changed: Partial<Omit<ANS, "Id">>): Promise<ANS>;
+  deleteANS(id: string): Promise<void>;
 }

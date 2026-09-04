@@ -8,6 +8,7 @@ import Formatos from "./components/Formatos/Formatos";
 import InfoPage from "./components/Info/Informacion";
 import CrearPlantilla from "./components/NuevaPlantilla/NuevaPlantilla";
 import UsuariosPanel from "./components/Usuarios/Usuarios";
+import AnsAdmin from "./components/Admin/AnsAdmin/AnsAdmin";
 import CajerosPOSForm from "./components/CajerosPOS/CajerosPOS";
 import type { User } from "./Models/User";
 import { useAuth } from "./auth/authContext";
@@ -85,6 +86,7 @@ const NAV: MenuItem[] = [
   { id: "admin", label: "Administración", icon: <img src={settingsIcon} className="sb-icon" />, roles: ["Administrador", "Tecnico", "Listo"], children: [
       { id: "plantillas", label: "Plantillas", icon: <img src={templateIcon} className="sb-icon" />, to: <CrearPlantilla />, roles: ["Administrador", "Tecnico", "Listo"] },
       { id: "usuarios", label: "Usuarios", icon: <img src={usersIcon} className="sb-icon" />, to: <UsuariosPanel />, roles: ["Administrador"] },
+      { id: "ans", label: "ANS", icon: <img src={settingsIcon} className="sb-icon" />, to: <AnsAdmin />, roles: ["Administrador"] },
       { id: "tips", label: "Tips", icon: <img src={infoIcon} className="sb-icon" />, to: <AnnouncementsTable />, roles: ["Administrador", "Tecnico", "Listo"] },
       { id: "reports", label: "Reportes", icon: <img src={filesIcon} className="sb-icon" />, to: <ReportsPage />, roles: ["Administrador", "Tecnico", "Listo"] },
     ],

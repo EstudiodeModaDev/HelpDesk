@@ -1,0 +1,112 @@
+/* Reutiliza la paleta global de la app (index.css: --primary, --surface,
+   --ink, --border, --field-bg, --ring, --shadow, --radius, --brand-*) para
+   que este módulo conserve su propio layout pero respete los colores/tema
+   (claro/oscuro) del resto de la aplicación. */
+
+.ansa-page{
+  padding: 18px;
+  --ansa-danger: #dc2626; /* mismo rojo de "danger" ya usado en Usuarios.css/TareasRegistradas.css */
+}
+
+/* ---------- Hero ---------- */
+.ansa-hero{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+  background: linear-gradient(135deg, var(--brand-600), var(--primary));
+  color: var(--primary-ink); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+.ansa-hero-title{ margin:0 0 6px; font-size: 22px; font-weight: 800; letter-spacing: .2px; color: inherit; }
+.ansa-hero-subtitle{ margin:0; max-width: 560px; color: color-mix(in oklab, var(--primary-ink) 78%, transparent); font-size: 13.5px; }
+
+/* ---------- Botones propios ---------- */
+.ansa-btn{
+  appearance:none; border-radius: 999px; border: 1px solid transparent; cursor:pointer;
+  padding: 10px 18px; font-weight: 700; font-size: 14px; display:inline-flex; align-items:center; gap:6px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.ansa-btn:active{ transform: translateY(1px); }
+.ansa-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+.ansa-btn--primary{ background: var(--surface); color: var(--brand-600); box-shadow: 0 8px 18px rgba(0,0,0,.18); }
+.ansa-btn--primary:hover:not(:disabled){ box-shadow: 0 10px 22px rgba(0,0,0,.24); }
+.ansa-btn--ghost{ background: transparent; border-color: var(--bd); color: var(--ink); }
+.ansa-btn--ghost:hover{ background: color-mix(in oklab, var(--primary) 12%, transparent); }
+.ansa-btn--danger{ background: var(--ansa-danger); color: #fff; }
+.ansa-btn--xs{ padding: 5px 10px; font-size: 12px; }
+
+/* ---------- Filtros ---------- */
+.ansa-filterbar{
+  display:flex; gap:10px; align-items:center; flex-wrap: wrap;
+  background: var(--surface); border:1px solid var(--bd); border-radius: 999px;
+  padding: 8px 10px; margin: 0 0 16px; box-shadow: var(--shadow);
+}
+.ansa-input{ flex: 1 1 280px; min-width: 200px; padding: 9px 14px; border-radius: 999px; border:1px solid var(--bd); background: var(--field-bg); color: var(--ink); }
+.ansa-input::placeholder{ color: var(--muted); }
+.ansa-input:focus-visible{ outline:none; box-shadow: 0 0 0 4px var(--ring); }
+.ansa-select{ padding: 9px 12px; border-radius: 999px; border:1px solid var(--bd); background: var(--field-bg); color: var(--ink); }
+.ansa-select--block{ width: 100%; }
+
+/* ---------- Tarjeta / tabla ---------- */
+.ansa-card{ background: var(--surface); border:1px solid var(--bd); border-radius: var(--radius); box-shadow: var(--shadow); overflow:auto; }
+
+.ansa-table{ width: 100%; border-collapse: collapse; }
+.ansa-table thead th{
+  text-align: left; position: sticky; top: 0; z-index: 1; background: var(--surface-elev);
+  border-bottom: 2px solid var(--bd); padding: 12px 14px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; font-size: 11.5px; color: var(--muted);
+}
+.ansa-table tbody td{ border-bottom: 1px solid var(--bd); padding: 10px 14px; color: var(--ink); }
+.ansa-table tbody tr:hover{ background: color-mix(in oklab, var(--primary) 6%, transparent); }
+
+.ansa-empty{ text-align:center; color: var(--muted); padding: 28px; }
+
+/* Insignia de nivel ANS, coloreada por severidad (rojo = ANS 1 urgente → teal de marca = ANS 5, el nivel "seguro") */
+.ansa-badge{
+  display:inline-flex; align-items:center; gap:6px; padding: 5px 12px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 700; color: var(--ansa-badge-ink, #fff);
+  background: var(--ansa-badge-color, var(--muted));
+}
+
+.ansa-row-actions{ display:flex; gap:6px; align-items:center; white-space: nowrap; }
+.ansa-icon-btn{
+  appearance:none; border:1px solid var(--bd); background: var(--surface); color: var(--ink);
+  width: 30px; height: 30px; border-radius: 10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+}
+.ansa-icon-btn:hover{ border-color: var(--primary); color: var(--brand-600); }
+.ansa-icon-btn--danger:hover{ border-color: var(--ansa-danger); color: var(--ansa-danger); }
+
+.ansa-confirm{ display:flex; align-items:center; gap:8px; font-size: 12.5px; color: var(--muted); }
+
+/* ---------- Modal (crear/editar) ---------- */
+.ansa-modal-overlay{
+  position: fixed; inset: 0; background: rgba(0,0,0, .5); backdrop-filter: blur(2px);
+  display:flex; align-items:center; justify-content:center; z-index: 1000; padding: 16px;
+}
+.ansa-modal{
+  width: 100%; max-width: 440px; background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow:hidden; border: 1px solid var(--bd);
+}
+.ansa-modal-head{
+  display:flex; align-items:center; justify-content:space-between; padding: 16px 20px;
+  background: linear-gradient(135deg, var(--brand-600), var(--primary)); color: var(--primary-ink);
+}
+.ansa-modal-head h2{ margin:0; font-size: 17px; font-weight: 800; color: inherit; }
+.ansa-modal-close{ appearance:none; background: rgba(255,255,255,.18); border:none; color: inherit; width:28px; height:28px; border-radius:50%; cursor:pointer; }
+.ansa-modal-close:hover{ background: rgba(255,255,255,.3); }
+
+.ansa-modal-body{ padding: 18px 20px; display:flex; flex-direction:column; gap:14px; }
+.ansa-form-field{ display:flex; flex-direction:column; gap:6px; }
+.ansa-form-label{ font-size: 12.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+
+.ansa-nivel-picker{ display:flex; gap:8px; flex-wrap: wrap; }
+.ansa-nivel-chip{
+  appearance:none; cursor:pointer; border-radius: 999px; padding: 7px 14px; font-weight: 700; font-size: 12.5px;
+  border: 2px solid var(--ansa-badge-color, var(--muted)); color: var(--ansa-badge-color, var(--muted)); background: transparent;
+}
+.ansa-nivel-chip.is-selected{ background: var(--ansa-badge-color, var(--muted)); color: var(--ansa-badge-ink, #fff); }
+
+.ansa-modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top: 4px; }
+
+@media (max-width: 640px){
+  .ansa-hero{ flex-direction: column; }
+  .ansa-input{ flex-basis: 100%; }
+}
