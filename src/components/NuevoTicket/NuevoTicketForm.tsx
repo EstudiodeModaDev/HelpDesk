@@ -1,5 +1,4 @@
 import * as React from "react";
-import toast from "react-hot-toast";
 import Select, { components, type OptionProps, type SingleValue } from "react-select";
 import "./NuevoTicketForm.css";
 import "../../App.css"
@@ -35,7 +34,7 @@ export default function NuevoTicketForm() {
 
   const {account} = useAuth()
   const userRole = useUserRole(account?.username)
-  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit, balanceCharge} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: tickets!, Usuarios: UsuariosSPServiceSvc, Logs: logs!});
+  const {state, errors, submitting, categorias, subcategoriasAll, articulosAll, loadingCatalogos, setField, handleSubmit,} = useNuevoTicketForm({ Categorias, SubCategorias, Articulos, Tickets: tickets!, Usuarios: UsuariosSPServiceSvc, Logs: logs!});
   const { franqOptions, loading: loadingFranq, error: franqError } = useFranquicias(FranquiciasSvc!);
   const { workersOptions, loadingWorkers, error: usersError } = useWorkers({
     onlyEnabled: true,
@@ -213,19 +212,9 @@ export default function NuevoTicketForm() {
                 placeholder={loading ? "Cargando usuarios…" : "Buscar resolutor…"}
                 value={state.resolutor}
                 onChange={async (opt) => {
-                  console.table(opt)
-                  if(opt?.jobTitle === "Tecnico"){
-                    const respuesta = (await balanceCharge({targetId: opt?.id ?? "", fuente: state.fuente}))
-                      if(respuesta?.ok || account?.username === "mamartinez@estudiodemoda.com.co"){
-                        setField("resolutor", opt ?? null)
-                      } else {
-                        toast.error("Este resolutor tiene demasiados casos hoy. Escoge otro para balancear la carga.")
-                      }
-                    } else {
-                      setField("resolutor", opt ?? null)
-                    }
+                    setField("resolutor", opt ?? null)
                   }
-                } 
+                }
                 classNamePrefix="rs"
                 isDisabled={submitting || loading}
                 isLoading={loading}
