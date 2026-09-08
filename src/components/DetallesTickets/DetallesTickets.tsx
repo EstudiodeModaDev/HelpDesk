@@ -15,6 +15,7 @@ import CaseInfoGrid from "./CaseInfoGrid";
 import CaseAttachments from "./CaseAttachments";
 import ModalShell from "./ModalShell";
 import CambiarFuente from "./Modals/ChangeFuente";
+import PausarTicket from "./Modals/PausarTicket";
 
 type Props = {
   ticket: Ticket;
@@ -23,7 +24,7 @@ type Props = {
   role: string;
 };
 
-type ActiveModal = "recategorizar" | "reasignar" | "observador" | "fuente" |null;
+type ActiveModal = "recategorizar" | "reasignar" | "observador" | "fuente" | "pausar" | null;
 
 export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
   const { loadAttachments, rows } = useTicketsAttachments();
@@ -87,6 +88,11 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
     onDocumentar();
   }, [onDocumentar]);
 
+  const handlePausado = React.useCallback(() => {
+    setActiveModal(null);
+    onDocumentar();
+  }, [onDocumentar]);
+
   const closeSeguimiento = React.useCallback(() => {
     setShowSeg(false);
     setShowBotton(true);
@@ -145,9 +151,14 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
           <button type="button" className="btn btn-terciary" onClick={openMessages} style={{ marginRight: 8 }}>
             Comentarios
           </button>
-          <button type="button" className="btn btn-secondary-final" onClick={toggleSeguimiento}>
+          <button type="button" className="btn btn-secondary-final" onClick={toggleSeguimiento} style={{ marginRight: 8 }}>
             {showSeg ? "Ocultar seguimiento" : "Seguimiento ticket"}
           </button>
+          {canRecategorizar && (
+            <button type="button" className="btn btn-secondary-final" onClick={() => setActiveModal("pausar")}>
+              {selected.Estadodesolicitud === "Pausado" ? "Reanudar" : "Pausar"} ticket
+            </button>
+          )}
         </div>
       )}
 
@@ -194,6 +205,12 @@ export function CaseDetail({ ticket, onVolver, role, onDocumentar }: Props) {
           onClose={closeModal}
         >
           <CambiarFuente ticket={selected} onDone={handleFuenteChanged}/>
+        </ModalShell>
+      )}
+
+      {activeModal === "pausar" && (
+        <ModalShell ariaLabel="Pausar ticket" onClose={closeModal}>
+          <PausarTicket ticket={selected} onCancel={closeModal} onDone={handlePausado} />
         </ModalShell>
       )}
 

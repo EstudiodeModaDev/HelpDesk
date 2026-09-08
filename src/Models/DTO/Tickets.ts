@@ -25,4 +25,5 @@ export type SupabaseTickets = {
     ticket_solvi_minutosdominicales?: number | null,
     ticket_solvi_minutosfestivos?: number | null,
     ticket_solvi_minutostotales?: number | null,
+    ticket_solvi_fecha_pausa?: string | null,
 }

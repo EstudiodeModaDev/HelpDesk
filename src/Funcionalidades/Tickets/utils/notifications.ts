@@ -89,6 +89,24 @@ function buildTicketUrl(ticketId: string | number | undefined): string {
   return `${baseUrl}/${encodeURIComponent(safeTicketId)}`;
 }
 
+function formatDuration(ms: number): string {
+  const totalMinutes = Math.max(0, Math.round(ms / 60000));
+
+  if (totalMinutes < 60) {
+    return `${totalMinutes} ${totalMinutes === 1 ? "minuto" : "minutos"}`;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const hoursLabel = `${hours} ${hours === 1 ? "hora" : "horas"}`;
+
+  if (minutes === 0) {
+    return hoursLabel;
+  }
+
+  return `${hoursLabel} y ${minutes} ${minutes === 1 ? "minuto" : "minutos"}`;
+}
+
 function buildOpenTicketButton(ticketId: string | number | undefined): string {
   const ticketUrl = buildTicketUrl(ticketId);
   return `
@@ -343,6 +361,101 @@ export async function notifySolicitanteCategoryChange(
     payload: {
       message: {
         subject: title,
+        body: {
+          contentType: "HTML",
+          content: body,
+        },
+        toRecipients: to,
+      },
+    },
+    senderMail: "listo@estudiodemoda.com.co",
+  });
+}
+
+export async function notifyTicketPausedSolicitante(ticket: Ticket, motivo: string): Promise<void> {
+  const address = (ticket.CorreoSolicitante ?? "").trim();
+
+  if (!address) {
+    throw new Error("notifyTicketPausedSolicitante: correo del solicitante inválido");
+  }
+
+  const subject = `Tu ticket ${ticket.ID} ha sido pausado`;
+  const body = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#111827;line-height:1.5;">
+      <p>Hola ${escapeHtml(ticket.Solicitante ?? "")},</p>
+      <p>Te informamos que tu caso ha sido <strong>puesto en pausa</strong> mientras se gestiona. El tiempo que dure la pausa no se contará dentro del tiempo de solución del caso.</p>
+      <div style="border:1px solid #fde68a;border-radius:12px;padding:16px;background:#fffbeb;">
+        <p style="margin:0 0 8px 0;"><strong>ID del Caso:</strong> ${escapeHtml(String(ticket.ID ?? "-"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Asunto:</strong> ${escapeHtml(String(ticket.AsuntoTicket ?? "Sin asunto"))}</p>
+        <p style="margin:0;"><strong>Motivo de la pausa:</strong><br>${motivo || "Sin detalle"}</p>
+      </div>
+      ${buildOpenTicketButton(ticket.ID)}
+      <p style="margin-top:16px;">Te avisaremos apenas el caso se reanude. Este es un mensaje automático, por favor no respondas.</p>
+    </div>
+  `.trim();
+
+  const to: GraphRecipient[] = [
+    {
+      emailAddress: { address },
+    },
+  ];
+
+  await sendMail({
+    payload: {
+      message: {
+        subject,
+        body: {
+          contentType: "HTML",
+          content: body,
+        },
+        toRecipients: to,
+      },
+    },
+    senderMail: "listo@estudiodemoda.com.co",
+  });
+}
+
+export async function notifyTicketResumedSolicitante(
+  ticket: Ticket,
+  tiempoPausadoMs: number,
+  nuevaFechaMaxima?: string | null,
+): Promise<void> {
+  const address = (ticket.CorreoSolicitante ?? "").trim();
+
+  if (!address) {
+    throw new Error("notifyTicketResumedSolicitante: correo del solicitante inválido");
+  }
+
+  const tiempoTexto = formatDuration(tiempoPausadoMs);
+  const fechaMaximaTexto = toISODateTimeFlex(nuevaFechaMaxima ?? ticket.FechaMaxima) || "—";
+
+  const subject = `Tu ticket ${ticket.ID} se ha reanudado`;
+  const body = `
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#111827;line-height:1.5;">
+      <p>Hola ${escapeHtml(ticket.Solicitante ?? "")},</p>
+      <p>Te informamos que tu caso se ha <strong>reanudado</strong> y ya está siendo atendido nuevamente.</p>
+      <div style="border:1px solid #bbf7d0;border-radius:12px;padding:16px;background:#f0fdf4;">
+        <p style="margin:0 0 8px 0;"><strong>ID del Caso:</strong> ${escapeHtml(String(ticket.ID ?? "-"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Asunto:</strong> ${escapeHtml(String(ticket.AsuntoTicket ?? "Sin asunto"))}</p>
+        <p style="margin:0 0 8px 0;"><strong>Tiempo que estuvo en pausa:</strong> ${tiempoTexto}</p>
+        <p style="margin:0;"><strong>Nueva fecha máxima de solución:</strong> ${fechaMaximaTexto}</p>
+      </div>
+      <p style="margin-top:12px;">Como el caso estuvo en pausa, se sumaron <strong>${tiempoTexto}</strong> al tiempo máximo de solución, para compensar el tiempo que estuvo detenido.</p>
+      ${buildOpenTicketButton(ticket.ID)}
+      <p style="margin-top:16px;">Este es un mensaje automático, por favor no respondas.</p>
+    </div>
+  `.trim();
+
+  const to: GraphRecipient[] = [
+    {
+      emailAddress: { address },
+    },
+  ];
+
+  await sendMail({
+    payload: {
+      message: {
+        subject,
         body: {
           contentType: "HTML",
           content: body,

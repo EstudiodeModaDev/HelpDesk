@@ -329,6 +329,7 @@ export class SupabaseTicketRepository implements TicketsRepository {
       Solicitante: bdModel.ticket_solvi_solicitante,
       SubCategoria: bdModel.ticket_solvi_subcategoria,
       FechaMaxima: bdModel.ticket_solvi_fechamaxima,
+      FechaPausa: bdModel.ticket_solvi_fecha_pausa,
       FechaCierreReal: bdModel.FechaCierreReal,
       MinutosNocturnos: bdModel.MinutosNocturnos,
       MinutosDominicales: bdModel.MinutosDominicales,

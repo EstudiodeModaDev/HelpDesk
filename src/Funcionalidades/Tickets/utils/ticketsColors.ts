@@ -8,6 +8,10 @@ export function calcularColorEstado(ticket: Ticket): string {
     return "rgb(32, 32, 32)";
   }
 
+  if (estado === "pausado") {
+    return "rgb(59, 130, 246)";
+  }
+
   if (!ticket.FechaApertura || !ticket.FechaMaxima) {
     return "rgba(255,0,0,1)";
   }

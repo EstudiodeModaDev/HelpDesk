@@ -24,6 +24,7 @@ export type Ticket = {
   MinutosDominicales?: number;
   MinutosFestivos?: number
   MinutosTotales?: number
+  FechaPausa?: string | null;
 
 };
 

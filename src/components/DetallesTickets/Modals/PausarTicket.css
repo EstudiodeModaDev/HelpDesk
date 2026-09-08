@@ -1,0 +1,95 @@
+/* =========================================================
+   PAUSAR TICKET — usa los tokens globales de la app
+   ========================================================= */
+.pt-card{
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pt-head{
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.pt-icon{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--primary) 16%, var(--surface));
+  color: var(--primary);
+  font-size: 18px;
+}
+
+.pt-title{
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .1px;
+  color: var(--ink);
+}
+
+.pt-subtitle{
+  margin: 6px 0 0;
+  max-width: 46ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pt-form{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pt-field{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pt-label{
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pt-editor .rte-editor{ min-height: 130px; }
+
+.pt-error{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.pt-error:empty{ display: none; }
+
+.pt-error::before{
+  content: "⚠";
+  font-size: 12px;
+}
+
+.pt-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bd);
+}
+
+@media (max-width: 480px){
+  .pt-head{ flex-direction: column; }
+  .pt-actions{ flex-direction: column-reverse; }
+  .pt-actions .btn{ max-width: none; width: 100%; }
+}

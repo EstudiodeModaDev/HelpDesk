@@ -54,7 +54,7 @@ function buildTicketsFilter(params: {
   let filter: filterTickets = {};
 
   if (params.filterMode === "En curso") {
-    filter.ticketStatus = ["En Atención", "Fuera de tiempo"];
+    filter.ticketStatus = ["En Atención", "Fuera de tiempo", "Pausado"];
   } else if (params.filterMode === "Cerrados") {
     filter.ticketStatus = ["Cerrado"];
   }
